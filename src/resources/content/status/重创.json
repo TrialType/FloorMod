@@ -1,0 +1,40 @@
+{
+    "name":"重创",
+    "damageMultiplier":1.2,
+    "speedMultiplier":0.75,
+    "healthMultiplier":0.4,
+    "reloadMultiplier":0.5,
+    "color":"914B00FF",
+    "effectChance": 1,
+    "effect": {
+		"type": "MultiEffect",
+		"effects": [
+			{
+				"type": "ParticleEffect",
+				"particles": 6,
+				"baseLength": 0,
+				"length": 25,
+				"lifetime": 10,
+				"sizeFrom": 2,
+				"sizeTo": 0,
+				"colorFrom": "914B00FF",
+				"colorTo": "914B00FF"
+			},
+			{
+				"type": "ParticleEffect",
+				"particles": 2,
+				"line": true,
+				"interp": "slowFast",
+				"strokeFrom": 2,
+				"strokeTo": 0,
+				"lenFrom": 10,
+				"lenTo": 0,
+				"length": 23,
+				"baseLength": 0,
+				"lifetime": 10,
+				"colorFrom": "914B00FF",
+				"colorTo": "914B00FF"
+			}
+		]
+	}
+}

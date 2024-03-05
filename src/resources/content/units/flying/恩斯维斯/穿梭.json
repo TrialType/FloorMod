@@ -1,0 +1,99 @@
+{
+    "name":"穿梭",
+    "type":"flying",
+    "flying":true,
+    "health":57750,
+    "armor":20,
+    "speed":7,
+    "description":"恩斯维斯空军t6。",
+    "hitSize":49,
+    "darg":0.1,
+    "displayAmmoMultiplier":true,
+   	"faceTarget":true,
+    "rotateSpeed":3,
+    "maxRange":400,
+    "strafePenalty":0,
+    "engines":[
+        {
+            "y":-25,
+            "x":0,
+            "radius":5,
+            "rotation":-90
+        },
+        {
+            "y":-24,
+            "x":13.7,
+            "radius":4,
+            "rotation":-90
+        },
+        {
+            "y":-24,
+            "x":-13.7,
+            "radius":4,
+            "rotation":-90
+        }
+    ],
+    "weapons":[
+        {
+            "reload":480,
+            "mirror":false,
+            "rotate": false,
+			"alternate": true,
+			"bullet": {
+				"type": "BaseBulletType",
+				"keepVelocity":true,
+				"spawnUnit": "穿梭1"
+			}
+        },
+        {
+            "reload":37,
+            "mirror":true,
+            "name":"电磁炮1",
+            "x":13.2,
+            "y":1.4,
+            "rotate":false,
+            "bullet":{
+                "scaleLife":false,
+                "shrinkY":3,
+                "lightOpacity":0.5,
+                "lightColor":"F30000FF",
+                "shootEffect":"none",
+                "hitEffect":"none",
+                "despawnEffect":"none",
+                "type":"BaseBulletType",
+                "sprite":"none",
+                "drawSize":2,
+                "hitSize":2,
+                "lifetime":20,
+                "speed":7,
+                "damage":25,
+                "width":2,
+                "height":2,
+                "lightning":12,
+                "lightningColor":"F30000FF",
+                "lightningDamage":100,
+                "lightningLength":12,
+                "lightningCone":360,
+                "fragBullets":3,
+                "fragBullet":{
+                    "type":"BaseBulletTypr",
+                    "width":0,
+                    "height":0,
+                    "speed":0,
+                    "lifetime":60,
+                    "lightning":6,
+                    "lightningColor":"F30000FF",
+                    "lightningDamage":25,
+                    "lightningLength":15
+                }
+            }
+        }
+    ],
+    "requirements": {
+		"block": "air-factory",
+		"time": 10,
+		"requirements":[
+			"copper/0"
+		]
+	}
+}

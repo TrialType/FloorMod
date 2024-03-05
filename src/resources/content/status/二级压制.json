@@ -1,0 +1,38 @@
+{
+    "name":"二级压制",
+    "speedMultiplier":0.8,
+    "reloadMultiplier":0.55,
+    "color":"AAAA99FF",
+    "effectChance": 1,
+    "effect": {
+		"type": "MultiEffect",
+		"effects": [
+			{
+				"type": "ParticleEffect",
+				"particles": 6,
+				"baseLength": 0,
+				"length": 25,
+				"lifetime": 10,
+				"sizeFrom": 2,
+				"sizeTo": 0,
+				"colorFrom": "AAAA99FF",
+				"colorTo": "AAAA99FF"
+			},
+			{
+				"type": "ParticleEffect",
+				"particles": 2,
+				"line": true,
+				"interp": "slowFast",
+				"strokeFrom": 2,
+				"strokeTo": 0,
+				"lenFrom": 10,
+				"lenTo": 0,
+				"length": 23,
+				"baseLength": 0,
+				"lifetime": 10,
+				"colorFrom": "AAAA00FF",
+				"colorTo": "AAAA99FF"
+			}
+		]
+	}
+}

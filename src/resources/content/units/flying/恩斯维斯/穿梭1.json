@@ -1,0 +1,79 @@
+{
+    "type":"flying",
+    "name":"穿梭1",
+    "flying":true,
+    "health":1000,
+    "armor":47,
+    "speed":9,
+    "drag":0,
+    "accel":0,
+    "logicControllable": false,
+	"playerControllable": false,
+	"useUnitCap": false,
+	"isEnemy": false,
+	"physics": false,
+	"faceTarget":false,
+	"allowedInPayloads": false,
+	"rotateSpeed":0,
+	"hidden": true,
+	"engines":[
+	    {
+	        "x":0,
+	        "y":-2.8,
+	        "radius":0.3,
+	        "rotation":-90
+	    },
+	    {
+	        "x":3,
+	        "y":-2.8,
+	        "radius":1,
+	        "rotation":-90
+	    },
+	    {
+	        "x":-3,
+	        "y":-2.8,
+	        "radius":1,
+	        "rotation":-90
+	    }
+	],
+    "weapons":[
+        {
+            "x":2,
+            "reload":0.125,
+            "controllable":false,
+            "autoTarget":true,
+            "alwaysShooting":true,
+            "aiControllable":false,
+            "shoot":{
+				"shots":1,
+				"shotDelay":0
+			},
+            "bullet":{
+                "type": "BasicBulletType",
+                "absorbable":true,
+                "speed":1,
+                "width":4,
+                "height":4,
+                "damage":13,
+                "lifetime":1500,  
+                "weaveScale":1540,
+                "weaveMag":0.8,
+                "pierce":true,
+                "pierceBuilding":true,
+                "lightning":3,
+                "lightningDamage":13,
+                "lightningLenght":3
+            }
+        },
+        {
+            "alwaysShooting":true,
+            "shoot":{
+                "firstShotDelay":300
+            },
+            "bullet":{
+                "type":"ExplosionBulletType",
+                "damage":0
+            }
+        }
+    ]
+}

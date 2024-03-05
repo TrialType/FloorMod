@@ -1,0 +1,53 @@
+{
+    "name":"测试",
+    "type":"PowerTurret",
+    "category":"turret",
+    "range":600,
+    "health":260,
+    "size":1,
+    "targetAir":true,
+	"targetGround":true,
+    "reload":1,
+    "placeOverlapMargin":1,
+    "fogRadiusMultiuplier":104,
+    "inEditor":true,
+    "xRand":1,
+    "shoot":{
+        "type":"ShootPattern"
+    },
+    "shootEffect":"none",
+    "shootCone":40,
+    "recoil":4,
+    "shake":0.1,
+    "firingMoveFract":0.5,
+    "shootDuration":230,
+    "shootSound":"laserbig",
+    "loopSound":"beam",
+    "loopSoundVolume":2,
+    "shootType":{
+        "type":"BasicBulletType",
+        "length":200,
+        "hitEffect":"hitMeltdown",
+        "hitColor":"meltdownHit",
+        "drawSize":20,
+        "timescaleDamage":true,
+
+        "incendChance":0.4,
+        "incendSpread":5,
+        "incendAmount":1,
+        "ammoMultiplier":1,
+        "width":0.5
+    },
+
+    "scaledHealth":200,
+    "consumes":{
+		"power":0.1,
+		"coolant":{
+			"amount":0.2,
+			"optional":true
+		}
+	},
+	"requirements": [
+		"silicon/0"
+	]
+}

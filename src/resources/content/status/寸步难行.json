@@ -1,0 +1,7 @@
+{
+    "name":"寸步难行",
+    "speedMultiplier":0.33,
+    "color":"00000000",
+    "effectChance": 1,
+    "effect":"none"
+}
