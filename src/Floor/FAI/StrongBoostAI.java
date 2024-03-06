@@ -80,13 +80,11 @@ public class StrongBoostAI extends FlyingAI {
             first = false;
             wu.first = false;
             if (unit.type.circleTarget) {
-                unit.rotation = unit.rotation + 14;
                 updateTarget();
                 if (target != null) {
-
-                    Fx.healWave.at(target);
-
                     circleAttack(30);
+                } else{
+                    unit.rotation = unit.rotation + 14;
                 }
             } else if (target != null) {
                 moveTo(target, unit.type.range * 0.8f);
@@ -242,7 +240,7 @@ public class StrongBoostAI extends FlyingAI {
 
         vec.setLength(unit.speed());
 
-        unit.moveAt(vec);
+        unit.movePref(vec);
     }
 
     public void updateTarget() {

@@ -526,7 +526,7 @@ public class FUnits {
             armor = 9f;
             immunities = ObjectSet.with(StatusEffects.burning);
 
-            abilities.add(new StrongMinerAbility(transfer, 100, 1, 1));
+            abilities.add(new StrongMinerAbility(transfer, 2400, 1, 1));
 
             weapons.add(new Weapon() {{
                 reload = 60;
