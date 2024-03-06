@@ -231,6 +231,11 @@ public class StrongBoostAI extends FlyingAI {
         float ty = target.y();
         float sx = tx - ux;
         float sy = ty - uy;
+        if (lastTarget != null && lastTarget != target) {
+            pass = false;
+        } else {
+            lastTarget = target;
+        }
         if (!pass) {
             if (orx * sx <= 0 && ory * sy <= 0) {
                 pass = true;
@@ -243,6 +248,9 @@ public class StrongBoostAI extends FlyingAI {
         } else {
             if (sx * sx + sy * sy >= circleLength * circleLength) {
                 float angle = Angles.angle(tx, ty, ux, uy) + 5;
+                if (angle < 0) {
+                    angle = angle + 360;
+                }
                 float sl = (float) sqrt(sx * sx + sy * sy);
                 float xx = (float) (sl * cos(toRadians(angle)));
                 float yy = (float) (sl * sin(toRadians(angle)));
