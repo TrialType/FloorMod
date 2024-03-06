@@ -5,29 +5,27 @@ import arc.math.Mathf;
 import arc.struct.IntSeq;
 import arc.struct.ObjectIntMap;
 import arc.struct.Seq;
-import mindustry.content.Blocks;
 import mindustry.gen.Nulls;
 import mindustry.type.Item;
 import mindustry.world.Tile;
+import mindustry.world.blocks.environment.AirBlock;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import static mindustry.Vars.indexer;
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class FLine {
     public static final Map<Tile, TileMiner> tm = new HashMap<>();
     public static IntSeq[][][] ores;
-    public static ObjectIntMap<Item> allOres = new ObjectIntMap<>();
+    public static ObjectIntMap<Item> allOres;
     public static final int quadrantSize = 20;
     public static int quadWidth, quadHeight;
     private static int index = -1;
 
-    public FLine() {
+    private FLine() {
     }
-
 
     public static boolean couldMine(TileMiner unit, Tile tile) {
         update();
@@ -47,10 +45,8 @@ public class FLine {
     }
 
     public static Tile findOre(TileMiner sm, Item item) {
-        if(ores == null || allOres == null){
-            get();
-        }
-        if (ores[item.id] != null && ores[item.id].length != 0) {
+        get();
+        if (ores[item.id] != null) {
             float minDst = 0f;
             Tile closest = null;
             for (int qx = 0; qx < quadWidth; qx++) {
@@ -59,7 +55,7 @@ public class FLine {
                     if (arr != null && arr.size > 0) {
                         for (int i = 0; i < arr.size; i++) {
                             Tile tile = world.tile(arr.get(i));
-                            if (tile.block() == Blocks.air && couldMine(sm, tile)) {
+                            if (tile.block() instanceof AirBlock && couldMine(sm, tile)) {
                                 float dst = Mathf.dst2(sm.x, sm.y, tile.worldx(), tile.worldy());
                                 if (closest == null || dst < minDst) {
                                     closest = tile;
@@ -87,12 +83,11 @@ public class FLine {
             }
             return closest;
         }
-
         return null;
     }
 
     public static void removeOre(Tile tile) {
-        if(ores == null || allOres == null){
+        if (ores == null || allOres == null) {
             get();
         }
         Item item = tile.drop();
@@ -105,22 +100,32 @@ public class FLine {
     }
 
     public static boolean hasOre(Item item) {
-        if(ores == null || allOres == null){
+        if (ores == null || allOres == null) {
             get();
         }
         return allOres.get(item) > 0;
     }
 
+    @SuppressWarnings("unchecked")
     public static void get() {
+        Field field1;
+        Field field2;
+        Field field3;
+        Field field4;
         try {
-            Field field1 = indexer.getClass().getDeclaredField("ores");
-            Field field2 = indexer.getClass().getDeclaredField("allOres");
+            field1 = indexer.getClass().getDeclaredField("ores");
+            field2 = indexer.getClass().getDeclaredField("allOres");
+            field3 = indexer.getClass().getDeclaredField("quadWidth");
+            field4 = indexer.getClass().getDeclaredField("quadHeight");
             field1.setAccessible(true);
             field2.setAccessible(true);
-            Object obj = field2.get(indexer);
+            field3.setAccessible(true);
+            field4.setAccessible(true);
             ores = (IntSeq[][][]) field1.get(indexer);
-            allOres = (ObjectIntMap<Item>) obj;
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            allOres = (ObjectIntMap<Item>) field2.get(indexer);
+            quadWidth = (int) field3.get(indexer);
+            quadHeight = (int) field4.get(indexer);
+        } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
             throw new RuntimeException(e);
         }
     }

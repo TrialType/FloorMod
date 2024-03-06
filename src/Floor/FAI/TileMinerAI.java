@@ -6,6 +6,7 @@ import Floor.FTools.NeedPoseBridge;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import mindustry.content.Blocks;
+import mindustry.content.Fx;
 import mindustry.entities.Units;
 import mindustry.entities.units.AIController;
 import mindustry.gen.*;
@@ -33,9 +34,7 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
     @Override
     public void updateMovement() {
         if (sm != null && spawner != null) {
-
             if (!unit.canMine()) return;
-
             if (unit.mineTile != null && !unit.mineTile.within(unit, unit.hitSize * 4)) {
                 unit.elevation = 1;
                 FLine.tm.remove(unit.mineTile);
@@ -43,12 +42,10 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
                 targetItem = null;
                 ore = null;
             }
-
             if (!unit.validMine(ore)) {
                 ore = null;
                 unit.mineTile = null;
             }
-
             if (sm.team.isAI()) {
                 if (mining) {
                     if (sm.tiles[0] != null && sm.tiles[1] != null) {
@@ -58,20 +55,15 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
                             targetItem = unit.type.mineItems.min(i -> FLine.hasOre(i) && unit.canMine(i) && FLine.allOres.get(i) > 0,
                                     i -> unit.closestEnemyCore().items.get(i));
                         }
-
                         if (targetItem != null) {
                             ore = FLine.findOre(sm, targetItem);
                         }
-
                         if (ore != null) {
-
                             moveTo(ore, unit.hitSize * 4, 20f);
-
                             if (ore.block() == Blocks.air && unit.within(ore, unit.hitSize * 5)) {
                                 unit.mineTile = ore;
                                 FLine.tm.put(ore, sm);
                             }
-
                             if (ore.block() != Blocks.air) {
                                 mining = false;
                                 targetItem = null;
@@ -131,7 +123,6 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
             ore = sm.mineTile;
         }
     }
-
     @Override
     public void init() {
         if (unit instanceof TileMiner) {
@@ -140,7 +131,6 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
             ore = sm.mineTile;
         }
     }
-
     @Override
     public void setPose(Vec2 vec2) {
         targetPos = vec2;

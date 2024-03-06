@@ -20,10 +20,6 @@ public class TilePutAI extends AIController implements NeedPoseBridge {
     public TilePutAI(Unit unit) {
         this.unit = unit;
     }
-
-    public TilePutAI() {
-    }
-
     @Override
     public void updateMovement() {
         if (tm != null && pose != null) {

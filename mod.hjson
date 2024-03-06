@@ -5,7 +5,7 @@ displayName: "Floor"
 name: "Floor"
 
 #your name
-author: "Me"
+author: "试做型"
 
 #the fully qualified main class of the mod
 main: "Floor.Floor"
