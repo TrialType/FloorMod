@@ -8,7 +8,6 @@ import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.struct.Seq;
 import arc.util.Time;
-import mindustry.Vars;
 import mindustry.ai.types.FlyingAI;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
@@ -226,7 +225,7 @@ public class StrongBoostAI extends FlyingAI {
 
     @Override
     public void circleAttack(float circleLength){
-        vec.set(unit).sub(target);
+        vec.set(target).sub(unit);
 
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());

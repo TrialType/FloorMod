@@ -435,7 +435,7 @@ public class FUnits {
             circleTarget = true;
             flying = true;
             targetAir = targetGround = true;
-            maxRange = 1000;
+            maxRange = range = 40;
             rotateSpeed = 360;
             speed = 7;
             drag = 1F;
