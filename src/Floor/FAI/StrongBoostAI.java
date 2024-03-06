@@ -80,7 +80,7 @@ public class StrongBoostAI extends FlyingAI {
             if (unit.type.circleTarget) {
                 updateTarget();
                 if (target != null) {
-                    circleAttack(30);
+                    circleShoot(30);
                 } else{
                     unit.rotation = unit.rotation + 14;
                 }
@@ -222,9 +222,7 @@ public class StrongBoostAI extends FlyingAI {
             my = new Seq<>();
         }
     }
-
-    @Override
-    public void circleAttack(float circleLength){
+    public void circleShoot(float circleLength){
         vec.set(target).sub(unit);
 
         float ang = unit.angleTo(target);
@@ -240,7 +238,6 @@ public class StrongBoostAI extends FlyingAI {
 
         unit.moveAt(vec);
     }
-
     public void updateTarget() {
         target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE,u -> !u.spawnedByCore());
         if (target == null) {
