@@ -178,7 +178,7 @@ public class StrongBoostAI extends FlyingAI {
                     start = true;
                 }
             }
-            if (hit || unit.hitTime > 0 || Units.closestTarget(unit.team, ux, uy, unit.type.range * 0.8f) != null) {
+            if (hit || unit.hitTime > 0 || Units.closestTarget(unit.team, ux, uy, unit.range() * 0.8f) != null) {
                 hit = true;
                 changeCounter += Time.delta;
                 if (changeCounter >= changeTime) {
@@ -229,7 +229,7 @@ public class StrongBoostAI extends FlyingAI {
         if(diff > 70f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
         }else{
-            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 20));
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 40f));
         }
 
         vec.setLength(unit.speed());

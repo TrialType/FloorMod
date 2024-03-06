@@ -18,8 +18,11 @@ import arc.graphics.Color;
 import arc.math.Interp;
 import arc.struct.ObjectSet;
 import mindustry.ai.UnitCommand;
+import mindustry.ai.types.CommandAI;
 import mindustry.content.*;
 import mindustry.entities.Effect;
+import mindustry.entities.abilities.ForceFieldAbility;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.abilities.SpawnDeathAbility;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.MultiEffect;
@@ -28,13 +31,15 @@ import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.part.HoverPart;
 import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootBarrel;
+import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
+import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 
 public class FUnits {
-    public static UnitType a, velocity, AVelocity, Velocity, crazy, barb, b, transfer;
+    public static UnitType a, velocity, AVelocity, Velocity, crazy, barb, b, transfer, Hammer, Buying;
 
     public static void load() {
         Velocity = new UnitType("Velocity") {{
@@ -507,36 +512,105 @@ public class FUnits {
             mineSpeed = 1;
             mineTier = 5;
         }};
-        b = new UnitType("b") {{
+        Buying = new ENGSWEISUnitType("Buying") {{
             constructor = TileSpawnerUnit::create;
+            aiController = StrongBoostAI::new;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
 
-            hitSize = 24f;
+            minSpeed = 5;
+            reload = 3600;
+            HitReload = 3600;
+            percent = 30;
+            firstPercent = true;
+            Speed1 = 0.3F;
+            Health2 = 2000;
+
+            defend = 25;
+            power = 5;
 
             rotateSpeed = 5.4f;
-            buildSpeed = 30f;
+            buildSpeed = 3f;
 
             drownTimeMultiplier = 4f;
 
+            hitSize = 24f;
             flying = true;
-            speed = 1f;
+            speed = 0.4f;
             engineOffset = 9;
             engineSize = 3;
+            accel = 0.9F;
+            drag = 0.9F;
+            maxRange = range = 40;
 
-            health = 4000;
+            health = 2000;
             armor = 9f;
-            immunities = ObjectSet.with(StatusEffects.burning);
 
             abilities.add(new StrongMinerAbility(transfer, 2400, 1, 1));
+            abilities.add(new ShieldRegenFieldAbility(25, 900, 90, range));
 
             weapons.add(new Weapon() {{
-                reload = 60;
+                reload = 180;
                 y = 3.8F;
                 x = 2.7F;
                 top = false;
+                alternate = false;
+                shoot = new ShootBarrel() {{
+                    shots = 30;
+                    firstShotDelay = 60;
+                    shotDelay = 1;
+                }};
                 bullet = new BasicBulletType() {{
+                    homingDelay = 45;
+                    homingPower = 0.1F;
+                    homingRange = 1000;
+                    inaccuracy = 30;
+                    weaveRandom = true;
                     speed = 3.7F;
-                    damage = 15;
-                    lifetime = 60;
+                    damage = 150;
+                    lifetime = 240;
+                    splashDamage = 150;
+                    splashDamageRadius = 5.5F;
+                    trailChance = 1F;
+                }};
+            }});
+        }};
+        Hammer = new ENGSWEISUnitType("Hammer") {{
+            constructor = ENGSWEISUnitEntity::create;
+            aiController = StrongBoostAI::new;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+
+            health = 250;
+            speed = 1.2F;
+            range = maxRange = 36;
+            armor = 4;
+            accel = 0.9F;
+            drag = 0.9F;
+            flying = true;
+
+            percent = 20;
+            firstPercent = true;
+            Health2 = 350;
+            minSpeed = 8;
+            Speed1 = 1.0F;
+            HitReload = 3600;
+            reload = 3600;
+
+            defend = 100;
+            power = 2;
+
+            abilities.add(new ForceFieldAbility(hitSize / 2, 1, 100, 180));
+
+            weapons.add(new Weapon() {{
+                reload = 42;
+                x = y = 0;
+                shoot = new ShootSpread() {{
+                    shots = 8;
+                    spread = 45;
+                }};
+                bullet = new BasicBulletType() {{
+                    damage = 28;
+                    lifetime = 90;
+                    speed = 4;
                 }};
             }});
         }};
