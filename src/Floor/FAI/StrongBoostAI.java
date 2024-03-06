@@ -83,6 +83,9 @@ public class StrongBoostAI extends FlyingAI {
                 unit.rotation = unit.rotation + 14;
                 updateTarget();
                 if (target != null) {
+
+                    Fx.healWave.at(target);
+
                     circleAttack(30);
                 }
             } else if (target != null) {
