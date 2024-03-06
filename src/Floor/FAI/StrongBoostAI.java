@@ -10,7 +10,6 @@ import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.ai.types.FlyingAI;
-import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.gen.Healthc;
@@ -226,21 +225,21 @@ public class StrongBoostAI extends FlyingAI {
     }
 
     @Override
-    public void circleAttack(float circleLength) {
+    public void circleAttack(float circleLength){
         vec.set(target).sub(unit);
 
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());
 
-        if (diff > 70f && vec.len() < circleLength) {
+        if(diff > 70f && vec.len() < circleLength / 20){
             vec.setAngle(unit.vel().angle());
-        } else {
+        }else{
             vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6));
         }
 
         vec.setLength(unit.speed());
 
-        unit.movePref(vec);
+        unit.moveAt(vec);
     }
 
     public void updateTarget() {
