@@ -233,9 +233,8 @@ public class StrongBoostAI extends FlyingAI {
         float sy = ty - uy;
         if (lastTarget != null && lastTarget != target) {
             pass = false;
-        } else {
-            lastTarget = target;
         }
+        lastTarget = target;
         if (!pass) {
             if (orx * sx <= 0 && ory * sy <= 0) {
                 pass = true;
