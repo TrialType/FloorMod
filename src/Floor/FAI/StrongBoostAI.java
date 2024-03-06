@@ -27,10 +27,10 @@ public class StrongBoostAI extends FlyingAI {
     private float delayCounter;
     private float delay;
     private Effect boostEffect;
+    private float changeTime;
     private boolean start = false;
     private float orx;
     private float ory;
-    private float changeTime;
     private float changeCounter;
     private boolean hit;
     private int step;
@@ -39,7 +39,6 @@ public class StrongBoostAI extends FlyingAI {
     private float moveX;
     private float moveY;
     private Teamc lastTarget;
-
     @Override
     public void updateUnit() {
         if (BoostUnitType != null && wu != null) {
@@ -68,7 +67,6 @@ public class StrongBoostAI extends FlyingAI {
             }
         }
     }
-
     @Override
     public void updateMovement() {
         unloadPayloads();
@@ -80,7 +78,8 @@ public class StrongBoostAI extends FlyingAI {
             if (unit.type.circleTarget) {
                 updateTarget();
                 if (target != null) {
-                    circleShoot(30);
+                    circleAttack(30);
+                    //circleShoot(30);
                 } else{
                     unit.rotation = unit.rotation + 14;
                 }
@@ -200,7 +199,6 @@ public class StrongBoostAI extends FlyingAI {
             }
         }
     }
-
     @Override
     public void init() {
         if (unit.type instanceof ENGSWEISUnitType) {
