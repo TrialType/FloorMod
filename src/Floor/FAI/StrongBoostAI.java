@@ -78,7 +78,7 @@ public class StrongBoostAI extends FlyingAI {
             if (unit.type.circleTarget) {
                 updateTarget();
                 if (target != null) {
-                    circleAttack(30);
+                    circleAttack(30f);
                     //circleShoot(30);
                 } else{
                     unit.rotation = unit.rotation + 14;
