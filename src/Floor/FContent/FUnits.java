@@ -605,7 +605,7 @@ public class FUnits {
                 x = y = 0;
                 shoot = new ShootSpread() {{
                     shots = 8;
-                    spread = 45;
+                    spread = 22.5F;
                 }};
                 bullet = new BasicBulletType() {{
                     damage = 28;

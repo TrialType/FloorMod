@@ -6,6 +6,7 @@ import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
+import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.ai.types.FlyingAI;
@@ -39,6 +40,7 @@ public class StrongBoostAI extends FlyingAI {
     private float moveX;
     private float moveY;
     private Teamc lastTarget;
+
     @Override
     public void updateUnit() {
         if (BoostUnitType != null && wu != null) {
@@ -67,6 +69,7 @@ public class StrongBoostAI extends FlyingAI {
             }
         }
     }
+
     @Override
     public void updateMovement() {
         unloadPayloads();
@@ -78,9 +81,8 @@ public class StrongBoostAI extends FlyingAI {
             if (unit.type.circleTarget) {
                 updateTarget();
                 if (target != null) {
-                    circleAttack(30f);
-                    //circleShoot(30);
-                } else{
+                    circleShoot(30.0f);
+                } else {
                     unit.rotation = unit.rotation + 14;
                 }
             } else if (target != null) {
@@ -199,6 +201,7 @@ public class StrongBoostAI extends FlyingAI {
             }
         }
     }
+
     @Override
     public void init() {
         if (unit.type instanceof ENGSWEISUnitType) {
@@ -220,24 +223,36 @@ public class StrongBoostAI extends FlyingAI {
             my = new Seq<>();
         }
     }
-    public void circleShoot(float circleLength){
-        vec.set(target).sub(unit);
 
-        float ang = unit.angleTo(target);
-        float diff = Angles.angleDist(ang, unit.rotation());
+    public void circleShoot(float circleLength) {
+        float ux = unit.x;
+        float uy = unit.y;
+        float tx = target.x();
+        float ty = target.y();
+        vec.set(tx - ux, ty - uy);
 
-        if(diff > 70f && vec.len() < circleLength){
-            vec.setAngle(unit.vel().angle());
-        }else{
-            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 40f));
+        float angle1 = Mathf.atan2(ux, uy) * Mathf.radiansToDegrees;
+        if (angle1 < 0) angle1 += 360;
+        float ang = Angles.angle(ux, uy, tx, ty);
+        float a = Mathf.mod(ang, 360f);
+        float b = Mathf.mod(angle1, 360f);
+        float diff = Math.min((a - b) < 0 ? a - b + 360 : a - b, (b - a) < 0 ? b - a + 360 : b - a);
+
+        if (diff > 70f && vec.len() < circleLength) {
+            vec.setAngle(angle1);
+        } else {
+            float angle2 = Mathf.atan2(vec.x, vec.y) * Mathf.radiansToDegrees;
+            if (angle2 < 0) angle2 += 360;
+            vec.setAngle(Angles.moveToward(angle1, angle2, 40f));
         }
 
         vec.setLength(unit.speed());
 
         unit.moveAt(vec);
     }
+
     public void updateTarget() {
-        target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE,u -> !u.spawnedByCore());
+        target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE, u -> !u.spawnedByCore());
         if (target == null) {
             Units.nearbyBuildings(unit.x, unit.y, Float.MAX_VALUE, b -> target = target == null && !(b instanceof CoreBlock.CoreBuild) && !(b.team == unit.team) ? b : target);
         }
