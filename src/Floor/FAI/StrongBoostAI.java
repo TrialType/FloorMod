@@ -226,15 +226,15 @@ public class StrongBoostAI extends FlyingAI {
 
     @Override
     public void circleAttack(float circleLength){
-        vec.set(target).sub(unit);
+        vec.set(unit).sub(target);
 
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());
 
-        if(diff > 70f && vec.len() < circleLength / 20){
+        if(diff > 70f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
         }else{
-            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6));
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 20));
         }
 
         vec.setLength(unit.speed());
