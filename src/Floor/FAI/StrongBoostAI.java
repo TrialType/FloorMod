@@ -6,7 +6,6 @@ import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
-import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.ai.types.FlyingAI;
@@ -40,6 +39,7 @@ public class StrongBoostAI extends FlyingAI {
     private float moveX;
     private float moveY;
     private Teamc lastTarget;
+    private boolean pass = false;
 
     @Override
     public void updateUnit() {
@@ -229,25 +229,32 @@ public class StrongBoostAI extends FlyingAI {
         float uy = unit.y;
         float tx = target.x();
         float ty = target.y();
-        vec.set(tx - ux, ty - uy);
-
-        float angle1 = Mathf.atan2(ux, uy) * Mathf.radiansToDegrees;
-        if (angle1 < 0) angle1 += 360;
-        float ang = Angles.angle(ux, uy, tx, ty);
-        float a = Mathf.mod(ang, 360f);
-        float b = Mathf.mod(angle1, 360f);
-        float diff = Math.min((a - b) < 0 ? a - b + 360 : a - b, (b - a) < 0 ? b - a + 360 : b - a);
-
-        if (diff > 70f && vec.len() < circleLength) {
-            vec.setAngle(angle1);
+        float sx = tx - ux;
+        float sy = ty - uy;
+        if (!pass) {
+            if (orx * sx <= 0 && ory * sy <= 0) {
+                pass = true;
+            } else {
+                orx = sx;
+                ory = sy;
+                vec.set(orx, ory);
+            }
+            vec.setLength(unit.speed());
         } else {
-            float angle2 = Mathf.atan2(vec.x, vec.y) * Mathf.radiansToDegrees;
-            if (angle2 < 0) angle2 += 360;
-            vec.setAngle(Angles.moveToward(angle1, angle2, 40f));
+            if (sx * sx + sy * sy >= circleLength * circleLength) {
+                float angle = Angles.angle(tx, ty, ux, uy) + 5;
+                float sl = (float) sqrt(sx * sx + sy * sy);
+                float xx = (float) (sl * cos(angle));
+                float yy = (float) (sl * sin(angle));
+                vec.set(xx + tx - ux, yy + ty - uy);
+                orx = tx - ux;
+                ory = ty - uy;
+                pass = false;
+            } else {
+                vec.set(orx, ory);
+                vec.setLength(min(unit.speed(), circleLength * circleLength - sx * sx + sy * sy));
+            }
         }
-
-        vec.setLength(unit.speed());
-
         unit.moveAt(vec);
     }
 
