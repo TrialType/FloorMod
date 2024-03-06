@@ -235,7 +235,7 @@ public class StrongBoostAI extends FlyingAI {
         if (diff > 70f && vec.len() < circleLength) {
             vec.setAngle(unit.vel().angle());
         } else {
-            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 20));
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6));
         }
 
         vec.setLength(unit.speed());
