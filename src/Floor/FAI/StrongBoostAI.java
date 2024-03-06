@@ -234,7 +234,7 @@ public class StrongBoostAI extends FlyingAI {
         if (diff > 70f && vec.len() < circleLength) {
             vec.setAngle(unit.vel().angle());
         } else {
-            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 40));
+            vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 20));
         }
 
         vec.setLength(unit.speed());
@@ -243,7 +243,7 @@ public class StrongBoostAI extends FlyingAI {
     }
 
     public void updateTarget() {
-        target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE);
+        target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE,u -> !u.spawnedByCore());
         if (target == null) {
             Units.nearbyBuildings(unit.x, unit.y, Float.MAX_VALUE, b -> target = target == null && !(b instanceof CoreBlock.CoreBuild) && !(b.team == unit.team) ? b : target);
         }
