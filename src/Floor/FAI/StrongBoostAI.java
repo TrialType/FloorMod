@@ -244,8 +244,8 @@ public class StrongBoostAI extends FlyingAI {
             if (sx * sx + sy * sy >= circleLength * circleLength) {
                 float angle = Angles.angle(tx, ty, ux, uy) + 5;
                 float sl = (float) sqrt(sx * sx + sy * sy);
-                float xx = (float) (sl * cos(angle));
-                float yy = (float) (sl * sin(angle));
+                float xx = (float) (sl * cos(toRadians(angle)));
+                float yy = (float) (sl * sin(toRadians(angle)));
                 vec.set(xx + tx - ux, yy + ty - uy);
                 orx = tx - ux;
                 ory = ty - uy;
