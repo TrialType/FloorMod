@@ -426,7 +426,7 @@ public class FUnits {
             immunities.add(StatusEffects.wet);
             immunities.add(StatusEffects.sporeSlowed);
 
-            Health2 = 4000;
+            Health2 = 3000;
             Speed1 = 3;
 
             HitReload = 15;
@@ -446,7 +446,7 @@ public class FUnits {
             speed = 7;
             drag = 1F;
             accel = 0.5F;
-            health = 4000;
+            health = 6600;
             armor = 7;
         }};
         barb = new ENGSWEISUnitType("barb") {{
@@ -550,6 +550,7 @@ public class FUnits {
             abilities.add(new ShieldRegenFieldAbility(25, 900, 90, range));
 
             weapons.add(new Weapon() {{
+                range = 150;
                 reload = 180;
                 y = 3.8F;
                 x = 2.7F;
@@ -567,10 +568,10 @@ public class FUnits {
                     inaccuracy = 30;
                     weaveRandom = true;
                     speed = 3.7F;
-                    damage = 150;
+                    damage = 1;
                     lifetime = 240;
                     splashDamage = 150;
-                    splashDamageRadius = 5.5F;
+                    splashDamageRadius = 25.5F;
                     trailChance = 1F;
                 }};
             }});
@@ -640,15 +641,42 @@ public class FUnits {
             defend = 20;
             power = 20;
 
-            weapons.add(new Weapon(){{
-                reload = 180;
+            weapons.add(new Weapon() {{
+                range = 320;
+                reload = 780;
                 mirror = false;
-                bullet = new SqrtDamageBullet(){{
+                shoot = new ShootBarrel(){{
+                    firstShotDelay = 120;
+                }};
+                bullet = new SqrtDamageBullet() {{
                     damage = 600;
                     speed = 0;
                     lifetime = 480;
                     halfWidth = 120;
                     sqrtLength = 320;
+                    shootEffect = Fx.heal;
+                }};
+            }});
+            weapons.add(new Weapon() {{
+                reload = 2;
+                alternate = false;
+                bullet = new BasicBulletType() {{
+                    damage = 20;
+                    speed = 7;
+                    lifetime = 90;
+                }};
+            }});
+            weapons.add(new Weapon() {{
+                reload = 150;
+                alternate = false;
+                bullet = new PercentBulletType() {{
+                    percent = 7.5F;
+                    firstPercent = true;
+                    speed = 5.5F;
+                    lifetime = 120;
+                    trailChance = 1;
+                    trailColor = Pal.redLight;
+                    hitEffect = Fx.dynamicWave;
                 }};
             }});
         }};
