@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.type.Item;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.world;
 
@@ -52,8 +53,11 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
                         mining = false;
                     } else {
                         if (timer.get(timerTarget2, 60 * 4) || targetItem == null) {
-                            targetItem = unit.type.mineItems.min(i -> FLine.hasOre(i) && unit.canMine(i) && FLine.allOres.get(i) > 0,
-                                    i -> unit.closestEnemyCore().items.get(i));
+                            CoreBlock.CoreBuild core = unit.closestEnemyCore();
+                            if(core != null){
+                                targetItem = unit.type.mineItems.min(i -> FLine.hasOre(i) && unit.canMine(i) && FLine.allOres.get(i) > 0,
+                                        i -> core.items.get(i));
+                            }
                         }
                         if (targetItem != null) {
                             ore = FLine.findOre(sm, targetItem);

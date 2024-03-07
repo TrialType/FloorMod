@@ -3,6 +3,7 @@ package Floor.FContent;
 import Floor.FAI.*;
 import Floor.FEntities.FAbility.HitDamageAbility;
 import Floor.FEntities.FAbility.StrongMinerAbility;
+import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.ENGSWEISUnitEntity;
 import Floor.FEntities.FUnit.F.TileMiner;
 import Floor.FEntities.FUnit.F.TileSpawnerUnit;
@@ -39,7 +40,7 @@ import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 
 public class FUnits {
-    public static UnitType a, velocity, AVelocity, Velocity, crazy, barb, b, transfer, Hammer, Buying;
+    public static UnitType a, velocity, AVelocity, Velocity, crazy, barb, b, transfer, Hammer, Buying, Transition;
 
     public static void load() {
         Velocity = new UnitType("Velocity") {{
@@ -525,7 +526,7 @@ public class FUnits {
             Speed1 = 0.3F;
             Health2 = 2000;
 
-            defend = 25;
+            defend = 15;
             power = 5;
 
             rotateSpeed = 5.4f;
@@ -598,7 +599,7 @@ public class FUnits {
             defend = 100;
             power = 2;
 
-            abilities.add(new ForceFieldAbility(hitSize / 2, 1, 100, 180));
+            abilities.add(new ForceFieldAbility(hitSize * 2, 1, 100, 600));
 
             weapons.add(new Weapon() {{
                 reload = 42;
@@ -611,6 +612,43 @@ public class FUnits {
                     damage = 28;
                     lifetime = 90;
                     speed = 4;
+                }};
+            }});
+        }};
+        Transition = new ENGSWEISUnitType("Transition") {{
+            constructor = ENGSWEISUnitEntity::create;
+            aiController = StrongBoostAI::new;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+
+            health = 22000;
+            speed = 2F;
+            range = maxRange = 72;
+            armor = 14;
+            accel = 0.9F;
+            drag = 0.9F;
+            flying = true;
+            hitSize = 40;
+
+            percent = 75;
+            firstPercent = true;
+            Health2 = 18000;
+            minSpeed = 8;
+            Speed1 = 1.3F;
+            HitReload = 3600;
+            reload = 3600;
+
+            defend = 20;
+            power = 20;
+
+            weapons.add(new Weapon(){{
+                reload = 180;
+                mirror = false;
+                bullet = new SqrtDamageBullet(){{
+                    damage = 600;
+                    speed = 0;
+                    lifetime = 480;
+                    halfWidth = 120;
+                    sqrtLength = 320;
                 }};
             }});
         }};

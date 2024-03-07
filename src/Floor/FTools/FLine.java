@@ -87,9 +87,7 @@ public class FLine {
     }
 
     public static void removeOre(Tile tile) {
-        if (ores == null || allOres == null) {
-            get();
-        }
+        get();
         Item item = tile.drop();
         if (ores[item.id] != null) {
             int qx = (tile.x / FLine.quadrantSize);
@@ -100,9 +98,7 @@ public class FLine {
     }
 
     public static boolean hasOre(Item item) {
-        if (ores == null || allOres == null) {
-            get();
-        }
+        get();
         return allOres.get(item) > 0;
     }
 

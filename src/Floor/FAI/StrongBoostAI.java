@@ -11,6 +11,7 @@ import arc.util.Time;
 import mindustry.ai.types.FlyingAI;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
+import mindustry.gen.Groups;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
 import mindustry.graphics.Pal;
@@ -39,11 +40,20 @@ public class StrongBoostAI extends FlyingAI {
     private float moveX;
     private float moveY;
     private Teamc lastTarget;
-    private boolean pass = false;
+    //private boolean pass = false;
+    private int order = 3;
 
     @Override
     public void updateUnit() {
         if (BoostUnitType != null && wu != null) {
+            if (first) {
+                target = null;
+            }
+            if (target == null) {
+                wu.target = null;
+            } else {
+                wu.target = target;
+            }
             if (lastTarget instanceof Healthc h && (h.dead() || h.health() <= 0)) {
                 lastTarget = null;
                 start = false;
@@ -57,9 +67,6 @@ public class StrongBoostAI extends FlyingAI {
             if (!first) {
                 updateVisuals();
                 updateTargeting();
-            }
-            if (first) {
-                target = null;
             }
             updateMovement();
         } else {
@@ -82,9 +89,8 @@ public class StrongBoostAI extends FlyingAI {
                 updateTarget();
                 if (target != null) {
                     circleShoot(30.0f);
-                } else {
-                    unit.rotation = unit.rotation + 14;
                 }
+                unit.rotation = unit.rotation + 14;
             } else if (target != null) {
                 moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
@@ -142,21 +148,23 @@ public class StrongBoostAI extends FlyingAI {
                         if (step == mx.size - 1) {
                             mx.clear();
                             my.clear();
-                            step = 0;
-                            start = false;
-                            return;
                         } else {
                             step++;
                         }
                     }
-                    moveX = ux;
-                    moveY = uy;
-                    orx = mx.get(step);
-                    ory = my.get(step);
-                    float mxx = orx - ux;
-                    float myy = ory - uy;
-                    float mll = (float) sqrt(mxx * mxx + myy * myy);
-                    vec.set(mxx * unit.speed() / mll, myy * unit.speed() / mll);
+                    if (mx.size == 0) {
+                        vec.set(cx - ux, cy - uy);
+                        vec.setLength(unit.speed());
+                    } else {
+                        moveX = ux;
+                        moveY = uy;
+                        orx = mx.get(step);
+                        ory = my.get(step);
+                        float mxx = orx - ux;
+                        float myy = ory - uy;
+                        float mll = (float) sqrt(mxx * mxx + myy * myy);
+                        vec.set(mxx * unit.speed() / mll, myy * unit.speed() / mll);
+                    }
                     unit.rotation = unit.rotation + 2;
                     unit.moveAt(vec);
                 } else {
@@ -164,8 +172,8 @@ public class StrongBoostAI extends FlyingAI {
                         float lx = cx - ux;
                         float ly = cy - uy;
                         float ll = (float) sqrt(lx * lx + ly * ly);
-                        float mmx = ly * min(unit.speed() * 300, 300) / ll;
-                        float mmy = lx * min(unit.speed() * 300, 300) / ll;
+                        float mmx = ly * max(min(unit.speed() * 300, 300), 200) / ll;
+                        float mmy = lx * max(min(unit.speed() * 300, 300), 200) / ll;
                         float n = 10;
                         for (int i = 1; i <= n; i++) {
                             if (i % 2 == 0) {
@@ -231,40 +239,60 @@ public class StrongBoostAI extends FlyingAI {
         float ty = target.y();
         float sx = tx - ux;
         float sy = ty - uy;
-        if (lastTarget != null && lastTarget != target) {
-            pass = false;
+        if (lastTarget != target) {
+            orx = sx;
+            ory = sy;
+            order = 3;
+            //pass = false;
         }
         lastTarget = target;
-        if (!pass) {
-            if (orx * sx <= 0 && ory * sy <= 0) {
-                pass = true;
-            } else {
-                orx = sx;
-                ory = sy;
-                vec.set(orx, ory);
-            }
+        if (order == 3 && unit.within(target, circleLength)) {
+            order = 2;
+        } else if (order == 2 && !unit.within(target, circleLength)) {
+            order = 1;
+        }
+        if (order == 1) {
+            float angle = Angles.angle(tx, ty, ux, uy) + 5;
+            vec.set((float) (sx + cos(toRadians(angle))), (float) (sy + sin(toRadians(angle))));
+            orx = sx;
+            ory = sy;
+            order = 3;
+        } else if(order == 2){
+            vec.set(orx, ory);
             vec.setLength(unit.speed());
         } else {
-            if (sx * sx + sy * sy >= circleLength * circleLength) {
-                float angle = Angles.angle(tx, ty, ux, uy) + 5;
-                if (angle < 0) {
-                    angle = angle + 360;
-                }
-                float sl = (float) sqrt(sx * sx + sy * sy);
-                float xx = (float) (sl * cos(toRadians(angle)));
-                float yy = (float) (sl * sin(toRadians(angle)));
-                vec.set(xx + tx - ux, yy + ty - uy);
-                orx = tx - ux;
-                ory = ty - uy;
-                pass = false;
-            } else {
-                vec.set(orx, ory);
-                vec.setLength(min(unit.speed(), circleLength * circleLength - sx * sx + sy * sy));
-            }
+            vec.set(sx, sy);
+            vec.setLength(unit.speed());
         }
+//        if (!pass) {
+//            if (orx * sx <= 0 && ory * sy <= 0) {
+//                pass = true;
+//            } else {
+//                orx = sx;
+//                ory = sy;
+//                vec.set(orx, ory);
+//            }
+//            vec.setLength(unit.speed());
+//        } else {
+//            if (sx * sx + sy * sy >= circleLength * circleLength) {
+//                float angle = Angles.angle(tx, ty, ux, uy) + 5;
+//                if (angle < 0) {
+//                    angle = angle + 360;
+//                }
+//                float sl = (float) sqrt(sx * sx + sy * sy);
+//                float xx = (float) (sl * cos(toRadians(angle)));
+//                float yy = (float) (sl * sin(toRadians(angle)));
+//                vec.set(xx + tx - ux, yy + ty - uy);
+//                orx = tx - ux;
+//                ory = ty - uy;
+//                pass = false;
+//            } else {
+//                vec.set(orx, ory);
+//                vec.setLength(min(unit.speed(), circleLength * circleLength - sx * sx + sy * sy));
+//            }
+//        }
         unit.moveAt(vec);
     }
-
     public void updateTarget() {
         target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE, u -> !u.spawnedByCore());
         if (target == null) {
