@@ -11,7 +11,7 @@ public class ENGSWEISUnitType extends UnitType {
     public float percent = 1;
     public boolean firstPercent = false;
     public float changeHel = -1;
-    public float HitReload = Float.MAX_VALUE;
+    public float HitReload = 3600;
     public float minSpeed = Float.MAX_VALUE;
     public float defend = 1.0F / 3;
     public int power = 1;
