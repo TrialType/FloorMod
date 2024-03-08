@@ -57,6 +57,8 @@ public class FUnits {
     public static void load() {
         shuttle = new UnitType("shuttle") {
             {
+                constructor = UnitEntity::create;
+
                 flying = true;
                 health = 1000;
                 armor = 47;
@@ -116,6 +118,10 @@ public class FUnits {
             }
         };
         Shuttle = new ENGSWEISUnitType("Shuttle") {{
+            constructor = ENGSWEISUnitEntity::create;
+            aiController = StrongBoostAI::new;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+
             flying = true;
             health = 57750;
             armor = 20;
