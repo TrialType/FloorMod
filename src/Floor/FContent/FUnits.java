@@ -134,7 +134,7 @@ public class FUnits {
             strafePenalty = 0;
             engines.add(new UnitEngine(0, -25, 5, -90));
             engines.add(new UnitEngine(13.7F, -24, 4, -90));
-            engines.add(new UnitEngine(13.7F, -24, 4, -90));
+            engines.add(new UnitEngine(-13.7F, -24, 4, -90));
             weapons.add(new Weapon() {{
                 reload = 480;
                 mirror = false;
