@@ -21,6 +21,7 @@ public class ENGSWEISUnitType extends UnitType {
     public float Speed1 = 0.5F;
     public float Health2 = 70;
     public int exchangeTime = 120;
+    public int number = 0;
     public ENGSWEISUnitType(String name) {
         super(name);
         aiController = StrongBoostAI::new;

@@ -3,6 +3,7 @@ package Floor.FEntities.FUnit.F;
 import Floor.FContent.FEvents;
 import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.ENGSWEISUnitType;
+import Floor.FTools.BossList;
 import Floor.FTools.UnitChainAble;
 import arc.Events;
 import arc.math.Mathf;
@@ -33,16 +34,22 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
     public boolean first = true;
     private final Seq<Integer> idList = new Seq<>();
     public Teamc target;
+
     protected ENGSWEISUnitEntity() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
         this.resupplyTime = Mathf.random(10.0F);
         this.statuses = new Seq<>();
     }
+
     public static ENGSWEISUnitEntity create() {
         return new ENGSWEISUnitEntity();
     }
+
     @Override
     public void update() {
+        if (!team.isAI() || BossList.list.indexOf(type) > -1) {
+            first = false;
+        }
         super.update();
         unitMap.replaceAll((u, v) -> v + Time.delta);
         buildingMap.replaceAll((u, v) -> v + Time.delta);
@@ -96,10 +103,12 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             }
         }
     }
+
     @Override
     public int classId() {
         return 113;
     }
+
     @Override
     public void read(Reads read) {
         short REV = read.s();
@@ -352,6 +361,7 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         first = read.bool();
         this.afterRead();
     }
+
     @Override
     public void write(Writes write) {
         write.s(7);
@@ -399,6 +409,7 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         }
         write.bool(first);
     }
+
     @Override
     public float speed() {
         if (first) {
@@ -407,11 +418,5 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             }
         }
         return super.speed();
-    }
-    public void updateLastPosition() {
-        this.deltaX = this.x - this.lastX;
-        this.deltaY = this.y - this.lastY;
-        this.lastX = this.x;
-        this.lastY = this.y;
     }
 }

@@ -2,6 +2,10 @@ package Floor.FContent;
 
 import Floor.FType.FStatusEffect.ADH;
 import arc.graphics.Color;
+import arc.math.Interp;
+import mindustry.content.Fx;
+import mindustry.entities.Effect;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
 
@@ -15,7 +19,7 @@ public class FStatusEffects {
             AHealth, AHealth1, AHealth2, AHealth3, AHealth4, AHealth5, AHealth6, AHealth7, AHealth8, AHealth9,
             AAgain, AAgain1, AAgain2, AAgain3, AAgain4, AAgain5, AAgain6, AAgain7, AAgain8, AAgain9;
     public static StatusEffect[] Speed, Damage, Reload, Health, Again;
-    public static StatusEffect StrongStop , boostSpeed;
+    public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit;
 
     //private static final Random r = new Random();
     public static void load() {
@@ -129,6 +133,8 @@ public class FStatusEffects {
                 particles = 1;
             }};
         }
+
+
         StrongStop = new StatusEffect("StrongStop") {{
             speedMultiplier = 0;
             disarm = true;
@@ -137,6 +143,70 @@ public class FStatusEffects {
             speedMultiplier = 9;
             show = false;
             permanent = false;
+        }};
+        suppressII = new StatusEffect("suppressII") {{
+            speedMultiplier = 0.8F;
+            reloadMultiplier = 0.55F;
+            color = new Color(170, 170, 153, 255);
+            effectChance = 1;
+            effect = new MultiEffect(new ParticleEffect() {{
+                baseLength = 0;
+                length = 25;
+                lifetime = 10;
+                sizeFrom = 2;
+                sizeTo = 0;
+                colorFrom = color;
+                colorTo = color;
+            }}, new ParticleEffect() {{
+                particles = 2;
+                line = true;
+                interp = Interp.slowFast;
+                strokeFrom = 2;
+                strokeTo = 0;
+                lenFrom = 10;
+                lenTo = 0;
+                length = 23;
+                baseLength = 0;
+                lifetime = 10;
+                colorFrom = new Color(170, 170, 0, 255);
+                colorTo = color;
+            }});
+        }};
+        slowII = new StatusEffect("slowII") {{
+            speedMultiplier = 0.33F;
+            color = new Color(0, 0, 0, 0);
+            effectChance = 1;
+            effect = Fx.none;
+        }};
+        HardHit = new StatusEffect("HardHit") {{
+            damageMultiplier = 1.2F;
+            speedMultiplier = 0.75F;
+            healthMultiplier = 0.4F;
+            reloadMultiplier = 0.5F;
+            color = new Color(145, 75, 0, 255);
+            effectChance = 1;
+            effect = new MultiEffect(new ParticleEffect() {{
+                baseLength = 0;
+                length = 25;
+                lifetime = 10;
+                sizeFrom = 2;
+                sizeTo = 0;
+                colorFrom = color;
+                colorTo = color;
+            }}, new ParticleEffect() {{
+                particles = 2;
+                line = true;
+                interp = Interp.slowFast;
+                strokeFrom = 2;
+                strokeTo = 0;
+                lenFrom = 10;
+                lenTo = 0;
+                length = 23;
+                baseLength = 0;
+                lifetime = 10;
+                colorFrom = color;
+                colorTo = color;
+            }});
         }};
     }
 }

@@ -82,6 +82,7 @@ public class UnitOverride {
         /*=================================================================*/
         /*=================================================================*/
         /*=================================================================*/
+        UnitTypes.collaris.health = 77000;
         BulletType b =  UnitTypes.collaris.weapons.get(0).bullet;
         UnitTypes.collaris.targetAir = true;
         b.damage = 520;
@@ -109,6 +110,7 @@ public class UnitOverride {
 
         /*-----------------------------------------------------------------------------*/
 
+        UnitTypes.vela.health = 77000;
         UnitTypes.vela.weapons.get(0).bullet = new FlyContinuousLaserBulletType() {{
             damage = 35f;
             length = 180f;

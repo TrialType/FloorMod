@@ -90,7 +90,7 @@ public class FDamage extends Damage {
         if (angle < 0) angle = angle + 360;
         Seq<Float> xs = new Seq<>();
         Seq<Float> ys = new Seq<>();
-        for (float l = abs(width); l >= -abs(width); l -= 0.3F) {
+        for (float l = abs(width); l >= -abs(width); l -= 15) {
             float lenX = (float) (l * Math.cos(Math.toRadians(angle)));
             float lenY = (float) (l * Math.sin(Math.toRadians(angle)));
             xs.add(x + lenX);
@@ -107,11 +107,11 @@ public class FDamage extends Damage {
                 if (u.team == team) {
                     return;
                 }
-                float ux = u.x, uy = u.y;
+                float ux = u.lastX, uy = u.lastY;
                 float angle1 = Angles.angleDist(Angles.angle(ax1, ay1, ux, uy), rotation);
                 float angle2 = Angles.angleDist(Angles.angle(ax2, ay2, ux, uy), rotation);
                 float angle3 = Angles.angleDist(Angles.angle(ux, uy, ax1, ay1), Angles.angle(ux, uy, ax2, ay2));
-                if (angle1 != 0 && angle2 != 0 && angle3 == angle1 + angle2) {
+                if (abs(angle3 - angle1 - angle2) <= 1F) {
                     float len2 = (float) sqrt((ux - ax1) * (ux - ax1) + (uy - ay1) * (uy - ay1));
                     if (len2 * cos(toRadians(angle1)) <= length) {
                         boolean dead = u.dead;
@@ -131,7 +131,7 @@ public class FDamage extends Damage {
                 float angle1 = Angles.angleDist(Angles.angle(ax1, ay1, ux, uy), rotation);
                 float angle2 = Angles.angleDist(Angles.angle(ax2, ay2, ux, uy), rotation);
                 float angle3 = Angles.angleDist(Angles.angle(ux, uy, ax1, ay1), Angles.angle(ux, uy, ax2, ay2));
-                if (angle1 != 0 && angle2 != 0 && angle3 == angle1 + angle2) {
+                if (abs(angle3 - angle1 - angle2) <= 0.1F) {
                     float len2 = (float) sqrt((ux - ax1) * (ux - ax1) + (uy - ay1) * (uy - ay1));
                     if (len2 * cos(toRadians(angle1)) <= length) {
                         boolean dead = u.dead;
@@ -144,54 +144,5 @@ public class FDamage extends Damage {
                 }
             });
         }
-//        for (float l = abs(width); l >= 0; l -= 0.3F) {
-//            float lenX = (float) (l * Math.cos(Math.toRadians(angle)));
-//            float lenY = (float) (l * Math.sin(Math.toRadians(angle)));
-//            float ax1 = (x + lenX);
-//            float ay1 = (y + lenY);
-//
-//            float ax2 = (x - lenX);
-//            float ay2 = (y - lenY);
-//            Units.nearbyEnemies(team, x, y, length * 1.44F, u -> {
-//                if (u.team == team) {
-//                    return;
-//                }
-//                float ux = u.x, uy = u.y;
-//                float angle1 = Angles.angleDist(Angles.angle(ax1, ay1, ux, uy), rotation);
-//                float angle2 = Angles.angleDist(Angles.angle(ax2, ay2, ux, uy), rotation);
-//                float angle3 = Angles.angleDist(Angles.angle(ux, uy, ax1, ay1), Angles.angle(ux, uy, ax2, ay2));
-//                if (angle1 != 0 && angle2 != 0 && angle3 == angle1 + angle2) {
-//                    float len2 = (float) sqrt((ux - ax1) * (ux - ax1) + (uy - ay1) * (uy - ay1));
-//                    if (len2 * cos(toRadians(angle1)) <= length) {
-//                        boolean dead = u.dead;
-//                        u.damage(damage * 4 / (width / 0.3F));
-//                        if (!dead && u.dead) {
-//                            Events.fire(new EventType.UnitBulletDestroyEvent(u, bullet));
-//                        }
-//
-//                    }
-//                }
-//            });
-//            Units.nearbyBuildings(x, y, length * 1.44F, u -> {
-//                if (u.team == team) {
-//                    return;
-//                }
-//                float ux = u.x, uy = u.y;
-//                float angle1 = Angles.angleDist(Angles.angle(ax1, ay1, ux, uy), rotation);
-//                float angle2 = Angles.angleDist(Angles.angle(ax2, ay2, ux, uy), rotation);
-//                float angle3 = Angles.angleDist(Angles.angle(ux, uy, ax1, ay1), Angles.angle(ux, uy, ax2, ay2));
-//                if (angle1 != 0 && angle2 != 0 && angle3 == angle1 + angle2) {
-//                    float len2 = (float) sqrt((ux - ax1) * (ux - ax1) + (uy - ay1) * (uy - ay1));
-//                    if (len2 * cos(toRadians(angle1)) <= length) {
-//                        boolean dead = u.dead;
-//                        u.damage(damage / (width / 0.3F));
-//                        if (!dead && u.dead) {
-//                            Events.fire(new EventType.BuildingBulletDestroyEvent(u, bullet));
-//                        }
-//
-//                    }
-//                }
-//            });
-//        }
     }
 }

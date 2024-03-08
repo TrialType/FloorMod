@@ -3,18 +3,25 @@ package Floor.FAI;
 import Floor.FContent.FStatusEffects;
 import Floor.FEntities.FUnit.F.ENGSWEISUnitEntity;
 import Floor.FEntities.FUnitType.ENGSWEISUnitType;
+import Floor.FTools.BossList;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
+import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.Time;
+import arc.util.Tmp;
 import mindustry.ai.types.FlyingAI;
+import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.entities.Predict;
+import mindustry.entities.Sized;
 import mindustry.entities.Units;
 import mindustry.gen.Groups;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
 import mindustry.graphics.Pal;
+import mindustry.type.Weapon;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static java.lang.Math.*;
@@ -40,8 +47,8 @@ public class StrongBoostAI extends FlyingAI {
     private float moveX;
     private float moveY;
     private Teamc lastTarget;
-    //private boolean pass = false;
     private int order = 3;
+    private int number;
 
     @Override
     public void updateUnit() {
@@ -82,25 +89,23 @@ public class StrongBoostAI extends FlyingAI {
         unloadPayloads();
         float ux = unit.x;
         float uy = unit.y;
-        if (!first || !unit.team.isAI()) {
-            first = false;
-            wu.first = false;
+        if (!first) {
             if (unit.type.circleTarget) {
-                updateTarget();
+                updateTarget(true);
                 if (target != null) {
                     circleShoot(30.0f);
                 }
                 unit.rotation = unit.rotation + 14;
             } else if (target != null) {
-                moveTo(target, unit.type.range * 0.8f);
-                unit.lookAt(target);
                 float x = target.x();
                 float y = target.y();
-                if (start && unit.rotation == Angles.moveToward(
+                if (start && abs(unit.rotation - Angles.moveToward(
                         unit.rotation,
                         Angles.angle(ux, uy, x, y),
-                        unit.type.rotateSpeed * Time.delta * unit.speedMultiplier())
+                        unit.type.rotateSpeed * Time.delta * unit.speedMultiplier())) <= 5F
                 ) {
+                    orx = x - ux;
+                    ory = y - uy;
                     if (unit.speed() <= 0.01F) {
                         start = false;
                         counter = 0;
@@ -113,14 +118,14 @@ public class StrongBoostAI extends FlyingAI {
                         return;
                     }
                     lastTarget = target;
-                    if (delayCounter >= delay) {
+                    if (delayCounter >= delay && (orx != 0 || ory != 0)) {
                         if (unit.speed() < 10) {
                             unit.apply(FStatusEffects.boostSpeed, 3);
                             return;
                         }
                         if (unit.speed() >= 10) {
-                            float ml = (float) sqrt(orx * orx + ory * ory);
-                            vec.set(orx * min(unit.speed() * 80, 68) / ml, ory * min(unit.speed() * 80, 68) / ml);
+                            vec.set(orx, ory);
+                            vec.setLength(min(unit.speed() * 80, 68));
                             unit.moveAt(vec);
                             boostEffect.at(ux, -unit.hitSize() / 2 + uy, unit.rotation - 90);
                             start = false;
@@ -129,12 +134,14 @@ public class StrongBoostAI extends FlyingAI {
                         }
                     }
                 }
-                if (unit.within(x, y, unit.type.range * 0.9f) && counter >= reload && !start) {
+                moveTo(target, unit.range() * 0.8f);
+                unit.lookAt(target);
+                if (unit.within(x, y, unit.range()) && counter >= reload && !start) {
                     start = true;
                     delayCounter = 0;
-                    orx = x - ux;
-                    ory = y - uy;
                 }
+            } else {
+                updateTarget(false);
             }
         } else {
             CoreBlock.CoreBuild core = unit.closestEnemyCore();
@@ -197,6 +204,16 @@ public class StrongBoostAI extends FlyingAI {
                     wu.first = false;
                     unit.health = BoostUnitType.Health2;
                     unit.maxHealth(BoostUnitType.Health2);
+                    if (number > 0 && unit.team.isAI()) {
+                        Units.nearby(ux, uy, 100, 100, u -> {
+                            if (number > 0 && u.team == unit.team && !(BossList.list.indexOf(u.type) >= 0)) {
+                                if (u instanceof ENGSWEISUnitEntity) {
+                                    u.hitTime = 1.0F;
+                                    number--;
+                                }
+                            }
+                        });
+                    }
                     return;
                 }
                 Draw.color(Pal.lighterOrange);
@@ -208,6 +225,7 @@ public class StrongBoostAI extends FlyingAI {
                 Draw.reset();
             }
         }
+        first = wu.first;
     }
 
     @Override
@@ -221,6 +239,7 @@ public class StrongBoostAI extends FlyingAI {
             delayCounter = 0;
             changeCounter = 0;
             changeTime = BoostUnitType.exchangeTime;
+            number = BoostUnitType.number;
         }
         if (unit instanceof ENGSWEISUnitEntity) {
             wu = (ENGSWEISUnitEntity) unit;
@@ -243,7 +262,6 @@ public class StrongBoostAI extends FlyingAI {
             orx = sx;
             ory = sy;
             order = 3;
-            //pass = false;
         }
         lastTarget = target;
         if (order == 3 && unit.within(target, circleLength)) {
@@ -257,46 +275,99 @@ public class StrongBoostAI extends FlyingAI {
             orx = sx;
             ory = sy;
             order = 3;
-        } else if(order == 2){
+        } else if (order == 2) {
             vec.set(orx, ory);
             vec.setLength(unit.speed());
         } else {
             vec.set(sx, sy);
             vec.setLength(unit.speed());
         }
-//        if (!pass) {
-//            if (orx * sx <= 0 && ory * sy <= 0) {
-//                pass = true;
-//            } else {
-//                orx = sx;
-//                ory = sy;
-//                vec.set(orx, ory);
-//            }
-//            vec.setLength(unit.speed());
-//        } else {
-//            if (sx * sx + sy * sy >= circleLength * circleLength) {
-//                float angle = Angles.angle(tx, ty, ux, uy) + 5;
-//                if (angle < 0) {
-//                    angle = angle + 360;
-//                }
-//                float sl = (float) sqrt(sx * sx + sy * sy);
-//                float xx = (float) (sl * cos(toRadians(angle)));
-//                float yy = (float) (sl * sin(toRadians(angle)));
-//                vec.set(xx + tx - ux, yy + ty - uy);
-//                orx = tx - ux;
-//                ory = ty - uy;
-//                pass = false;
-//            } else {
-//                vec.set(orx, ory);
-//                vec.setLength(min(unit.speed(), circleLength * circleLength - sx * sx + sy * sy));
-//            }
-//        }
         unit.moveAt(vec);
     }
-    public void updateTarget() {
-        target = Units.closestTarget(unit.team, unit.x, unit.y, Float.MAX_VALUE, u -> !u.spawnedByCore());
+
+    public void updateWeapons() {
+        float rotation = unit.rotation - 90;
+        boolean ret = retarget();
+
+        if (ret && unit.team.isAI()) {
+            target = findMainTarget(unit.x, unit.y, unit.range(), unit.type.targetAir, unit.type.targetGround);
+        } else if (ret && (target == null || !(target instanceof CoreBlock.CoreBuild))) {
+            updateTarget(false);
+        }
+
+        noTargetTime += Time.delta;
+
+        if (invalid(target)) {
+            target = null;
+        } else {
+            noTargetTime = 0f;
+        }
+
+        unit.isShooting = false;
+
+        for (var mount : unit.mounts) {
+            Weapon weapon = mount.weapon;
+            float wrange = weapon.range();
+
+            //let uncontrollable weapons do their own thing
+            if (!weapon.controllable || weapon.noAttack) continue;
+
+            if (!weapon.aiControllable) {
+                mount.rotate = false;
+                continue;
+            }
+
+            float mountX = unit.x + Angles.trnsx(rotation, weapon.x, weapon.y),
+                    mountY = unit.y + Angles.trnsy(rotation, weapon.x, weapon.y);
+
+            if (unit.type.singleTarget) {
+                mount.target = target;
+            } else {
+                if (ret) {
+                    mount.target = findTarget(mountX, mountY, wrange, weapon.bullet.collidesAir, weapon.bullet.collidesGround);
+                }
+
+                if (checkTarget(mount.target, mountX, mountY, wrange)) {
+                    mount.target = null;
+                }
+            }
+
+            boolean shoot = false;
+
+            if (mount.target != null) {
+                shoot = mount.target.within(mountX, mountY, wrange + (mount.target instanceof Sized s ? s.hitSize() / 2f : 0f)) && shouldShoot();
+
+                Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
+                mount.aimX = to.x;
+                mount.aimY = to.y;
+            }
+
+            unit.isShooting |= (mount.shoot = mount.rotate = shoot);
+
+            if (mount.target == null && !shoot && !Angles.within(mount.rotation, mount.weapon.baseRotation, 0.01f) && noTargetTime >= rotateBackTimer) {
+                mount.rotate = true;
+                Tmp.v1.trns(unit.rotation + mount.weapon.baseRotation, 5f);
+                mount.aimX = mountX + Tmp.v1.x;
+                mount.aimY = mountY + Tmp.v1.y;
+            }
+
+            if (shoot) {
+                unit.aimX = mount.aimX;
+                unit.aimY = mount.aimY;
+            }
+        }
+    }
+
+    public void updateTarget(boolean world) {
+        float radius;
+        if (world) {
+            radius = Float.MAX_VALUE;
+        } else {
+            radius = unit.range() * 10;
+        }
+        target = Units.closestTarget(unit.team, unit.x, unit.y, radius, u -> !u.spawnedByCore());
         if (target == null) {
-            Units.nearbyBuildings(unit.x, unit.y, Float.MAX_VALUE, b -> target = target == null && !(b instanceof CoreBlock.CoreBuild) && !(b.team == unit.team) ? b : target);
+            Units.nearbyBuildings(unit.x, unit.y, radius, b -> target = target == null && !(b instanceof CoreBlock.CoreBuild) && !(b.team == unit.team) ? b : target);
         }
         if (target == null) {
             target = unit.closestEnemyCore();

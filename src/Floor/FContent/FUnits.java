@@ -15,6 +15,7 @@ import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FBulletType.PercentBulletType;
 import Floor.FEntities.FBulletType.PercentEmpBulletType;
 import Floor.FEntities.FUnitType.TileMinerUnitType;
+import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.math.Interp;
 import arc.struct.ObjectSet;
@@ -40,17 +41,158 @@ import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 
 public class FUnits {
-    public static UnitType a, velocity, AVelocity, Velocity, crazy, barb, b, transfer, Hammer, Buying, Transition;
+    public static UnitType transfer, shuttle/*, bulletInterception*/;
 
+    ////ENGSWEISBoss
+    public static UnitType velocity, AVelocity, Velocity;
+
+    //ENGSWEISFlying
+    public static UnitType barb, Hammer, Buying, crazy, Transition, Shuttle;
+
+    //ENGSWEISLand
+    public static UnitType a;
+
+    //special
+    //public static UnitType BulletInterception;
     public static void load() {
-        Velocity = new UnitType("Velocity") {{
-            hidden = true;
-            constructor = FUnitEntity::create;
-            speed = 10;
+        shuttle = new UnitType("shuttle") {
+            {
+                flying = true;
+                health = 1000;
+                armor = 47;
+                speed = 9;
+                drag = 0;
+                accel = 0;
+                logicControllable = false;
+                playerControllable = false;
+                useUnitCap = false;
+                isEnemy = false;
+                physics = false;
+                faceTarget = false;
+                allowedInPayloads = false;
+                rotateSpeed = 0;
+                hidden = true;
+                engines.add(new UnitEngine(0, -2.8F, 0.3F, -90));
+                engines.add(new UnitEngine(3, -2.8F, 1, -90));
+                engines.add(new UnitEngine(-3, -2.8F, 1, -90));
+                weapons.add(new Weapon() {{
+                    x = 2;
+                    reload = 0.125F;
+                    controllable = false;
+                    autoTarget = true;
+                    alwaysShooting = true;
+                    aiControllable = false;
+                    shoot = new ShootBarrel() {{
+                        shots = 1;
+                        shotDelay = 0;
+                    }};
+                    bullet = new BasicBulletType() {
+                        {
+                            absorbable = true;
+                            speed = 1;
+                            width = 4;
+                            height = 4;
+                            damage = 13;
+                            lifetime = 750;
+                            weaveScale = 1540;
+                            weaveMag = 0.8F;
+                            pierce = true;
+                            pierceBuilding = true;
+                            lightning = 3;
+                            lightningDamage = 13;
+                            lightningLength = 3;
+                        }
+                    };
+                }});
+                weapons.add(new Weapon() {{
+                    alwaysShooting = true;
+                    shoot = new ShootBarrel() {{
+                        firstShotDelay = 150;
+                    }};
+                    bullet = new ExplosionBulletType() {{
+                        damage = 0;
+                    }};
+                }});
+            }
+        };
+        Shuttle = new ENGSWEISUnitType("Shuttle") {{
+            flying = true;
+            health = 57750;
+            armor = 20;
+            speed = 7;
+            hitSize = 49;
+            drag = 0.1F;
+            faceTarget = true;
+            rotateSpeed = 3;
+            maxRange = 400;
+            strafePenalty = 0;
+            engines.add(new UnitEngine(0, -25, 5, -90));
+            engines.add(new UnitEngine(13.7F, -24, 4, -90));
+            engines.add(new UnitEngine(13.7F, -24, 4, -90));
+            weapons.add(new Weapon() {{
+                reload = 480;
+                mirror = false;
+                rotate = false;
+                alternate = true;
+                bullet = new BasicBulletType() {
+                    {
+                        keepVelocity = true;
+                        spawnUnit = shuttle;
+                    }
+                };
+
+            }});
+            weapons.add(new Weapon() {{
+
+                reload = 37;
+                mirror = true;
+                x = 13.2F;
+                y = 1.4F;
+                rotate = false;
+                bullet = new BasicBulletType() {{
+                    scaleLife = false;
+                    shrinkY = 3;
+                    lightOpacity = 0.5F;
+                    lightColor = new Color(243, 0, 0, 255);
+                    shootEffect = Fx.none;
+                    hitEffect = shootEffect;
+                    despawnEffect = shootEffect;
+                    drawSize = 2;
+                    hitSize = 2;
+                    lifetime = 20;
+                    speed = 7;
+                    damage = 25;
+                    width = 2;
+                    height = 2;
+                    lightning = 12;
+                    lightningColor = lightColor;
+                    lightningDamage = 100;
+                    lightningLength = 12;
+                    lightningCone = 360;
+                    fragBullets = 3;
+                    fragBullet = new BasicBulletType() {{
+                        width = 0;
+                        height = 0;
+                        speed = 0;
+                        lifetime = 60;
+                        lightning = 6;
+                        lightningColor = lightColor;
+                        lightningDamage = 25;
+                        lightningLength = 15;
+                    }};
+                }};
+            }});
         }};
+        Velocity = new ENGSWEISUnitType("Velocity") {
+            {
+                constructor = ENGSWEISUnitEntity::create;
+                speed = 6;
+                hidden = true;
+            }
+        };
         AVelocity = new UnitType("AVelocity") {
             {
-                constructor = FMechUnit::create;
+                constructor = PayloadUnit::create;
                 health = 50000;
                 armor = 12;
                 speed = 0;
@@ -60,22 +202,12 @@ public class FUnits {
                 hidden = true;
                 createScorch = false;
                 createWreck = false;
-                abilities.add(
-                        new SpawnDeathAbility() {{
-                            unit = Velocity;
-                            spread = 0;
-                        }}
-                );
                 weapons.add(new Weapon() {
                     {
                         controllable = false;
                         autoTarget = true;
                         alwaysShooting = true;
                         aiControllable = false;
-                        shoot = new ShootBarrel() {{
-                            shots = 1;
-                            shotDelay = 0;
-                        }};
                         reload = 2000;
                         bullet = new BasicBulletType() {{
                             hitEffect = Fx.massiveExplosion;
@@ -93,7 +225,7 @@ public class FUnits {
                     aiControllable = false;
                     shootSound = Sounds.explosion;
                     shoot = new ShootBarrel() {{
-                        firstShotDelay = 1800;
+                        firstShotDelay = 2000;
                     }};
                     reload = 2000;
                     bullet = new BasicBulletType() {{
@@ -103,75 +235,83 @@ public class FUnits {
                         damage = 0;
                         splashDamage = 5000;
                         splashDamageRadius = 160;
+                        spawnUnit = Velocity;
                     }};
                 }});
             }
         };
-        a = new ChainUnitType("a") {{
-            constructor = ChainLegUnit::create;
-            flying = false;
-            speed = 0.8F;
-            health = 900000;
-            hitSize = 13;
-            buildRange = 100;
-            buildSpeed = 10;
-            weapons.add(new Weapon("a-weapon") {{
-                top = false;
-                shootY = 3f;
-                reload = 9f;
-                ejectEffect = Fx.none;
-                recoil = 1f;
-                x = 7f;
-                shootSound = Sounds.flame;
+        a = new ChainUnitType("a") {
+            {
+                constructor = ChainLegUnit::create;
+                flying = false;
+                speed = 0.8F;
+                health = 900000;
+                hitSize = 13;
+                buildRange = 100;
+                buildSpeed = 10;
+                weapons.add(new Weapon("a-weapon") {{
+                    top = false;
+                    shootY = 3f;
+                    reload = 9f;
+                    ejectEffect = Fx.none;
+                    recoil = 1f;
+                    x = 7f;
+                    shootSound = Sounds.flame;
 
-                bullet = new PercentBulletType() {{
-                    lifetime = 20;
-                    firstPercent = true;
-                    percent = 2.5F;
-                    width = 15;
-                    height = 15;
-                    speed = 10;
-                    damage = 0;
-                    WS = true;
-                    splashDamageRadius = 0;
-                }};
-            }});
-            engines.add(
-                    new UnitEngine(
-                            (float) (hitSize * Math.sin(Math.toRadians(90)) / 2.0F),
-                            (float) (hitSize * Math.cos(Math.toRadians(90)) / 2.0F),
-                            3, 0
-                    )
-            );
-            engines.add(
-                    new UnitEngine(
-                            (float) (hitSize * Math.sin(Math.toRadians(180)) / 2.0F),
-                            (float) (hitSize * Math.cos(Math.toRadians(180)) / 2.0F),
-                            3, -90
-                    )
-            );
-            engines.add(
-                    new UnitEngine(
-                            (float) (hitSize * Math.sin(Math.toRadians(270)) / 2.0F),
-                            (float) (hitSize * Math.cos(Math.toRadians(270)) / 2.0F),
-                            3, 180
-                    )
-            );
-        }};
+                    bullet = new PercentBulletType() {{
+                        lifetime = 20;
+                        firstPercent = true;
+                        percent = 2.5F;
+                        width = 15;
+                        height = 15;
+                        speed = 10;
+                        damage = 0;
+                        WS = true;
+                        splashDamageRadius = 0;
+                    }};
+                }});
+                engines.add(
+                        new UnitEngine(
+                                (float) (hitSize * Math.sin(Math.toRadians(90)) / 2.0F),
+                                (float) (hitSize * Math.cos(Math.toRadians(90)) / 2.0F),
+                                3, 0
+                        )
+                );
+                engines.add(
+                        new UnitEngine(
+                                (float) (hitSize * Math.sin(Math.toRadians(180)) / 2.0F),
+                                (float) (hitSize * Math.cos(Math.toRadians(180)) / 2.0F),
+                                3, -90
+                        )
+                );
+                engines.add(
+                        new UnitEngine(
+                                (float) (hitSize * Math.sin(Math.toRadians(270)) / 2.0F),
+                                (float) (hitSize * Math.cos(Math.toRadians(270)) / 2.0F),
+                                3, 180
+                        )
+                );
+            }
+        };
         velocity = new ENGSWEISUnitType("velocity") {
             {
-                constructor = FUnitEntity::create;
+                constructor = ENGSWEISUnitEntity::create;
+
+                damage = 50;
+                HitReload = 15;
+                Speed1 = 3.5F;
+                minSpeed = 3;
+
                 defend = 60;
                 power = 50;
                 flying = true;
-                health = 202125;
+                health = 100000;
                 armor = 30;
-                speed = 5;
+                speed = 3.5F;
                 hitSize = 35;
                 createScorch = false;
                 createWreck = false;
                 abilities.add(new SpawnDeathAbility(AVelocity, 1, 0));
-                abilities.add(new HitDamageAbility(37, 0, -1, false, 30, 5));
                 weapons.add(new Weapon() {{
                     reload = 300;
                     controllable = false;
@@ -267,42 +407,7 @@ public class FUnits {
                         splashDamagePierce = true;
                         statusDuration = 1200;
                         keepVelocity = false;
-                        status = new StatusEffect("HD") {{
-                            damageMultiplier = 1.5F;
-                            speedMultiplier = 0.5F;
-                            healthMultiplier = 0.5F;
-                            reloadMultiplier = 0.5F;
-                            color = Color.valueOf("914B00FF");
-                            effectChance = 1;
-                            effect = new MultiEffect() {
-                                {
-                                    effects = new Effect[2];
-                                    effects[0] = new ParticleEffect() {{
-                                        particles = 6;
-                                        baseLength = 0;
-                                        length = 25;
-                                        lifetime = 10;
-                                        sizeFrom = 2;
-                                        sizeTo = 0;
-                                        colorFrom = Color.valueOf("914B00FF");
-                                        colorTo = colorFrom;
-                                    }};
-                                    effects[1] = new ParticleEffect() {{
-                                        particles = 2;
-                                        interp = Interp.slowFast;
-                                        line = true;
-                                        lifetime = 10;
-                                        strokeFrom = 2;
-                                        strokeTo = 2;
-                                        length = 2;
-                                        lenTo = 0;
-                                        baseLength = 0;
-                                        colorFrom = Color.valueOf("914B00FF");
-                                        colorTo = colorFrom;
-                                    }};
-                                }
-                            };
-                        }};
+                        status = FStatusEffects.HardHit;
                         fragBullets = 4;
                         fragVelocityMax = 0;
                         fragVelocityMin = 0;
@@ -416,269 +521,310 @@ public class FUnits {
                 });
             }
         };
-        crazy = new ENGSWEISUnitType("crazy") {{
-            constructor = ENGSWEISUnitEntity::create;
-            aiController = StrongBoostAI::new;
-            defaultCommand = new UnitCommand("crazy", "crazy", u -> new StrongBoostAI());
-            commands = new UnitCommand[]{UnitCommand.moveCommand, defaultCommand};
-            immunities.add(StatusEffects.slow);
-            immunities.add(StatusEffects.unmoving);
-            immunities.add(StatusEffects.wet);
-            immunities.add(StatusEffects.sporeSlowed);
+        crazy = new ENGSWEISUnitType("crazy") {
+            {
+                constructor = ENGSWEISUnitEntity::create;
+                aiController = StrongBoostAI::new;
+                defaultCommand = new UnitCommand("crazy", "crazy", u -> new StrongBoostAI());
+                commands = new UnitCommand[]{UnitCommand.moveCommand, defaultCommand};
+                immunities.add(StatusEffects.slow);
+                immunities.add(StatusEffects.unmoving);
+                immunities.add(StatusEffects.wet);
+                immunities.add(StatusEffects.sporeSlowed);
 
-            Health2 = 3000;
-            Speed1 = 3;
+                Health2 = 3000;
+                Speed1 = 3;
 
-            HitReload = 15;
-            percent = 2.5F;
-            changeHel = 100;
-            damage = 200 * 1.4F;
-            minSpeed = 5;
-            firstPercent = true;
+                HitReload = 15;
+                percent = 2.5F;
+                changeHel = 100;
+                damage = 200 * 1.4F;
+                minSpeed = 5;
+                firstPercent = true;
 
-            defend = 100;
-            power = 2;
-            circleTarget = true;
-            flying = true;
-            targetAir = targetGround = true;
-            maxRange = range = 40;
-            rotateSpeed = 360;
-            speed = 7;
-            drag = 1F;
-            accel = 0.5F;
-            health = 6600;
-            armor = 7;
-        }};
-        barb = new ENGSWEISUnitType("barb") {{
-            constructor = ENGSWEISUnitEntity::create;
-            aiController = StrongBoostAI::new;
-            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
-            flying = true;
-            targetAir = targetGround = true;
+                defend = 100;
+                power = 2;
+                circleTarget = true;
+                flying = true;
+                targetAir = targetGround = true;
+                maxRange = range = 40;
+                rotateSpeed = 360;
+                speed = 7;
+                drag = 1F;
+                accel = 0.5F;
+                health = 6600;
+                armor = 7;
+            }
+        };
+        barb = new ENGSWEISUnitType("barb") {
+            {
+                constructor = ENGSWEISUnitEntity::create;
+                aiController = StrongBoostAI::new;
+                commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+                flying = true;
+                targetAir = targetGround = true;
 
-            Speed1 = 0.8F;
-            damage = 0;
-            percent = 10;
-            changeHel = -1;
-            firstPercent = true;
-            reload = 3600;
-            minSpeed = 7;
-            delay = 90;
-            HitReload = 90;
+                Speed1 = 0.8F;
+                damage = 0;
+                percent = 10;
+                changeHel = -1;
+                firstPercent = true;
+                reload = 3600;
+                minSpeed = 7;
+                delay = 90;
+                HitReload = 90;
 
-            range = 40;
-            maxRange = range;
-            speed = 1.3F;
-            rotateSpeed = 5;
-            faceTarget = true;
-            health = 140;
-            armor = 2;
-            engineOffset = 7;
-            engineSize = 2.5F;
-            itemCapacity = 30;
-            hitSize = 5;
-            weapons.add(new Weapon() {{
-                reload = 30;
-                y = 3.8F;
-                x = 2.7F;
-                top = false;
-                bullet = new BasicBulletType() {{
-                    speed = 3.7F;
-                    damage = 15;
-                    lifetime = 60;
-                }};
-            }});
-        }};
-        transfer = new TileMinerUnitType("transfer") {{
-            constructor = TileMiner::create;
-            defaultCommand = new UnitCommand("TileMine", "TileMine", TileMinerAI::new);
-            aiController = TileMinerAI::new;
-            commands = new UnitCommand[]{defaultCommand, new UnitCommand("TilePut", "TilePut", TilePutAI::new)};
-            controller = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new PoseBridgeCommand();
-            hidden = true;
-            isEnemy = false;
-            useUnitCap = false;
+                range = 40;
+                maxRange = range;
+                speed = 1.3F;
+                rotateSpeed = 5;
+                faceTarget = true;
+                health = 140;
+                armor = 2;
+                engineOffset = 7;
+                engineSize = 2.5F;
+                itemCapacity = 30;
+                hitSize = 5;
+                weapons.add(new Weapon() {{
+                    reload = 30;
+                    y = 3.8F;
+                    x = 2.7F;
+                    top = false;
+                    bullet = new BasicBulletType() {{
+                        speed = 3.7F;
+                        damage = 15;
+                        lifetime = 60;
+                    }};
+                }});
+            }
+        };
+        transfer = new TileMinerUnitType("transfer") {
+            {
+                constructor = TileMiner::create;
+                defaultCommand = new UnitCommand("TileMine", "TileMine", TileMinerAI::new);
+                aiController = TileMinerAI::new;
+                commands = new UnitCommand[]{defaultCommand, new UnitCommand("TilePut", "TilePut", TilePutAI::new)};
+                controller = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new PoseBridgeCommand();
+                hidden = true;
+                isEnemy = false;
+                useUnitCap = false;
 
-            flying = true;
-            health = 100;
-            speed = 1.7F;
-            armor = 2;
-            drag = 0.8F;
-            accel = 0.8F;
-            rotateSpeed = 4;
+                flying = true;
+                health = 100;
+                speed = 1.7F;
+                armor = 2;
+                drag = 0.8F;
+                accel = 0.8F;
+                rotateSpeed = 4;
 
-            mineFloor = true;
-            mineWalls = true;
-            mineRange = 0;
-            mineSpeed = 1;
-            mineTier = 5;
-        }};
-        Buying = new ENGSWEISUnitType("Buying") {{
-            constructor = TileSpawnerUnit::create;
-            aiController = StrongBoostAI::new;
-            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+                mineFloor = true;
+                mineWalls = true;
+                mineRange = 0;
+                mineSpeed = 1;
+                mineTier = 5;
+            }
+        };
+        Buying = new ENGSWEISUnitType("Buying") {
+            {
+                constructor = TileSpawnerUnit::create;
+                aiController = StrongBoostAI::new;
+                commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
 
-            minSpeed = 5;
-            reload = 3600;
-            HitReload = 3600;
-            percent = 30;
-            firstPercent = true;
-            Speed1 = 0.3F;
-            Health2 = 2000;
+                minSpeed = 5;
+                reload = 3600;
+                HitReload = 3600;
+                percent = 30;
+                firstPercent = true;
+                Speed1 = 0.3F;
+                Health2 = 2000;
+                number = 3;
 
-            defend = 15;
-            power = 5;
+                defend = 15;
+                power = 5;
 
-            rotateSpeed = 5.4f;
-            buildSpeed = 3f;
+                rotateSpeed = 5.4f;
+                buildSpeed = 3f;
 
-            drownTimeMultiplier = 4f;
+                drownTimeMultiplier = 4f;
 
-            hitSize = 24f;
-            flying = true;
-            speed = 0.4f;
-            engineOffset = 9;
-            engineSize = 3;
-            accel = 0.9F;
-            drag = 0.9F;
-            maxRange = range = 40;
+                hitSize = 24f;
+                flying = true;
+                speed = 0.4f;
+                engineOffset = 9;
+                engineSize = 3;
+                accel = 0.9F;
+                drag = 0.9F;
+                maxRange = range = 40;
 
-            health = 2000;
-            armor = 9f;
+                health = 2000;
+                armor = 9f;
 
-            abilities.add(new StrongMinerAbility(transfer, 2400, 1, 1));
-            abilities.add(new ShieldRegenFieldAbility(25, 900, 90, range));
+                abilities.add(new StrongMinerAbility(transfer, 2400, 1, 1));
+                abilities.add(new ShieldRegenFieldAbility(25, 900, 90, range));
 
-            weapons.add(new Weapon() {{
-                range = 150;
-                reload = 180;
-                y = 3.8F;
-                x = 2.7F;
-                top = false;
-                alternate = false;
-                shoot = new ShootBarrel() {{
-                    shots = 30;
-                    firstShotDelay = 60;
-                    shotDelay = 1;
-                }};
-                bullet = new BasicBulletType() {{
-                    homingDelay = 45;
-                    homingPower = 0.1F;
-                    homingRange = 1000;
-                    inaccuracy = 30;
-                    weaveRandom = true;
-                    speed = 3.7F;
-                    damage = 1;
-                    lifetime = 240;
-                    splashDamage = 150;
-                    splashDamageRadius = 25.5F;
-                    trailChance = 1F;
-                }};
-            }});
-        }};
-        Hammer = new ENGSWEISUnitType("Hammer") {{
-            constructor = ENGSWEISUnitEntity::create;
-            aiController = StrongBoostAI::new;
-            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+                weapons.add(new Weapon() {{
+                    range = 150;
+                    reload = 180;
+                    y = 3.8F;
+                    x = 2.7F;
+                    top = false;
+                    alternate = false;
+                    shoot = new ShootBarrel() {{
+                        shots = 30;
+                        firstShotDelay = 60;
+                        shotDelay = 1;
+                    }};
+                    bullet = new BasicBulletType() {{
+                        homingDelay = 45;
+                        homingPower = 0.1F;
+                        homingRange = 1000;
+                        inaccuracy = 30;
+                        weaveRandom = true;
+                        speed = 3.7F;
+                        damage = 1;
+                        lifetime = 240;
+                        splashDamage = 150;
+                        splashDamageRadius = 25.5F;
+                        trailChance = 1F;
+                    }};
+                }});
+            }
+        };
+        Hammer = new ENGSWEISUnitType("Hammer") {
+            {
+                constructor = ENGSWEISUnitEntity::create;
+                aiController = StrongBoostAI::new;
+                commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
 
-            health = 250;
-            speed = 1.2F;
-            range = maxRange = 36;
-            armor = 4;
-            accel = 0.9F;
-            drag = 0.9F;
-            flying = true;
+                health = 250;
+                speed = 1.2F;
+                range = maxRange = 36;
+                armor = 4;
+                accel = 0.9F;
+                drag = 0.9F;
+                flying = true;
 
-            percent = 20;
-            firstPercent = true;
-            Health2 = 350;
-            minSpeed = 8;
-            Speed1 = 1.0F;
-            HitReload = 3600;
-            reload = 3600;
+                percent = 20;
+                firstPercent = true;
+                Health2 = 350;
+                minSpeed = 8;
+                Speed1 = 1.0F;
+                HitReload = 3600;
+                reload = 3600;
 
-            defend = 100;
-            power = 2;
+                defend = 100;
+                power = 2;
 
-            abilities.add(new ForceFieldAbility(hitSize * 2, 1, 100, 600));
+                abilities.add(new ForceFieldAbility(hitSize * 2, 1, 100, 600));
 
-            weapons.add(new Weapon() {{
-                reload = 42;
-                x = y = 0;
-                shoot = new ShootSpread() {{
-                    shots = 8;
-                    spread = 22.5F;
-                }};
-                bullet = new BasicBulletType() {{
-                    damage = 28;
-                    lifetime = 90;
-                    speed = 4;
-                }};
-            }});
-        }};
-        Transition = new ENGSWEISUnitType("Transition") {{
-            constructor = ENGSWEISUnitEntity::create;
-            aiController = StrongBoostAI::new;
-            commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
+                weapons.add(new Weapon() {{
+                    reload = 42;
+                    x = y = 0;
+                    shoot = new ShootSpread() {{
+                        shots = 8;
+                        spread = 22.5F;
+                    }};
+                    bullet = new BasicBulletType() {{
+                        damage = 28;
+                        lifetime = 90;
+                        speed = 4;
+                    }};
+                }});
+            }
+        };
+        Transition = new ENGSWEISUnitType("Transition") {
+            {
+                constructor = ENGSWEISUnitEntity::create;
+                aiController = StrongBoostAI::new;
+                commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
 
-            health = 22000;
-            speed = 2F;
-            range = maxRange = 72;
-            armor = 14;
-            accel = 0.9F;
-            drag = 0.9F;
-            flying = true;
-            hitSize = 40;
+                health = 22000;
+                speed = 2F;
+                range = maxRange = 40;
+                armor = 14;
+                accel = 0.9F;
+                drag = 0.9F;
+                flying = true;
+                hitSize = 40;
 
-            percent = 75;
-            firstPercent = true;
-            Health2 = 18000;
-            minSpeed = 8;
-            Speed1 = 1.3F;
-            HitReload = 3600;
-            reload = 3600;
+                percent = 75;
+                firstPercent = true;
+                Health2 = 18000;
+                minSpeed = 8;
+                Speed1 = 1.3F;
+                HitReload = 3600;
+                reload = 3600;
 
-            defend = 20;
-            power = 20;
+                defend = 20;
+                power = 20;
 
-            weapons.add(new Weapon() {{
-                range = 320;
-                reload = 780;
-                mirror = false;
-                shoot = new ShootBarrel(){{
-                    firstShotDelay = 120;
-                }};
-                bullet = new SqrtDamageBullet() {{
-                    damage = 600;
-                    speed = 0;
-                    lifetime = 480;
-                    halfWidth = 120;
-                    sqrtLength = 320;
-                    shootEffect = Fx.heal;
-                }};
-            }});
-            weapons.add(new Weapon() {{
-                reload = 2;
-                alternate = false;
-                bullet = new BasicBulletType() {{
-                    damage = 20;
-                    speed = 7;
-                    lifetime = 90;
-                }};
-            }});
-            weapons.add(new Weapon() {{
-                reload = 150;
-                alternate = false;
-                bullet = new PercentBulletType() {{
-                    percent = 7.5F;
-                    firstPercent = true;
-                    speed = 5.5F;
-                    lifetime = 120;
-                    trailChance = 1;
-                    trailColor = Pal.redLight;
-                    hitEffect = Fx.dynamicWave;
-                }};
-            }});
-        }};
+                weapons.add(new Weapon() {{
+                    range = 320;
+                    reload = 780;
+                    mirror = false;
+                    shoot = new ShootBarrel() {{
+                        firstShotDelay = 120;
+                    }};
+                    bullet = new SqrtDamageBullet() {{
+                        damage = 600;
+                        speed = 0;
+                        lifetime = 1200;
+                        halfWidth = 120;
+                        sqrtLength = 320;
+                        chargeEffect = new ParticleEffect() {{
+                            lifetime = 120;
+                            sizeFrom = 3;
+                            sizeTo = 0;
+                            interp = Interp.zero;
+                            colorFrom = Pal.redLight;
+                            colorTo = Pal.redDust;
+                            particles = 15;
+                            cone = 60;
+                        }};
+                    }};
+                }});
+                weapons.add(new Weapon() {{
+                    reload = 5;
+                    alternate = false;
+                    bullet = new BasicBulletType() {{
+                        damage = 25;
+                        speed = 7;
+                        lifetime = 90;
+                    }};
+                }});
+                weapons.add(new Weapon() {{
+                    reload = 450;
+                    alternate = false;
+                    y = 10;
+                    bullet = new PercentBulletType() {{
+                        percent = 7.5F;
+                        firstPercent = true;
+                        speed = 5.5F;
+                        lifetime = 120;
+                        trailChance = 1;
+                        trailColor = Pal.redLight;
+                        hitEffect = Fx.dynamicWave;
+                    }};
+                }});
+                weapons.add(new Weapon() {{
+                    reload = 450;
+                    alternate = false;
+                    y = -10;
+                    bullet = new PercentBulletType() {{
+                        percent = 7.5F;
+                        firstPercent = true;
+                        speed = 5.5F;
+                        lifetime = 120;
+                        trailChance = 1;
+                        trailColor = Pal.redLight;
+                        hitEffect = Fx.dynamicWave;
+                    }};
+                }});
+            }
+        };
+
+
+        BossList.list.add(velocity);
+        BossList.list.add(Velocity);
     }
 }
