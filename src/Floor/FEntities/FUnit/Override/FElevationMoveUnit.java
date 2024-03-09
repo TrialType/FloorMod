@@ -23,6 +23,8 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
     private final Seq<Integer> idList = new Seq<>();
     public Seq<Unit> units = new Seq<>();
     public Map<String, Integer> unitAbilities = new HashMap<>();
+    public int level = 0;
+    public float exp = 0;
 
     protected FElevationMoveUnit() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
@@ -84,6 +86,8 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
             for (int i = 0; i < number; i++) {
                 unitAbilities.put(read.str(), read.i());
             }
+            level = read.i();
+            exp = read.f();
         } else {
             throw new IllegalArgumentException("Unknown revision '" + REV + "' for entity type 'elude'");
         }
@@ -134,6 +138,8 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
             write.str(s);
             write.i(unitAbilities.get(s));
         }
+        write.i(level);
+        write.f(exp);
     }
 
     @Override
@@ -168,5 +174,31 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
     @Override
     public Seq<Unit> getUit() {
         return units;
+    }
+    @Override
+    public int getLevel() {
+        return level;
+    }
+    @Override
+    public void setLevel(int l){
+        level = l;
+    }
+    @Override
+    public float getExp() {
+        return exp;
+    }
+    @Override
+    public void addExp(float exp) {
+        this.exp = exp + this.exp;
+    }
+
+    @Override
+    public int number() {
+        int number = 0;
+        while (exp > (4 + level) * maxHealth / 10) {
+            exp = exp % (4 + level) * maxHealth / 10;
+            number++;
+        }
+        return number;
     }
 }

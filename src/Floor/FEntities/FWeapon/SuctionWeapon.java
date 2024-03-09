@@ -48,7 +48,6 @@ public class SuctionWeapon extends Weapon {
 
         if (baseTarget != mount.target) {
             if (mount.target != null && (points.get(unit) == null || !points.get(unit).within(mount.target, range / 2))) {
-
                 points.put(unit, new Vec2(mount.target.x(), mount.target.y()));
                 map.put(unit, mount.target);
                 baseTarget = mount.target;
@@ -69,17 +68,25 @@ public class SuctionWeapon extends Weapon {
                 }
             }
 
+            final boolean[] has = {false};
             Units.nearbyEnemies(unit.team, tx, ty, range, u -> {
                 if (BossList.list.indexOf(u.type) < 0) {
-                    float ux = u.x, uy = u.y;
-                    float len = (float) sqrt((ux - tx) * (ux - tx) + (uy - ty) * (uy - ty));
-                    float power = abs(1 - (len / range));
-                    Vec2 vec = new Vec2();
-                    vec.set(tx - ux, ty - uy);
-                    vec.setLength(power * unit.hitSize * 2 / u.hitSize);
-                    u.vel.add(vec);
+                    has[0] = true;
+                    if (!u.within(tx, ty, 20)) {
+                        float ux = u.x, uy = u.y;
+                        float len = (float) sqrt((ux - tx) * (ux - tx) + (uy - ty) * (uy - ty));
+                        float power = abs(1 - ((len - 18F) / (range - 18F)));
+                        Vec2 vec = new Vec2();
+                        vec.set((tx - ux) * (1 - power), (ty - uy) * (1 - power));
+                        vec.setLength(power * unit.hitSize * 4.5F / u.hitSize / u.hitSize);
+                        u.vel.add(vec);
+                    }
                 }
             });
+            if (!has[0]) {
+                map.remove(unit);
+                points.remove(unit);
+            }
         }
     }
 

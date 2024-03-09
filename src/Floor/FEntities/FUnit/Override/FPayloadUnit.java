@@ -26,6 +26,8 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
     private final Seq<Integer> idList = new Seq<>();
     public Seq<Unit> units = new Seq<>();
     public Map<String, Integer> unitAbilities = new HashMap<>();
+    public int level = 0;
+    public float exp = 0;
 
     protected FPayloadUnit() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
@@ -87,7 +89,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             }
 
             this.team = TypeIO.readTeam(read);
-            this.type = (UnitType) Vars.content.getByID(ContentType.unit, read.s());
+            this.type = Vars.content.getByID(ContentType.unit, read.s());
             this.x = read.f();
             this.y = read.f();
         } else if (REV == 1) {
@@ -125,7 +127,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             }
 
             this.team = TypeIO.readTeam(read);
-            this.type = (UnitType) Vars.content.getByID(ContentType.unit, read.s());
+            this.type = Vars.content.getByID(ContentType.unit, read.s());
             this.x = read.f();
             this.y = read.f();
         } else if (REV == 2) {
@@ -164,7 +166,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             }
 
             this.team = TypeIO.readTeam(read);
-            this.type = (UnitType) Vars.content.getByID(ContentType.unit, read.s());
+            this.type = Vars.content.getByID(ContentType.unit, read.s());
             this.x = read.f();
             this.y = read.f();
         } else if (REV == 3) {
@@ -203,7 +205,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             }
 
             this.team = TypeIO.readTeam(read);
-            this.type = (UnitType) Vars.content.getByID(ContentType.unit, read.s());
+            this.type = Vars.content.getByID(ContentType.unit, read.s());
             this.updateBuilding = read.bool();
             this.x = read.f();
             this.y = read.f();
@@ -242,7 +244,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             }
 
             this.team = TypeIO.readTeam(read);
-            this.type = (UnitType) Vars.content.getByID(ContentType.unit, read.s());
+            this.type = Vars.content.getByID(ContentType.unit, read.s());
             this.updateBuilding = read.bool();
             this.vel = TypeIO.readVec2(read, this.vel);
             this.x = read.f();
@@ -287,7 +289,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             }
 
             this.team = TypeIO.readTeam(read);
-            this.type = (UnitType) Vars.content.getByID(ContentType.unit, read.s());
+            this.type = Vars.content.getByID(ContentType.unit, read.s());
             this.updateBuilding = read.bool();
             this.vel = TypeIO.readVec2(read, this.vel);
             this.x = read.f();
@@ -303,6 +305,8 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
         for (int i = 0; i < number; i++) {
             unitAbilities.put(read.str(), read.i());
         }
+        level = read.i();
+        exp = read.f();
         this.afterRead();
     }
 
@@ -321,13 +325,13 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
 
         int INDEX;
         for (INDEX = 0; INDEX < this.payloads.size; ++INDEX) {
-            TypeIO.writePayload(write, (Payload) this.payloads.get(INDEX));
+            TypeIO.writePayload(write, this.payloads.get(INDEX));
         }
 
         write.i(this.plans.size);
 
         for (INDEX = 0; INDEX < this.plans.size; ++INDEX) {
-            TypeIO.writePlan(write, (BuildPlan) this.plans.get(INDEX));
+            TypeIO.writePlan(write, this.plans.get(INDEX));
         }
 
         write.f(this.rotation);
@@ -337,7 +341,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
         write.i(this.statuses.size);
 
         for (INDEX = 0; INDEX < this.statuses.size; ++INDEX) {
-            TypeIO.writeStatus(write, (StatusEntry) this.statuses.get(INDEX));
+            TypeIO.writeStatus(write, this.statuses.get(INDEX));
         }
 
         TypeIO.writeTeam(write, this.team);
@@ -357,6 +361,8 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             write.str(s);
             write.i(unitAbilities.get(s));
         }
+        write.i(level);
+        write.f(exp);
     }
 
     @Override
@@ -391,5 +397,30 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
     @Override
     public Seq<Unit> getUit() {
         return units;
+    }
+    @Override
+    public int getLevel() {
+        return level;
+    }
+    @Override
+    public void setLevel(int l){
+        level = l;
+    }
+    @Override
+    public float getExp() {
+        return exp;
+    }
+    @Override
+    public void addExp(float exp) {
+        this.exp = exp + this.exp;
+    }
+    @Override
+    public int number() {
+        int number = 0;
+        while (exp > (4 + level) * maxHealth / 10) {
+            exp = exp % (4 + level) * maxHealth / 10;
+            number++;
+        }
+        return number;
     }
 }

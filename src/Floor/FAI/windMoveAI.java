@@ -116,7 +116,7 @@ public class windMoveAI extends FlyingAI {
                 if (unit.within(core, unit.range())) {
                     target = core;
                 }
-                moveTo(core, unit.range() * 0.8f);
+                moveTo(core, unit.range() * 0.5f);
                 unit.lookAt(target == null ? core : target);
             }
         } else {

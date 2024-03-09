@@ -1006,6 +1006,7 @@ public class FUnits {
 
             targetAir = targetGround = true;
             range = maxRange = 200;
+            hitSize = 40;
             flying = true;
             health = 1000000;
             armor = 50;
@@ -1014,7 +1015,6 @@ public class FUnits {
             drag = 0.9F;
             accel = 0.9F;
         }};
-
 
         BossList.list.add(velocity);
         BossList.list.add(Velocity);

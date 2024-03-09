@@ -1,28 +1,20 @@
 package Floor.FContent;
 
-import Floor.FTools.FLine;
 import Floor.FTools.FUnitUpGrade;
 import arc.Events;
-import arc.math.Mathf;
-import arc.struct.IntSeq;
 import mindustry.Vars;
-import mindustry.content.Blocks;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.abilities.SpawnDeathAbility;
 import mindustry.game.EventType;
-import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Entityc;
 import mindustry.gen.Healthc;
 import mindustry.gen.Unit;
-import mindustry.world.Tile;
 
 import java.util.Map;
 import java.util.Random;
 
-import static mindustry.Vars.*;
-import static mindustry.Vars.world;
 
 public class FEvents {
     private static final String[] list = {
@@ -55,8 +47,19 @@ public class FEvents {
                 getPower(e.unit, true, true);
             }
         });
-        Events.on(EventType.UnitBulletDestroyEvent.class, e -> getPower(e.bullet.owner, true, false));
-        Events.on(FEvents.UnitDestroyOtherEvent.class, e -> getPower(e.killer, true, false));
+
+        Events.on(EventType.UnitBulletDestroyEvent.class, e -> {
+            if (e.bullet.owner instanceof FUnitUpGrade uug && e.unit instanceof FUnitUpGrade) {
+                uug.addExp(e.unit.maxHealth);
+                getPower(e.bullet.owner, true, false);
+            }
+        });
+        Events.on(FEvents.UnitDestroyOtherEvent.class, e -> {
+            if (e.killer instanceof FUnitUpGrade uug && e.other instanceof FUnitUpGrade) {
+                uug.addExp(e.other.maxHealth());
+                getPower(e.killer, true, false);
+            }
+        });
     }
 
     private static void over() {
@@ -71,17 +74,24 @@ public class FEvents {
 
     private static void getPower(Entityc e, boolean get, boolean full) {
         if (e instanceof Unit u && e instanceof FUnitUpGrade uug) {
+            if (uug.getLevel() >= 42) {
+                return;
+            }
             Map<String, Integer> m = uug.getMap();
             if (full) {
+                uug.setLevel(42);
                 Sit(u, m, null, true);
                 return;
             }
             if (get) {
-                over();
-                for (String s : list) {
-                    if (m.computeIfAbsent(s, k -> -1) == -1 || !(m.get(s) >= 9)) {
-                        Sit(u, m, s, false);
-                        return;
+                int number = uug.number();
+                for (int i = 0; i < number; i++) {
+                    over();
+                    for (String s : list) {
+                        if (m.computeIfAbsent(s, k -> -1) == -1 || !(m.get(s) >= 9)) {
+                            Sit(u, m, s, false);
+                            return;
+                        }
                     }
                 }
             } else {

@@ -24,6 +24,8 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
     private final Seq<Integer> idList = new Seq<>();
     public Seq<Unit> units = new Seq<>();
     public Map<String, Integer> unitAbilities = new HashMap<>();
+    public int level = 0;
+    public float exp = 0;
 
     protected FUnitEntity() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
@@ -289,6 +291,8 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
         for (int i = 0; i < number; i++) {
             unitAbilities.put(read.str(), read.i());
         }
+        level = read.i();
+        exp = read.f();
         this.afterRead();
     }
 
@@ -337,6 +341,8 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
             write.str(s);
             write.i(unitAbilities.get(s));
         }
+        write.i(level);
+        write.f(exp);
     }
 
     @Override
@@ -388,5 +394,30 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
     @Override
     public Seq<Unit> getUit() {
         return units;
+    }
+    @Override
+    public int getLevel() {
+        return level;
+    }
+    @Override
+    public void setLevel(int l){
+        level = l;
+    }
+    @Override
+    public float getExp() {
+        return exp;
+    }
+    @Override
+    public void addExp(float exp) {
+        this.exp = exp + this.exp;
+    }
+    @Override
+    public int number() {
+        int number = 0;
+        while (exp > (4 + level) * maxHealth / 10) {
+            exp = exp % (4 + level) * maxHealth / 10;
+            number++;
+        }
+        return number;
     }
 }

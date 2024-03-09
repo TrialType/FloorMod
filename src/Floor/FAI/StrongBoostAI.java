@@ -12,14 +12,13 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.ai.types.FlyingAI;
-import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Predict;
 import mindustry.entities.Sized;
 import mindustry.entities.Units;
-import mindustry.gen.Groups;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
+import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.Weapon;
 import mindustry.world.blocks.storage.CoreBlock;
@@ -276,7 +275,11 @@ public class StrongBoostAI extends FlyingAI {
             ory = sy;
             order = 3;
         } else if (order == 2) {
-            vec.set(orx, ory);
+            if (target instanceof Unit u && u.elevation == 1 && unit.within(target, 0.1F)) {
+                vec.set(-orx, -ory);
+            } else {
+                vec.set(orx, ory);
+            }
             vec.setLength(unit.speed());
         } else {
             vec.set(sx, sy);
