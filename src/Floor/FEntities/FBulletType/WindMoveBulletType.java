@@ -23,7 +23,7 @@ public class WindMoveBulletType extends BasicBulletType {
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - (float) fragBullets / 2) * fragSpread);
                 if (fragBullet instanceof WindMoveBulletType wmb) {
-                    LargeNumberBullet bullet = wmb.create(b, null, b.team, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, wmb.damage, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax), null, null, -1, -1);
+                    LargeNumberBullet bullet = wmb.create(b.owner, null, b.team, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, wmb.damage, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax), null, null, -1, -1);
                     if (bullet.owner instanceof windUnit wu) {
                         if (i < fragBullets / 2) {
                             wu.bullets.put(bullet, speed);

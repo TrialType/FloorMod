@@ -52,13 +52,15 @@ public class FUnits {
     public static void load() {
         bulletInterception = new UnitType("bulletInterception") {{
             constructor = UnitEntity::create;
+            controller = u -> new WeaponDefendAI();
+
             health = 1000;
             speed = 1.5F;
             armor = 0;
             rotateSpeed = 1;
             drag = 0;
             accel = 1;
-            maxRange = 100;
+            maxRange = range = 120;
             isEnemy = false;
             flying = true;
             logicControllable = false;
@@ -1007,7 +1009,7 @@ public class FUnits {
             flying = true;
             health = 1000000;
             armor = 50;
-            speed = 0.3F;
+            speed = 0.1F;
             rotateSpeed = 12;
             drag = 0.9F;
             accel = 0.9F;
@@ -1016,5 +1018,6 @@ public class FUnits {
 
         BossList.list.add(velocity);
         BossList.list.add(Velocity);
+        BossList.list.add(Winder);
     }
 }

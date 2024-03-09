@@ -2,13 +2,18 @@ package Floor.FEntities.FBulletType;
 
 import Floor.FTools.FDamage;
 import arc.Events;
+import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.util.Tmp;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Damage;
+import mindustry.entities.Effect;
 import mindustry.entities.Fires;
+import mindustry.entities.Lightning;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.game.EventType;
 import mindustry.gen.*;
+import mindustry.world.blocks.ConstructBlock;
 
 import static mindustry.Vars.indexer;
 
@@ -79,6 +84,52 @@ public class PercentBulletType extends BasicBulletType {
             if (makeFire) {
                 indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
             }
+        }
+    }
+    @Override
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct){
+        if (WS) {
+            splashDamage = ((build.maxHealth()) * percent / 100);
+        }
+        if (WL) {
+            lightningDamage = ((build.maxHealth()) * lightningPercent * 1.503F / 100);
+        }
+        if(makeFire && build.team != b.team){
+            Fires.create(build.tile);
+        }
+
+        if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
+            healEffect.at(build.x, build.y, 0f, healColor, build.block);
+            build.heal(healPercent / 100f * build.maxHealth + healAmount);
+        }else if(build.team != b.team && direct){
+            hit(b);
+        }
+
+        handlePierce(b, initialHealth, x, y);
+    }
+    public void hit(Bullet b){
+        float x = b.x,y  =b.y;
+        hitEffect.at(x, y, b.rotation(), hitColor);
+        hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
+
+        Effect.shake(hitShake, hitShake, b);
+
+        if(fragOnHit){
+            createFrags(b, x, y);
+        }
+        createPuddles(b, x, y);
+        createIncend(b, x, y);
+        createUnits(b, x, y);
+
+        if(suppressionRange > 0){
+            //bullets are pooled, require separate Vec2 instance
+            Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y));
+        }
+
+        createSplashDamage(b, x, y);
+
+        for(int i = 0; i < lightning; i++){
+            Lightning.create(b, lightningColor, lightningDamage < 0 ? damage : lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone/2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
         }
     }
 }

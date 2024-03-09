@@ -11,9 +11,10 @@ import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.ctype.ContentType;
-import mindustry.gen.Groups;
+import mindustry.entities.Units;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import java.util.*;
 
@@ -29,6 +30,8 @@ public class windUnit extends FUnitEntity {
         shrinkY = 0;
         lifetime = Float.MAX_VALUE;
         damage = 80;
+        splashDamage = 40;
+        splashDamageRadius = 15;
         speed = 0.8F;
     }};
     private final WindMoveBulletType mid = new WindMoveBulletType() {{
@@ -37,6 +40,8 @@ public class windUnit extends FUnitEntity {
         shrinkY = 0;
         lifetime = Float.MAX_VALUE;
         damage = 160;
+        splashDamage = 80;
+        splashDamageRadius = 20;
         speed = 0.6F;
         fragAngle = 90;
         fragBullets = 3;
@@ -49,6 +54,8 @@ public class windUnit extends FUnitEntity {
         shrinkY = 0;
         lifetime = Float.MAX_VALUE;
         damage = 400;
+        splashDamage = 200;
+        splashDamageRadius = 25;
         speed = 0.4F;
         fragAngle = 90;
         fragBullets = 3;
@@ -85,20 +92,20 @@ public class windUnit extends FUnitEntity {
         }
         super.update();
 
-        float dx = (float) cos(toRadians(-rotation + 90)) * range() * 5F;
-        float dy = (float) sin(toRadians(-rotation + 90)) * range() * 5F;
-        Groups.unit.intersect(x - dx, y - dy, range() * 10, range() * 10, u -> {
-            if (u.team != team && u.within(this, range() * 5)) {
-                float l = (float) sqrt((u.x - x) * (u.x - x) + (u.y - y) * (u.y - y));
+        Units.nearbyEnemies(team, x, y, range() * 5, u -> {
+            if (u.within(this, range() * 5)) {
+                float ux = u.x;
+                float uy = u.y;
+                vec.set(ux - x, uy - y);
+                float l = (float) sqrt((x - ux) * (x - ux) + (y - uy) * (y - uy));
                 float power = (range() * 5 - l) / range() / 15;
-                vec.set(u.x - x, u.y - y);
-                vec.setLength((float) (power * range() / sqrt(u.hitSize)) / 10);
+                vec.setLength((float) (power * 100 / u.speed() / sqrt(u.hitSize)));
                 u.vel.add(vec);
             }
         });
 
         createTimer = createTimer + Time.delta;
-        if (createTimer >= 300) {
+        if (createTimer >= 420) {
             if (rotation < 0) {
                 rotation = rotation + 360;
             }
@@ -153,7 +160,7 @@ public class windUnit extends FUnitEntity {
     private void createBullets(int x, int y) {
         Random ra = new Random();
         int number = ra.nextInt((int) ((world.width() + world.height()) * 0.4 + 1.0));
-        number = target == null ? number : number * 2;
+        number = target == null ? number : target instanceof CoreBlock.CoreBuild ? number * 4 : number * 2;
         for (int i = 0; i < number; i++) {
             int size = ra.nextInt(31) + 1;
             float bx, by;

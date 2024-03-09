@@ -117,11 +117,7 @@ public class windMoveAI extends FlyingAI {
                     target = core;
                 }
                 moveTo(core, unit.range() * 0.8f);
-                if (target != null) {
-                    unit.lookAt(target);
-                } else {
-                    unit.lookAt(core);
-                }
+                unit.lookAt(target == null ? core : target);
             }
         } else {
             if (target != null) {

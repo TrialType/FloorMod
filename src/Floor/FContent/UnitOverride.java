@@ -2,15 +2,19 @@ package Floor.FContent;
 
 import Floor.FEntities.FBulletType.FlyContinuousLaserBulletType;
 import Floor.FEntities.FUnit.Override.*;
+import Floor.FEntities.FWeapon.SuctionWeapon;
 import arc.graphics.Color;
 import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.LaserBulletType;
+import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 
 public class UnitOverride {
-    public static void load(){
+    public static void load() {
         UnitTypes.dagger.constructor = FMechUnit::create;
         UnitTypes.mace.constructor = FMechUnit::create;
         UnitTypes.fortress.constructor = FMechUnit::create;
@@ -82,8 +86,69 @@ public class UnitOverride {
         /*=================================================================*/
         /*=================================================================*/
         /*=================================================================*/
-        UnitTypes.collaris.health = 77000;
-        BulletType b =  UnitTypes.collaris.weapons.get(0).bullet;
+
+        UnitTypes.scepter.health = 31500;
+
+
+        UnitTypes.reign.health = 84000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.arkyid.health = 28000;
+
+
+        UnitTypes.toxopid.health = 77000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.antumbra.health = 25200;
+
+
+        UnitTypes.eclipse.health = 77000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.quad.health = 22000;
+
+
+        UnitTypes.oct.health = 77000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.sei.health = 22000;
+
+        UnitTypes.omura.health = 77000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.aegires.health = 42000;
+
+        UnitTypes.navanax.health = 70000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.precept.health = 17500;
+
+        UnitTypes.vanquish.health = 38500;
+
+        UnitTypes.conquer.health = 77000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.obviate.health = 8050;
+
+        UnitTypes.quell.health = 22000;
+
+        UnitTypes.disrupt.health = 42000;
+
+        /*-----------------------------------------------------------------------------*/
+
+        UnitTypes.anthicus.health = 10150;
+
+        UnitTypes.tecta.health = 26550;
+
+        UnitTypes.collaris.health = 63000;
+        BulletType b = UnitTypes.collaris.weapons.get(0).bullet;
         UnitTypes.collaris.targetAir = true;
         b.damage = 520;
         b.splashDamage = 85f;
@@ -92,7 +157,7 @@ public class UnitOverride {
         b.intervalBullets = 3;
         b.intervalRandomSpread = 30;
         b.intervalAngle = 0;
-        b.intervalBullet = new BasicBulletType(){{
+        b.intervalBullet = new BasicBulletType() {{
             lifetime = 180;
             damage = 120;
             speed = 6;
@@ -110,7 +175,7 @@ public class UnitOverride {
 
         /*-----------------------------------------------------------------------------*/
 
-        UnitTypes.vela.health = 77000;
+        UnitTypes.vela.health = 22000;
         UnitTypes.vela.weapons.get(0).bullet = new FlyContinuousLaserBulletType() {{
             damage = 35f;
             length = 180f;
@@ -133,6 +198,58 @@ public class UnitOverride {
             colors = new Color[]{Pal.heal.cpy().a(.2f), Pal.heal.cpy().a(.5f), Pal.heal.cpy().mul(1.2f), Color.white};
         }};
         UnitTypes.vela.rotateSpeed = 5.4F;
+
+        UnitTypes.corvus.health = 77000;
+        UnitTypes.corvus.weapons.remove(0);
+        UnitTypes.corvus.weapons.add(new SuctionWeapon("corvus-weapon") {{
+            range = 200;
+            time = 600;
+
+            shootSound = Sounds.laserblast;
+            chargeSound = Sounds.lasercharge;
+            soundPitchMin = 1f;
+            top = false;
+            mirror = false;
+            shake = 14f;
+            shootY = 5f;
+            x = y = 0;
+            reload = 350f;
+            recoil = 0f;
+
+            cooldownTime = 350f;
+
+            shootStatusDuration = 60f * 2f;
+            shootStatus = StatusEffects.unmoving;
+            shoot.firstShotDelay = Fx.greenLaserCharge.lifetime;
+            parentizeEffects = true;
+
+            bullet = new LaserBulletType() {{
+                length = 460f;
+                damage = 1120f;
+                width = 75f;
+
+                lifetime = 65f;
+
+                lightningSpacing = 35f;
+                lightningLength = 25;
+                lightningDelay = 1.1f;
+                lightningLengthRand = 5;
+                lightningDamage = 150;
+                lightningAngleRand = 40f;
+                largeHit = true;
+                lightColor = lightningColor = Pal.heal;
+
+                chargeEffect = Fx.greenLaserCharge;
+
+                healPercent = 25f;
+                collidesTeam = true;
+
+                sideAngle = 15f;
+                sideWidth = 0f;
+                sideLength = 0f;
+                colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
+            }};
+        }});
 
         /*-----------------------------------------------------------------------------*/
 
