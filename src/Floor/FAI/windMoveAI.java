@@ -56,7 +56,6 @@ public class windMoveAI extends FlyingAI {
                 Weapon weapon = mount.weapon;
                 float wrange = weapon.range();
 
-                //let uncontrollable weapons do their own thing
                 if (!weapon.controllable || weapon.noAttack) continue;
 
                 if (!weapon.aiControllable) {

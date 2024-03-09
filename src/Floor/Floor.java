@@ -4,9 +4,7 @@ import Floor.FContent.*;
 import Floor.FTools.FLine;
 import mindustry.mod.Mod;
 public class Floor extends Mod {
-    public Floor() {
-
-    }
+    public Floor() {}
     @Override
     public void loadContent() {
         FCommands.load();
