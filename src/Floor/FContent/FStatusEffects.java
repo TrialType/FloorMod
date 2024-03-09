@@ -9,8 +9,6 @@ import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
 
-//import java.util.Random;
-
 public class FStatusEffects {
     public static StatusEffect
             ASpeed, ASpeed1, ASpeed2, ASpeed3, ASpeed4, ASpeed5, ASpeed6, ASpeed7, ASpeed8, ASpeed9,
@@ -21,7 +19,6 @@ public class FStatusEffects {
     public static StatusEffect[] Speed, Damage, Reload, Health, Again;
     public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit;
 
-    //private static final Random r = new Random();
     public static void load() {
         ASpeed = new StatusEffect("ASpeed");
         ASpeed1 = new StatusEffect("ASpeed1");
@@ -79,7 +76,7 @@ public class FStatusEffects {
         Health = new StatusEffect[]{AHealth, AHealth1, AHealth2, AHealth3, AHealth4, AHealth5, AHealth6, AHealth7, AHealth8, AHealth9};
         Again = new StatusEffect[]{AAgain, AAgain1, AAgain2, AAgain3, AAgain4, AAgain5, AAgain6, AAgain7, AAgain8, AAgain9};
         for (int i = 0; i < 10; i++) {
-            Speed[i].speedMultiplier = (/*r.nextInt(101) / 100.0F +*/ 1.2F + i * 0.2F);
+            Speed[i].speedMultiplier = (1.2F + i * 0.2F);
             Speed[i].effectChance = 0.1F;
             Speed[i].permanent = true;
             Speed[i].effect = new ParticleEffect() {
@@ -140,7 +137,7 @@ public class FStatusEffects {
             disarm = true;
         }};
         boostSpeed = new StatusEffect("boostSpeed") {{
-            speedMultiplier = 9;
+            speedMultiplier = 15;
             show = false;
             permanent = false;
         }};
