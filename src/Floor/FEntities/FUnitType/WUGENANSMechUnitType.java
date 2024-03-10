@@ -9,6 +9,8 @@ public class WUGENANSMechUnitType extends UnitType {
     public float damageRadius = 20;
     public float landReload = 3600;
     public float needPower = 10000;
+    public float powerRange = 100;
+    public float getRange = 20;
     public WUGENANSMechUnitType(String name) {
         super(name);
     }
