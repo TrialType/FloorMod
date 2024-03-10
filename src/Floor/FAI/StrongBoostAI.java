@@ -12,14 +12,12 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.ai.types.FlyingAI;
-import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Predict;
 import mindustry.entities.Sized;
 import mindustry.entities.Units;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
-import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.Weapon;
 import mindustry.world.blocks.storage.CoreBlock;
@@ -264,13 +262,9 @@ public class StrongBoostAI extends FlyingAI {
             order = 3;
         }
         lastTarget = target;
-        float length = circleLength;
-        if (target instanceof Unit u && u.elevation == 1) {
-            length = length + u.hitSize / 2;
-        }
-        if (order == 3 && unit.within(target, length)) {
+        if (order == 3 && unit.within(target, circleLength)) {
             order = 2;
-        } else if (order == 2 && !unit.within(target, length)) {
+        } else if (order == 2 && !unit.within(target, circleLength)) {
             order = 1;
         }
         if (order == 1) {
@@ -281,16 +275,7 @@ public class StrongBoostAI extends FlyingAI {
             start = false;
             order = 3;
         } else if (order == 2) {
-            if (start || target instanceof Unit u && u.elevation == 1 && unit.within(target, u.hitSize / 2 + 0.1F)) {
-                if(start){
-                    vec.set(-orx, -ory);
-                } else {
-                    vec.set(orx, ory);
-                    start = true;
-                }
-            } else {
-                vec.set(orx, ory);
-            }
+            vec.set(orx,ory);
             vec.setLength(unit.speed());
         } else {
             vec.set(sx, sy);

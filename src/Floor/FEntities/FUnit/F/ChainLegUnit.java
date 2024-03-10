@@ -47,18 +47,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, UnitChainAble {
-
     private int underUnitId;
     public Unit underUnit = null;
     public Healthc order = null;
     public boolean upon;
     public Map<String, Integer> unitAbilities = new HashMap<>();
-
     @Override
     public int classId() {
         return 100;
     }
-
     protected ChainLegUnit() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
         this.curMoveOffset = new Vec2();
@@ -66,20 +63,32 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         this.resupplyTime = Mathf.random(10.0F);
         this.statuses = new Seq<>();
     }
-
     public static ChainLegUnit create() {
         return new ChainLegUnit();
     }
-
-    public boolean canMine() {
-        return underUnit == null && this.type.mineSpeed > 0.0F && this.type.mineTier >= 0;
-    }
-
     public boolean canPass(int tileX, int tileY) {
         EntityCollisions.SolidPred s = this.solidity();
         return underUnit != null || s == null || !s.solid(tileX, tileY);
     }
 
+    public void hitboxTile(Rect rect) {
+        float size;
+        if (underUnit != null) size = 0F;
+        else size = Math.min(this.hitSize * 0.66F, 7.9F);
+        rect.setCentered(this.x, this.y, size, size);
+    }
+
+    @Override
+    public EntityCollisions.SolidPred solidity() {
+        if (elevation > 0.09) {
+            return null;
+        } else {
+            return this.type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
+        }
+    }
+    public boolean canMine() {
+        return underUnit == null && this.type.mineSpeed > 0.0F && this.type.mineTier >= 0;
+    }
     public void drawBuildPlans() {
         if (underUnit != null) return;
         Boolf<BuildPlan> skip = plan ->
@@ -97,7 +106,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         }
         Draw.reset();
     }
-
     public void drawBuilding() {
         if (underUnit != null) return;
         boolean active = this.activelyBuilding();
@@ -124,7 +132,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
             }
         }
     }
-
     public void drawBuildingBeam(float px, float py) {
         if (underUnit != null) return;
         boolean active = this.activelyBuilding();
@@ -150,7 +157,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
             }
         }
     }
-
     public void drawPlan(BuildPlan plan, float alpha) {
         if (underUnit != null) return;
         plan.animScale = 1.0F;
@@ -161,53 +167,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         }
 
     }
-
-    public void hitboxTile(Rect rect) {
-        float size;
-        if (underUnit != null) size = 0F;
-        else size = Math.min(this.hitSize * 0.66F, 7.9F);
-        rect.setCentered(this.x, this.y, size, size);
-    }
-
-    @Override
-    public void UnderUnit(Unit unit) {
-        underUnit = unit;
-    }
-
-    @Override
-    public Unit UnderUnit() {
-        return underUnit;
-    }
-
-    @Override
-    public void upon(boolean b) {
-        upon = b;
-    }
-
-    @Override
-    public void order(Healthc order) {
-        this.order = order;
-    }
-
-    @Override
-    public Healthc order() {
-        return order;
-    }
-
-    @Override
-    public boolean upon() {
-        return upon;
-    }
-
-    @Override
-    public EntityCollisions.SolidPred solidity() {
-        if (elevation > 0.09) {
-            return null;
-        } else {
-            return this.type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
-        }
-    }
-
     @Override
     public void read(Reads read) {
         short REV = read.s();
@@ -457,7 +416,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         this.upon = read.bool();
         this.afterRead();
     }
-
     @Override
     public void write(Writes write) {
         write.s(7);
@@ -504,7 +462,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         write.i(underUnit == null ? -1 : underUnit.id);
         write.bool(upon);
     }
-
     @Override
     public void update() {
         float offset;
@@ -901,7 +858,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         }
         underUnitId = -1;
     }
-
     @Override
     public void updateDrowning() {
         Floor floor = this.drownFloor();
@@ -922,9 +878,32 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
 
         this.drownTime = Mathf.clamp(this.drownTime);
     }
-
     @Override
     public Map<String, Integer> getMap() {
         return unitAbilities;
+    }
+    @Override
+    public void UnderUnit(Unit unit) {
+        underUnit = unit;
+    }
+    @Override
+    public Unit UnderUnit() {
+        return underUnit;
+    }
+    @Override
+    public void upon(boolean b) {
+        upon = b;
+    }
+    @Override
+    public void order(Healthc order) {
+        this.order = order;
+    }
+    @Override
+    public Healthc order() {
+        return order;
+    }
+    @Override
+    public boolean upon() {
+        return upon;
     }
 }

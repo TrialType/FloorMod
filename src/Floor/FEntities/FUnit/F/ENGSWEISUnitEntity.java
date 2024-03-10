@@ -1,39 +1,43 @@
 package Floor.FEntities.FUnit.F;
 
 import Floor.FContent.FEvents;
+import Floor.FContent.FUnits;
 import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import Floor.FTools.BossList;
-import Floor.FTools.UnitChainAble;
 import arc.Events;
 import arc.math.Mathf;
+import arc.math.geom.QuadTree;
 import arc.math.geom.Rect;
+import arc.math.geom.Vec2;
 import arc.struct.Bits;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
-import mindustry.content.Fx;
+import mindustry.async.AsyncProcess;
+import mindustry.async.PhysicsProcess;
 import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
 import mindustry.entities.units.StatusEntry;
 import mindustry.gen.*;
 import mindustry.io.TypeIO;
-import mindustry.world.blocks.storage.CoreBlock;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import static mindustry.Vars.indexer;
+import static mindustry.Vars.asyncCore;
 
 public class ENGSWEISUnitEntity extends FUnitEntity {
+    public final static Seq<ENGSWEISUnitEntity> crazy = new Seq<>();
     private final Map<Unit, Float> unitMap = new HashMap<>();
     private final Map<Building, Float> buildingMap = new HashMap<>();
     public boolean first = true;
     private final Seq<Integer> idList = new Seq<>();
     public Teamc target;
+    public static BeginChanger bc = new BeginChanger();
 
     protected ENGSWEISUnitEntity() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
@@ -45,8 +49,35 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         return new ENGSWEISUnitEntity();
     }
 
+    public static void change() {
+        try {
+            Field file1 = PhysicsProcess.class.getDeclaredField("physics");
+            file1.setAccessible(true);
+            for (AsyncProcess process : asyncCore.processes) {
+                if (process instanceof PhysicsProcess) {
+                    PhysicsProcess.PhysicsWorld pw = (PhysicsProcess.PhysicsWorld) file1.get(process);
+                    if (!(pw instanceof PhysicsWorldChanger)) {
+                        Field field2 = PhysicsProcess.PhysicsWorld.class.getDeclaredField("bodies");
+                        field2.setAccessible(true);
+                        PhysicsWorldChanger physicsWorldChanger = new PhysicsWorldChanger(Vars.world.getQuadBounds(new Rect()));
+                        //noinspection unchecked
+                        physicsWorldChanger.bodies = (Seq<PhysicsProcess.PhysicsWorld.PhysicsBody>) field2.get(pw);
+                        file1.set(process, physicsWorldChanger);
+                        asyncCore.processes.add(bc);
+                    }
+                }
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void update() {
+        if (type == FUnits.crazy && crazy.indexOf(this) < 0) {
+            crazy.add(this);
+            change();
+        }
         if (!team.isAI() || BossList.list.indexOf(type) > -1) {
             first = false;
         }
@@ -418,5 +449,101 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             }
         }
         return super.speed();
+    }
+
+    public static class BeginChanger implements AsyncProcess {
+        @Override
+        public void begin() {
+            Seq<ENGSWEISUnitEntity> us = new Seq<>();
+            for (ENGSWEISUnitEntity eu : crazy) {
+                if (eu.dead || eu.health <= 0 || !(eu.type == FUnits.crazy)) {
+                    us.add(eu);
+                }
+            }
+            crazy.removeAll(us);
+            for (ENGSWEISUnitEntity u : crazy) {
+                if (u.target != null) {
+                    u.physref.body.layer = 3;
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static class PhysicsWorldChanger extends PhysicsProcess.PhysicsWorld {
+        public PhysicsWorldChanger(Rect bounds) {
+            super(bounds);
+            for (int i = 0; i < 4; i++) {
+                trees[i] = new QuadTree<>(new Rect(bounds));
+            }
+        }
+
+        public final QuadTree<PhysicsBody>[] trees = new QuadTree[4];
+        private static final float scl = 1.25f;
+        public Seq<PhysicsBody> bodies;
+        public final Seq<PhysicsBody> seq = new Seq<>(PhysicsBody.class);
+        private final Rect rect = new Rect();
+        private final Vec2 vec = new Vec2();
+
+        public void add(PhysicsBody body) {
+            bodies.add(body);
+        }
+
+        public void remove(PhysicsBody body) {
+            bodies.remove(body);
+        }
+
+        public void update() {
+            for (int i = 0; i < 4; i++) {
+                trees[i].clear();
+            }
+
+            var bodyItems = bodies.items;
+            int bodySize = bodies.size;
+
+            for (int i = 0; i < bodySize; i++) {
+                PhysicsBody body = bodyItems[i];
+                body.collided = false;
+                trees[body.layer].insert(body);
+            }
+
+            for (int i = 0; i < bodySize; i++) {
+                PhysicsBody body = bodyItems[i];
+
+                if (!body.local) continue;
+
+                body.hitbox(rect);
+
+                seq.size = 0;
+                trees[body.layer].intersect(rect, seq);
+                int size = seq.size;
+                var items = seq.items;
+
+                for (int j = 0; j < size; j++) {
+                    PhysicsBody other = items[j];
+
+                    if (other == body || other.collided) continue;
+
+                    float rs = body.radius + other.radius;
+                    float dst = Mathf.dst(body.x, body.y, other.x, other.y);
+
+                    if (dst < rs) {
+                        vec.set(body.x - other.x, body.y - other.y).setLength(rs - dst);
+                        float ms = body.mass + other.mass;
+                        float m1 = other.mass / ms, m2 = body.mass / ms;
+
+                        //first body is always local due to guard check above
+                        body.x += vec.x * m1 / scl;
+                        body.y += vec.y * m1 / scl;
+
+                        if (other.local) {
+                            other.x -= vec.x * m2 / scl;
+                            other.y -= vec.y * m2 / scl;
+                        }
+                    }
+                }
+                body.collided = true;
+            }
+        }
     }
 }
