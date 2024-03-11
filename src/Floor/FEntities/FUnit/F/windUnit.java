@@ -99,7 +99,7 @@ public class windUnit extends FUnitEntity {
                 vec.set(ux - x, uy - y);
                 float l = (float) sqrt((x - ux) * (x - ux) + (y - uy) * (y - uy));
                 float power = (range() * 5 - l) / range() / 15;
-                vec.setLength(power * 12 / u.speed());
+                vec.setLength(power * 12 / (u.speed() + 0.9F));
                 u.vel.add(vec);
             }
         });

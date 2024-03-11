@@ -7,9 +7,8 @@ import mindustry.ai.types.GroundAI;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.effect.ExplosionEffect;
-import mindustry.gen.Healthc;
+import mindustry.gen.Player;
 import mindustry.gen.Teamc;
-import mindustry.world.blocks.storage.CoreBlock;
 
 import static java.lang.Math.min;
 
@@ -55,10 +54,6 @@ public class LandMoveAI extends GroundAI {
     @Override
     public void updateMovement() {
 
-        if (wu.changing) {
-            return;
-        }
-
         unloadPayloads();
 
         if (upping || landing) {
@@ -76,10 +71,9 @@ public class LandMoveAI extends GroundAI {
 
         updatePowerTarget();
         if (powerTarget != null) {
-            if (unit.within(powerTarget, getRange * 0.2F)) {
+            if (unit.within(powerTarget, getRange)) {
                 if (!under) {
-                    moveTo(powerTarget, getRange * 0.1F);
-
+                    moveTo(powerTarget, getRange * 0.2F);
                     Units.nearbyBuildings(unit.x, unit.y, getRange, b -> {
                         if (b.team != unit.team && b.power != null) {
                             float capacity = b.power.graph.getLastPowerStored();
@@ -89,7 +83,6 @@ public class LandMoveAI extends GroundAI {
                             }
                         }
                     });
-
                 } else {
                     wu.outTimer = 0;
                     upping = true;
@@ -100,52 +93,33 @@ public class LandMoveAI extends GroundAI {
                     wu.landTimer = 0;
                 } else {
                     moveTo(powerTarget, getRange * 0.7F);
-                    walkEffect.at(unit);
+                    if(under){
+                        walkEffect.at(unit);
+                    }
                 }
             }
         } else if (target != null) {
-
-            if (target instanceof CoreBlock.CoreBuild || target instanceof Healthc h && h.maxHealth() > unit.maxHealth) {
-                CoreBlock.CoreBuild core = (CoreBlock.CoreBuild) target;
-                if (unit.within(target, wut.damageRadius * 0.9F + core.hitSize())) {
-                    if (under) {
-                        upping = true;
-                        wu.outTimer = 0;
-                    } else {
-                        moveTo(target, wut.damageRadius * 0.7F + core.hitSize());
-                    }
+            if (unit.within(target, wut.damageRadius)) {
+                if (under) {
+                    upping = true;
+                    wu.outTimer = 0;
                 } else {
-                    if (!under && !(unit.floorOn() == null || unit.floorOn().isDeep()) && timer >= landReload) {
-                        landing = true;
-                        wu.landTimer = 0;
-                    } else {
-                        moveTo(target, wut.damageRadius * 0.7F + core.hitSize());
-                        walkEffect.at(unit);
-                    }
+                    moveTo(target, wut.damageRadius * 0.7F);
                 }
             } else {
-                if (unit.within(target, wut.damageRadius * 0.9F)) {
-                    if (under) {
-                        upping = true;
-                        wu.outTimer = 0;
-                    } else {
-                        moveTo(target, wut.damageRadius * 0.7F);
-                    }
+                if (!under && !(unit.floorOn() == null || unit.floorOn().isDeep()) && timer >= landReload) {
+                    landing = true;
+                    wu.landTimer = 0;
                 } else {
-                    if (!under && !(unit.floorOn() == null || unit.floorOn().isDeep()) && timer >= landReload) {
-                        landing = true;
-                        wu.landTimer = 0;
-                    } else {
-                        moveTo(target, wut.damageRadius * 0.7F);
+                    moveTo(target, wut.damageRadius * 0.7F);
+                    if(under){
                         walkEffect.at(unit);
                     }
                 }
             }
-
         } else {
-            if (under) {
-                wu.outTimer = 0;
-                upping = true;
+            if (under || wu.under) {
+                under = wu.under = false;
             }
         }
     }
