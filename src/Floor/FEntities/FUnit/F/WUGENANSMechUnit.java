@@ -23,11 +23,21 @@ public class WUGENANSMechUnit extends FMechUnit {
     public float power;
     public float outTimer = -1;
     public float landTimer = -1;
-    public float reload;
     public float time1;
     public float time2;
+    public float timerChanging = 0;
     public static BeginChanger bc = new BeginChanger();
     public static PhysicsWorldChanger physicsWorldChanger;
+
+    public static WUGENANSMechUnit create() {
+        return new WUGENANSMechUnit();
+    }
+
+    @Override
+    public int classId() {
+        return 117;
+    }
+
     public static void change() {
         try {
             Field file1 = PhysicsProcess.class.getDeclaredField("physics");
@@ -53,6 +63,7 @@ public class WUGENANSMechUnit extends FMechUnit {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     public void update() {
         if (mec.indexOf(this) < 0) {
@@ -63,37 +74,47 @@ public class WUGENANSMechUnit extends FMechUnit {
         super.update();
 
         if (type instanceof WUGENANSMechUnitType wut) {
-            if(changing){
-
-            }else {
-                reload = wut.landReload;
-                time1 = wut.outTime;
-                time2 = wut.landTime;
-                if (under && outTimer >= 0) {
-                    outTimer += Time.delta;
-                    elevation = Mathf.lerpDelta(elevation, 0, Time.delta / time1);
-                    if (outTimer >= time1) {
-                        Damage.damage(team, x, y, wut.damageRadius, wut.upDamage);
-                        under = false;
-                        outTimer = -1;
-                    }
-                } else if (!under && landTimer >= 0) {
-                    landTimer += Time.delta;
-                    elevation = Mathf.lerpDelta(elevation, -1, Time.delta / time2);
-                    if (landTimer >= time2) {
-                        under = true;
-                        landTimer = -1;
-                    }
-                } else if (under) {
-                    elevation = -1;
-                } else {
-                    elevation = 0;
+            if (power >= wut.needPower) {
+                changing = true;
+                timerChanging = timerChanging + Time.delta;
+                if (timerChanging > 120) {
+                    power = power - wut.needPower;
+                    timerChanging = 0;
+                    changing = false;
+                    WUGENANSMechUnit wu = (WUGENANSMechUnit) wut.create(team);
+                    wu.x = x + 0.5F;
+                    wu.y = y + 0.5F;
+                    wu.rotation = rotation;
+                    wu.add();
                 }
+            }
+            time1 = wut.outTime;
+            time2 = wut.landTime;
+            if (under && outTimer >= 0) {
+                outTimer += Time.delta;
+                elevation = Mathf.lerpDelta(elevation, 0, Time.delta / time1);
+                if (outTimer >= time1) {
+                    Damage.damage(team, x, y, wut.damageRadius, wut.upDamage);
+                    under = false;
+                    outTimer = -1;
+                }
+            } else if (!under && landTimer >= 0) {
+                landTimer += Time.delta;
+                elevation = Mathf.lerpDelta(elevation, -1, Time.delta / time2);
+                if (landTimer >= time2) {
+                    under = true;
+                    landTimer = -1;
+                }
+            } else if (under) {
+                elevation = -1;
+            } else {
+                landTimer = outTimer = -1;
+                elevation = 0;
             }
         } else if (under) {
             elevation = 0;
             under = false;
-            outTimer = 0;
+            outTimer = -1;
         }
     }
 

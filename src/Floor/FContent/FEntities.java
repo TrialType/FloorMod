@@ -22,5 +22,6 @@ public class FEntities {
         EntityMapping.idMap[114] = TileMiner::create;
         EntityMapping.idMap[115] = TileSpawnerUnit::create;
         EntityMapping.idMap[116] = windUnit::create;
+        EntityMapping.idMap[117] = WUGENANSMechUnit::create;
     }
 }

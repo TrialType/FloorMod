@@ -3,7 +3,9 @@ package Floor.FAI;
 import Floor.FEntities.FUnit.F.WUGENANSMechUnit;
 import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
 import arc.struct.Seq;
+import arc.util.Time;
 import mindustry.ai.types.GroundAI;
+import mindustry.content.Fx;
 import mindustry.entities.Units;
 import mindustry.gen.Building;
 import mindustry.gen.Teamc;
@@ -19,10 +21,16 @@ public class LandMoveAI extends GroundAI {
     private boolean under;
     private boolean landing;
     private boolean upping;
+    private float landReload;
+    private float timer = 0;
 
     @Override
     public void updateUnit() {
         if (wu != null && wut != null) {
+            if (timer <= landReload) {
+                timer = timer + Time.delta;
+            }
+
             if (useFallback() && (fallback != null || (fallback = fallback()) != null)) {
                 fallback.unit(unit);
                 fallback.updateUnit();
@@ -39,16 +47,32 @@ public class LandMoveAI extends GroundAI {
 
     @Override
     public void updateMovement() {
-        unloadPayloads();
 
-        if(upping || landing){
+        if(wu.changing){
             return;
         }
+
+        unloadPayloads();
+
+        if (upping || landing) {
+            if (wu.under && !under) {
+                under = true;
+                landing = false;
+            } else if (!wu.under && under) {
+                under = false;
+                timer = 0;
+                upping = false;
+            }
+            return;
+        }
+
         updatePowerTarget();
         if (powerTarget != null) {
-            moveTo(powerTarget, getRange * 0.9F);
-            if (unit.within(powerTarget, getRange)) {
-                if(under){
+            Fx.healWave.at(unit);
+
+            if (unit.within(powerTarget, getRange * 0.9F)) {
+                if (!under) {
+                    moveTo(powerTarget, 1F);
                     getting = true;
                     for (Building b : buildings) {
                         wu.power += b.power.status;
@@ -59,15 +83,34 @@ public class LandMoveAI extends GroundAI {
                 }
             } else {
                 getting = false;
+                if (!under && timer >= landReload && !(unit.floorOn() == null || unit.floorOn().isDeep())) {
+                    landing = true;
+                    wu.landTimer = 0;
+                } else {
+                    moveTo(powerTarget, getRange * 0.9F);
+                }
             }
         } else if (target != null) {
             getting = false;
-            if (!(unit.floorOn() == null || unit.floorOn().isDeep()) && !landing) {
-                landing = true;
-                wu.landTimer = 0;
+            if (unit.within(target, wut.damageRadius * 0.9F)) {
+                if (under) {
+                    upping = true;
+                    wu.outTimer = 0;
+                } else {
+                    moveTo(target, unit.range() * 0.9F);
+                }
+            } else {
+                if (!under && !(unit.floorOn() == null || unit.floorOn().isDeep()) && timer >= landReload) {
+                    landing = true;
+                    wu.landTimer = 0;
+                } else {
+                    moveTo(target, unit.range() * 0.9F);
+                }
             }
+        } else {
             if (under) {
-                moveTo(target, unit.range() * 0.8F);
+                wu.outTimer = 0;
+                upping = true;
             }
         }
     }
@@ -105,6 +148,8 @@ public class LandMoveAI extends GroundAI {
             wut = (WUGENANSMechUnitType) unit.type;
             powerRange = wut.powerRange;
             getRange = wut.getRange;
+            landReload = wut.landReload;
+            timer = landReload;
         }
     }
 }

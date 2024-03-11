@@ -10,6 +10,7 @@ import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import Floor.FEntities.FBulletType.PercentBulletType;
 import Floor.FEntities.FBulletType.PercentEmpBulletType;
 import Floor.FEntities.FUnitType.TileMinerUnitType;
+import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
 import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.math.Interp;
@@ -45,6 +46,9 @@ public class FUnits {
 
     //ENGSWEISLand
     public static UnitType a;
+
+    //WUGENANSMechUnit
+    public static UnitType c;
 
     //special
     public static UnitType BulletInterception;
@@ -1014,6 +1018,15 @@ public class FUnits {
             rotateSpeed = 12;
             drag = 0.9F;
             accel = 0.9F;
+        }};
+
+        c = new WUGENANSMechUnitType("c") {{
+            constructor = WUGENANSMechUnit::create;
+            aiController = LandMoveAI::new;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("lm", "lm", u -> new LandMoveAI())};
+
+            health = 114514;
+            upDamage = 1000;
         }};
 
         BossList.list.add(velocity);

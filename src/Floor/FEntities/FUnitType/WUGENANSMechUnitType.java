@@ -1,5 +1,6 @@
 package Floor.FEntities.FUnitType;
 
+import Floor.FEntities.FUnit.F.WUGENANSMechUnit;
 import mindustry.type.UnitType;
 
 public class WUGENANSMechUnitType extends UnitType {
