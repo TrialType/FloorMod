@@ -99,13 +99,17 @@ public class windUnit extends FUnitEntity {
                 vec.set(ux - x, uy - y);
                 float l = (float) sqrt((x - ux) * (x - ux) + (y - uy) * (y - uy));
                 float power = (range() * 5 - l) / range() / 15;
-                vec.setLength(power * hitSize * 2 / u.hitSize / u.hitSize);
+                vec.setLength(power * 12 / u.speed());
                 u.vel.add(vec);
             }
         });
 
+        float reload = 420;
+        if (target instanceof CoreBlock.CoreBuild) {
+            reload = 210;
+        }
         createTimer = createTimer + Time.delta;
-        if (createTimer >= 420) {
+        if (createTimer >= reload) {
             if (rotation < 0) {
                 rotation = rotation + 360;
             }

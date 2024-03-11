@@ -43,7 +43,7 @@ public class KnockingTurret extends Block {
         super.setBars();
         addBar("power", (KnockingTurretBuild entity) -> new Bar(
                 "power", Pal.accent,
-                () -> (float) entity.power / maxPower
+                () -> (float) entity.stopPower / maxPower
         ));
         addBar("reload", (KnockingTurretBuild entity) -> new Bar(
                 "reload", Pal.techBlue,
@@ -66,7 +66,7 @@ public class KnockingTurret extends Block {
 
     public class KnockingTurretBuild extends Building {
         private int reloadCounter = 0;
-        private int power = maxPower;
+        private int stopPower = maxPower;
         public boolean broken = false;
         private float Boost = 0;
 
@@ -75,17 +75,17 @@ public class KnockingTurret extends Block {
             Boost = Mathf.lerpDelta(Boost, 1, 0.1F);
             reloadCounter++;
 
-            if (power > 0) {
-                Groups.unit.intersect(x - findRadius()/2, y - findRadius()/2, findRadius(), findRadius(), unit -> {
+            if (stopPower > 0) {
+                Groups.unit.intersect(x - findRadius() / 2, y - findRadius() / 2, findRadius(), findRadius(), unit -> {
                     if (unit.team != team && unit.speed() >= minSpeed) {
-                        if (unit.type instanceof ENGSWEISUnitType wut && power >= wut.power) {
+                        if (unit.type instanceof ENGSWEISUnitType wut && stopPower >= wut.power) {
                             unit.apply(FStatusEffects.StrongStop, 600.0F / wut.defend);
-                            power = power - wut.power;
-                        } else if (power >= sqrt(unit.hitSize)) {
+                            stopPower = stopPower - wut.power;
+                        } else if (stopPower >= sqrt(unit.hitSize)) {
                             unit.apply(FStatusEffects.StrongStop, (float) (600.0F / sqrt(unit.hitSize)));
-                            power = (int) (power - sqrt(unit.speed()));
+                            stopPower = (int) (stopPower - sqrt(unit.speed()));
                         }
-                        if (power == 0) {
+                        if (stopPower == 0) {
                             Fx.shieldBreak.at(x, y, radius, team.color);
                             Boost = 0;
                             broken = true;
@@ -94,12 +94,12 @@ public class KnockingTurret extends Block {
                 });
             }
 
-            if (reloadCounter >= reload && power < maxPower) {
-                if (power == 0) {
+            if (reloadCounter >= reload && stopPower < maxPower) {
+                if (stopPower == 0) {
                     Fx.spawnShockwave.at(x, y);
                 }
                 reloadCounter = 0;
-                power++;
+                stopPower++;
                 broken = false;
             }
         }
@@ -107,7 +107,7 @@ public class KnockingTurret extends Block {
         @Override
         public void draw() {
             super.draw();
-            Draw.alpha((float) power / maxPower * 0.75f);
+            Draw.alpha((float) stopPower / maxPower * 0.75f);
             Draw.z(Layer.blockAdditive);
             Draw.blend(Blending.additive);
             Draw.blend();
@@ -147,7 +147,7 @@ public class KnockingTurret extends Block {
         public void write(Writes write) {
             super.write(write);
             write.bool(broken);
-            write.i(power);
+            write.i(stopPower);
             write.i(reloadCounter);
         }
 
@@ -155,7 +155,7 @@ public class KnockingTurret extends Block {
         public void read(Reads read, byte revision) {
             super.read(read, revision);
             broken = read.bool();
-            power = read.i();
+            stopPower = read.i();
             reloadCounter = read.i();
         }
     }

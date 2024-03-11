@@ -11,6 +11,12 @@ import mindustry.Vars;
 import mindustry.async.AsyncProcess;
 import mindustry.async.PhysicsProcess;
 import mindustry.entities.Damage;
+import mindustry.entities.EntityCollisions;
+import mindustry.game.Team;
+import mindustry.gen.Healthc;
+import mindustry.gen.Hitboxc;
+import mindustry.gen.Teamc;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import java.lang.reflect.Field;
 
@@ -94,7 +100,12 @@ public class WUGENANSMechUnit extends FMechUnit {
                 outTimer += Time.delta;
                 elevation = Mathf.lerpDelta(elevation, 0, Time.delta / time1);
                 if (outTimer >= time1) {
-                    Damage.damage(team, x, y, wut.damageRadius, wut.upDamage);
+                    if (tileOn().block() != null) {
+                        if (tileOn().block() instanceof Healthc h && (h.health() <= maxHealth && !(tileOn().block() instanceof CoreBlock))) {
+                            h.kill();
+                        }
+                    }
+                    Damage.damage(team, x, y, wut.damageRadius * 1.4F, wut.upDamage);
                     under = false;
                     outTimer = -1;
                 }
@@ -116,6 +127,27 @@ public class WUGENANSMechUnit extends FMechUnit {
             under = false;
             outTimer = -1;
         }
+    }
+
+    public EntityCollisions.SolidPred solidity() {
+        return this.isFlying() || under ? null : EntityCollisions::solid;
+    }
+
+    public boolean canShoot() {
+        return !under && !this.disarmed && (!this.type.canBoost || !this.isFlying());
+    }
+
+    public boolean checkTarget(boolean targetAir, boolean targetGround) {
+        return this.isGrounded() && targetGround || this.isFlying() && targetAir;
+    }
+
+    public boolean collides(Hitboxc other) {
+        return this.hittable();
+    }
+
+    @Override
+    public boolean targetable(Team target) {
+        return !under && super.targetable(target);
     }
 
     public static class BeginChanger implements AsyncProcess {
