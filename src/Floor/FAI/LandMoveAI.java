@@ -160,7 +160,7 @@ public class LandMoveAI extends GroundAI {
         if (!getting) {
             powerTarget = Units.closestTarget(unit.team, unit.x, unit.y, powerRange, u -> false, b -> {
 
-                if (b.power.graph.getLastPowerStored() >= 1000 && b.power != null) {
+                if (b.power != null && b.power.graph.getLastPowerStored() >= 1000) {
 
                     final int[] number = {0};
                     Units.nearbyBuildings(b.x, b.y, getRange * 0.8F, bu -> {
