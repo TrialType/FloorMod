@@ -4,8 +4,6 @@ import Floor.FEntities.FUnit.F.WUGENANSMechUnit;
 import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
 import arc.util.Time;
 import mindustry.ai.types.GroundAI;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.effect.ExplosionEffect;
@@ -19,7 +17,6 @@ public class LandMoveAI extends GroundAI {
     private WUGENANSMechUnit wu;
     private WUGENANSMechUnitType wut;
     private Teamc powerTarget;
-    private boolean getting = false;
     private float powerRange;
     private float getRange;
     private boolean under;
@@ -79,10 +76,9 @@ public class LandMoveAI extends GroundAI {
 
         updatePowerTarget();
         if (powerTarget != null) {
-            if (unit.within(powerTarget, getRange * 0.9F)) {
+            if (unit.within(powerTarget, getRange * 0.2F)) {
                 if (!under) {
-                    moveTo(powerTarget, 1F);
-                    getting = true;
+                    moveTo(powerTarget, getRange * 0.1F);
 
                     Units.nearbyBuildings(unit.x, unit.y, getRange, b -> {
                         if (b.team != unit.team && b.power != null) {
@@ -99,7 +95,6 @@ public class LandMoveAI extends GroundAI {
                     upping = true;
                 }
             } else {
-                getting = false;
                 if (!under && timer >= landReload && !(unit.floorOn() == null || unit.floorOn().isDeep())) {
                     landing = true;
                     wu.landTimer = 0;
@@ -109,7 +104,6 @@ public class LandMoveAI extends GroundAI {
                 }
             }
         } else if (target != null) {
-            getting = false;
 
             if (target instanceof CoreBlock.CoreBuild || target instanceof Healthc h && h.maxHealth() > unit.maxHealth) {
                 CoreBlock.CoreBuild core = (CoreBlock.CoreBuild) target;
@@ -157,26 +151,24 @@ public class LandMoveAI extends GroundAI {
     }
 
     public void updatePowerTarget() {
-        if (!getting) {
-            powerTarget = Units.closestTarget(unit.team, unit.x, unit.y, powerRange, u -> false, b -> {
+        powerTarget = Units.closestTarget(unit.team, unit.x, unit.y, powerRange, u -> false, b -> {
 
-                if (b.power != null && b.power.graph.getLastPowerStored() >= 1000) {
+            if (b.power != null && b.power.graph.getLastPowerStored() >= 1000) {
 
-                    final int[] number = {0};
-                    Units.nearbyBuildings(b.x, b.y, getRange * 0.8F, bu -> {
-                        if (b.team != unit.team && b.power.graph.getLastPowerStored() >= 1000) {
-                            number[0]++;
-                        }
-                    });
+                final int[] number = {0};
+                Units.nearbyBuildings(b.x, b.y, getRange * 0.8F, bu -> {
+                    if (b.team != unit.team && b.power.graph.getLastPowerStored() >= 1000) {
+                        number[0]++;
+                    }
+                });
 
-                    return number[0] >= 1;
+                return number[0] >= 1;
 
-                }
-                return false;
-            });
-            if (target == null && powerTarget == null) {
-                target = unit.closestEnemyCore();
             }
+            return false;
+        });
+        if (target == null && powerTarget == null) {
+            target = unit.closestEnemyCore();
         }
     }
 
