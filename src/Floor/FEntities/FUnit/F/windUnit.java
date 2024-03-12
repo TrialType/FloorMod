@@ -99,8 +99,8 @@ public class windUnit extends FUnitEntity {
                 vec.set(ux - x, uy - y);
                 float l = (float) sqrt((x - ux) * (x - ux) + (y - uy) * (y - uy));
                 float power = (range() * 5 - l) / range() / 15;
-                vec.setLength(power * 12 / (u.speed() + 0.9F));
-                u.vel.add(vec);
+                vec.setLength(power * 36);
+                u.moveAt(vec);
             }
         });
 
@@ -163,7 +163,7 @@ public class windUnit extends FUnitEntity {
 
     private void createBullets(int x, int y) {
         Random ra = new Random();
-        int number = (int) (ra.nextInt((int) ((world.width() + world.height()) * 0.1 + 1)) + (world.width() + world.height()) * 0.01);
+        int number = (int) (ra.nextInt((int) ((world.width() + world.height()) * 0.3 + 1)) + (world.width() + world.height()) * 0.05);
         number = target == null ? number : target instanceof CoreBlock.CoreBuild ? number * 4 : number * 2;
         for (int i = 0; i < number; i++) {
             int size = ra.nextInt(31) + 1;

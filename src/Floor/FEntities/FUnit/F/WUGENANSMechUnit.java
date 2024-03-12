@@ -78,7 +78,6 @@ public class WUGENANSMechUnit extends FMechUnit {
 
     @Override
     public void update() {
-
         if (mec.indexOf(this) < 0) {
             change();
             mec.add(this);
@@ -96,7 +95,7 @@ public class WUGENANSMechUnit extends FMechUnit {
                     wu.x = x - hitSize / 2;
                     wu.y = y - hitSize / 2;
                     wu.rotation = rotation;
-                    if(world.buildWorld(wu.x,wu.y) != null){
+                    if (world.buildWorld(wu.x, wu.y) != null) {
                         wu.under = true;
                     } else {
                         wu.under = under;
@@ -159,6 +158,11 @@ public class WUGENANSMechUnit extends FMechUnit {
     @Override
     public boolean targetable(Team target) {
         return !under && super.targetable(target);
+    }
+
+    @Override
+    public boolean isGrounded() {
+        return this.elevation < 0.001F && !under;
     }
 
     public static class BeginChanger implements AsyncProcess {

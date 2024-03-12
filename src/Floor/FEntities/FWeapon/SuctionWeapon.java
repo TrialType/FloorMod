@@ -78,8 +78,8 @@ public class SuctionWeapon extends Weapon {
                         float power = abs(1 - ((len - 18F) / (range - 18F)));
                         Vec2 vec = new Vec2();
                         vec.set((tx - ux) * (1 - power), (ty - uy) * (1 - power));
-                        vec.setLength(power * 12 / (u.speed() + 0.9F));
-                        u.vel.add(vec);
+                        vec.setLength(power * 28);
+                        u.moveAt(vec);
                     }
                 }
             });

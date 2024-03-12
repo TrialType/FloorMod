@@ -4,11 +4,15 @@ import Floor.FEntities.FUnit.F.WUGENANSMechUnit;
 import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
 import arc.util.Time;
 import mindustry.ai.types.GroundAI;
+import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.gen.Player;
 import mindustry.gen.Teamc;
+import mindustry.graphics.Pal;
+import mindustry.type.ammo.PowerAmmoType;
+import mindustry.world.Block;
 
 import static java.lang.Math.min;
 
@@ -23,6 +27,7 @@ public class LandMoveAI extends GroundAI {
     private boolean upping;
     private float landReload;
     private float timer = 0;
+    private float effectTimer = 0;
     private final Effect walkEffect = new ExplosionEffect() {{
         smokes = 1;
         waveLife = 0;
@@ -32,10 +37,12 @@ public class LandMoveAI extends GroundAI {
 
     @Override
     public void updateUnit() {
+
         if (wu != null && wut != null) {
             if (timer <= landReload) {
                 timer = timer + Time.delta;
             }
+            effectTimer += Time.delta;
 
             if (useFallback() && (fallback != null || (fallback = fallback()) != null)) {
                 fallback.unit(unit);
@@ -73,13 +80,26 @@ public class LandMoveAI extends GroundAI {
         if (powerTarget != null) {
             if (unit.within(powerTarget, getRange)) {
                 if (!under) {
-                    moveTo(powerTarget, getRange * 0.2F);
+                    boolean effect;
+                    if (effectTimer >= 120) {
+                        effectTimer = 0;
+                        effect = true;
+                    } else {
+                        effect = false;
+                    }
+                    moveTo(powerTarget, getRange * 0.4F);
                     Units.nearbyBuildings(unit.x, unit.y, getRange, b -> {
                         if (b.team != unit.team && b.power != null) {
                             float capacity = b.power.graph.getLastPowerStored();
-                            if (capacity > 0) {
-                                wu.power += min(wut.needPower / 6000, capacity / 10);
-                                b.power.status -= min(wut.needPower / 6000, capacity) / capacity;
+                            float product = b.power.graph.getLastPowerProduced();
+                            if (capacity > 0 || product > 0) {
+                                if (b.power.status > 0) {
+                                    wu.power += min(wut.needPower / 6000, capacity / 10);
+                                    b.power.status -= min(b.power.status, min(wut.needPower / 6000, capacity) / capacity);
+                                    if (effect) {
+                                        Fx.itemTransfer.at(b.x, b.y, Math.max(getRange / 100f, 1f), Pal.power, unit);
+                                    }
+                                }
                             }
                         }
                     });
@@ -93,7 +113,7 @@ public class LandMoveAI extends GroundAI {
                     wu.landTimer = 0;
                 } else {
                     moveTo(powerTarget, getRange * 0.7F);
-                    if(under){
+                    if (under) {
                         walkEffect.at(unit);
                     }
                 }
@@ -112,7 +132,7 @@ public class LandMoveAI extends GroundAI {
                     wu.landTimer = 0;
                 } else {
                     moveTo(target, wut.damageRadius * 0.7F);
-                    if(under){
+                    if (under) {
                         walkEffect.at(unit);
                     }
                 }
@@ -125,22 +145,7 @@ public class LandMoveAI extends GroundAI {
     }
 
     public void updatePowerTarget() {
-        powerTarget = Units.closestTarget(unit.team, unit.x, unit.y, powerRange, u -> false, b -> {
-
-            if (b.power != null && b.power.graph.getLastPowerStored() >= 1000) {
-
-                final int[] number = {0};
-                Units.nearbyBuildings(b.x, b.y, getRange * 0.8F, bu -> {
-                    if (b.team != unit.team && b.power.graph.getLastPowerStored() >= 1000) {
-                        number[0]++;
-                    }
-                });
-
-                return number[0] >= 1;
-
-            }
-            return false;
-        });
+        powerTarget = Units.closestTarget(unit.team, unit.x, unit.y, powerRange, u -> false, b -> b.power != null && (b.power.graph.getLastPowerStored() >= 1000 || b.power.graph.getLastPowerProduced() >= 1000));
         if (target == null && powerTarget == null) {
             target = unit.closestEnemyCore();
         }
