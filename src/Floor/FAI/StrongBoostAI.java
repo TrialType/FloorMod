@@ -23,6 +23,7 @@ import mindustry.type.Weapon;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import static java.lang.Math.*;
+import static mindustry.Vars.world;
 
 public class StrongBoostAI extends FlyingAI {
     private ENGSWEISUnitType BoostUnitType = null;
@@ -42,8 +43,6 @@ public class StrongBoostAI extends FlyingAI {
     private int step;
     private Seq<Float> mx;
     private Seq<Float> my;
-    private float moveX;
-    private float moveY;
     private Teamc lastTarget;
     private int order = 3;
     private int number;
@@ -92,8 +91,9 @@ public class StrongBoostAI extends FlyingAI {
                 updateTarget(true);
                 if (target != null) {
                     circleShoot(30.0f);
+                } else {
+                    unit.rotation = unit.rotation + 14;
                 }
-                unit.rotation = unit.rotation + 14;
             } else if (target != null) {
                 float x = target.x();
                 float y = target.y();
@@ -147,12 +147,13 @@ public class StrongBoostAI extends FlyingAI {
                 float cx = core.x;
                 float cy = core.y;
                 if (start) {
-                    orx = mx.get(step);
-                    ory = my.get(step);
-                    if (unit.within(orx, ory, 1F) || orx < 0 || ory < 0 || (abs(moveX - ux) < unit.speed() / 20) && (abs(moveY - uy) < unit.speed() / 20)) {
+                    if (unit.within(orx, ory, 1F) ||
+                            mx.get(step) < 0 || mx.get(step) > world.width() * 8 ||
+                            my.get(step) < 0 || my.get(step) > world.height() * 8) {
                         if (step == mx.size - 1) {
                             mx.clear();
                             my.clear();
+                            step = 0;
                         } else {
                             step++;
                         }
@@ -161,14 +162,12 @@ public class StrongBoostAI extends FlyingAI {
                         vec.set(cx - ux, cy - uy);
                         vec.setLength(unit.speed());
                     } else {
-                        moveX = ux;
-                        moveY = uy;
                         orx = mx.get(step);
                         ory = my.get(step);
                         float mxx = orx - ux;
                         float myy = ory - uy;
-                        float mll = (float) sqrt(mxx * mxx + myy * myy);
-                        vec.set(mxx * unit.speed() / mll, myy * unit.speed() / mll);
+                        vec.set(mxx, myy);
+                        vec.setLength(unit.speed());
                     }
                     unit.rotation = unit.rotation + 2;
                     unit.moveAt(vec);
@@ -275,7 +274,7 @@ public class StrongBoostAI extends FlyingAI {
             start = false;
             order = 3;
         } else if (order == 2) {
-            vec.set(orx,ory);
+            vec.set(orx, ory);
             vec.setLength(unit.speed());
         } else {
             vec.set(sx, sy);

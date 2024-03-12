@@ -18,10 +18,12 @@ import mindustry.entities.Damage;
 import mindustry.entities.EntityCollisions;
 import mindustry.entities.units.StatusEntry;
 import mindustry.game.Team;
+import mindustry.gen.Building;
 import mindustry.gen.Healthc;
 import mindustry.gen.Hitboxc;
 import mindustry.gen.Teamc;
 import mindustry.io.TypeIO;
+import mindustry.world.Build;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import java.lang.reflect.Field;
@@ -109,9 +111,10 @@ public class WUGENANSMechUnit extends FMechUnit {
                 outTimer += Time.delta;
                 elevation = Mathf.lerpDelta(elevation, 0, Time.delta / time1);
                 if (outTimer >= time1) {
-                    if (tileOn().build != null) {
-                        if (tileOn().build.health() <= maxHealth && !(tileOn().build instanceof CoreBlock.CoreBuild)) {
-                            tileOn().build.kill();
+                    Building b = world.buildWorld(x,y);
+                    if (b != null) {
+                        if (b.health() <= maxHealth && !(b instanceof CoreBlock.CoreBuild)) {
+                            b.kill();
                         }
                     }
                     Damage.damage(team, x, y, wut.damageRadius * 1.4F, wut.upDamage);

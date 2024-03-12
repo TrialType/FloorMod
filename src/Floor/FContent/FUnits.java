@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import Floor.FAI.*;
 import Floor.FEntities.FAbility.StrongMinerAbility;
+import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
@@ -45,7 +46,7 @@ public class FUnits {
     public static UnitType barb, Hammer, Buying, crazy, Transition, Shuttle;
 
     //ENGSWEISLand
-    public static UnitType a;
+    public static UnitType dive, befall;
 
     //WUGENANSMechUnit
     public static UnitType c;
@@ -427,56 +428,73 @@ public class FUnits {
                 }};
             }});
         }};
-        a = new ChainUnitType("a") {{
+        dive = new ChainUnitType("dive") {{
             constructor = ChainLegUnit::create;
+
             flying = false;
             speed = 0.8F;
-            health = 900000;
+            health = 900;
+            armor = 18;
             hitSize = 13;
-            buildRange = 100;
-            buildSpeed = 10;
+            percent = 13;
             weapons.add(new Weapon("a-weapon") {{
                 top = false;
-                shootY = 3f;
-                reload = 9f;
+                mirror = false;
+                shootY = 0f;
+                reload = 4;
                 ejectEffect = Fx.none;
                 recoil = 1f;
-                x = 7f;
+                x = 0f;
                 shootSound = Sounds.flame;
 
-                bullet = new PercentBulletType() {{
+                shoot = new ShootSpread() {{
+                    shots = 16;
+                    spread = 11.25F;
+                }};
+
+                bullet = new BasicBulletType() {{
+                    shootEffect = Fx.shootSmallFlame;
                     lifetime = 20;
-                    firstPercent = true;
-                    percent = 2.5F;
                     width = 15;
                     height = 15;
-                    speed = 10;
-                    damage = 0;
-                    WS = true;
-                    splashDamageRadius = 0;
+                    speed = 2.5F;
+                    damage = 10;
+
+                    status = StatusEffects.burning;
                 }};
             }});
             engines.add(
                     new UnitEngine(
                             (float) (hitSize * Math.sin(Math.toRadians(90)) / 2.0F),
                             (float) (hitSize * Math.cos(Math.toRadians(90)) / 2.0F),
-                            3, 0
+                            4, 0
                     )
             );
             engines.add(
                     new UnitEngine(
                             (float) (hitSize * Math.sin(Math.toRadians(180)) / 2.0F),
                             (float) (hitSize * Math.cos(Math.toRadians(180)) / 2.0F),
-                            3, -90
+                            4, -90
                     )
             );
             engines.add(
                     new UnitEngine(
                             (float) (hitSize * Math.sin(Math.toRadians(270)) / 2.0F),
                             (float) (hitSize * Math.cos(Math.toRadians(270)) / 2.0F),
-                            3, 180
+                            4, 180
                     )
             );
+        }};
+        befall = new ChainUnitType("befall") {{
+            constructor = ChainLegUnit::create;
+
+            health = 6000;
+            armor = 30;
+            speed = 1;
+            range = maxRange = 56;
+
+            abilities.add(new ShieldRegenFieldAbility(200, 1000, 120, 0.01F));
+            abilities.add(new TimeLargeDamageAbility());
         }};
         velocity = new ENGSWEISUnitType("velocity") {{
             constructor = ENGSWEISUnitEntity::create;
@@ -1025,7 +1043,7 @@ public class FUnits {
             aiController = LandMoveAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("lm", "lm", u -> new LandMoveAI())};
 
-            health = 114514;
+            health = 1000;
             upDamage = 1000;
         }};
 

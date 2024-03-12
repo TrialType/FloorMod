@@ -76,14 +76,16 @@ public class KnockingTurret extends Block {
             reloadCounter++;
 
             if (stopPower > 0) {
-                Groups.unit.intersect(x - findRadius() / 2, y - findRadius() / 2, findRadius(), findRadius(), unit -> {
+                Groups.unit.intersect(x - findRadius() / 2, y - findRadius() / 2, findRadius() / 2, findRadius() / 2, unit -> {
                     if (unit.team != team && unit.speed() >= minSpeed) {
                         if (unit.type instanceof ENGSWEISUnitType wut && stopPower >= wut.power) {
                             unit.apply(FStatusEffects.StrongStop, 600.0F / wut.defend);
                             stopPower = stopPower - wut.power;
+                            unit.vel.setZero();
                         } else if (stopPower >= sqrt(unit.hitSize)) {
                             unit.apply(FStatusEffects.StrongStop, (float) (600.0F / sqrt(unit.hitSize)));
                             stopPower = (int) (stopPower - sqrt(unit.speed()));
+                            unit.vel.setZero();
                         }
                         if (stopPower == 0) {
                             Fx.shieldBreak.at(x, y, radius, team.color);

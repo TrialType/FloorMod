@@ -23,7 +23,6 @@ public class ChainAI extends GroundAI {
     private Unit underUnit = null;
     private boolean upon;
     private float timer = 1500;
-    //private float timer1 = 600;
     private Healthc order = null;
 
     public void FindUnderUnit() {
@@ -52,15 +51,6 @@ public class ChainAI extends GroundAI {
     @Override
     public void updateUnit() {
         if (unit instanceof UnitChainAble uca) {
-            //timer1++;
-//            if (timer1 > 600 && underUnit != null) {
-//                Time.runTask(0, () -> {
-//                    BaseDialog dialog = new BaseDialog(underUnit + "////" + upon + "///" + order + "///" + unit);
-//                    dialog.cont.button("I see", dialog::hide).size(100f, 50f);
-//                    dialog.show();
-//                });
-//                timer1 = 0;
-//            }
             underUnit = uca.UnderUnit();
             upon = uca.upon();
             timer += 1;
@@ -89,7 +79,6 @@ public class ChainAI extends GroundAI {
                     uca.UnderUnit(null);
                     uca.upon(false);
                     unit.elevation = 0;
-                    //unit.damage(unit.maxHealth() / 2);
                     return;
                 }
                 Seq<Unit> se = new Seq<>();
@@ -99,12 +88,7 @@ public class ChainAI extends GroundAI {
                 float x = 0, y = 0;
                 if (se.size == 1) {
                     x = y = 0;
-                } /*else {
-                    float angle = ((se.indexOf(unit) + 1) * 360.0F) / se.size + underUnit.rotation + 90;
-                    angle = angle % 360;
-                    x = (float) (underUnit.hitSize * Math.cos(Math.toRadians(angle)) / 3.0F);
-                    y = (float) (underUnit.hitSize * Math.sin(Math.toRadians(angle)) / 3.0F);
-                }*/
+                }
                 float mx = underUnit.x() + x - unit.x;
                 float my = underUnit.y() + y - unit.y;
                 float s = unit.speed();

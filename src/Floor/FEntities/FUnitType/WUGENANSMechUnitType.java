@@ -134,9 +134,7 @@ public class WUGENANSMechUnitType extends UnitType {
             }
         }
 
-        if (mech != null) {
-            unit.trns(-legOffset.x, -legOffset.y);
-        }
+        unit.trns(-legOffset.x, -legOffset.y);
 
         Draw.reset();
     }
