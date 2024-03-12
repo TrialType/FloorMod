@@ -126,8 +126,13 @@ public class WUGENANSMechUnit extends FMechUnit {
                     landTimer = -1;
                 }
             } else if (under) {
+                if(floorOn().isDeep()){
+                    under = false;
+                    elevation = 1;
+                } else {
+                    elevation = -1;
+                }
                 landTimer = outTimer = -1;
-                elevation = -1;
             } else {
                 landTimer = outTimer = -1;
                 elevation = 0;

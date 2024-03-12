@@ -78,7 +78,9 @@ public class WUGENANSMechUnitType extends UnitType {
             drawPayload((Unit & Payloadc) unit);
         }
 
-        drawSoftShadow(unit);
+        if (!(unit instanceof WUGENANSMechUnit wu && wu.under)) {
+            drawSoftShadow(unit);
+        }
 
         Draw.z(z);
 

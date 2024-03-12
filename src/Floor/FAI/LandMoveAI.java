@@ -93,12 +93,10 @@ public class LandMoveAI extends GroundAI {
                             float capacity = b.power.graph.getLastPowerStored();
                             float product = b.power.graph.getLastPowerProduced();
                             if (capacity > 0 || product > 0) {
-                                if (b.power.status > 0) {
-                                    wu.power += min(wut.needPower / 6000, capacity / 10);
-                                    b.power.status -= min(b.power.status, min(wut.needPower / 6000, capacity) / capacity);
-                                    if (effect) {
-                                        Fx.itemTransfer.at(b.x, b.y, Math.max(getRange / 100f, 1f), Pal.power, unit);
-                                    }
+                                wu.power += min(wut.needPower / 6000, capacity / 10);
+                                b.power.status -= min(b.power.status, min(wut.needPower / 6000, capacity) / capacity);
+                                if (effect) {
+                                    Fx.itemTransfer.at(b.x, b.y, Math.max(getRange / 100f, 1f), Pal.power, unit);
                                 }
                             }
                         }
