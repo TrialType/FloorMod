@@ -123,7 +123,7 @@ public class StrongBoostAI extends FlyingAI {
                         }
                         if (unit.speed() >= 10) {
                             vec.set(orx, ory);
-                            vec.setLength(min(unit.speed() * 80, 68));
+                            vec.setLength(min(unit.speed() * 80, 80));
                             unit.moveAt(vec);
                             boostEffect.at(ux, -unit.hitSize() / 2 + uy, unit.rotation - 90);
                             start = false;
@@ -147,13 +147,13 @@ public class StrongBoostAI extends FlyingAI {
                 float cx = core.x;
                 float cy = core.y;
                 if (start) {
-                    if (unit.within(orx, ory, 1F) ||
+                    if (!(step == -1) && (unit.within(orx, ory, 1F) ||
                             mx.get(step) < 0 || mx.get(step) > world.width() * 8 ||
-                            my.get(step) < 0 || my.get(step) > world.height() * 8) {
+                            my.get(step) < 0 || my.get(step) > world.height() * 8)) {
                         if (step == mx.size - 1) {
                             mx.clear();
                             my.clear();
-                            step = 0;
+                            step = -1;
                         } else {
                             step++;
                         }

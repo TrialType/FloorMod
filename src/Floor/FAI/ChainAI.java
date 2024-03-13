@@ -7,8 +7,6 @@ import arc.func.Cons;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.ai.Pathfinder;
-import mindustry.ai.UnitCommand;
-import mindustry.ai.types.CommandAI;
 import mindustry.ai.types.GroundAI;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
@@ -81,6 +79,7 @@ public class ChainAI extends GroundAI {
                     unit.elevation = 0;
                     return;
                 }
+
                 Seq<Unit> se = new Seq<>();
                 if (underUnit instanceof LayAble l) {
                     se = l.getUit();
@@ -209,9 +208,8 @@ public class ChainAI extends GroundAI {
 
             faceTarget();
         } else {
-            CommandAI c = new CommandAI();
+            GroundAI c = new GroundAI();
             c.unit(unit);
-            c.command(UnitCommand.moveCommand);
             c.updateUnit();
         }
     }

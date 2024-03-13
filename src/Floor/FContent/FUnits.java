@@ -1,6 +1,7 @@
 package Floor.FContent;
 
 import Floor.FAI.*;
+import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
@@ -455,10 +456,10 @@ public class FUnits {
                 bullet = new BasicBulletType() {{
                     shootEffect = Fx.shootSmallFlame;
                     lifetime = 20;
-                    width = 15;
-                    height = 15;
-                    speed = 2.5F;
-                    damage = 10;
+                    width = 0;
+                    height = 0;
+                    speed = 2.3F;
+                    damage = 20;
 
                     status = StatusEffects.burning;
                 }};
@@ -914,6 +915,7 @@ public class FUnits {
             power = 2;
 
             abilities.add(new ForceFieldAbility(hitSize * 2, 1, 100, 600));
+            abilities.add(new EMPAbility());
 
             weapons.add(new Weapon() {{
                 reload = 42;

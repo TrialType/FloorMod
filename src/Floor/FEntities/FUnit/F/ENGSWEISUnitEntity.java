@@ -81,10 +81,13 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             crazy.add(this);
             change();
         }
+
         if (!team.isAI() || BossList.list.indexOf(type) > -1) {
             first = false;
         }
+
         super.update();
+
         unitMap.replaceAll((u, v) -> v + Time.delta);
         buildingMap.replaceAll((u, v) -> v + Time.delta);
         if (moving() && type instanceof ENGSWEISUnitType eut) {
