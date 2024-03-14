@@ -13,7 +13,8 @@ public class FDefends {
     public static void load() {
         kt = new KnockingTurret("kt") {{
             hasPower = true;
-            health = 114514;
+            health = 650;
+
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
     }

@@ -134,6 +134,7 @@ public class FStatusEffects {
 
         StrongStop = new StatusEffect("StrongStop") {{
             speedMultiplier = 0;
+            buildSpeedMultiplier = 0;
             disarm = true;
         }};
         boostSpeed = new StatusEffect("boostSpeed") {{

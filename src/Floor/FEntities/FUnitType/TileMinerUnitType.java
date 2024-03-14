@@ -21,8 +21,4 @@ public class TileMinerUnitType extends UnitType {
         }
         return unit;
     }
-    @Override
-    public void setStats(){
-        super.setStats();
-    }
 }

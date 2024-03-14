@@ -29,24 +29,30 @@ public class windUnit extends FUnitEntity {
         height = 30;
         shrinkY = 0;
         lifetime = Float.MAX_VALUE;
-        damage = 80;
+        damage = 100;
         splashDamage = 40;
         splashDamageRadius = 15;
         speed = 0.8F;
+
+        absorbable = false;
+        hittable = false;
     }};
     private final WindMoveBulletType mid = new WindMoveBulletType() {{
         width = 40;
         height = 40;
         shrinkY = 0;
         lifetime = Float.MAX_VALUE;
-        damage = 160;
+        damage = 200;
         splashDamage = 80;
         splashDamageRadius = 20;
         speed = 0.6F;
         fragAngle = 90;
-        fragBullets = 3;
+        fragBullets = 5;
         fragBullet = small;
         fragOnAbsorb = fragOnHit = true;
+
+        absorbable = false;
+        hittable = false;
     }};
     private final WindMoveBulletType large = new WindMoveBulletType() {{
         width = 50;
@@ -58,9 +64,12 @@ public class windUnit extends FUnitEntity {
         splashDamageRadius = 25;
         speed = 0.4F;
         fragAngle = 90;
-        fragBullets = 3;
+        fragBullets = 5;
         fragBullet = mid;
         fragOnAbsorb = fragOnHit = true;
+
+        absorbable = false;
+        hittable = false;
     }};
 
     private float createTimer;

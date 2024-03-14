@@ -17,7 +17,7 @@ public class ENGSWEISUnitType extends UnitType {
     public int power = 1;
     public long reload = 1800;
     public float delay = 90;
-    public Effect boostEffect = Fx.healWave;
+    public Effect boostEffect = Fx.missileTrailSmoke;
     public float Speed1 = 0.5F;
     public float Health2 = 70;
     public int exchangeTime = 120;

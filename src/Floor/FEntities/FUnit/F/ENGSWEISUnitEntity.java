@@ -7,6 +7,7 @@ import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import Floor.FTools.BossList;
 import Floor.FTools.PhysicsWorldChanger;
 import arc.Events;
+import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Rect;
 import arc.struct.Bits;
@@ -17,6 +18,7 @@ import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.async.AsyncProcess;
 import mindustry.async.PhysicsProcess;
+import mindustry.content.Fx;
 import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
 import mindustry.entities.units.StatusEntry;
@@ -27,6 +29,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.*;
 import static mindustry.Vars.asyncCore;
 
 public class ENGSWEISUnitEntity extends FUnitEntity {
@@ -66,7 +69,7 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
                     }
                 }
             }
-            if(bc != null){
+            if (bc != null) {
                 asyncCore.processes.add(bc);
                 bc = null;
             }
@@ -77,7 +80,7 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
 
     @Override
     public void update() {
-        if (type == FUnits.crazy && crazy.indexOf(this) < 0) {
+        if (crazy.indexOf(this) < 0) {
             crazy.add(this);
             change();
         }
@@ -90,7 +93,7 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
 
         unitMap.replaceAll((u, v) -> v + Time.delta);
         buildingMap.replaceAll((u, v) -> v + Time.delta);
-        if (moving() && type instanceof ENGSWEISUnitType eut) {
+        if (moving() && type instanceof ENGSWEISUnitType eut && target != null) {
             float damage = eut.damage;
             float changeHel = eut.changeHel;
             float percent = eut.percent;
@@ -98,42 +101,27 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             float reload = eut.HitReload;
             float minSpeed = eut.minSpeed;
             if (speed() >= minSpeed) {
-                Units.nearbyEnemies(team, x, y, hitSize / 2, u -> {
-                    if (!(u.team == team)) {
-                        float time = unitMap.computeIfAbsent(u, unit1 -> -1F);
-                        if (time < 0 || time >= reload) {
-                            unitMap.put(u, 0F);
-                            boolean life = u.dead();
-                            if (firstPercent && u.health() > changeHel || !firstPercent && u.health() < changeHel) {
-                                u.health(u.health() - u.maxHealth() * percent / 100.0F);
-                                u.damage(0);
-                                if (u.health() <= 0) u.kill();
-                            } else {
-                                u.damage(damage);
-                            }
-                            if (!life && u.dead()) {
-                                Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
-                            }
-                        }
+                float length = type == FUnits.crazy ? hitSize / 2 : min(speed() * 100, 100);
+                float angle = rotation + 90;
+                float dx = (float) (hitSize * cos(toRadians(angle)));
+                float dy = (float) (hitSize * sin(toRadians(angle)));
+                float xp = dx + x;
+                float yp = dy + y;
+                float xj = x - dx;
+                float yj = y - dy;
+                Units.nearbyEnemies(team, x, y, length, u -> {
+                    float timer = unitMap.computeIfAbsent(u, f -> reload);
+                    if (timer >= reload) {
+                        unitMap.put(u, 0F);
+                        applyDamage(u, xp, yp, xj, yj, length, percent, damage, firstPercent, changeHel, type == FUnits.crazy);
                     }
                 });
-                Units.nearbyBuildings(x, y, hitSize / 2F, b -> {
-                    if (!(b.team == team)) {
-                        float time = buildingMap.computeIfAbsent(b, unit1 -> -1F);
-                        if (time < 0 || time >= reload) {
+                Units.nearbyBuildings(x, y, length, b -> {
+                    if (b.team != team) {
+                        float timer = buildingMap.computeIfAbsent(b, f -> reload);
+                        if (timer >= reload) {
                             buildingMap.put(b, 0F);
-                            boolean life = b.dead();
-                            if (firstPercent && b.health() > changeHel / 2 || !firstPercent && b.health() < changeHel * 2) {
-                                b.health(b.health() - b.maxHealth() * percent / 100.0F);
-                                b.damage(0);
-                                if (b.health() <= 0) b.kill();
-                            } else {
-                                b.damage(damage);
-                            }
-                            if (!life && b.dead()) {
-                                Events.fire(new FEvents.UnitDestroyOtherEvent(this, b));
-                            }
-
+                            applyDamage(b, xp, yp, xj, yj, length, percent, damage, firstPercent, changeHel, type == FUnits.crazy);
                         }
                     }
                 });
@@ -457,16 +445,53 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         return super.speed();
     }
 
+    private void applyDamage(Healthc u, float x1, float y1, float x2, float y2, float length, float percent, float damage, boolean firstPercent, float changeHel, boolean crazy) {
+
+        if (crazy) {
+            percentDamage(u, percent, damage, firstPercent, changeHel);
+        } else {
+            Fx.healWave.at(this);
+
+            float rotate = Angles.angle(x, y, target.x(), target.y());
+            float ux = u.x();
+            float uy = u.y();
+            float l1 = (float) sqrt((x1 - ux) * (x1 - uy) + (y1 - uy) * (y1 - uy));
+            float l2 = (float) sqrt((x2 - ux) * (x2 - uy) + (y2 - uy) * (y2 - uy));
+            float angle1 = Angles.angleDist(Angles.angle(x1, y1, ux, uy), rotate);
+            float angle2 = Angles.angleDist(Angles.angle(x2, y2, ux, uy), rotate);
+            float angle3 = Angles.angleDist(Angles.angle(ux, uy, x1, y1), Angles.angle(ux, uy, x2, y2));
+            if (l1 * cos(toRadians(angle1)) <= length && l2 * cos(toRadians(angle2)) <= length && abs(angle1 + angle2 - angle3) <= 15) {
+                percentDamage(u, percent, damage, firstPercent, changeHel);
+            }
+        }
+    }
+
+    private void percentDamage(Healthc u, float percent, float damage, boolean firstPercent, float changeHel) {
+
+        boolean dead = u.dead();
+        if (firstPercent && u.health() > changeHel || (!firstPercent && u.health() <= changeHel)) {
+            u.health(u.health() - u.maxHealth() * percent / 100);
+            u.hitTime(1.0F);
+        } else {
+            u.damage(damage);
+        }
+        if (!dead && u.dead()) {
+            Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
+        }
+    }
+
     public static class BeginChanger implements AsyncProcess {
         @Override
         public void begin() {
             Seq<ENGSWEISUnitEntity> us = new Seq<>();
             for (ENGSWEISUnitEntity eu : crazy) {
-                if (eu.dead || eu.health <= 0 || !(eu.type == FUnits.crazy)) {
+                if (eu.dead || eu.health <= 0 || eu.target == null) {
                     us.add(eu);
                 }
             }
+
             crazy.removeAll(us);
+
             for (ENGSWEISUnitEntity u : crazy) {
                 if (u.target != null) {
                     u.physref.body.layer = 3;

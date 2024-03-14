@@ -7,6 +7,7 @@ import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
+import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.ChainUnitType;
 import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import Floor.FEntities.FBulletType.PercentBulletType;
@@ -18,6 +19,7 @@ import arc.graphics.Color;
 import arc.math.Interp;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
+import mindustry.entities.Effect;
 import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.entities.abilities.ShieldArcAbility;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
@@ -54,6 +56,7 @@ public class FUnits {
 
     //special
     public static UnitType BulletInterception;
+    public static UnitType d;
 
     public static void load() {
         bulletInterception = new UnitType("bulletInterception") {{
@@ -460,10 +463,12 @@ public class FUnits {
                     height = 0;
                     speed = 2.3F;
                     damage = 20;
+                    despawnEffect = hitEffect = Fx.none;
 
                     status = StatusEffects.burning;
                 }};
             }});
+
             engines.add(
                     new UnitEngine(
                             (float) (hitSize * Math.sin(Math.toRadians(90)) / 2.0F),
@@ -496,6 +501,28 @@ public class FUnits {
 
             abilities.add(new ShieldRegenFieldAbility(200, 1000, 120, 0.01F));
             abilities.add(new TimeLargeDamageAbility());
+
+            engines.add(
+                    new UnitEngine(
+                            (float) (hitSize * Math.sin(Math.toRadians(90)) / 2.0F),
+                            (float) (hitSize * Math.cos(Math.toRadians(90)) / 2.0F),
+                            5, 0
+                    )
+            );
+            engines.add(
+                    new UnitEngine(
+                            (float) (hitSize * Math.sin(Math.toRadians(180)) / 2.0F),
+                            (float) (hitSize * Math.cos(Math.toRadians(180)) / 2.0F),
+                            5, -90
+                    )
+            );
+            engines.add(
+                    new UnitEngine(
+                            (float) (hitSize * Math.sin(Math.toRadians(270)) / 2.0F),
+                            (float) (hitSize * Math.cos(Math.toRadians(270)) / 2.0F),
+                            5, 180
+                    )
+            );
         }};
         velocity = new ENGSWEISUnitType("velocity") {{
             constructor = ENGSWEISUnitEntity::create;
@@ -742,7 +769,7 @@ public class FUnits {
             Health2 = 3000;
             Speed1 = 3;
 
-            HitReload = 25;
+            HitReload = 18;
             percent = 1.5F;
             changeHel = 100;
             damage = 200 * 1.4F;
@@ -1048,8 +1075,23 @@ public class FUnits {
             health = 1000;
             upDamage = 1000;
         }};
+        d = new UnitType("d") {{
+            constructor = FUnitEntity::create;
+            health = 100000;
+            armor = 10000;
+            speed = 1.2F;
+            weapons.add(new Weapon() {{
+                reload = 10;
+                bullet = new BasicBulletType() {{
+                    shootEffect = new WaveEffect() {{
+                        interp = Interp.swing;
+                    }};
+                }};
+            }});
+        }};
 
         BossList.list.add(velocity);
+        BossList.list.add(AVelocity);
         BossList.list.add(Velocity);
         BossList.list.add(Winder);
     }

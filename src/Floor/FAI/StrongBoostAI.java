@@ -16,6 +16,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.Predict;
 import mindustry.entities.Sized;
 import mindustry.entities.Units;
+import mindustry.gen.Building;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
 import mindustry.graphics.Pal;
@@ -53,21 +54,20 @@ public class StrongBoostAI extends FlyingAI {
             if (first) {
                 target = null;
             }
-            if (target == null) {
-                wu.target = null;
-            } else {
+
+            if (lastTarget != target) {
                 wu.target = target;
-            }
-            if (lastTarget instanceof Healthc h && (h.dead() || h.health() <= 0)) {
-                lastTarget = null;
+                lastTarget = target;
                 start = false;
             }
+
             counter += Time.delta;
             if (useFallback() && (fallback != null || (fallback = fallback()) != null)) {
                 fallback.unit(unit);
                 fallback.updateUnit();
                 return;
             }
+
             if (!first) {
                 updateVisuals();
                 updateTargeting();
@@ -102,8 +102,6 @@ public class StrongBoostAI extends FlyingAI {
                         Angles.angle(ux, uy, x, y),
                         unit.type.rotateSpeed * Time.delta * unit.speedMultiplier())) <= 5F
                 ) {
-                    orx = x - ux;
-                    ory = y - uy;
                     if (unit.speed() <= 0.01F) {
                         start = false;
                         counter = 0;
@@ -118,12 +116,12 @@ public class StrongBoostAI extends FlyingAI {
                     lastTarget = target;
                     if (delayCounter >= delay && (orx != 0 || ory != 0)) {
                         if (unit.speed() < 10) {
-                            unit.apply(FStatusEffects.boostSpeed, 3);
+                            unit.apply(FStatusEffects.boostSpeed, 2);
                             return;
                         }
                         if (unit.speed() >= 10) {
                             vec.set(orx, ory);
-                            vec.setLength(min(unit.speed() * 80, 80));
+                            vec.setLength(min(unit.speed() * 100, 100));
                             unit.moveAt(vec);
                             boostEffect.at(ux, -unit.hitSize() / 2 + uy, unit.rotation - 90);
                             start = false;
@@ -134,9 +132,11 @@ public class StrongBoostAI extends FlyingAI {
                 }
                 moveTo(target, unit.range() * 0.8f);
                 unit.lookAt(target);
-                if (unit.within(x, y, unit.range()) && counter >= reload && !start) {
+                if (unit.within(x, y, unit.range()) && counter >= reload && !start && target instanceof Building && BossList.list.indexOf(unit.type) < 0) {
                     start = true;
                     delayCounter = 0;
+                    orx = x - ux;
+                    ory = y - uy;
                 }
             } else {
                 updateTarget(false);
