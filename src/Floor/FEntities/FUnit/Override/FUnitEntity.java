@@ -3,13 +3,17 @@ package Floor.FEntities.FUnit.Override;
 import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.LayAble;
 import Floor.FTools.UnitChainAble;
+import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.Bits;
 import arc.struct.Seq;
+import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.ctype.ContentType;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.units.StatusEntry;
 import mindustry.gen.Groups;
 import mindustry.gen.Unit;
@@ -18,6 +22,9 @@ import mindustry.io.TypeIO;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.Math.max;
+import static mindustry.Vars.world;
 
 public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
     private int timer = 0;
@@ -344,7 +351,6 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
         write.i(level);
         write.f(exp);
     }
-
     @Override
     public void update() {
         if (units.size == 0 && idList.size > 0) {

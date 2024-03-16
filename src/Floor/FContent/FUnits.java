@@ -19,7 +19,6 @@ import arc.graphics.Color;
 import arc.math.Interp;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
-import mindustry.entities.Effect;
 import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.entities.abilities.ShieldArcAbility;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
@@ -43,7 +42,7 @@ public class FUnits {
     public static UnitType transfer, shuttlevI, bulletInterception;
 
     ////ENGSWEISBoss
-    public static UnitType velocity, AVelocity, Velocity, Winder;
+    public static UnitType velocity, AVelocity, Velocity, hidden, cave;
 
     //ENGSWEISFlying
     public static UnitType barb, Hammer, Buying, crazy, Transition, Shuttle;
@@ -1050,10 +1049,10 @@ public class FUnits {
                 }};
             }});
         }};
-        Winder = new UnitType("Winder") {{
-            constructor = windUnit::create;
-            aiController = windMoveAI::new;
-            commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("findAuto", "findAuto", u -> new windMoveAI())};
+        hidden = new UnitType("hidden") {{
+            constructor = HiddenUnit::create;
+            aiController = HiddenAI::new;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("findAuto", "findAuto", u -> new HiddenAI())};
 
             targetAir = targetGround = true;
             range = maxRange = 200;
@@ -1073,26 +1072,26 @@ public class FUnits {
             commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("lm", "lm", u -> new LandMoveAI())};
 
             health = 1000;
-            upDamage = 1000;
+            upDamage = 70;
         }};
-        d = new UnitType("d") {{
-            constructor = FUnitEntity::create;
+        cave = new UnitType("cave") {{
+            constructor = CaveUnit::create;
+
+            hittable = false;
+            targetable = false;
+            playerControllable = logicControllable = false;
+
+            rotateSpeed = 0;
+            hitSize = 45;
             health = 100000;
             armor = 10000;
-            speed = 1.2F;
-            weapons.add(new Weapon() {{
-                reload = 10;
-                bullet = new BasicBulletType() {{
-                    shootEffect = new WaveEffect() {{
-                        interp = Interp.swing;
-                    }};
-                }};
-            }});
+            speed = 0F;
         }};
 
         BossList.list.add(velocity);
         BossList.list.add(AVelocity);
         BossList.list.add(Velocity);
-        BossList.list.add(Winder);
+        BossList.list.add(hidden);
+        BossList.list.add(cave);
     }
 }

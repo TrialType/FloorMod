@@ -1,5 +1,6 @@
 package Floor.FContent;
 
+import Floor.FEntities.FEffectState.WaterEffectState;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FBullet.removeSpwanBullet;
@@ -7,6 +8,7 @@ import mindustry.gen.EntityMapping;
 
 public class FEntities {
     public static void load(){
+        EntityMapping.idMap[98] = WaterEffectState::create;
         EntityMapping.idMap[99] = removeSpwanBullet::new;
         EntityMapping.idMap[100] = ChainLegUnit::create;
         EntityMapping.idMap[103] = FLegsUnit::create;
@@ -21,7 +23,8 @@ public class FEntities {
         EntityMapping.idMap[113] = ENGSWEISUnitEntity::create;
         EntityMapping.idMap[114] = TileMiner::create;
         EntityMapping.idMap[115] = TileSpawnerUnit::create;
-        EntityMapping.idMap[116] = windUnit::create;
+        EntityMapping.idMap[116] = HiddenUnit::create;
         EntityMapping.idMap[117] = WUGENANSMechUnit::create;
+        EntityMapping.idMap[118] = CaveUnit::create;
     }
 }

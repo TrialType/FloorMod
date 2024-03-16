@@ -1,7 +1,7 @@
 package Floor.FEntities.FBulletType;
 
 import Floor.FEntities.FBullet.LargeNumberBullet;
-import Floor.FEntities.FUnit.F.windUnit;
+import Floor.FEntities.FUnit.F.HiddenUnit;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Nullable;
@@ -16,15 +16,15 @@ import mindustry.world.blocks.ControlBlock;
 import static mindustry.Vars.net;
 import static mindustry.Vars.world;
 
-public class WindMoveBulletType extends BasicBulletType {
+public class HiddenBulletType extends BasicBulletType {
     public void createFrags(Bullet b, float x, float y) {
         if (fragBullet != null && (fragOnAbsorb || !b.absorbed)) {
             for (int i = 0; i < fragBullets; i++) {
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - (float) fragBullets / 2) * fragSpread);
-                if (fragBullet instanceof WindMoveBulletType wmb) {
+                if (fragBullet instanceof HiddenBulletType wmb) {
                     LargeNumberBullet bullet = wmb.create(b.owner, null, b.team, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, wmb.damage, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax), null, null, -1, -1);
-                    if (bullet.owner instanceof windUnit wu) {
+                    if (bullet.owner instanceof HiddenUnit wu) {
                         if (i < fragBullets / 2) {
                             wu.bullets.put(bullet, speed);
                         } else {

@@ -1,7 +1,7 @@
 package Floor.FEntities.FUnit.F;
 
 import Floor.FEntities.FBullet.LargeNumberBullet;
-import Floor.FEntities.FBulletType.WindMoveBulletType;
+import Floor.FEntities.FBulletType.HiddenBulletType;
 import Floor.FEntities.FUnit.Override.FUnitEntity;
 import arc.math.Angles;
 import arc.math.Mathf;
@@ -21,10 +21,10 @@ import java.util.*;
 import static java.lang.Math.*;
 import static mindustry.Vars.world;
 
-public class windUnit extends FUnitEntity {
+public class HiddenUnit extends FUnitEntity {
     public final Map<LargeNumberBullet, Float> bullets = new HashMap<>();
     public Teamc target;
-    private final WindMoveBulletType small = new WindMoveBulletType() {{
+    private final HiddenBulletType small = new HiddenBulletType() {{
         width = 30;
         height = 30;
         shrinkY = 0;
@@ -37,7 +37,7 @@ public class windUnit extends FUnitEntity {
         absorbable = false;
         hittable = false;
     }};
-    private final WindMoveBulletType mid = new WindMoveBulletType() {{
+    private final HiddenBulletType mid = new HiddenBulletType() {{
         width = 40;
         height = 40;
         shrinkY = 0;
@@ -54,7 +54,7 @@ public class windUnit extends FUnitEntity {
         absorbable = false;
         hittable = false;
     }};
-    private final WindMoveBulletType large = new WindMoveBulletType() {{
+    private final HiddenBulletType large = new HiddenBulletType() {{
         width = 50;
         height = 50;
         shrinkY = 0;
@@ -74,7 +74,7 @@ public class windUnit extends FUnitEntity {
 
     private float createTimer;
 
-    protected windUnit() {
+    protected HiddenUnit() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
         this.resupplyTime = Mathf.random(10.0F);
         this.statuses = new Seq<>();
@@ -84,7 +84,7 @@ public class windUnit extends FUnitEntity {
     }
 
     public static FUnitEntity create() {
-        return new windUnit();
+        return new HiddenUnit();
     }
 
     @Override

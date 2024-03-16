@@ -23,41 +23,53 @@ public class FEvents {
     private static final Random r = new Random();
 
     public static void load() {
-        Events.on(EventType.UnitCreateEvent.class, e -> getPower(e.unit, false, false));
+        Events.on(GetPowerEvent.class, e -> {
+            if (e.getter instanceof FUnitUpGrade) {
+                if (e.full) {
+                    getPower(e.getter, false, true, false);
+                } else {
+                    for (int i = 0; i < e.number; i++) {
+                        getPower(e.getter, true, false, true);
+                    }
+                }
+            }
+        });
+
+        Events.on(EventType.UnitCreateEvent.class, e -> getPower(e.unit, false, false, false));
         Events.on(EventType.UnitSpawnEvent.class, e -> {
             if (Vars.state.wave >= 6 && Vars.state.wave < 30) {
-                getPower(e.unit, false, false);
+                getPower(e.unit, false, false, false);
             } else if (Vars.state.wave >= 30 && Vars.state.wave < 50) {
                 for (int i = 0; i < 7; i++) {
-                    getPower(e.unit, true, false);
+                    getPower(e.unit, true, false, true);
                 }
             } else if (Vars.state.wave >= 50 && Vars.state.wave < 70) {
                 for (int i = 0; i < 13; i++) {
-                    getPower(e.unit, true, false);
+                    getPower(e.unit, true, false, true);
                 }
             } else if (Vars.state.wave >= 70 && Vars.state.wave < 88) {
                 for (int i = 0; i < 19; i++) {
-                    getPower(e.unit, true, false);
+                    getPower(e.unit, true, false, true);
                 }
             } else if (Vars.state.wave >= 88 && Vars.state.wave < 100) {
                 for (int i = 0; i < 25; i++) {
-                    getPower(e.unit, true, false);
+                    getPower(e.unit, true, false, true);
                 }
             } else if (Vars.state.wave >= 100) {
-                getPower(e.unit, true, true);
+                getPower(e.unit, true, true, true);
             }
         });
 
         Events.on(EventType.UnitBulletDestroyEvent.class, e -> {
             if (e.bullet.owner instanceof FUnitUpGrade uug && e.unit instanceof FUnitUpGrade) {
                 uug.addExp(e.unit.maxHealth);
-                getPower(e.bullet.owner, true, false);
+                getPower(e.bullet.owner, true, false, false);
             }
         });
         Events.on(FEvents.UnitDestroyOtherEvent.class, e -> {
             if (e.killer instanceof FUnitUpGrade uug && e.other instanceof FUnitUpGrade) {
                 uug.addExp(e.other.maxHealth());
-                getPower(e.killer, true, false);
+                getPower(e.killer, true, false, false);
             }
         });
     }
@@ -72,7 +84,7 @@ public class FEvents {
         }
     }
 
-    private static void getPower(Entityc e, boolean get, boolean full) {
+    private static void getPower(Entityc e, boolean get, boolean full, boolean one) {
         if (e instanceof Unit u && e instanceof FUnitUpGrade uug) {
             if (uug.getLevel() >= 42) {
                 return;
@@ -81,10 +93,9 @@ public class FEvents {
             if (full) {
                 uug.setLevel(42);
                 Sit(u, m, null, true);
-                return;
-            }
-            if (get) {
+            } else if (get) {
                 int number = uug.number();
+                number = one ? 1 : number;
                 for (int i = 0; i < number; i++) {
                     over();
                     for (String s : list) {
@@ -212,6 +223,18 @@ public class FEvents {
         public UnitDestroyOtherEvent(Unit killer, Healthc other) {
             this.killer = killer;
             this.other = other;
+        }
+    }
+
+    public static class GetPowerEvent {
+        Unit getter;
+        int number;
+        boolean full;
+
+        public GetPowerEvent(Unit u, int n, boolean full) {
+            getter = u;
+            number = n;
+            this.full = full;
         }
     }
 }

@@ -450,7 +450,7 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         if (crazy) {
             percentDamage(u, percent, damage, firstPercent, changeHel);
         } else {
-            Fx.healWave.at(this);
+            Fx.healWave.at(u);
 
             float rotate = Angles.angle(x, y, target.x(), target.y());
             float ux = u.x();

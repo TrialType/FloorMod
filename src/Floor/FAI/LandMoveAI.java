@@ -32,7 +32,7 @@ public class LandMoveAI extends GroundAI {
         smokes = 1;
         waveLife = 0;
         sparks = 0;
-        lifetime = 5;
+        lifetime = 15;
     }};
 
     @Override

@@ -1,6 +1,6 @@
 package Floor.FAI;
 
-import Floor.FEntities.FUnit.F.windUnit;
+import Floor.FEntities.FUnit.F.HiddenUnit;
 import arc.math.Angles;
 import arc.math.geom.Vec2;
 import arc.util.Time;
@@ -12,8 +12,8 @@ import mindustry.entities.Units;
 import mindustry.type.Weapon;
 import mindustry.world.blocks.storage.CoreBlock;
 
-public class windMoveAI extends FlyingAI {
-    private windUnit wu = null;
+public class HiddenAI extends FlyingAI {
+    private HiddenUnit wu = null;
 
     @Override
     public void updateUnit() {
@@ -21,7 +21,7 @@ public class windMoveAI extends FlyingAI {
             super.updateUnit();
             wu.target = target;
         } else {
-            if (unit instanceof windUnit wU) {
+            if (unit instanceof HiddenUnit wU) {
                 this.wu = wU;
             }
         }
@@ -127,7 +127,7 @@ public class windMoveAI extends FlyingAI {
     }
 
     public void init() {
-        if (unit instanceof windUnit wU) {
+        if (unit instanceof HiddenUnit wU) {
             this.wu = wU;
         }
     }
