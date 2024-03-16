@@ -1077,6 +1077,7 @@ public class FUnits {
         cave = new UnitType("cave") {{
             constructor = CaveUnit::create;
 
+            killable = false;
             hittable = false;
             targetable = false;
             playerControllable = logicControllable = false;

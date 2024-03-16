@@ -144,7 +144,7 @@ public class CaveUnit extends FUnitWaterMove {
         }
     }
     public void updateEffect() {
-        WaveEffect[] effects = new WaveEffect[28];
+        WaterWave[] effects = new WaterWave[28];
         for (int i = 0; i < 28; i++) {
             String a;
             if (i <= 13) {
@@ -153,7 +153,7 @@ public class CaveUnit extends FUnitWaterMove {
                 a = Integer.toHexString(255 - (i - 13) * 10);
             }
             int finalI = i;
-            effects[i] = new WaveEffect() {{
+            effects[i] = new WaterWave() {{
                 startDelay = 25 * finalI;
                 sizeFrom = 0;
                 sizeTo = max(world.width(), world.height()) * 11.2f;
