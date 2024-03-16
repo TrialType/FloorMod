@@ -4,6 +4,7 @@ import Floor.FType.FStatusEffect.ADH;
 import arc.graphics.Color;
 import arc.math.Interp;
 import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
@@ -17,7 +18,7 @@ public class FStatusEffects {
             AHealth, AHealth1, AHealth2, AHealth3, AHealth4, AHealth5, AHealth6, AHealth7, AHealth8, AHealth9,
             AAgain, AAgain1, AAgain2, AAgain3, AAgain4, AAgain5, AAgain6, AAgain7, AAgain8, AAgain9;
     public static StatusEffect[] Speed, Damage, Reload, Health, Again;
-    public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit, High_tension;
+    public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit, High_tension, fastII;
 
     public static void load() {
         ASpeed = new StatusEffect("ASpeed");
@@ -209,6 +210,12 @@ public class FStatusEffects {
         High_tension = new StatusEffect("High_tension") {{
             speedMultiplier = 0.8f;
             reloadMultiplier = 0.8f;
+        }};
+        fastII = new StatusEffect("fastII") {{
+            speedMultiplier = 2.4f;
+
+
+            init(() -> opposite(StatusEffects.slow));
         }};
     }
 }

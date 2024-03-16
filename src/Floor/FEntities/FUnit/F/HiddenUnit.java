@@ -101,14 +101,14 @@ public class HiddenUnit extends FUnitEntity {
         }
         super.update();
 
-        Units.nearbyEnemies(team, x, y, range() * 5, u -> {
-            if (u.within(this, range() * 5)) {
+        Units.nearbyEnemies(team, x, y, range(), u -> {
+            if (u.within(this, range())) {
                 float ux = u.x;
                 float uy = u.y;
                 vec.set(ux - x, uy - y);
                 float l = (float) sqrt((x - ux) * (x - ux) + (y - uy) * (y - uy));
-                float power = (range() * 5 - l) / range() / 15;
-                vec.setLength(power * 36);
+                float power = (range() - l) / range();
+                vec.setLength(power * 32);
                 u.moveAt(vec);
             }
         });

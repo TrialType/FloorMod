@@ -7,7 +7,6 @@ import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
-import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.ChainUnitType;
 import Floor.FEntities.FUnitType.ENGSWEISUnitType;
 import Floor.FEntities.FBulletType.PercentBulletType;
@@ -18,11 +17,9 @@ import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.math.Interp;
 import mindustry.ai.UnitCommand;
+import mindustry.ai.types.CommandAI;
 import mindustry.content.*;
-import mindustry.entities.abilities.ForceFieldAbility;
-import mindustry.entities.abilities.ShieldArcAbility;
-import mindustry.entities.abilities.ShieldRegenFieldAbility;
-import mindustry.entities.abilities.SpawnDeathAbility;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
@@ -51,11 +48,10 @@ public class FUnits {
     public static UnitType dive, befall;
 
     //WUGENANSMechUnit
-    public static UnitType c;
+    public static UnitType recluse;
 
     //special
     public static UnitType BulletInterception;
-    public static UnitType d;
 
     public static void load() {
         bulletInterception = new UnitType("bulletInterception") {{
@@ -394,6 +390,7 @@ public class FUnits {
             hidden = true;
             createScorch = false;
             createWreck = false;
+
             weapons.add(new Weapon() {
                 {
                     controllable = false;
@@ -410,6 +407,7 @@ public class FUnits {
                     }};
                 }
             });
+
             weapons.add(new Weapon() {{
                 controllable = false;
                 autoTarget = true;
@@ -440,6 +438,7 @@ public class FUnits {
             armor = 18;
             hitSize = 13;
             percent = 13;
+
             weapons.add(new Weapon("a-weapon") {{
                 top = false;
                 mirror = false;
@@ -449,12 +448,10 @@ public class FUnits {
                 recoil = 1f;
                 x = 0f;
                 shootSound = Sounds.flame;
-
                 shoot = new ShootSpread() {{
                     shots = 16;
                     spread = 11.25F;
                 }};
-
                 bullet = new BasicBulletType() {{
                     shootEffect = Fx.shootSmallFlame;
                     lifetime = 20;
@@ -540,7 +537,9 @@ public class FUnits {
             hitSize = 35;
             createScorch = false;
             createWreck = false;
+
             abilities.add(new SpawnDeathAbility(AVelocity, 1, 0));
+
             weapons.add(new Weapon() {{
                 reload = 300;
                 controllable = false;
@@ -816,6 +815,7 @@ public class FUnits {
             engineSize = 2.5F;
             itemCapacity = 30;
             hitSize = 5;
+
             weapons.add(new Weapon("barb-weapon") {{
                 reload = 30;
                 y = 3.8F;
@@ -1007,6 +1007,7 @@ public class FUnits {
                     }};
                 }};
             }});
+
             weapons.add(new Weapon() {{
                 reload = 5;
                 alternate = false;
@@ -1020,6 +1021,7 @@ public class FUnits {
                 reload = 900;
                 alternate = false;
                 y = 10;
+
                 bullet = new PercentBulletType() {{
                     homingRange = 1000;
                     homingPower = 0.1F;
@@ -1064,18 +1066,61 @@ public class FUnits {
             rotateSpeed = 12;
             drag = 0.9F;
             accel = 0.9F;
+            faceTarget = false;
+
+            immunities.addAll(
+                    FStatusEffects.fastII,
+                    StatusEffects.slow, StatusEffects.wet,
+                    StatusEffects.unmoving, FStatusEffects.StrongStop,
+                    StatusEffects.fast, StatusEffects.freezing
+            );
+
+            abilities.add(new StatusFieldAbility(FStatusEffects.fastII, 600, 540, 100));
+            abilities.add(new ShieldRegenFieldAbility(4000, 100000, 240, 100));
+            abilities.add(new UnitSpawnAbility(Hammer, 600, 1, 1));
+            abilities.add(new UnitSpawnAbility(Hammer, 600, -1, 1));
+            abilities.add(new UnitSpawnAbility(Hammer, 600, -1, -1));
+            abilities.add(new UnitSpawnAbility(Hammer, 600, 1, -1));
+
+            weapons.add(new Weapon() {{
+                reload = 2.5f;
+                mirror = false;
+                y = x = 0;
+                shoot = new ShootSpread() {{
+                    shots = 32;
+                    spread = 10;
+                }};
+                bullet = new LightningBulletType() {{
+                    damage = 1000;
+                    lightningColor = Color.valueOf("436E2D");
+                    lightningLength = 50;
+                    lightningLengthRand = 25;
+                }};
+            }});
         }};
 
-        c = new WUGENANSMechUnitType("c") {{
+        recluse = new WUGENANSMechUnitType("recluse") {{
             constructor = WUGENANSMechUnit::create;
             aiController = LandMoveAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("lm", "lm", u -> new LandMoveAI())};
 
             health = 1000;
             upDamage = 70;
+
+            weapons.add(new Weapon() {{
+                reload = 120;
+                mirror = false;
+                y = 0;
+                bullet = new BasicBulletType() {{
+                    damage = 10;
+                    speed = 3;
+                    lifetime = 180;
+                }};
+            }});
         }};
         cave = new UnitType("cave") {{
             constructor = CaveUnit::create;
+            aiController = CommandAI::new;
 
             killable = false;
             hittable = false;
@@ -1084,9 +1129,10 @@ public class FUnits {
 
             rotateSpeed = 0;
             hitSize = 45;
-            health = 100000;
-            armor = 10000;
+            health = 1;
+            armor = 0;
             speed = 0F;
+            drag = 1;
         }};
 
         BossList.list.add(velocity);
