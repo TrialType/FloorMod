@@ -18,6 +18,7 @@ import mindustry.content.UnitTypes;
 import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
 import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.WaveEffect;
 import mindustry.gen.Unit;
 import mindustry.graphics.Trail;
 import mindustry.type.UnitType;
@@ -143,7 +144,7 @@ public class CaveUnit extends FUnitWaterMove {
         }
     }
     public void updateEffect() {
-        WaterWave[] effects = new WaterWave[28];
+        WaveEffect[] effects = new WaveEffect[28];
         for (int i = 0; i < 28; i++) {
             String a;
             if (i <= 13) {
@@ -152,7 +153,7 @@ public class CaveUnit extends FUnitWaterMove {
                 a = Integer.toHexString(255 - (i - 13) * 10);
             }
             int finalI = i;
-            effects[i] = new WaterWave() {{
+            effects[i] = new WaveEffect() {{
                 startDelay = 25 * finalI;
                 sizeFrom = 0;
                 sizeTo = max(world.width(), world.height()) * 11.2f;
