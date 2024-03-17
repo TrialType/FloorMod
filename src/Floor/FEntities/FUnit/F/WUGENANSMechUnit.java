@@ -273,9 +273,11 @@ public class WUGENANSMechUnit extends FMechUnit {
         int index;
 
         int boost = 0;
-        for (int p = (int) power, i = (int) powerNeed; p > powerNeed; i *= 2) {
-            p = p - i;
-            boost++;
+        if(!Units.canCreate(team,type)){
+            for (int p = (int) power, i = (int) powerNeed; p > powerNeed; i *= 2) {
+                p = p - i;
+                boost++;
+            }
         }
         if (!this.statuses.isEmpty()) {
             index = 0;
@@ -287,26 +289,30 @@ public class WUGENANSMechUnit extends FMechUnit {
                         break label338;
                     }
 
-                    StatusEntry entry = this.statuses.get(index++);
+                    StatusEntry entry = statuses.get(index++);
                     entry.time = Math.max(entry.time - Time.delta, 0.0F);
                     if (entry.effect != null && (!(entry.time <= 0.0F) || entry.effect.permanent)) {
-                        this.applied.set(entry.effect.id);
-                        this.speedMultiplier *= entry.effect.speedMultiplier + boost;
-                        this.healthMultiplier *= entry.effect.healthMultiplier + boost;
-                        this.damageMultiplier *= entry.effect.damageMultiplier + boost;
-                        this.reloadMultiplier *= entry.effect.reloadMultiplier + boost;
-                        this.buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
-                        this.dragMultiplier *= entry.effect.dragMultiplier;
-                        this.disarmed |= entry.effect.disarm;
+                        applied.set(entry.effect.id);
+                        speedMultiplier *= entry.effect.speedMultiplier;
+                        healthMultiplier *= entry.effect.healthMultiplier;
+                        damageMultiplier *= entry.effect.damageMultiplier;
+                        reloadMultiplier *= entry.effect.reloadMultiplier;
+                        buildSpeedMultiplier *= entry.effect.buildSpeedMultiplier;
+                        dragMultiplier *= entry.effect.dragMultiplier;
+                        disarmed |= entry.effect.disarm;
                         entry.effect.update(this, entry.time);
                     } else {
                         Pools.free(entry);
                         --index;
-                        this.statuses.remove(index);
+                        statuses.remove(index);
                     }
                 }
             }
         }
+        speedMultiplier += boost;
+        healthMultiplier += boost;
+        damageMultiplier += boost;
+        reloadMultiplier += boost;
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {
             this.interpolate();

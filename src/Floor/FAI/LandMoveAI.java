@@ -8,11 +8,8 @@ import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.effect.ExplosionEffect;
-import mindustry.gen.Player;
 import mindustry.gen.Teamc;
 import mindustry.graphics.Pal;
-import mindustry.type.ammo.PowerAmmoType;
-import mindustry.world.Block;
 
 import static java.lang.Math.min;
 

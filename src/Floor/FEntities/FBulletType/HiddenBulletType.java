@@ -36,7 +36,7 @@ public class HiddenBulletType extends BasicBulletType {
         }
     }
 
-    public @Nullable LargeNumberBullet create(@Nullable Entityc owner, @Nullable Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY) {
+    public LargeNumberBullet create(Entityc owner, Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, @Nullable Mover mover, float aimX, float aimY) {
         if (!Mathf.chance(createChance)) return null;
         if (ignoreSpawnAngle) angle = 0;
         if (spawnUnit != null) {

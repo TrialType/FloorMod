@@ -14,6 +14,7 @@ import arc.util.Time;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
@@ -107,12 +108,12 @@ public class CaveUnit extends FUnitWaterMove {
     @Override
     public void update() {
         if (allTimer >= 21000) {
-            Fx.unitDrop.at(x, y, rotation, this);
+            Fx.unitDrop.at(x, y, 0, this);
             if (allTimer >= 21600) {
                 allTimer = 0;
                 back = true;
                 WaterWave.back = true;
-                Call.unitDeath(this.id);
+                destroy();
                 return;
             }
         }
@@ -166,7 +167,7 @@ public class CaveUnit extends FUnitWaterMove {
                 sizeFrom = 0;
                 sizeTo = max(world.width(), world.height()) * 11.2f;
                 lifetime = max(world.width(), world.height()) * 13.44f;
-                strokeTo = strokeFrom = 22f;
+                strokeTo = strokeFrom = 24f;
                 colorTo = colorFrom = Color.valueOf("061726" + a);
             }};
         }
@@ -183,14 +184,15 @@ public class CaveUnit extends FUnitWaterMove {
             if (u.shield > 0.01) {
                 u.destroy();
             } else {
-                u.apply(FStatusEffects.High_tension);
-                u.damage(u.maxHealth * 0.0002f);
+                u.apply(StatusEffects.slow, 2);
+                u.apply(FStatusEffects.High_tension, 2);
+                u.damage(u.maxHealth * 0.001f);
             }
         });
         Units.nearbyBuildings(x, y, length * boost, b -> {
             b.applySlowdown(0.8f, 3);
             if (b.team != team) {
-                b.damage(b.maxHealth * 0.0002f);
+                b.damage(b.maxHealth * 0.001f);
             }
         });
     }

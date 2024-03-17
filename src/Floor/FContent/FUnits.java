@@ -4,6 +4,7 @@ import Floor.FAI.*;
 import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
+import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
@@ -15,10 +16,16 @@ import Floor.FEntities.FUnitType.TileMinerUnitType;
 import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
 import Floor.FTools.BossList;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
 import arc.math.Interp;
+import arc.math.Mathf;
+import arc.math.Rand;
+import arc.math.geom.Position;
+import arc.util.Tmp;
 import mindustry.ai.UnitCommand;
-import mindustry.ai.types.CommandAI;
 import mindustry.content.*;
+import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
@@ -28,13 +35,13 @@ import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.part.HoverPart;
 import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootBarrel;
+import mindustry.entities.pattern.ShootPattern;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
-
 public class FUnits {
     public static UnitType transfer, shuttlevI, bulletInterception;
 
@@ -1075,8 +1082,8 @@ public class FUnits {
                     StatusEffects.fast, StatusEffects.freezing
             );
 
-            abilities.add(new StatusFieldAbility(FStatusEffects.fastII, 600, 540, 100));
-            abilities.add(new ShieldRegenFieldAbility(4000, 100000, 240, 100));
+            abilities.add(new StatusFieldAbility(FStatusEffects.fastII, 600, 610, 100));
+            abilities.add(new ShieldRegenFieldAbility(10000, 100000, 610, 100));
             abilities.add(new UnitSpawnAbility(Hammer, 600, 1, 1));
             abilities.add(new UnitSpawnAbility(Hammer, 600, -1, 1));
             abilities.add(new UnitSpawnAbility(Hammer, 600, -1, -1));
@@ -1091,10 +1098,10 @@ public class FUnits {
                     spread = 10;
                 }};
                 bullet = new LightningBulletType() {{
-                    damage = 1000;
+                    damage = 800;
                     lightningColor = Color.valueOf("436E2D");
-                    lightningLength = 50;
-                    lightningLengthRand = 25;
+                    lightningLength = 35;
+                    lightningLengthRand = 15;
                 }};
             }});
         }};
@@ -1104,28 +1111,87 @@ public class FUnits {
             aiController = LandMoveAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("lm", "lm", u -> new LandMoveAI())};
 
-            health = 1000;
-            upDamage = 70;
+            health = 120;
+            upDamage = 13;
 
             weapons.add(new Weapon() {{
-                reload = 120;
-                mirror = false;
-                y = 0;
-                bullet = new BasicBulletType() {{
-                    damage = 10;
+                rotate = true;
+                rotateSpeed = 12;
+                reload = 30;
+                x = 25;
+                y = 15;
+                shootSound = Sounds.none;
+
+                shoot = new ShootPattern() {{
+                    shots = 4;
+                    firstShotDelay = 30;
+                    shotDelay = 10;
+                }};
+
+                bullet = new AroundBulletType() {{
+                    range = maxRange = 1000;
+                    lifetime = 3600;
                     speed = 3;
-                    lifetime = 180;
+                    damage = 100;
+                    splashDamage = 100;
+                    splashDamageRadius = 85;
+                    splashDamagePierce = true;
+
+                    frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
+                    hitEffect = despawnEffect = Fx.none;
+                    shootEffect = Fx.none;
+
+                    targetRange = 1000;
+                    circleRange = 120;
+                    statusEffect = FStatusEffects.High_tensionII;
+                    applyEffect = new Effect(30f, 300f, e -> {
+                        Rand rand = new Rand();
+                        if (!(e.data instanceof Position p)) return;
+                        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+                        Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+                        float n = Tmp.v1.x, normy = Tmp.v1.y;
+                        float range = 6f;
+                        int links = Mathf.ceil(dst / range);
+                        float spacing = dst / links;
+
+                        Lines.stroke(4f * e.fout());
+                        Draw.color(Color.white, Color.valueOf("01066FAA"), e.fin());
+
+                        Lines.beginLine();
+
+                        Lines.linePoint(e.x, e.y);
+
+                        rand.setSeed(e.id);
+
+                        for (int i = 0; i < links; i++) {
+                            float nx, ny;
+                            if (i == links - 1) {
+                                nx = tx;
+                                ny = ty;
+                            } else {
+                                float len = (i + 1) * spacing;
+                                Tmp.v1.setToRandomDirection(rand).scl(range / 2f);
+                                nx = e.x + n * len + Tmp.v1.x;
+                                ny = e.y + normy * len + Tmp.v1.y;
+                            }
+
+                            Lines.linePoint(nx, ny);
+                        }
+
+                        Lines.endLine();
+                    }).followParent(false).rotWithParent(false);
                 }};
             }});
         }};
         cave = new UnitType("cave") {{
             constructor = CaveUnit::create;
-            aiController = CommandAI::new;
 
             killable = false;
             hittable = false;
             targetable = false;
             playerControllable = logicControllable = false;
+            faceTarget = false;
 
             rotateSpeed = 0;
             hitSize = 45;
@@ -1133,6 +1199,81 @@ public class FUnits {
             armor = 0;
             speed = 0F;
             drag = 1;
+            range = maxRange = 1000;
+            targetAir = targetGround = true;
+
+            for (int i = 0; i < 2; i++) {
+                int finalI = i;
+                weapons.add(new Weapon() {{
+                    rotate = true;
+                    rotateSpeed = 12;
+                    reload = 120;
+                    x = 25;
+                    y = finalI % 2 == 0 ? 15 : -15;
+                    shootSound = Sounds.none;
+
+                    shoot = new ShootBarrel() {{
+                        shots = 4;
+                        firstShotDelay = 30;
+                        shotDelay = 10;
+                    }};
+
+                    bullet = new AroundBulletType() {{
+                        range = maxRange = 1000;
+                        lifetime = 600;
+                        speed = 3;
+                        damage = 500;
+                        splashDamage = 20;
+                        splashDamageRadius = 85;
+                        splashDamagePierce = true;
+
+                        frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
+                        hitEffect = despawnEffect = Fx.none;
+                        shootEffect = Fx.none;
+
+                        targetRange = 1000;
+                        circleRange = 120;
+                        statusEffect = FStatusEffects.High_tensionII;
+                        applyEffect = new Effect(30f, 300f, e -> {
+                            Rand rand = new Rand();
+                            if (!(e.data instanceof Position p)) return;
+                            float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+                            Tmp.v1.set(p).sub(e.x, e.y).nor();
+
+                            float n = Tmp.v1.x, normy = Tmp.v1.y;
+                            float range = 6f;
+                            int links = Mathf.ceil(dst / range);
+                            float spacing = dst / links;
+
+                            Lines.stroke(4f * e.fout());
+                            Draw.color(Color.white, Color.valueOf("01066FAA"), e.fin());
+
+                            Lines.beginLine();
+
+                            Lines.linePoint(e.x, e.y);
+
+                            rand.setSeed(e.id);
+
+                            for (int i = 0; i < links; i++) {
+                                float nx, ny;
+                                if (i == links - 1) {
+                                    nx = tx;
+                                    ny = ty;
+                                } else {
+                                    float len = (i + 1) * spacing;
+                                    Tmp.v1.setToRandomDirection(rand).scl(range / 2f);
+                                    nx = e.x + n * len + Tmp.v1.x;
+                                    ny = e.y + normy * len + Tmp.v1.y;
+                                }
+
+                                Lines.linePoint(nx, ny);
+                            }
+
+                            Lines.endLine();
+                        }).followParent(false).rotWithParent(false);
+                    }};
+                }});
+            }
         }};
 
         BossList.list.add(velocity);
