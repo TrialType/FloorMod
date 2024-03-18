@@ -1224,7 +1224,7 @@ public class FUnits {
                         speed = 3;
                         damage = 500;
                         splashDamage = 20;
-                        splashDamageRadius = 85;
+                        splashDamageRadius = 20;
                         splashDamagePierce = true;
 
                         frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
