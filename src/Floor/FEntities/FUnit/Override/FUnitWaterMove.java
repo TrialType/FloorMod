@@ -387,6 +387,7 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
             fu.setSpeedLevel(speedLevel / 2);
             fu.setShieldLevel(shieldLevel / 2);
             fu.setReloadLevel(reloadLevel / 2);
+            fu.setLevel(damageLevel / 2 + healthLevel / 2 + speedLevel / 2 + shieldLevel / 2 + reloadLevel / 2);
             if (shieldLevel >= 2) {
                 fu.sfa = new ShieldRegenFieldAbility(maxHealth / 200 * shieldLevel,
                         maxHealth * shieldLevel / 20, 120, 60);

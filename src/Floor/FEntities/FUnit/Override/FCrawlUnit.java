@@ -160,7 +160,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
     }
 
     @Override
-    public void update(){
+    public void update() {
         super.update();
 
         speedMultiplier += speedLevel * 0.2f;
@@ -171,6 +171,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
             sfa.update(this);
         }
     }
+
     @Override
     public void kill() {
         if ((new Random()).nextInt(10) + 1 <= againLevel) {
@@ -183,7 +184,8 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
             fu.setSpeedLevel(speedLevel / 2);
             fu.setShieldLevel(shieldLevel / 2);
             fu.setReloadLevel(reloadLevel / 2);
-            if(shieldLevel >= 2){
+            fu.setLevel(damageLevel / 2 + healthLevel / 2 + speedLevel / 2 + shieldLevel / 2 + reloadLevel / 2);
+            if (shieldLevel >= 2) {
                 fu.sfa = new ShieldRegenFieldAbility(maxHealth / 200 * shieldLevel,
                         maxHealth * shieldLevel / 20, 120, 60);
             }
@@ -204,9 +206,10 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
     }
 
     @Override
-    public void setLevel(int l){
+    public void setLevel(int l) {
         level = l;
     }
+
     @Override
     public float getExp() {
         return exp;
@@ -275,6 +278,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
     public void setShieldLevel(int shieldLevel) {
         this.shieldLevel = shieldLevel;
     }
+
     @Override
     public void sfa(int level) {
         sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,

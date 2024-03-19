@@ -4,23 +4,14 @@ import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
 import arc.Events;
 import mindustry.Vars;
-import mindustry.entities.abilities.Ability;
-import mindustry.entities.abilities.ShieldRegenFieldAbility;
-import mindustry.entities.abilities.SpawnDeathAbility;
 import mindustry.game.EventType;
-import mindustry.gen.Building;
-import mindustry.gen.Entityc;
 import mindustry.gen.Healthc;
 import mindustry.gen.Unit;
 
-import java.util.Map;
 import java.util.Random;
 
 
 public class FEvents {
-    private static final String[] list = {
-            "healthy", "damage", "reload", "speed", "again", "shield"
-    };
     private static final Random r = new Random();
     public static void load() {
         Events.on(GetPowerEvent.class, e -> {
@@ -79,7 +70,6 @@ public class FEvents {
             this.other = other;
         }
     }
-
     public static class GetPowerEvent {
         Unit getter;
         int number;

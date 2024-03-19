@@ -11,7 +11,7 @@ public class UnitUpGrade {
     }
 
     public static void getPower(FUnitUpGrade uug, int number, boolean get, boolean full) {
-        if(uug.getLevel() < 60){
+        if (uug.getLevel() < 60) {
             if (full) {
                 uug.setLevel(60);
                 uug.setAgainLevel(10);
@@ -27,6 +27,8 @@ public class UnitUpGrade {
                     getPower(uug, index);
                 }
             }
+        } else {
+            uug.number();
         }
     }
 
