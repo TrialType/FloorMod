@@ -11,10 +11,12 @@ public class TimeCore extends CoreBlock {
         solid = solidifes = false;
         teamPassable = false;
         underBullets = true;
-        breakable = false;
         targetable = false;
         canOverdrive = false;
-        size = 0;
+        destructible = false;
+        itemCapacity = 0;
+        unitCapModifier = 0;
+        size = 1;
     }
 
     public class TimeCoreBuild extends CoreBuild {
@@ -23,12 +25,17 @@ public class TimeCore extends CoreBlock {
         @Override
         public void updateTile() {
             super.updateTile();
-            if (Vars.state.wave == Vars.state.rules.winWave) {
+            if (Vars.state.wave >= Vars.state.rules.winWave) {
                 killTimer += Time.delta;
-                if(killTimer >= 120){
+                if (killTimer >= 120) {
                     kill();
+                    remove();
                 }
             }
+        }
+
+        @Override
+        public void damage(float damage) {
         }
     }
 }

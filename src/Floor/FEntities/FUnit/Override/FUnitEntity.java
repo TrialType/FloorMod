@@ -386,7 +386,7 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
         speedMultiplier += speedLevel * 0.2f;
         damageMultiplier += damageLevel * 0.2f;
         reloadMultiplier += reloadLevel * 0.2f;
-        heal(maxHealth * healthLevel * 0.01f);
+        heal(maxHealth * healthLevel * 0.0001f);
         if (sfa != null) {
             sfa.update(this);
         }

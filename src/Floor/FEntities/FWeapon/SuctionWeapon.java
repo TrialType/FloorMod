@@ -69,8 +69,10 @@ public class SuctionWeapon extends Weapon {
             }
 
             final boolean[] has = {false};
+            final int[] number = {0};
             Units.nearbyEnemies(unit.team, tx, ty, range, u -> {
-                if (BossList.list.indexOf(u.type) < 0) {
+                if (BossList.list.indexOf(u.type) < 0 && u.type.targetable && number[0] <= 3) {
+                    number[0]++;
                     has[0] = true;
                     if (!u.within(tx, ty, 20)) {
                         float ux = u.x, uy = u.y;

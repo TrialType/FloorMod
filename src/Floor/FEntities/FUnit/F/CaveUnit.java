@@ -181,12 +181,13 @@ public class CaveUnit extends UnitWaterMove {
         float boost = allTimer >= max(world.width(), world.height()) * 13.44f ? 1 : allTimer * 0.00695f / max(world.width(), world.height()) * 13.44f;
         Units.nearbyEnemies(team, x, y, length * boost, u -> {
             if (u.shield > 0.01) {
-                u.destroy();
+                u.damage(u.shield() * 2);
+                u.damage(u.maxHealth * 0.001f);
             } else {
-                u.apply(StatusEffects.slow, 2);
-                u.apply(FStatusEffects.High_tension, 2);
                 u.damage(u.maxHealth * 0.001f);
             }
+            u.apply(StatusEffects.slow, 2);
+            u.apply(FStatusEffects.High_tension, 2);
         });
         Units.nearbyBuildings(x, y, length * boost, b -> {
             b.applySlowdown(0.8f, 3);
