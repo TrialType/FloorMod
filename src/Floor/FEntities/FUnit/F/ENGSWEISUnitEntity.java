@@ -21,6 +21,7 @@ import mindustry.async.PhysicsProcess;
 import mindustry.content.Fx;
 import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.units.StatusEntry;
 import mindustry.gen.*;
 import mindustry.io.TypeIO;
@@ -90,6 +91,14 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         }
 
         super.update();
+
+        speedMultiplier += speedLevel * 0.2f;
+        damageMultiplier += damageLevel * 0.2f;
+        reloadMultiplier += reloadLevel * 0.2f;
+        heal(maxHealth * healthLevel * 0.01f);
+        if (sfa != null) {
+            sfa.update(this);
+        }
 
         unitMap.replaceAll((u, v) -> v + Time.delta);
         buildingMap.replaceAll((u, v) -> v + Time.delta);
@@ -384,6 +393,19 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             unitAbilities.put(read.str(), read.i());
         }
         first = read.bool();
+        level = read.i();
+        exp = read.f();
+
+        damageLevel = read.i();
+        speedLevel = read.i();
+        reloadLevel = read.i();
+        healthLevel = read.i();
+        againLevel = read.i();
+        shieldLevel = read.i();
+        if (shieldLevel > 0) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
         this.afterRead();
     }
 
@@ -433,6 +455,14 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             write.i(unitAbilities.get(s));
         }
         write.bool(first);
+        write.i(level);
+        write.f(exp);
+        write.i(damageLevel);
+        write.i(speedLevel);
+        write.i(reloadLevel);
+        write.i(healthLevel);
+        write.i(againLevel);
+        write.i(shieldLevel);
     }
 
     @Override

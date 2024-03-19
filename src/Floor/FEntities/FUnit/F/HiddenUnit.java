@@ -2,7 +2,6 @@ package Floor.FEntities.FUnit.F;
 
 import Floor.FEntities.FBullet.LargeNumberBullet;
 import Floor.FEntities.FBulletType.HiddenBulletType;
-import Floor.FEntities.FUnit.Override.FUnitEntity;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
@@ -14,6 +13,7 @@ import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
+import mindustry.gen.UnitEntity;
 import mindustry.world.blocks.storage.CoreBlock;
 
 import java.util.*;
@@ -21,7 +21,7 @@ import java.util.*;
 import static java.lang.Math.*;
 import static mindustry.Vars.world;
 
-public class HiddenUnit extends FUnitEntity {
+public class HiddenUnit extends UnitEntity {
     public final Map<LargeNumberBullet, Float> bullets = new HashMap<>();
     public Teamc target;
     private final HiddenBulletType small = new HiddenBulletType() {{
@@ -83,7 +83,7 @@ public class HiddenUnit extends FUnitEntity {
         small.load();
     }
 
-    public static FUnitEntity create() {
+    public static HiddenUnit create() {
         return new HiddenUnit();
     }
 

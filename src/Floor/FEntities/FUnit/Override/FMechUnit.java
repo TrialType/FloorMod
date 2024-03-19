@@ -8,23 +8,36 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.ctype.ContentType;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.units.StatusEntry;
 import mindustry.gen.MechUnit;
 import mindustry.io.TypeIO;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class FMechUnit extends MechUnit implements FUnitUpGrade {
     public Map<String, Integer> unitAbilities = new HashMap<>();
+
+    protected int damageLevel = 0;
+    protected int speedLevel = 0;
+    protected int healthLevel = 0;
+    protected int reloadLevel = 0;
+    protected int againLevel = 0;
+    protected int shieldLevel = 0;
+    protected ShieldRegenFieldAbility sfa = null;
+
     public int level = 0;
     public float exp = 0;
+
     protected FMechUnit() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
         this.resupplyTime = Mathf.random(10.0F);
         this.statuses = new Seq<>();
     }
-    public static FMechUnit create(){
+
+    public static FMechUnit create() {
         return new FMechUnit();
     }
 
@@ -282,7 +295,6 @@ public class FMechUnit extends MechUnit implements FUnitUpGrade {
         }
 
 
-
         int number = read.i();
         for (int i = 0; i < number; i++) {
             unitAbilities.put(read.str(), read.i());
@@ -290,6 +302,16 @@ public class FMechUnit extends MechUnit implements FUnitUpGrade {
         level = read.i();
         exp = read.f();
 
+        damageLevel = read.i();
+        speedLevel = read.i();
+        reloadLevel = read.i();
+        healthLevel = read.i();
+        againLevel = read.i();
+        shieldLevel = read.i();
+        if (shieldLevel > 0) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
         this.afterRead();
     }
 
@@ -337,35 +359,135 @@ public class FMechUnit extends MechUnit implements FUnitUpGrade {
         }
         write.i(level);
         write.f(exp);
+        write.i(damageLevel);
+        write.i(speedLevel);
+        write.i(reloadLevel);
+        write.i(healthLevel);
+        write.i(againLevel);
+        write.i(shieldLevel);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        speedMultiplier += speedLevel * 0.2f;
+        damageMultiplier += damageLevel * 0.2f;
+        reloadMultiplier += reloadLevel * 0.2f;
+        heal(maxHealth * healthLevel * 0.01f);
+        if (sfa != null) {
+            sfa.update(this);
+        }
+    }
+
+    @Override
+    public void kill() {
+        if ((new Random()).nextInt(10) + 1 <= againLevel) {
+            FMechUnit fu = (FMechUnit) type.create(team);
+            fu.x(x);
+            fu.y(y);
+            fu.rotation(rotation);
+            fu.setDamageLevel(damageLevel / 2);
+            fu.setHealthLevel(healthLevel / 2);
+            fu.setSpeedLevel(speedLevel / 2);
+            fu.setShieldLevel(shieldLevel / 2);
+            fu.setReloadLevel(reloadLevel / 2);
+            if (shieldLevel >= 2) {
+                fu.sfa = new ShieldRegenFieldAbility(maxHealth / 200 * shieldLevel,
+                        maxHealth * shieldLevel / 20, 120, 60);
+            }
+            fu.health(maxHealth / 10 * againLevel);
+            fu.add();
+        }
+        super.kill();
     }
 
     @Override
     public Map<String, Integer> getMap() {
         return unitAbilities;
     }
+
     @Override
     public int getLevel() {
         return level;
     }
+
     @Override
-    public void setLevel(int l){
+    public void setLevel(int l) {
         level = l;
     }
+
     @Override
     public float getExp() {
         return exp;
     }
+
     @Override
     public void addExp(float exp) {
         this.exp = exp + this.exp;
     }
+
     @Override
     public int number() {
         int number = 0;
         while (exp > (4 + level) * maxHealth / 10) {
-            exp = exp % (4 + level) * maxHealth / 10;
+            exp = exp - (4 + level) * maxHealth / 10;
+            level++;
             number++;
         }
         return number;
+    }
+
+    public int getDamageLevel() {
+        return damageLevel;
+    }
+
+    public void setDamageLevel(int damageLevel) {
+        this.damageLevel = damageLevel;
+    }
+
+    public int getSpeedLevel() {
+        return speedLevel;
+    }
+
+    public void setSpeedLevel(int speedLevel) {
+        this.speedLevel = speedLevel;
+    }
+
+    public int getHealthLevel() {
+        return healthLevel;
+    }
+
+    public void setHealthLevel(int healthLevel) {
+        this.healthLevel = healthLevel;
+    }
+
+    public int getReloadLevel() {
+        return reloadLevel;
+    }
+
+    public void setReloadLevel(int reloadLevel) {
+        this.reloadLevel = reloadLevel;
+    }
+
+    public int getAgainLevel() {
+        return againLevel;
+    }
+
+    public void setAgainLevel(int againLevel) {
+        this.againLevel = againLevel;
+    }
+
+    public int getShieldLevel() {
+        return shieldLevel;
+    }
+
+    public void setShieldLevel(int shieldLevel) {
+        this.shieldLevel = shieldLevel;
+    }
+    @Override
+    public void sfa(int level) {
+        sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                maxHealth * shieldLevel / 10, 120, 60);
     }
 }

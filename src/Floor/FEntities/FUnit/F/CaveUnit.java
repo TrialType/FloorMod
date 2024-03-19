@@ -4,7 +4,6 @@ import Floor.FContent.FEvents;
 import Floor.FContent.FStatusEffects;
 import Floor.FContent.FUnits;
 import Floor.FEntities.FEffect.WaterWave;
-import Floor.FEntities.FUnit.Override.FUnitWaterMove;
 import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
@@ -19,8 +18,8 @@ import mindustry.content.UnitTypes;
 import mindustry.ctype.ContentType;
 import mindustry.entities.Units;
 import mindustry.entities.effect.MultiEffect;
-import mindustry.gen.Call;
 import mindustry.gen.Unit;
+import mindustry.gen.UnitWaterMove;
 import mindustry.graphics.Trail;
 import mindustry.type.UnitType;
 
@@ -29,7 +28,7 @@ import java.util.Random;
 import static java.lang.Math.max;
 import static mindustry.Vars.world;
 
-public class CaveUnit extends FUnitWaterMove {
+public class CaveUnit extends UnitWaterMove {
     private static final Seq<UnitType> u1 = new Seq<>(new UnitType[]{
             UnitTypes.dagger,
             UnitTypes.nova,
@@ -96,7 +95,7 @@ public class CaveUnit extends FUnitWaterMove {
         this.tright = new Trail(1);
     }
 
-    public static FUnitWaterMove create() {
+    public static CaveUnit create() {
         return new CaveUnit();
     }
 

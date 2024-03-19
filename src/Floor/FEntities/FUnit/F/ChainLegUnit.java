@@ -26,6 +26,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.EntityCollisions;
 import mindustry.entities.Leg;
 import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.units.BuildPlan;
 import mindustry.entities.units.StatusEntry;
 import mindustry.entities.units.WeaponMount;
@@ -414,6 +415,20 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         }
         underUnitId = read.i();
         this.upon = read.bool();
+
+        level = read.i();
+        exp = read.f();
+
+        damageLevel = read.i();
+        speedLevel = read.i();
+        reloadLevel = read.i();
+        healthLevel = read.i();
+        againLevel = read.i();
+        shieldLevel = read.i();
+        if (shieldLevel > 0) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
         this.afterRead();
     }
     @Override
@@ -461,6 +476,15 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
 
         write.i(underUnit == null ? -1 : underUnit.id);
         write.bool(upon);
+
+        write.i(level);
+        write.f(exp);
+        write.i(damageLevel);
+        write.i(speedLevel);
+        write.i(reloadLevel);
+        write.i(healthLevel);
+        write.i(againLevel);
+        write.i(shieldLevel);
     }
     @Override
     public void update() {
@@ -733,6 +757,13 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
                     }
                 }
             }
+        }
+        speedMultiplier += speedLevel * 0.2f;
+        damageMultiplier += damageLevel * 0.2f;
+        reloadMultiplier += reloadLevel * 0.2f;
+        heal(maxHealth * healthLevel * 0.01f);
+        if (sfa != null) {
+            sfa.update(this);
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {

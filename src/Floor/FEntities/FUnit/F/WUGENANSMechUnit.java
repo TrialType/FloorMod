@@ -23,6 +23,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.EntityCollisions;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.units.StatusEntry;
 import mindustry.entities.units.WeaponMount;
 import mindustry.game.Team;
@@ -308,6 +309,13 @@ public class WUGENANSMechUnit extends FMechUnit {
                     }
                 }
             }
+        }
+        speedMultiplier += speedLevel * 0.2f;
+        damageMultiplier += damageLevel * 0.2f;
+        reloadMultiplier += reloadLevel * 0.2f;
+        heal(maxHealth * healthLevel * 0.01f);
+        if (sfa != null) {
+            sfa.update(this);
         }
         speedMultiplier += boost;
         healthMultiplier += boost;
@@ -799,6 +807,20 @@ public class WUGENANSMechUnit extends FMechUnit {
         under = read.bool();
         power = read.f();
         timerChanging = read.f();
+
+        level = read.i();
+        exp = read.f();
+
+        damageLevel = read.i();
+        speedLevel = read.i();
+        reloadLevel = read.i();
+        healthLevel = read.i();
+        againLevel = read.i();
+        shieldLevel = read.i();
+        if (shieldLevel > 0) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
         this.afterRead();
     }
 
@@ -849,5 +871,13 @@ public class WUGENANSMechUnit extends FMechUnit {
         write.bool(under);
         write.f(power);
         write.f(timerChanging);
+        write.i(level);
+        write.f(exp);
+        write.i(damageLevel);
+        write.i(speedLevel);
+        write.i(reloadLevel);
+        write.i(healthLevel);
+        write.i(againLevel);
+        write.i(shieldLevel);
     }
 }
