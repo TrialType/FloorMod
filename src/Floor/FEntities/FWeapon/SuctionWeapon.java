@@ -25,6 +25,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 public class SuctionWeapon extends Weapon {
+    public static final Map<Unit, Seq<Unit>> units = new HashMap<>();
     public static final Map<Unit, Teamc> map = new HashMap<>();
     public static final Map<Unit, Float> Timer = new HashMap<>();
     public static final Map<Unit, Vec2> points = new HashMap<>();
@@ -68,20 +69,25 @@ public class SuctionWeapon extends Weapon {
                 }
             }
 
+            Seq<Unit> number = units.computeIfAbsent(unit, u -> new Seq<>());
+            number.removeAll(u -> u.dead || u.health <= 0 || !u.within(point, range / 2));
             final boolean[] has = {false};
-            final int[] number = {0};
             Units.nearbyEnemies(unit.team, tx, ty, range, u -> {
-                if (BossList.list.indexOf(u.type) < 0 && u.type.targetable && number[0] <= 3) {
-                    number[0]++;
+                if (BossList.list.indexOf(u.type) < 0 && u.type.targetable) {
                     has[0] = true;
-                    if (!u.within(tx, ty, 20)) {
-                        float ux = u.x, uy = u.y;
-                        float len = (float) sqrt((ux - tx) * (ux - tx) + (uy - ty) * (uy - ty));
-                        float power = abs(1 - ((len - 18F) / (range - 18F)));
-                        Vec2 vec = new Vec2();
-                        vec.set((tx - ux) * (1 - power), (ty - uy) * (1 - power));
-                        vec.setLength(power * 28);
-                        u.moveAt(vec);
+                    if (number.size < 3) {
+                        number.add(u);
+                    }
+                    if (number.indexOf(u) >= 0) {
+                        if (!u.within(tx, ty, 20)) {
+                            float ux = u.x, uy = u.y;
+                            float len = (float) sqrt((ux - tx) * (ux - tx) + (uy - ty) * (uy - ty));
+                            float power = abs(1 - ((len - 18F) / (range - 18F)));
+                            Vec2 vec = new Vec2();
+                            vec.set((tx - ux) * (1 - power), (ty - uy) * (1 - power));
+                            vec.setLength(power * 28);
+                            u.moveAt(vec);
+                        }
                     }
                 }
             });

@@ -4,7 +4,8 @@ import Floor.FEntities.FBulletType.FlyContinuousLaserBulletType;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.pooling.Pools;
-import mindustry.gen.Bullet;
+import mindustry.gen.*;
+import mindustry.world.Block;
 
 public class removeSpwanBullet extends Bullet {
     public boolean couldAgain = true;
@@ -29,7 +30,7 @@ public class removeSpwanBullet extends Bullet {
             }
             couldAgain = false;
             remove();
-        } else {
+        } else if (!couldAgain) {
             vel.set(2 * Mathf.cos((float) Math.toRadians(rotation)), 2 * Mathf.sin((float) Math.toRadians(rotation)));
         }
         super.update();

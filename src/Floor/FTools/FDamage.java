@@ -1,5 +1,6 @@
 package Floor.FTools;
 
+import Floor.FContent.FEvents;
 import arc.Events;
 import arc.func.Cons;
 import arc.math.Angles;
@@ -65,6 +66,43 @@ public class FDamage extends Damage {
         }
 
     }
+
+    public static void EventMissileDamage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, Unit missile) {
+        Cons<Unit> cons = unit -> {
+            if (unit.team == team || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))) {
+                return;
+            }
+            boolean dead = unit.dead;
+            float amount = calculateDamage(scaled ? Math.max(0, unit.dst(x, y) - unit.type.hitSize / 2) : unit.dst(x, y), radius, damage);
+            unit.damage(amount);
+
+            if (!dead && unit.dead) {
+                Events.fire(new FEvents.UnitDestroyOtherEvent(missile, unit));
+            }
+
+            float dst = vec.set(unit.x - x, unit.y - y).len();
+            unit.vel.add(vec.setLength((1f - dst / radius) * 2f / unit.mass()));
+
+            if (complete && damage >= 9999999f && unit.isPlayer()) {
+                Events.fire(EventType.Trigger.exclusionDeath);
+            }
+        };
+        rect.setSize(radius * 2).setCenter(x, y);
+        if (team != null) {
+            Units.nearbyEnemies(team, rect, cons);
+        } else {
+            Units.nearby(rect, cons);
+        }
+        if (ground) {
+            if (!complete) {
+                tileDamage(team, World.toTile(x), World.toTile(y), radius / tilesize, damage, null);
+            } else {
+                completeDamage(team, x, y, radius, damage);
+            }
+        }
+
+    }
+
 
     private static void completeDamage(Team team, float x, float y, float radius, float damage) {
 

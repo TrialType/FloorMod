@@ -4,6 +4,7 @@ import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
 import arc.Events;
 import mindustry.Vars;
+import mindustry.ai.types.MissileAI;
 import mindustry.game.EventType;
 import mindustry.gen.Healthc;
 import mindustry.gen.Unit;
@@ -60,9 +61,14 @@ public class FEvents {
             }
         });
         Events.on(FEvents.UnitDestroyOtherEvent.class, e -> {
-            if (e.killer instanceof FUnitUpGrade uug && e.other instanceof FUnitUpGrade) {
-                uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
-                UnitUpGrade.getPower(uug, uug.number(), true, false);
+            if (e.other instanceof FUnitUpGrade) {
+                if (e.killer instanceof FUnitUpGrade uug) {
+                    uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
+                    UnitUpGrade.getPower(uug, uug.number(), true, false);
+                } else if (e.killer.controller() instanceof MissileAI ai && ai.shooter instanceof FUnitUpGrade uug) {
+                    uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
+                    UnitUpGrade.getPower(uug, uug.number(), true, false);
+                }
             }
         });
     }

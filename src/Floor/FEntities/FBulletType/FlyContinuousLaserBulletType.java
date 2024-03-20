@@ -9,11 +9,13 @@ import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.ai.types.MissileAI;
 import mindustry.entities.Damage;
+import mindustry.entities.Fires;
 import mindustry.entities.Mover;
 import mindustry.entities.bullet.ContinuousLaserBulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
+import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.ControlBlock;
 
 import static mindustry.Vars.net;
@@ -99,12 +101,7 @@ public class FlyContinuousLaserBulletType extends ContinuousLaserBulletType {
         removeSpwanBullet rsb = (removeSpwanBullet) b;
         if (rsb != null) {
             float realLength;
-            if (!rsb.couldAgain) {
-                realLength = Damage.findLength(b, length, false, pierceCap);
-            } else {
-                realLength = Damage.findLength(b, length, laserAbsorb, pierceCap);
-            }
-
+            realLength = Damage.findLength(b, length, laserAbsorb, pierceCap);
             float rot = b.rotation();
 
             for (int i = 0; i < colors.length; i++) {
@@ -130,6 +127,29 @@ public class FlyContinuousLaserBulletType extends ContinuousLaserBulletType {
 
             Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
             Draw.reset();
+        }
+    }
+
+    @Override
+    public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct) {
+        if (makeFire && build.team != b.team) {
+            Fires.create(build.tile);
+        }
+
+        if (heals() && build.team == b.team && !(build.block instanceof ConstructBlock)) {
+            healEffect.at(build.x, build.y, 0f, healColor, build.block);
+            build.heal(healPercent / 100f * build.maxHealth + healAmount);
+        } else if (build.team != b.team && direct) {
+            hit(b);
+        }
+
+        if (build.absorbLasers() && b instanceof removeSpwanBullet rsb && !rsb.couldAgain) {
+            if (Math.abs(b.x - build.x) <= build.hitSize() / 2 + 0.5 && Math.abs(b.y - build.y) <= build.hitSize() / 2 + 0.5) {
+                b.hit = true;
+                b.remove();
+            }
+        } else {
+            handlePierce(b, initialHealth, x, y);
         }
     }
 }

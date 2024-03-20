@@ -1,6 +1,7 @@
 package Floor.FContent;
 
 import Floor.FEntities.FBulletType.FlyContinuousLaserBulletType;
+import Floor.FEntities.FBulletType.MissileExplosionBulletType;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FWeapon.SuctionWeapon;
 import arc.graphics.Color;
@@ -10,8 +11,10 @@ import mindustry.content.UnitTypes;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LaserBulletType;
+import mindustry.entities.effect.ExplosionEffect;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
+import mindustry.type.UnitType;
 
 public class UnitOverride {
     public static void load() {
@@ -140,7 +143,25 @@ public class UnitOverride {
         UnitTypes.quell.health = 22000;
 
         UnitTypes.disrupt.health = 42000;
-
+        UnitTypes.disrupt.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(140f,25f) {{
+            collidesAir = collidesGround = true;
+            suppressionRange = 140f;
+            shootEffect = new ExplosionEffect() {{
+                lifetime = 50f;
+                waveStroke = 5f;
+                waveLife = 8f;
+                waveColor = Color.white;
+                sparkColor = smokeColor = Pal.suppress;
+                waveRad = 40f;
+                smokeSize = 4f;
+                smokes = 7;
+                smokeSizeBase = 0f;
+                sparks = 10;
+                sparkRad = 40f;
+                sparkLen = 6f;
+                sparkStroke = 2f;
+            }};
+        }};
         /*-----------------------------------------------------------------------------*/
 
         UnitTypes.anthicus.health = 10150;
