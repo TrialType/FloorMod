@@ -771,14 +771,14 @@ public class FUnits {
             immunities.add(StatusEffects.wet);
             immunities.add(StatusEffects.sporeSlowed);
 
-            Health2 = 3000;
+            Health2 = 10000;
             Speed1 = 3;
 
             HitReload = 18;
             percent = 1.5F;
             changeHel = 100;
             damage = 200 * 1.4F;
-            minSpeed = 5;
+            minSpeed = 4;
             firstPercent = true;
 
             defend = 100;

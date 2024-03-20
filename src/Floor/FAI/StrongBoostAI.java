@@ -17,7 +17,6 @@ import mindustry.entities.Predict;
 import mindustry.entities.Sized;
 import mindustry.entities.Units;
 import mindustry.gen.Building;
-import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
 import mindustry.graphics.Pal;
 import mindustry.type.Weapon;
@@ -45,14 +44,17 @@ public class StrongBoostAI extends FlyingAI {
     private Seq<Float> mx;
     private Seq<Float> my;
     private Teamc lastTarget;
+    private Teamc lastCircleTarget;
     private int order = 3;
     private int number;
 
     @Override
     public void updateUnit() {
         if (BoostUnitType != null && wu != null) {
-            if (first) {
+            if (first && wu.first) {
                 target = null;
+            } else {
+                first = false;
             }
 
             if (lastTarget != target) {
@@ -108,12 +110,6 @@ public class StrongBoostAI extends FlyingAI {
                         delayCounter = 0;
                     }
                     delayCounter += Time.delta;
-                    if (lastTarget != null && lastTarget != target) {
-                        start = false;
-                        lastTarget = target;
-                        return;
-                    }
-                    lastTarget = target;
                     if (delayCounter >= delay && (orx != 0 || ory != 0)) {
                         if (unit.speed() < 10) {
                             unit.apply(FStatusEffects.boostSpeed, 2);
@@ -255,12 +251,12 @@ public class StrongBoostAI extends FlyingAI {
         float ty = target.y();
         float sx = tx - ux;
         float sy = ty - uy;
-        if (lastTarget != target) {
+        if (lastCircleTarget != target) {
             orx = sx;
             ory = sy;
             order = 3;
         }
-        lastTarget = target;
+        lastCircleTarget = target;
         if (order == 3 && unit.within(target, circleLength)) {
             order = 2;
         } else if (order == 2 && !unit.within(target, circleLength)) {
@@ -363,10 +359,7 @@ public class StrongBoostAI extends FlyingAI {
         } else {
             radius = unit.range() * 10;
         }
-        target = Units.closestTarget(unit.team, unit.x, unit.y, radius, u -> !u.spawnedByCore());
-        if (target == null) {
-            Units.nearbyBuildings(unit.x, unit.y, radius, b -> target = target == null && !(b instanceof CoreBlock.CoreBuild) && !(b.team == unit.team) ? b : target);
-        }
+        target = Units.closestTarget(unit.team, unit.x, unit.y, radius, u -> !u.spawnedByCore(), b -> true);
         if (target == null) {
             target = unit.closestEnemyCore();
         }
