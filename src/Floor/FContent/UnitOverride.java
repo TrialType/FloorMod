@@ -12,6 +12,9 @@ import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LaserBulletType;
 import mindustry.entities.effect.ExplosionEffect;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.WaveEffect;
+import mindustry.entities.effect.WrapEffect;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
@@ -141,10 +144,12 @@ public class UnitOverride {
         UnitTypes.obviate.health = 8050;
 
         UnitTypes.quell.health = 22000;
+        UnitTypes.quell.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(220f, 25f){{
+            shootEffect = Fx.massiveExplosion;
+        }};
 
         UnitTypes.disrupt.health = 42000;
-        UnitTypes.disrupt.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(140f,25f) {{
-            collidesAir = collidesGround = true;
+        UnitTypes.disrupt.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(280f,25f) {{
             suppressionRange = 140f;
             shootEffect = new ExplosionEffect() {{
                 lifetime = 50f;
@@ -165,6 +170,14 @@ public class UnitOverride {
         /*-----------------------------------------------------------------------------*/
 
         UnitTypes.anthicus.health = 10150;
+        UnitTypes.anthicus.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(280f, 25f){{
+            shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
+                colorFrom = colorTo = Pal.techBlue;
+                sizeTo = 40f;
+                lifetime = 12f;
+                strokeFrom = 4f;
+            }});
+        }};
 
         UnitTypes.tecta.health = 26550;
 

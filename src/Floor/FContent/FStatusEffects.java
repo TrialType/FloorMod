@@ -6,6 +6,7 @@ import arc.math.Interp;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
+import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
