@@ -130,6 +130,7 @@ public class UnitOverride {
 
                     constructor = TimedKillUnit::create;
                     controller = u -> new MissileAI_II();
+                    hidden = true;
                     flying = true;
                     health = 38500;
                     speed = 0.1f;
@@ -149,6 +150,7 @@ public class UnitOverride {
 
                                 constructor = TimedKillUnit::create;
                                 controller = u -> new MissileAI_II();
+                                hidden = true;
                                 flying = true;
                                 targetable = false;
                                 hittable = false;

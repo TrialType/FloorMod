@@ -97,6 +97,9 @@ public class UnitUpGrade {
         while (l > p[index]) {
             l -= (int) p[index];
             index++;
+            if (index == p.length - 1) {
+                break;
+            }
         }
         return index;
     }

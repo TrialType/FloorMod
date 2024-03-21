@@ -29,6 +29,7 @@ import mindustry.type.Item;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 
+import java.util.Iterator;
 import java.util.Random;
 
 public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
@@ -335,6 +336,7 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
 
             this.vel.scl(Math.max(1.0F - this.drag * Time.delta, 0.0F));
         }
+
         float cx;
         float cy;
         if (this.type.bounded) {
@@ -350,25 +352,25 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
             }
 
             if (!Vars.net.client() || this.isLocal()) {
-                cx = 0.0F;
-                cy = 0.0F;
+                float dx = 0.0F;
+                float dy = 0.0F;
                 if (this.x < range) {
-                    cx += -(this.x - range) / 30.0F;
+                    dx += -(this.x - range) / 30.0F;
                 }
 
                 if (this.y < offset) {
-                    cy += -(this.y - offset) / 30.0F;
+                    dy += -(this.y - offset) / 30.0F;
                 }
 
                 if (this.x > cy) {
-                    cx -= (this.x - cy) / 30.0F;
+                    dx -= (this.x - cy) / 30.0F;
                 }
 
                 if (this.y > cx) {
-                    cy -= (this.y - cx) / 30.0F;
+                    dy -= (this.y - cx) / 30.0F;
                 }
 
-                this.velAddNet(cx * Time.delta, cy * Time.delta);
+                this.velAddNet(dx * Time.delta, dy * Time.delta);
             }
 
             if (this.isGrounded()) {
@@ -493,13 +495,6 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
                     }
                 }
             }
-        }
-        speedMultiplier += speedLevel * 0.2f;
-        damageMultiplier += damageLevel * 0.2f;
-        reloadMultiplier += reloadLevel * 0.2f;
-        heal(maxHealth * healthLevel * 0.0001f);
-        if (sfa != null) {
-            sfa.update(this);
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {
@@ -631,6 +626,15 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
             WeaponMount mount = var18[accepted];
             mount.weapon.update(this, mount);
         }
+
+        speedMultiplier += speedLevel * 0.2f;
+        damageMultiplier += damageLevel * 0.2f;
+        reloadMultiplier += reloadLevel * 0.2f;
+        heal(maxHealth * healthLevel * 0.0001f);
+        if (sfa != null) {
+            sfa.update(this);
+        }
+
     }
 
     @Override

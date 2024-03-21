@@ -12,7 +12,8 @@ import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
 
 public class FStatusEffects {
-    public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit, High_tension, fastII, High_tensionII;
+    public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit, High_tension, fastII, High_tensionII,
+            High_tensionIII;
 
     public static void load() {
         StrongStop = new StatusEffect("StrongStop") {{
@@ -100,6 +101,13 @@ public class FStatusEffects {
         High_tensionII = new StatusEffect("High_tensionII") {{
             speedMultiplier = 0.4f;
             reloadMultiplier = 0.4f;
+            healthMultiplier = 0.9f;
+        }};
+        High_tensionIII = new StatusEffect("High_tensionIII") {{
+            speedMultiplier = 0.1f;
+            reloadMultiplier = 0.1f;
+            healthMultiplier = 0.8f;
+            damage = 90;
         }};
     }
 }
