@@ -106,9 +106,9 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             boolean crazy = type == FUnits.crazy;
             if (speed() >= minSpeed) {
 
-
                 float length = crazy ? hitSize / 1.5f : min(speed() * 100, 100);
-                float tsn = (float) (tan(toRadians(Angles.angle(x, y, target.x(), target.y()))));
+                float len = (float) sqrt((x - target.x()) * (x - target.x()) + (y - target.y()) * (y - target.y()));
+                float angle1 = Angles.angle(x, y, target.x(), target.y());
                 Units.nearbyEnemies(team, x, y, length, u -> {
                     float timer = unitMap.computeIfAbsent(u, f -> reload);
                     if (timer >= reload) {
@@ -117,10 +117,13 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
                         if (crazy) {
                             percentDamage(u, percent, damage, firstPercent, changeHel);
                         } else {
-                            float ux = tsn == 0 ? x - u.x : (u.y - y) / tsn + x;
-                            float uy = tsn == Float.POSITIVE_INFINITY ? y - u.y : (u.x - x) * tsn + y;
-                            if (sqrt(ux * ux + uy * uy) <= hitSize / 2) {
-                                percentDamage(u, percent, damage, firstPercent, changeHel);
+                            float angel2 = Angles.angle(x, y, u.x, u.y);
+                            float angle = Angles.angleDist(angle1, angel2);
+
+                            if (angle <= 90) {
+                                if (cos(toRadians(angle)) * len <= length && sin(toRadians(angle)) * len <= hitSize / 2) {
+                                    percentDamage(u, percent, damage, firstPercent, changeHel);
+                                }
                             }
                         }
                     }
@@ -134,10 +137,13 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
                             if (crazy) {
                                 percentDamage(b, percent, damage, firstPercent, changeHel);
                             } else {
-                                float bx = tsn == 0 ? 0 : (b.y - y) / tsn + x;
-                                float by = tsn == 0 ? 0 : (b.x - x) * tsn + y;
-                                if (sqrt(bx * bx + by * by) <= hitSize / 2) {
-                                    percentDamage(b, percent, damage, firstPercent, changeHel);
+                                float angel2 = Angles.angle(x, y, b.x, b.y);
+                                float angle = Angles.angleDist(angle1, angel2);
+
+                                if (angle <= 90) {
+                                    if (cos(toRadians(angle)) * len <= length && sin(toRadians(angle)) * len <= hitSize / 2) {
+                                        percentDamage(b, percent, damage, firstPercent, changeHel);
+                                    }
                                 }
                             }
                         }

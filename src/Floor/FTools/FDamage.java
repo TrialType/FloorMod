@@ -125,62 +125,47 @@ public class FDamage extends Damage {
 
     public static void SqrtDamage(@Nullable Bullet bullet, Team team, float damage, float x, float y, float rotation, float length, float width) {
         float angle = rotation + 90;
-        if (angle < 0) angle = angle + 360;
-        Seq<Float> xs = new Seq<>();
-        Seq<Float> ys = new Seq<>();
-        for (float l = abs(width); l >= -abs(width); l -= 15) {
-            float lenX = (float) (l * Math.cos(Math.toRadians(angle)));
-            float lenY = (float) (l * Math.sin(Math.toRadians(angle)));
-            xs.add(x + lenX);
-            ys.add(y + lenY);
-        }
-        for (int i = 0; i < xs.size - 1; i++) {
-            float ax1 = (xs.get(i));
-            float ay1 = (ys.get(i));
+        float len = width * 2 / 9;
+        float len2 = width;
 
-            float ax2 = (xs.get(i + 1));
-            float ay2 = (ys.get(i + 1));
-            int ii = i;
-            Units.nearbyEnemies(team, x, y, length * 1.44F, u -> {
-                if (u.team == team) {
-                    return;
-                }
-                float ux = u.lastX, uy = u.lastY;
-                float angle1 = Angles.angleDist(Angles.angle(ax1, ay1, ux, uy), rotation);
-                float angle2 = Angles.angleDist(Angles.angle(ax2, ay2, ux, uy), rotation);
-                float angle3 = Angles.angleDist(Angles.angle(ux, uy, ax1, ay1), Angles.angle(ux, uy, ax2, ay2));
-                if (abs(angle3 - angle1 - angle2) <= 1F) {
-                    float len2 = (float) sqrt((ux - ax1) * (ux - ax1) + (uy - ay1) * (uy - ay1));
-                    if (len2 * cos(toRadians(angle1)) <= length) {
+        int num = 0;
+        Seq<Unit> units = new Seq<>();
+        Seq<Building> buildings = new Seq<>();
+        Units.nearbyEnemies(team, x, y, max(length, width / 2) * 1.4f, units::add);
+        Units.nearbyBuildings(x, y, max(length, width / 2) * 1.4f, b -> {
+            if (b.team != team) {
+                buildings.add(b);
+            }
+        });
+        while (len2 > -width) {
+            num++;
+            float ox = (float) (x + cos(toRadians(angle)) * (len2 - len / 2));
+            float oy = (float) (y + sin(toRadians(angle)) * (len2 - len / 2));
+            for (Unit u : units) {
+                float angleO = Angles.angleDist(rotation, Angles.angle(ox, oy, u.x, u.y));
+                if (angleO <= 90) {
+                    float len3 = (float) sqrt((u.x - ox) * (u.x - ox) + (u.y - oy) * (u.y - oy));
+                    if (cos(toRadians(angleO)) * len3 <= length && sin(toRadians(angleO)) * len3 <= len / 2) {
                         boolean dead = u.dead;
-                        u.damage(min(ii + 1, xs.size - ii - 2) * 2 * damage / (xs.size - 1));
-                        if (!dead && u.dead) {
+                        u.damage(damage * (num == 5 ? 1 : num < 5 ? (float) num / 5.0f : (float) (5 - (num - 5)) / 5.0f));
+                        if (!dead && u.dead && bullet != null) {
                             Events.fire(new EventType.UnitBulletDestroyEvent(u, bullet));
                         }
-
                     }
                 }
-            });
-            Units.nearbyBuildings(x, y, length * 1.44F, u -> {
-                if (u.team == team) {
-                    return;
-                }
-                float ux = u.x, uy = u.y;
-                float angle1 = Angles.angleDist(Angles.angle(ax1, ay1, ux, uy), rotation);
-                float angle2 = Angles.angleDist(Angles.angle(ax2, ay2, ux, uy), rotation);
-                float angle3 = Angles.angleDist(Angles.angle(ux, uy, ax1, ay1), Angles.angle(ux, uy, ax2, ay2));
-                if (abs(angle3 - angle1 - angle2) <= 0.1F) {
-                    float len2 = (float) sqrt((ux - ax1) * (ux - ax1) + (uy - ay1) * (uy - ay1));
-                    if (len2 * cos(toRadians(angle1)) <= length) {
-                        boolean dead = u.dead;
-                        u.damage(min(ii + 1, xs.size - ii - 2) * 2 * damage / (xs.size - 1));
-                        if (!dead && u.dead) {
-                            Events.fire(new EventType.BuildingBulletDestroyEvent(u, bullet));
-                        }
-
+            }
+            for (Building b : buildings) {
+                float angleO = Angles.angleDist(rotation, Angles.angle(ox, oy, b.x, b.y));
+                if (angleO <= 90) {
+                    float len3 = (float) sqrt((b.x - ox) * (b.x - ox) + (b.y - oy) * (b.y - oy));
+                    if (cos(toRadians(angleO)) * len3 <= length && sin(toRadians(angleO)) * len3 < len / 2) {
+                        b.damage(damage * (num == 5 ? 1 : num < 5 ? (float) num / 5 : (float) (5 - (num - 5)) / 5));
                     }
                 }
-            });
+            }
+            len2 = len2 - len;
         }
+
     }
+
 }
