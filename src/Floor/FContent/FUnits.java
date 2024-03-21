@@ -42,6 +42,7 @@ import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
+
 public class FUnits {
     public static UnitType transfer, shuttlevI, bulletInterception;
 
@@ -115,8 +116,8 @@ public class FUnits {
             constructor = FLegsUnit::create;
 
             range = 1000;
-            health = 3000;
-            armor = 8;
+            health = 10000;
+            armor = 24;
             speed = 1;
             legCount = 6;
             legGroupSize = 2;
@@ -124,7 +125,7 @@ public class FUnits {
             legContinuousMove = false;
             abilities.add(new ShieldArcAbility() {{
                 regen = 2.5F;
-                max = 1300;
+                max = 5000;
                 cooldown = 300;
                 angle = 360;
                 whenShooting = false;
@@ -144,7 +145,7 @@ public class FUnits {
             weapons.add(new Weapon() {{
                 reload = 150;
                 mirror = false;
-                bullet = new BasicBulletType() {{
+                bullet = new BulletType() {{
                     spawnUnit = bulletInterception;
                 }};
             }});
@@ -1067,8 +1068,8 @@ public class FUnits {
             range = maxRange = 200;
             hitSize = 40;
             flying = true;
-            health = 1000000;
-            armor = 50;
+            health = 3000000;
+            armor = 150;
             speed = 0.1F;
             rotateSpeed = 12;
             drag = 0.9F;
@@ -1090,15 +1091,21 @@ public class FUnits {
             abilities.add(new UnitSpawnAbility(Hammer, 600, 1, -1));
 
             weapons.add(new Weapon() {{
-                reload = 2.5f;
+                reload = 45f;
                 mirror = false;
                 y = x = 0;
-                shoot = new ShootSpread() {{
-                    shots = 32;
-                    spread = 10;
+                shoot = new ShootPattern() {{
+                    shots = 5;
                 }};
-                bullet = new LightningBulletType() {{
-                    damage = 800;
+                bullet = new BasicBulletType() {{
+                    range = maxRange = 1000;
+                    inaccuracy = 60;
+                    width = height = 0;
+                    damage = 0;
+                    lifetime = 1800;
+                    speed = 0.9f;
+                    lightning = 24;
+                    lightningDamage = 800;
                     lightningColor = Color.valueOf("436E2D");
                     lightningLength = 35;
                     lightningLengthRand = 15;

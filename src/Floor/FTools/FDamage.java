@@ -26,6 +26,7 @@ public class FDamage extends Damage {
     private static final EventType.UnitDamageEvent bulletDamageEvent = new EventType.UnitDamageEvent();
     private static final Vec2 vec = new Vec2();
     private static final Rect rect = new Rect();
+    private FDamage(){}
 
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source) {
         Cons<Unit> cons = unit -> {

@@ -28,9 +28,9 @@ public class ChainUnitType extends UnitType {
         commands = new UnitCommand[]{
                 UnitCommand.boostCommand,
                 UnitCommand.moveCommand,
-                ucd
+                UCD
         };
-        defaultCommand = ucd;
+        defaultCommand = UCD;
         riseSpeed = 0.04F;
         canBoost = true;
         allowLegStep = true;

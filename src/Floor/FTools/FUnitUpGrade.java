@@ -1,7 +1,5 @@
 package Floor.FTools;
 
-import java.util.Map;
-
 public interface FUnitUpGrade {
     int getLevel();
     void setLevel(int level);

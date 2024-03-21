@@ -9,7 +9,6 @@ import mindustry.world.blocks.defense.turrets.ReloadTurret;
 
 public class FDefends {
     public static Block kt;
-
     public static void load() {
         kt = new KnockingTurret("kt") {{
             hasPower = true;
