@@ -19,6 +19,13 @@ public class TimeLargeDamageAbility extends Ability {
 
     public float baseDamage = 5;
 
+    public TimeLargeDamageAbility(float damage) {
+        baseDamage = damage;
+    }
+
+    public TimeLargeDamageAbility() {
+    }
+
     public void update(Unit unit) {
         updateTimes(unit);
 

@@ -2,9 +2,12 @@ package Floor.FEntities.FAbility;
 
 import Floor.FContent.FStatusEffects;
 import Floor.FEntities.FUnit.F.ENGSWEISUnitEntity;
+import arc.Core;
 import arc.math.Angles;
 import arc.math.geom.Position;
+import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Strings;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
@@ -12,7 +15,10 @@ import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.Building;
 import mindustry.gen.Unit;
-
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 
 public class EMPAbility extends Ability {
@@ -74,5 +80,24 @@ public class EMPAbility extends Ability {
                 }
             }
         }
+    }
+
+    public String localized(){
+        var type = getClass();
+        return Core.bundle.get("ability." + (type.isAnonymousClass() ? type.getSuperclass() : type).getSimpleName().replace("Ability", "").toLowerCase());
+    }
+    @Override
+    public void addStats(Table t) {
+        t.add("[lightgray]" + Stat.range.localized() + ": [white]" + range + " " + StatUnit.seconds.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.productionTime.localized() + ": [white]" + time / 60 + " " + StatUnit.seconds.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + reload / 60 + " " + StatUnit.seconds.localized());
+        t.row();
+    }
+
+    @Override
+    public void displayBars(Unit unit, Table bars) {
+        bars.add(new Bar(Stat.cooldownTime.localized(), Pal.accent, () -> Math.max(timer / reload, 1))).row();
     }
 }

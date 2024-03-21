@@ -17,23 +17,19 @@ import mindustry.content.Fx;
 import mindustry.ctype.ContentType;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
-import mindustry.entities.units.BuildPlan;
 import mindustry.entities.units.StatusEntry;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.*;
 import mindustry.input.InputHandler;
 import mindustry.io.TypeIO;
 import mindustry.type.Item;
-import mindustry.type.UnitType;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.payloads.BuildPayload;
 import mindustry.world.blocks.payloads.Payload;
 import mindustry.world.blocks.power.PowerGraph;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 
 public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
@@ -533,13 +529,12 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
             this.payloadPower.clear();
         }
 
-        Iterator var9 = this.payloads.iterator();
+        Iterator<Payload> var9 = this.payloads.iterator();
 
         Payload pay;
         while(var9.hasNext()) {
-            pay = (Payload)var9.next();
-            if (pay instanceof BuildPayload) {
-                BuildPayload pb = (BuildPayload)pay;
+            pay = var9.next();
+            if (pay instanceof BuildPayload pb) {
                 if (pb.build.power != null) {
                     if (this.payloadPower == null) {
                         this.payloadPower = new PowerGraph(false);
@@ -560,7 +555,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
         while(var9.hasNext()) {
             pay = (Payload)var9.next();
             pay.set(this.x, this.y, this.rotation);
-            pay.update(this, (Building)null);
+            pay.update(this, null);
         }
 
         this.shieldAlpha -= Time.delta / 15.0F;
@@ -587,7 +582,7 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
                         break label341;
                     }
 
-                    StatusEntry entry = (StatusEntry)this.statuses.get(index++);
+                    StatusEntry entry = this.statuses.get(index++);
                     entry.time = Math.max(entry.time - Time.delta, 0.0F);
                     if (entry.effect != null && (!(entry.time <= 0.0F) || entry.effect.permanent)) {
                         this.applied.set(entry.effect.id);

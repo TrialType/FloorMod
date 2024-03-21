@@ -1,14 +1,13 @@
 package Floor.FContent;
 
 import Floor.FAI.MissileAI_II;
+import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.FlyContinuousLaserBulletType;
 import Floor.FEntities.FBulletType.MissileExplosionBulletType;
 import Floor.FEntities.FUnit.F.TimeUpGradeUnit;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FWeapon.SuctionWeapon;
 import arc.graphics.Color;
-import mindustry.ai.types.FlyingAI;
-import mindustry.ai.types.MissileAI;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
@@ -16,10 +15,6 @@ import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.bullet.LaserBulletType;
-import mindustry.entities.effect.ExplosionEffect;
-import mindustry.entities.effect.MultiEffect;
-import mindustry.entities.effect.WaveEffect;
-import mindustry.entities.effect.WrapEffect;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Sounds;
 import mindustry.gen.TimedKillUnit;
@@ -102,9 +97,16 @@ public class UnitOverride {
         /*=================================================================*/
 
         UnitTypes.scepter.health = 31500;
-
+        UnitTypes.reign.weapons.get(0).bullet.damage = 150;
+        UnitTypes.reign.weapons.get(0).bullet.lightningDamage = 60;
+        UnitTypes.reign.weapons.get(1).bullet.damage = 30;
 
         UnitTypes.reign.health = 84000;
+        UnitTypes.reign.weapons.get(0).bullet.damage = 240;
+        UnitTypes.reign.weapons.get(0).bullet.splashDamage = 54;
+        UnitTypes.reign.weapons.get(0).bullet.fragBullet.damage = 60;
+        UnitTypes.reign.weapons.get(0).bullet.fragBullet.splashDamage = 45;
+        UnitTypes.reign.weapons.get(0).bullet.fragBullets = 6;
 
         /*-----------------------------------------------------------------------------*/
 
@@ -194,6 +196,7 @@ public class UnitOverride {
         /*-----------------------------------------------------------------------------*/
 
         UnitTypes.aegires.health = 42000;
+        UnitTypes.aegires.abilities.add(new TimeLargeDamageAbility(2));
 
         UnitTypes.navanax.health = 70000;
 
