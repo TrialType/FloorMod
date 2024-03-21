@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
+import Floor.FTools.UpGradeTime;
 import arc.Events;
 import mindustry.Vars;
 import mindustry.ai.types.MissileAI;
@@ -55,19 +56,30 @@ public class FEvents {
         });
 
         Events.on(EventType.UnitBulletDestroyEvent.class, e -> {
-            if (e.bullet.owner instanceof FUnitUpGrade uug && e.unit instanceof FUnitUpGrade) {
+            if (e.bullet.owner instanceof FUnitUpGrade uug && (e.unit instanceof FUnitUpGrade || e.unit.maxHealth() >= 1000)) {
                 uug.addExp(e.unit.maxHealth * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
                 UnitUpGrade.getPower(uug, uug.number(), true, false);
+            } else if (e.bullet.owner instanceof Unit u && u.controller() instanceof MissileAI ai && ai.shooter instanceof FUnitUpGrade uug) {
+                uug.addExp(e.unit.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
+                UnitUpGrade.getPower(uug, uug.number(), true, false);
+            }
+            if (e.bullet.owner instanceof Unit u) {
+                if (u.controller() instanceof MissileAI ai && ai.shooter instanceof UpGradeTime ugt) {
+                    ugt.add(1);
+                }
             }
         });
         Events.on(FEvents.UnitDestroyOtherEvent.class, e -> {
-            if (e.other instanceof FUnitUpGrade) {
+            if (e.other instanceof FUnitUpGrade || e.other.maxHealth() >= 1000) {
                 if (e.killer instanceof FUnitUpGrade uug) {
                     uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
                     UnitUpGrade.getPower(uug, uug.number(), true, false);
                 } else if (e.killer.controller() instanceof MissileAI ai && ai.shooter instanceof FUnitUpGrade uug) {
                     uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
                     UnitUpGrade.getPower(uug, uug.number(), true, false);
+                }
+                if (e.killer.controller() instanceof MissileAI ai && ai.shooter instanceof UpGradeTime ugt) {
+                    ugt.add(1);
                 }
             }
         });

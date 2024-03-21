@@ -910,10 +910,6 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
         this.drownTime = Mathf.clamp(this.drownTime);
     }
     @Override
-    public Map<String, Integer> getMap() {
-        return unitAbilities;
-    }
-    @Override
     public void UnderUnit(Unit unit) {
         underUnit = unit;
     }

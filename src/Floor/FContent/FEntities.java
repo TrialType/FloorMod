@@ -28,5 +28,6 @@ public class FEntities {
         EntityMapping.idMap[116] = HiddenUnit::create;
         EntityMapping.idMap[117] = WUGENANSMechUnit::create;
         EntityMapping.idMap[118] = CaveUnit::create;
+        EntityMapping.idMap[119] = TimeUpGradeUnit::create;
     }
 }

@@ -294,10 +294,6 @@ public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner
             idList.add(read.i());
 
         }
-        number = read.i();
-        for (int i = 0; i < number; i++) {
-            unitAbilities.put(read.str(), read.i());
-        }
         first = read.bool();
         number = read.i();
         for (int i = 0; i < number; i++) {
@@ -345,11 +341,6 @@ public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner
         write.i(units.size);
         for (Unit u : units) {
             write.i(u.id);
-        }
-        write.i(unitAbilities.size());
-        for (String s : unitAbilities.keySet()) {
-            write.str(s);
-            write.i(unitAbilities.get(s));
         }
         write.bool(first);
         write.i(miners.size);

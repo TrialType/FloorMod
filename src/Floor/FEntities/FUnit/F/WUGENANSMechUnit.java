@@ -796,11 +796,6 @@ public class WUGENANSMechUnit extends FMechUnit {
             this.y = read.f();
         }
 
-
-        int number = read.i();
-        for (int i = 0; i < number; i++) {
-            unitAbilities.put(read.str(), read.i());
-        }
         level = read.i();
         exp = read.f();
 
@@ -861,11 +856,6 @@ public class WUGENANSMechUnit extends FMechUnit {
         write.f(this.x);
         write.f(this.y);
 
-        write.i(unitAbilities.size());
-        for (String s : unitAbilities.keySet()) {
-            write.str(s);
-            write.i(unitAbilities.get(s));
-        }
         write.i(level);
         write.f(exp);
         write.bool(under);

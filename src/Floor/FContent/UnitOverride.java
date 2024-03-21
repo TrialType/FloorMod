@@ -1,23 +1,31 @@
 package Floor.FContent;
 
+import Floor.FAI.MissileAI_II;
 import Floor.FEntities.FBulletType.FlyContinuousLaserBulletType;
 import Floor.FEntities.FBulletType.MissileExplosionBulletType;
+import Floor.FEntities.FUnit.F.TimeUpGradeUnit;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FWeapon.SuctionWeapon;
 import arc.graphics.Color;
+import mindustry.ai.types.FlyingAI;
+import mindustry.ai.types.MissileAI;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.bullet.LaserBulletType;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.effect.WrapEffect;
+import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Sounds;
+import mindustry.gen.TimedKillUnit;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
+import mindustry.type.Weapon;
 
 public class UnitOverride {
     public static void load() {
@@ -43,7 +51,7 @@ public class UnitOverride {
         UnitTypes.horizon.constructor = FUnitEntity::create;
         UnitTypes.zenith.constructor = FUnitEntity::create;
         UnitTypes.antumbra.constructor = FUnitEntity::create;
-        UnitTypes.eclipse.constructor = FUnitEntity::create;
+        UnitTypes.eclipse.constructor = TimeUpGradeUnit::create;
 
         UnitTypes.poly.constructor = FUnitEntity::create;
         UnitTypes.mega.constructor = FPayloadUnit::create;
@@ -111,6 +119,64 @@ public class UnitOverride {
 
 
         UnitTypes.eclipse.health = 77000;
+        UnitTypes.eclipse.weapons.add(new Weapon() {{
+            reload = 480;
+            bullet = new BulletType() {{
+                lifetime = 0;
+                spawnUnit = new UnitType("eclipse1") {{
+                    lifetime = 1260;
+
+                    constructor = TimedKillUnit::create;
+                    controller = u -> new MissileAI_II();
+                    flying = true;
+                    health = 38500;
+                    speed = 0.1f;
+                    armor = 13;
+                    weapons.add(new Weapon() {{
+                        alwaysShooting = true;
+                        controllable = aiControllable = false;
+                        reload = 1202;
+                        shoot = new ShootPattern() {{
+                            firstShotDelay = 1200;
+                        }};
+                        bullet = new MissileExplosionBulletType(0, 0) {{
+                            spawnUnit = new UnitType("eclipse2") {{
+                                range = maxRange = 1000;
+
+                                lifetime = 1201;
+
+                                constructor = TimedKillUnit::create;
+                                controller = u -> new MissileAI_II();
+                                flying = true;
+                                targetable = false;
+                                hittable = false;
+                                speed = 11;
+                                weapons.add(new Weapon() {{
+                                    rangeOverride = 1;
+                                    bullet = new ExplosionBulletType(10000, 500);
+                                }});
+                            }};
+                        }};
+                    }});
+                    weapons.add(new Weapon() {{
+                        reload = 20;
+                        shoot = new ShootPattern() {{
+                            shots = 3;
+                        }};
+                        bullet = new BasicBulletType() {{
+                            inaccuracy = 24;
+
+                            homingRange = 1000;
+                            homingDelay = 20;
+                            homingPower = 0.07f;
+                            lifetime = 120;
+                            speed = 5;
+                            damage = 120;
+                        }};
+                    }});
+                }};
+            }};
+        }});
 
         /*-----------------------------------------------------------------------------*/
 
@@ -144,40 +210,14 @@ public class UnitOverride {
         UnitTypes.obviate.health = 8050;
 
         UnitTypes.quell.health = 22000;
-        UnitTypes.quell.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(220f, 25f){{
-            shootEffect = Fx.massiveExplosion;
-        }};
+        UnitTypes.quell.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet.splashDamage = 220f;
 
         UnitTypes.disrupt.health = 42000;
-        UnitTypes.disrupt.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(280f,25f) {{
-            suppressionRange = 140f;
-            shootEffect = new ExplosionEffect() {{
-                lifetime = 50f;
-                waveStroke = 5f;
-                waveLife = 8f;
-                waveColor = Color.white;
-                sparkColor = smokeColor = Pal.suppress;
-                waveRad = 40f;
-                smokeSize = 4f;
-                smokes = 7;
-                smokeSizeBase = 0f;
-                sparks = 10;
-                sparkRad = 40f;
-                sparkLen = 6f;
-                sparkStroke = 2f;
-            }};
-        }};
+        UnitTypes.disrupt.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet.splashDamage = 280f;
         /*-----------------------------------------------------------------------------*/
 
         UnitTypes.anthicus.health = 10150;
-        UnitTypes.anthicus.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet = new MissileExplosionBulletType(280f, 25f){{
-            shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
-                colorFrom = colorTo = Pal.techBlue;
-                sizeTo = 40f;
-                lifetime = 12f;
-                strokeFrom = 4f;
-            }});
-        }};
+        UnitTypes.anthicus.weapons.get(0).bullet.spawnUnit.weapons.get(0).bullet.splashDamage = 280f;
 
         UnitTypes.tecta.health = 26550;
 

@@ -403,10 +403,6 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
             idList.add(read.i());
 
         }
-        number = read.i();
-        for (int i = 0; i < number; i++) {
-            unitAbilities.put(read.str(), read.i());
-        }
         first = read.bool();
         level = read.i();
         exp = read.f();
@@ -463,11 +459,6 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         write.i(units.size);
         for (Unit u : units) {
             write.i(u.id);
-        }
-        write.i(unitAbilities.size());
-        for (String s : unitAbilities.keySet()) {
-            write.str(s);
-            write.i(unitAbilities.get(s));
         }
         write.bool(first);
         write.i(level);
