@@ -97,9 +97,9 @@ public class UnitOverride {
         /*=================================================================*/
 
         UnitTypes.scepter.health = 31500;
-        UnitTypes.reign.weapons.get(0).bullet.damage = 150;
-        UnitTypes.reign.weapons.get(0).bullet.lightningDamage = 60;
-        UnitTypes.reign.weapons.get(1).bullet.damage = 30;
+        UnitTypes.scepter.weapons.get(0).bullet.damage = 150;
+        UnitTypes.scepter.weapons.get(0).bullet.lightningDamage = 60;
+        UnitTypes.scepter.weapons.get(1).bullet.damage = 30;
 
         UnitTypes.reign.health = 84000;
         UnitTypes.reign.weapons.get(0).bullet.damage = 240;
