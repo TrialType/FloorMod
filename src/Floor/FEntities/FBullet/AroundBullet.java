@@ -54,6 +54,7 @@ public class AroundBullet extends Bullet {
         }
 
         if (abt != null) {
+            float time = abt.statusTime;
 
             updateMaps();
 
@@ -63,7 +64,6 @@ public class AroundBullet extends Bullet {
 
             if (target != null) {
                 if (!target.hasEffect(abt.statusEffect) && within(target, abt.circleRange + 5) && !lastStatus.get(target)) {
-                    type.hit(this, x, y);
 
                     Units.nearbyEnemies(team, target.x, target.y, abt.circleRange, u -> {
                         e.at(x, y, 0, Color.valueOf("06172699"), u);
@@ -75,7 +75,7 @@ public class AroundBullet extends Bullet {
                             return;
                         }
 
-                        u.apply(abt.statusEffect, 120);
+                        u.apply(abt.statusEffect, time);
 
                         if (lastStatus.get(u) != null) {
                             lastStatus.put(u, true);
@@ -189,7 +189,7 @@ public class AroundBullet extends Bullet {
             units.remove(this);
             boolean b = true;
             for (AroundBullet ab : units.keySet()) {
-                if (units.get(ab) == target) {
+                if (ab != this && units.get(ab) == target) {
                     b = false;
                     break;
                 }

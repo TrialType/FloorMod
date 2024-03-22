@@ -2,6 +2,7 @@ package Floor.FEntities.FUnit.F;
 
 import Floor.FEntities.FUnit.Override.FMechUnit;
 import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
+import Floor.FTools.HighChange;
 import Floor.FTools.PhysicsWorldChanger;
 import arc.math.Angles;
 import arc.math.Mathf;
@@ -274,12 +275,15 @@ public class WUGENANSMechUnit extends FMechUnit {
         int index;
 
         int boost = 0;
-        if(!Units.canCreate(team,type)){
+        if (!Units.canCreate(team, type)) {
             for (int p = (int) power, i = (int) powerNeed; p > powerNeed; i *= 2) {
                 p = p - i;
                 boost++;
             }
         }
+
+        power = Math.max(0, power - Time.delta / 60f * 1000f);
+
         if (!this.statuses.isEmpty()) {
             index = 0;
 
@@ -317,6 +321,37 @@ public class WUGENANSMechUnit extends FMechUnit {
         if (sfa != null) {
             sfa.update(this);
         }
+
+        float damageTo = 1;
+        float speedTo = 1;
+        float reloadTo = 1;
+        float healthTo = 1;
+        float buildTo = 1;
+        float dargTo = 1;
+        for (StatusEntry se : statuses) {
+            if (se.effect instanceof HighChange hc) {
+                damageTo = Math.min(damageTo, hc.damageTo());
+                speedTo = Math.min(speedTo, hc.speedTo());
+                reloadTo = Math.min(reloadTo, hc.reloadTo());
+                healthTo = Math.min(healthTo, hc.healthTo());
+                buildTo = Math.min(buildTo, hc.buildTo());
+                dargTo = Math.min(dargTo, hc.dargTo());
+            }
+        }
+        speedMultiplier *= speedTo;
+        damageMultiplier *= damageTo;
+        reloadMultiplier *= reloadTo;
+        healthMultiplier *= healthTo;
+        buildSpeedMultiplier *= buildTo;
+        dragMultiplier *= dargTo;
+
+        if (level > 60) {
+            int boost2 = level - 60;
+            speedMultiplier += boost2 * 0.01f;
+            damageMultiplier += boost2 * 0.01f;
+            reloadMultiplier += boost2 * 0.01f;
+        }
+
         speedMultiplier += boost;
         healthMultiplier += boost;
         damageMultiplier += boost;

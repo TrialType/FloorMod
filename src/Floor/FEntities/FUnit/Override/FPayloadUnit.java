@@ -1,6 +1,7 @@
 package Floor.FEntities.FUnit.Override;
 
 import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.HighChange;
 import Floor.FTools.LayAble;
 import Floor.FTools.UnitChainAble;
 import arc.math.Angles;
@@ -608,6 +609,36 @@ public class FPayloadUnit extends PayloadUnit implements FUnitUpGrade, LayAble {
         heal(maxHealth * healthLevel * 0.0001f);
         if (sfa != null) {
             sfa.update(this);
+        }
+
+        float damageTo = 1;
+        float speedTo = 1;
+        float reloadTo = 1;
+        float healthTo = 1;
+        float buildTo = 1;
+        float dargTo = 1;
+        for (StatusEntry se : statuses) {
+            if (se.effect instanceof HighChange hc) {
+                damageTo = Math.min(damageTo, hc.damageTo());
+                speedTo = Math.min(speedTo, hc.speedTo());
+                reloadTo = Math.min(reloadTo, hc.reloadTo());
+                healthTo = Math.min(healthTo, hc.healthTo());
+                buildTo = Math.min(buildTo, hc.buildTo());
+                dargTo = Math.min(dargTo, hc.dargTo());
+            }
+        }
+        speedMultiplier *= speedTo;
+        damageMultiplier *= damageTo;
+        reloadMultiplier *= reloadTo;
+        healthMultiplier *= healthTo;
+        buildSpeedMultiplier *= buildTo;
+        dragMultiplier *= dargTo;
+
+        if (level > 60) {
+            int boost2 = level - 60;
+            speedMultiplier += boost2 * 0.01f;
+            damageMultiplier += boost2 * 0.01f;
+            reloadMultiplier += boost2 * 0.01f;
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {

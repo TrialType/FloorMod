@@ -1,6 +1,7 @@
 package Floor.FContent;
 
 import Floor.FType.FStatusEffect.ADH;
+import Floor.FType.FStatusEffect.HighChangeStatus;
 import arc.graphics.Color;
 import arc.math.Interp;
 import mindustry.content.Fx;
@@ -90,23 +91,25 @@ public class FStatusEffects {
                 colorTo = color;
             }});
         }};
-        High_tension = new StatusEffect("High_tension") {{
-            speedMultiplier = 0.8f;
-            reloadMultiplier = 0.8f;
+        High_tension = new HighChangeStatus("High_tension") {{
+            speedTo = 0.8f;
+            reloadTo = 0.8f;
+            healthTo = 0.9f;
         }};
         fastII = new StatusEffect("fastII") {{
             speedMultiplier = 2.4f;
             init(() -> opposite(StatusEffects.slow));
         }};
-        High_tensionII = new StatusEffect("High_tensionII") {{
-            speedMultiplier = 0.4f;
-            reloadMultiplier = 0.4f;
-            healthMultiplier = 0.9f;
+        High_tensionII = new HighChangeStatus("High_tensionII") {{
+            speedTo = 0.5f;
+            reloadTo = 0.5f;
+            healthTo = 0.8f;
+            damage = 6;
         }};
-        High_tensionIII = new StatusEffect("High_tensionIII") {{
-            speedMultiplier = 0.1f;
-            reloadMultiplier = 0.1f;
-            healthMultiplier = 0.8f;
+        High_tensionIII = new HighChangeStatus("High_tensionIII") {{
+            speedTo = 0.1f;
+            reloadTo = 0.1f;
+            healthTo = 0.7f;
             damage = 90;
         }};
     }

@@ -1124,70 +1124,26 @@ public class FUnits {
             weapons.add(new Weapon() {{
                 rotate = true;
                 rotateSpeed = 12;
-                reload = 30;
+                reload = 90;
                 x = 25;
                 y = 15;
                 shootSound = Sounds.none;
 
                 shoot = new ShootPattern() {{
-                    shots = 4;
+                    shots = 1;
                     firstShotDelay = 30;
                     shotDelay = 10;
                 }};
 
-                bullet = new AroundBulletType() {{
+                bullet = new BasicBulletType() {{
                     range = maxRange = 1000;
-                    lifetime = 3600;
+                    lifetime = 240;
                     speed = 3;
                     damage = 100;
-                    splashDamage = 100;
-                    splashDamageRadius = 85;
-                    splashDamagePierce = true;
 
                     frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
                     hitEffect = despawnEffect = Fx.none;
                     shootEffect = Fx.none;
-
-                    targetRange = 1000;
-                    circleRange = 120;
-                    statusEffect = FStatusEffects.High_tensionII;
-                    applyEffect = new Effect(30f, 300f, e -> {
-                        Rand rand = new Rand();
-                        if (!(e.data instanceof Position p)) return;
-                        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
-                        Tmp.v1.set(p).sub(e.x, e.y).nor();
-
-                        float n = Tmp.v1.x, normy = Tmp.v1.y;
-                        float range = 6f;
-                        int links = Mathf.ceil(dst / range);
-                        float spacing = dst / links;
-
-                        Lines.stroke(4f * e.fout());
-                        Draw.color(Color.white, Color.valueOf("01066FAA"), e.fin());
-
-                        Lines.beginLine();
-
-                        Lines.linePoint(e.x, e.y);
-
-                        rand.setSeed(e.id);
-
-                        for (int i = 0; i < links; i++) {
-                            float nx, ny;
-                            if (i == links - 1) {
-                                nx = tx;
-                                ny = ty;
-                            } else {
-                                float len = (i + 1) * spacing;
-                                Tmp.v1.setToRandomDirection(rand).scl(range / 2f);
-                                nx = e.x + n * len + Tmp.v1.x;
-                                ny = e.y + normy * len + Tmp.v1.y;
-                            }
-
-                            Lines.linePoint(nx, ny);
-                        }
-
-                        Lines.endLine();
-                    }).followParent(false).rotWithParent(false);
                 }};
             }});
         }};

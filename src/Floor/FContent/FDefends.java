@@ -8,6 +8,7 @@ import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootPattern;
+import mindustry.entities.pattern.ShootSpread;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
@@ -33,16 +34,20 @@ public class FDefends {
 
             clipSize = 4;
             size = 4;
-            reload = 60;
-            range = 160;
+            reload = 180;
+            range = 360;
             rotateSpeed = 12;
             liquidCapacity = 5;
-            inaccuracy = 45;
+            inaccuracy = 0;
 
             hasPower = true;
+            consumesPower = true;
 
-            shoot = new ShootPattern() {{
-                shots = 8;
+            consumers = new Consume[]{new ConsumePower(1000, 1000, true)};
+
+            shoot = new ShootSpread() {{
+                shots = 2;
+                spread = 3;
             }};
             ammoTypes.put(Liquids.water, new AroundBulletType() {{
                 lifetime = 3600;
@@ -56,6 +61,7 @@ public class FDefends {
                 targetRange = 1000;
                 circleRange = 160;
 
+                statusTime = 240;
                 statusEffect = FStatusEffects.High_tensionIII;
                 frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
                 applyEffect = new WaveEffect() {{

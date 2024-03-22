@@ -11,32 +11,30 @@ public class UnitUpGrade {
     }
 
     public static void getPower(FUnitUpGrade uug, int number, boolean get, boolean full) {
-        if (uug.getLevel() < 60) {
-            if (full) {
-                uug.setLevel(60);
-                uug.setAgainLevel(10);
-                uug.setDamageLevel(10);
-                uug.setHealthLevel(10);
-                uug.setReloadLevel(10);
-                uug.setShieldLevel(10);
-                uug.sfa(10);
-                uug.setSpeedLevel(10);
-            } else if (get) {
-                for (int i = 0; i < number; i++) {
-                    int index = getIndex(uug);
-                    getPower(uug, index);
-                }
+        if (full) {
+            uug.setLevel(60);
+            uug.setAgainLevel(10);
+            uug.setDamageLevel(10);
+            uug.setHealthLevel(10);
+            uug.setReloadLevel(10);
+            uug.setShieldLevel(10);
+            uug.sfa(10);
+            uug.setSpeedLevel(10);
+        } else if (get) {
+            for (int i = 0; i < number; i++) {
+                int index = getIndex(uug);
+                getPower(uug, index, index);
             }
-        } else {
-            uug.number();
         }
     }
 
-    private static void getPower(FUnitUpGrade uug, int index) {
+    private static void getPower(FUnitUpGrade uug, int index, int start) {
         switch (list[index]) {
             case "healthy": {
                 if (uug.getHealthLevel() >= 10) {
-                    getPower(uug, 1);
+                    if (start != 1) {
+                        getPower(uug, 1, start);
+                    }
                 } else {
                     uug.setHealthLevel(uug.getHealthLevel() + 1);
                 }
@@ -44,7 +42,9 @@ public class UnitUpGrade {
             }
             case "damage": {
                 if (uug.getDamageLevel() >= 10) {
-                    getPower(uug, 2);
+                    if (start != 2) {
+                        getPower(uug, 2, start);
+                    }
                 } else {
                     uug.setDamageLevel(uug.getDamageLevel() + 1);
                 }
@@ -52,7 +52,9 @@ public class UnitUpGrade {
             }
             case "reload": {
                 if (uug.getReloadLevel() >= 10) {
-                    getPower(uug, 3);
+                    if (start != 3) {
+                        getPower(uug, 3, start);
+                    }
                 } else {
                     uug.setReloadLevel(uug.getReloadLevel() + 1);
                 }
@@ -60,7 +62,9 @@ public class UnitUpGrade {
             }
             case "speed": {
                 if (uug.getSpeedLevel() >= 10) {
-                    getPower(uug, 4);
+                    if (start != 4) {
+                        getPower(uug, 4, start);
+                    }
                 } else {
                     uug.setSpeedLevel(uug.getSpeedLevel() + 1);
                 }
@@ -68,7 +72,9 @@ public class UnitUpGrade {
             }
             case "again": {
                 if (uug.getAgainLevel() >= 10) {
-                    getPower(uug, 5);
+                    if (start != 5) {
+                        getPower(uug, 5, start);
+                    }
                 } else {
                     uug.setAgainLevel(uug.getAgainLevel() + 1);
                 }
@@ -78,6 +84,10 @@ public class UnitUpGrade {
                 if (uug.getShieldLevel() < 10) {
                     uug.setShieldLevel(uug.getShieldLevel() + 1);
                     uug.sfa(uug.getShieldLevel());
+                } else {
+                    if (start != 0) {
+                        getPower(uug, 0, start);
+                    }
                 }
                 break;
             }
@@ -85,21 +95,19 @@ public class UnitUpGrade {
     }
 
     private static int getIndex(FUnitUpGrade uug) {
-        float[] p = new float[]{100f / (uug.getHealthLevel() + 1), 100f / (uug.getDamageLevel() + 1),
-                100f / (uug.getReloadLevel() + 1), 100f / (uug.getSpeedLevel() + 1),
-                100f / (uug.getAgainLevel() + 1), 100f / (uug.getShieldLevel() + 1)};
-        Random ra = new Random();
-        int sum = (int) (100f / (uug.getHealthLevel() + 1) + 100f / (uug.getDamageLevel() + 1) +
-                100f / (uug.getReloadLevel() + 1) + 100f / (uug.getSpeedLevel() + 1) +
-                100f / (uug.getAgainLevel() + 1) + 100f / (uug.getShieldLevel() + 1));
-        int l = ra.nextInt(sum) + 1;
+        int damage = uug.getDamageLevel() + 1;
+        int speed = uug.getSpeedLevel() + 1;
+        int reload = uug.getReloadLevel() + 1;
+        int health = uug.getHealthLevel() + 1;
+        int shield = uug.getShieldLevel() + 1;
+        int again = uug.getAgainLevel() + 1;
+        int sum = 83160 / health + 83160 / damage + 83160 / reload + 83160 / speed + 83160 / again + 83160 / shield;
+        int[] k = new int[]{83160 / health, 83160 / damage, 83160 / reload, 83160 / speed, 83160 / again, 83160 / shield};
+        int power = new Random().nextInt(sum) + 1;
         int index = 0;
-        while (l > p[index]) {
-            l -= (int) p[index];
+        while (power > k[index]) {
+            power -= k[index];
             index++;
-            if (index == p.length - 1) {
-                break;
-            }
         }
         return index;
     }

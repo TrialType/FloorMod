@@ -24,6 +24,7 @@ public class AroundBulletType extends BasicBulletType {
     public float targetRange = 100;
     public float circleRange = 40;
     public StatusEffect statusEffect = StatusEffects.wet;
+    public float statusTime = 120;
     public Effect applyEffect = Fx.none;
 
     @Override

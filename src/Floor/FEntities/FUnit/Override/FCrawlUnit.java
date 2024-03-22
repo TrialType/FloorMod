@@ -1,6 +1,7 @@
 package Floor.FEntities.FUnit.Override;
 
 import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.HighChange;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Bits;
@@ -187,13 +188,13 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
         if (this.type.bounded) {
             offset = 0.0F;
             range = 0.0F;
-            cx = (float)Vars.world.unitHeight();
-            cy = (float)Vars.world.unitWidth();
+            cx = (float) Vars.world.unitHeight();
+            cy = (float) Vars.world.unitWidth();
             if (Vars.state.rules.limitMapArea && !this.team.isAI()) {
-                offset = (float)(Vars.state.rules.limitY * 8);
-                range = (float)(Vars.state.rules.limitX * 8);
-                cx = (float)(Vars.state.rules.limitHeight * 8) + offset;
-                cy = (float)(Vars.state.rules.limitWidth * 8) + range;
+                offset = (float) (Vars.state.rules.limitY * 8);
+                range = (float) (Vars.state.rules.limitX * 8);
+                cx = (float) (Vars.state.rules.limitHeight * 8) + offset;
+                cy = (float) (Vars.state.rules.limitWidth * 8) + range;
             }
 
             if (!Vars.net.client() || this.isLocal()) {
@@ -233,17 +234,17 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
         int accepted;
         if (this.moving()) {
             this.segmentRot = Angles.moveToward(this.segmentRot, this.rotation, this.type.segmentRotSpeed);
-            int radius = (int)Math.max(0.0F, this.hitSize / 8.0F * 2.0F);
+            int radius = (int) Math.max(0.0F, this.hitSize / 8.0F * 2.0F);
             index = 0;
             accepted = 0;
             int deeps = 0;
             this.lastDeepFloor = null;
 
-            for(cx = -radius; cx <= radius; ++cx) {
-                for(cy = -radius; cy <= radius; ++cy) {
+            for (cx = -radius; cx <= radius; ++cx) {
+                for (cy = -radius; cy <= radius; ++cy) {
                     if (cx * cx + cy * cy <= radius) {
                         ++index;
-                        Tile t = Vars.world.tileWorld(this.x + (float)(cx * 8), this.y + (float)(cy * 8));
+                        Tile t = Vars.world.tileWorld(this.x + (float) (cx * 8), this.y + (float) (cy * 8));
                         if (t != null) {
                             if (t.solid()) {
                                 ++accepted;
@@ -268,11 +269,11 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
                 }
             }
 
-            if ((float)deeps / (float)index < 0.75F) {
+            if ((float) deeps / (float) index < 0.75F) {
                 this.lastDeepFloor = null;
             }
 
-            this.lastCrawlSlowdown = Mathf.lerp(1.0F, this.type.crawlSlowdown, Mathf.clamp((float)accepted / (float)index / this.type.crawlSlowdownFrac));
+            this.lastCrawlSlowdown = Mathf.lerp(1.0F, this.type.crawlSlowdown, Mathf.clamp((float) accepted / (float) index / this.type.crawlSlowdownFrac));
         }
 
         this.segmentRot = Angles.clampRange(this.segmentRot, this.rotation, this.type.segmentMaxRot);
@@ -297,7 +298,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
         this.updateDrowning();
         this.hitTime -= Time.delta / 9.0F;
         this.stack.amount = Mathf.clamp(this.stack.amount, 0, this.itemCapacity());
-        this.itemTime = Mathf.lerpDelta(this.itemTime, (float)Mathf.num(this.hasItem()), 0.05F);
+        this.itemTime = Mathf.lerpDelta(this.itemTime, (float) Mathf.num(this.hasItem()), 0.05F);
         if (this.mineTile != null) {
             Building core = this.closestCore();
             Item item = this.getMineResult(this.mineTile);
@@ -314,11 +315,11 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
                 this.mineTimer = 0.0F;
             } else if (this.mining() && item != null) {
                 this.mineTimer += Time.delta * this.type.mineSpeed;
-                if (Mathf.chance(0.06 * (double)Time.delta)) {
+                if (Mathf.chance(0.06 * (double) Time.delta)) {
                     Fx.pulverizeSmall.at(this.mineTile.worldx() + Mathf.range(4.0F), this.mineTile.worldy() + Mathf.range(4.0F), 0.0F, item.color);
                 }
 
-                if (this.mineTimer >= 50.0F + (this.type.mineHardnessScaling ? (float)item.hardness * 15.0F : 15.0F)) {
+                if (this.mineTimer >= 50.0F + (this.type.mineHardnessScaling ? (float) item.hardness * 15.0F : 15.0F)) {
                     this.mineTimer = 0.0F;
                     if (Vars.state.rules.sector != null && this.team() == Vars.state.rules.defaultTeam) {
                         Vars.state.rules.sector.info.handleProduction(item, 1);
@@ -361,8 +362,8 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
             index = 0;
 
             label353:
-            while(true) {
-                while(true) {
+            while (true) {
+                while (true) {
                     if (index >= this.statuses.size) {
                         break label353;
                     }
@@ -395,6 +396,36 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
             sfa.update(this);
         }
 
+        float damageTo = 1;
+        float speedTo = 1;
+        float reloadTo = 1;
+        float healthTo = 1;
+        float buildTo = 1;
+        float dargTo = 1;
+        for (StatusEntry se : statuses) {
+            if (se.effect instanceof HighChange hc) {
+                damageTo = Math.min(damageTo, hc.damageTo());
+                speedTo = Math.min(speedTo, hc.speedTo());
+                reloadTo = Math.min(reloadTo, hc.reloadTo());
+                healthTo = Math.min(healthTo, hc.healthTo());
+                buildTo = Math.min(buildTo, hc.buildTo());
+                dargTo = Math.min(dargTo, hc.dargTo());
+            }
+        }
+        speedMultiplier *= speedTo;
+        damageMultiplier *= damageTo;
+        reloadMultiplier *= reloadTo;
+        healthMultiplier *= healthTo;
+        buildSpeedMultiplier *= buildTo;
+        dragMultiplier *= dargTo;
+
+        if (level > 60) {
+            int boost2 = level - 60;
+            speedMultiplier += boost2 * 0.01f;
+            damageMultiplier += boost2 * 0.01f;
+            reloadMultiplier += boost2 * 0.01f;
+        }
+
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {
             this.interpolate();
         }
@@ -419,7 +450,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
             this.team.data().updateCount(this.type, -1);
         }
 
-        if (Vars.state.rules.unitAmmo && this.ammo < (float)this.type.ammoCapacity - 1.0E-4F) {
+        if (Vars.state.rules.unitAmmo && this.ammo < (float) this.type.ammoCapacity - 1.0E-4F) {
             this.resupplyTime += Time.delta;
             if (this.resupplyTime > 10.0F) {
                 this.type.ammoType.resupply(this);
@@ -430,7 +461,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
         Ability[] var12 = this.abilities;
         index = var12.length;
 
-        for(accepted = 0; accepted < index; ++accepted) {
+        for (accepted = 0; accepted < index; ++accepted) {
             Ability a = var12[accepted];
             a.update(this);
         }
@@ -509,7 +540,7 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
         WeaponMount[] var18 = this.mounts;
         index = var18.length;
 
-        for(accepted = 0; accepted < index; ++accepted) {
+        for (accepted = 0; accepted < index; ++accepted) {
             WeaponMount mount = var18[accepted];
             mount.weapon.update(this, mount);
         }
