@@ -112,7 +112,7 @@ public class ChainAI extends GroundAI {
                     } else {
                         float oox = order.x();
                         float ooy = order.y();
-                        if (unit.within(oox, ooy, 2.7F)) {
+                        if (unit.within(oox, ooy, 13F)) {
                             unit.elevation = Mathf.approachDelta(unit.elevation, 0, 0.5F);
                         }
                         float ox = oox - unit.x();

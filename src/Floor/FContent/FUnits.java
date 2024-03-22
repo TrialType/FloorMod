@@ -39,9 +39,11 @@ import mindustry.entities.pattern.ShootPattern;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Pal;
+import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
+import mindustry.type.weapons.RepairBeamWeapon;
 
 public class FUnits {
     public static UnitType transfer, shuttlevI, bulletInterception;
@@ -59,9 +61,42 @@ public class FUnits {
     public static UnitType recluse;
 
     //special
-    public static UnitType BulletInterception;
+    public static UnitType BulletInterception, rejuvenate;
 
     public static void load() {
+        rejuvenate = new UnitType("rejuvenate") {{
+            constructor = LegsUnit::create;
+            aiController = HealthOnlyAI::new;
+
+            health = 30000;
+            armor = 100;
+            speed = 1f;
+            accel = 0.9f;
+            drag = 0.9f;
+            range = maxRange = 1000;
+
+            abilities.add(new StatusFieldAbility(new StatusEffect("Health_V") {{
+                healthMultiplier = 50000;
+            }}, 36000, 1200, 200));
+            abilities.add(new StatusFieldAbility(new StatusEffect("Healthy_V") {{
+                damage = -1000;
+            }}, 36000, 1200, 200));
+            abilities.add(new ShieldRegenFieldAbility(50000, 100000, 1200, 200));
+
+            weapons.add(new RepairBeamWeapon() {{
+                range = maxRange = 1000;
+                rotateSpeed = 12;
+                reload = 1200;
+
+                repairSpeed = 0.9f;
+
+                bullet = new BasicBulletType() {{
+                    damage = 1000;
+                    speed = 5;
+                    lifetime = 180;
+                }};
+            }});
+        }};
         bulletInterception = new UnitType("bulletInterception") {{
             constructor = UnitEntity::create;
             controller = u -> new WeaponDefendAI();
@@ -125,7 +160,7 @@ public class FUnits {
             legContinuousMove = false;
             abilities.add(new ShieldArcAbility() {{
                 regen = 2.5F;
-                max = 5000;
+                max = 50000;
                 cooldown = 300;
                 angle = 360;
                 whenShooting = false;
@@ -777,7 +812,7 @@ public class FUnits {
 
             HitReload = 18;
             percent = 1.5F;
-            changeHel = 100;
+            changeHel = 1000;
             damage = 200 * 1.4F;
             minSpeed = 4;
             firstPercent = true;
@@ -1170,7 +1205,7 @@ public class FUnits {
                 weapons.add(new Weapon() {{
                     rotate = true;
                     rotateSpeed = 12;
-                    reload = 120;
+                    reload = 20;
                     x = 25;
                     y = finalI % 2 == 0 ? 15 : -15;
                     shootSound = Sounds.none;
@@ -1185,8 +1220,8 @@ public class FUnits {
                         range = maxRange = 1000;
                         lifetime = 600;
                         speed = 3;
-                        damage = 500;
-                        splashDamage = 20;
+                        damage = 5000;
+                        splashDamage = 200;
                         splashDamageRadius = 20;
                         splashDamagePierce = true;
 

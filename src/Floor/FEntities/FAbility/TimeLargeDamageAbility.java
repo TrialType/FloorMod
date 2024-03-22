@@ -18,9 +18,11 @@ public class TimeLargeDamageAbility extends Ability {
     private final Map<Building, Float> buildingTimes = new HashMap<>();
 
     public float baseDamage = 5;
+    public float damageRange = -1;
 
-    public TimeLargeDamageAbility(float damage) {
+    public TimeLargeDamageAbility(float damage, float damageRange) {
         baseDamage = damage;
+        this.damageRange = damageRange;
     }
 
     public TimeLargeDamageAbility() {
@@ -31,7 +33,8 @@ public class TimeLargeDamageAbility extends Ability {
 
         Team team = unit.team;
         float x = unit.x, y = unit.y;
-        Units.nearbyEnemies(team, x, y, 42, u -> {
+        float radius = damageRange < 0 ? 42 : damageRange;
+        Units.nearbyEnemies(team, x, y, radius, u -> {
             float timer = unitTimes.computeIfAbsent(u, uu -> 0F);
             float damage = (float) Math.pow(baseDamage, timer / 120) * baseDamage / 4;
             boolean dead = u.dead;
@@ -40,7 +43,7 @@ public class TimeLargeDamageAbility extends Ability {
                 Events.fire(new FEvents.UnitDestroyOtherEvent(unit, u));
             }
         });
-        Units.nearbyBuildings(x, y, 42, b -> {
+        Units.nearbyBuildings(x, y, radius, b -> {
             if (b.team != team) {
                 float timer = buildingTimes.computeIfAbsent(b, uu -> 0F);
                 float damage = (float) Math.pow(baseDamage, timer / 120) * baseDamage / 4;
@@ -54,15 +57,16 @@ public class TimeLargeDamageAbility extends Ability {
     }
 
     private void updateTimes(Unit unit) {
+        float radius = damageRange < 0 ? 42 : damageRange;
         Seq<Unit> units = new Seq<>();
         Seq<Building> buildings = new Seq<>();
         for (Unit u : unitTimes.keySet()) {
-            if (u.dead || u.health() <= 0 || !u.within(unit, 42)) {
+            if (u.dead || u.health() <= 0 || !u.within(unit, radius)) {
                 units.add(u);
             }
         }
         for (Building b : buildingTimes.keySet()) {
-            if (b.dead || b.health() <= 0 || !b.within(unit, 42)) {
+            if (b.dead || b.health() <= 0 || !b.within(unit, radius)) {
                 buildings.add(b);
             }
         }
