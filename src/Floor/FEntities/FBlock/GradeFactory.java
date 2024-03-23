@@ -2,6 +2,7 @@ package Floor.FEntities.FBlock;
 
 import Floor.FContent.FItems;
 import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.UnitUpGrade;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.scene.ui.layout.Table;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 public class GradeFactory extends UnitBlock {
     private final static Map<Item, Integer> itemIndex = new HashMap<>();
-    public Seq<UnitType> grades = new Seq<>();
+    public Seq<UnitType> grades = new Seq<>(UnitUpGrade.uppers);
     public boolean out = true;
     public float constructTime = 60f * 3f;
 
@@ -33,18 +34,14 @@ public class GradeFactory extends UnitBlock {
 
         update = true;
         hasPower = true;
-        consumesPower = true;
         hasItems = true;
         solid = true;
         configurable = true;
-
+        clearOnDoubleTap = true;
         outputsPayload = true;
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
-        separateItemCapacity = true;
-        allowResupply = true;
-        acceptsItems = true;
         ambientSound = Sounds.respawning;
 
         itemIndex.put(FItems.healthPower, 0);
@@ -57,8 +54,6 @@ public class GradeFactory extends UnitBlock {
         configClear((GradeBuild b) -> b.choose = -1);
 
         config(Item.class, (GradeBuild b, Item i) -> {
-            Fx.healWave.at(Vars.player.unit());
-
             if (b.choose != itemIndex.get(i)) {
                 b.choose = itemIndex.get(i);
             }
@@ -113,6 +108,9 @@ public class GradeFactory extends UnitBlock {
 
         @Override
         public void updateTile() {
+            if (items.total() != 0) {
+                Fx.healWave.at(Vars.player.unit());
+            }
             updateItem();
 
             if (payload != null) {
@@ -127,9 +125,9 @@ public class GradeFactory extends UnitBlock {
 
             if (outing) {
                 moveOutPayload();
-            } else if (lastUnit instanceof FUnitUpGrade uug && moveInPayload()) {
+            } else if (lastUnit instanceof FUnitUpGrade uug && moveInPayload() && grades.indexOf(lastUnit.type) >= 0) {
                 update(uug);
-                if (item != null && itemUse >= 0 && /*items.get(item) >= itemUse &&*/ !lastUnit.type.isBanned()) {
+                if (item != null && itemUse >= 0 && items.get(item) >= itemUse && !lastUnit.type.isBanned()) {
                     float adder = Time.delta * edelta() * Math.max(0, efficiency);
                     timer = out ? level > 0 ? timer + adder : constructTime :
                             level >= 10 ? constructTime : timer + adder;
@@ -139,6 +137,7 @@ public class GradeFactory extends UnitBlock {
                             gradeChange(uug);
                         } else if (!out && level < 10) {
                             outing = true;
+                            items.remove(item, itemUse);
                             consume();
                             gradeChange(uug);
                         }

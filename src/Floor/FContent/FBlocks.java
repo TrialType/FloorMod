@@ -2,7 +2,6 @@ package Floor.FContent;
 
 import Floor.FEntities.FBlock.GradeFactory;
 import Floor.FTools.UnitUpGrade;
-import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.type.Category;
 import mindustry.type.UnitType;
@@ -22,10 +21,6 @@ public class FBlocks {
             consumePower(500f);
 
             constructTime = 60f * 10f;
-
-            for (UnitType ut : UnitUpGrade.uppers) {
-                grades.add(ut);
-            }
         }};
         inputPowerFactory = new GradeFactory("inputPowerFactory") {{
             requirements(Category.units, with(Items.copper, 200, Items.lead, 120, Items.silicon, 90));
@@ -36,10 +31,6 @@ public class FBlocks {
 
             constructTime = 60f * 10f;
             out = false;
-
-            for (UnitType ut : UnitUpGrade.uppers) {
-                grades.add(ut);
-            }
         }};
     }
 }
