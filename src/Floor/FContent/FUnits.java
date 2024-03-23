@@ -46,7 +46,7 @@ import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 
 public class FUnits {
-    public static UnitType transfer, shuttlevI, bulletInterception;
+    public static UnitType transfer, shuttlev_I, bulletInterception;
 
     ////ENGSWEISBoss
     public static UnitType velocity, AVelocity, Velocity, hidden, cave;
@@ -76,25 +76,20 @@ public class FUnits {
             range = maxRange = 1000;
 
             abilities.add(new StatusFieldAbility(new StatusEffect("Health_V") {{
-                healthMultiplier = 50000;
-            }}, 36000, 1200, 200));
+                healthMultiplier = 500;
+            }}, 2400, 1200, 160));
             abilities.add(new StatusFieldAbility(new StatusEffect("Healthy_V") {{
-                damage = -1000;
-            }}, 36000, 1200, 200));
-            abilities.add(new ShieldRegenFieldAbility(50000, 100000, 1200, 200));
+                damage = -40;
+            }}, 2400, 1200, 160));
+            abilities.add(new ShieldRegenFieldAbility(5000, 100000, 600, 160));
 
             weapons.add(new RepairBeamWeapon() {{
                 range = maxRange = 1000;
                 rotateSpeed = 12;
                 reload = 1200;
 
-                repairSpeed = 0.9f;
-
-                bullet = new BasicBulletType() {{
-                    damage = 1000;
-                    speed = 5;
-                    lifetime = 180;
-                }};
+                repairSpeed = 0;
+                fractionRepairSpeed = 0.4f;
             }});
         }};
         bulletInterception = new UnitType("bulletInterception") {{
@@ -277,7 +272,7 @@ public class FUnits {
                 }};
             }});
         }};
-        shuttlevI = new UnitType("shuttlevI") {{
+        shuttlev_I = new UnitType("shuttlev_I") {{
             constructor = UnitEntity::create;
 
             flying = true;
@@ -373,7 +368,7 @@ public class FUnits {
                 bullet = new BasicBulletType() {
                     {
                         keepVelocity = true;
-                        spawnUnit = shuttlevI;
+                        spawnUnit = shuttlev_I;
                     }
                 };
             }});

@@ -12,6 +12,7 @@ import mindustry.gen.Unit;
 
 import java.util.Random;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 
@@ -24,8 +25,9 @@ public class FEvents {
                 if (e.full) {
                     UnitUpGrade.getPower(uug, 0, false, true);
                 } else {
-                    uug.setLevel(uug.getLevel() + e.number);
-                    UnitUpGrade.getPower(uug, e.number, true, false);
+                    int num = min(60 - uug.baseLevel(), e.number);
+                    uug.setLevel(uug.getLevel() + num);
+                    UnitUpGrade.getPower(uug, num, true, false);
                 }
             }
         });
@@ -34,7 +36,7 @@ public class FEvents {
             if (e.unit instanceof FUnitUpGrade uug) {
                 int n = r.nextInt(6);
                 uug.setLevel(uug.getLevel() + n);
-                UnitUpGrade.getPower(uug, n, false, false);
+                UnitUpGrade.getPower(uug, n, true, false);
             }
         });
         Events.on(EventType.UnitSpawnEvent.class, e -> {
@@ -59,22 +61,22 @@ public class FEvents {
                     UnitUpGrade.getPower(uug, 0, false, true);
                 } else if (Vars.state.wave > 150) {
                     UnitUpGrade.getPower(uug, 0, false, true);
-                    uug.setLevel(60 + Vars.state.wave - 150);
+                    uug.setLevel(60 + 5 * (Vars.state.wave - 150));
                 }
             }
         });
 
         Events.on(EventType.UnitBulletDestroyEvent.class, e -> {
             if (e.bullet.owner instanceof FUnitUpGrade uug && (e.unit instanceof FUnitUpGrade || e.unit.maxHealth() >= 1000)) {
-                uug.addExp(e.unit.maxHealth * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
-                int min = 60 - uug.getLevel();
+                uug.addExp(e.unit.maxHealth * Math.max(1, uug.getLevel() / 15) * max(Vars.state.wave / 15, 1));
                 int n = uug.number();
-                UnitUpGrade.getPower(uug, min(n, min), true, false);
+                int min = min(60 - uug.baseLevel(), n);
+                UnitUpGrade.getPower(uug, min, true, false);
             } else if (e.bullet.owner instanceof Unit u && u.controller() instanceof MissileAI ai && ai.shooter instanceof FUnitUpGrade uug) {
-                uug.addExp(e.unit.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
-                int min = 60 - uug.getLevel();
+                uug.addExp(e.unit.maxHealth() * Math.max(1, uug.getLevel() / 15) * max(Vars.state.wave / 15, 1));
                 int n = uug.number();
-                UnitUpGrade.getPower(uug, min(n, min), true, false);
+                int min = min(60 - uug.baseLevel(), n);
+                UnitUpGrade.getPower(uug, min, true, false);
             }
             if (e.bullet.owner instanceof Unit u) {
                 if (u.controller() instanceof MissileAI ai && ai.shooter instanceof UpGradeTime ugt) {
@@ -85,15 +87,15 @@ public class FEvents {
         Events.on(FEvents.UnitDestroyOtherEvent.class, e -> {
             if (e.other instanceof FUnitUpGrade || e.other.maxHealth() >= 1000) {
                 if (e.killer instanceof FUnitUpGrade uug) {
-                    uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
-                    int min = 60 - uug.getLevel();
+                    uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 15) * max(Vars.state.wave / 15, 1));
                     int n = uug.number();
-                    UnitUpGrade.getPower(uug, min(n, min), true, false);
+                    int min = min(60 - uug.baseLevel(), n);
+                    UnitUpGrade.getPower(uug, min, true, false);
                 } else if (e.killer.controller() instanceof MissileAI ai && ai.shooter instanceof FUnitUpGrade uug) {
-                    uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 5) * Vars.state.wave / 5);
-                    int min = 60 - uug.getLevel();
+                    uug.addExp(e.other.maxHealth() * Math.max(1, uug.getLevel() / 15) * max(Vars.state.wave / 15, 1));
                     int n = uug.number();
-                    UnitUpGrade.getPower(uug, min(n, min), true, false);
+                    int min = min(60 - uug.baseLevel(), n);
+                    UnitUpGrade.getPower(uug, min, true, false);
                 }
                 if (e.killer.controller() instanceof MissileAI ai && ai.shooter instanceof UpGradeTime ugt) {
                     ugt.add(1);

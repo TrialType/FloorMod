@@ -5,10 +5,12 @@ import arc.math.Mathf;
 import arc.util.Nullable;
 import arc.util.Time;
 import mindustry.ai.types.MissileAI;
+import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Damage;
 import mindustry.entities.Fires;
 import mindustry.entities.Mover;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
@@ -16,9 +18,12 @@ import mindustry.world.blocks.ControlBlock;
 
 import static mindustry.Vars.*;
 
-public class MissileExplosionBulletType extends ExplosionBulletType {
+public class MissileExplosionBulletType extends BulletType {
+    public boolean withHealth = false;
+
     public MissileExplosionBulletType(float splashDamage, float splashDamageRadius) {
-        super(splashDamage, splashDamageRadius);
+        this.splashDamage = splashDamage;
+        this.splashDamageRadius = splashDamageRadius;
     }
 
     @Override
@@ -49,6 +54,9 @@ public class MissileExplosionBulletType extends ExplosionBulletType {
                         ai.shooter = control.unit();
                     }
 
+                }
+                if (withHealth && shooter instanceof Unit u) {
+                    spawned.maxHealth = (u.maxHealth + u.shield) / 16;
                 }
                 spawned.add();
             }

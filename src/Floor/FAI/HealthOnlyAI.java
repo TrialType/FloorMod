@@ -1,5 +1,6 @@
 package Floor.FAI;
 
+import Floor.FContent.FUnits;
 import mindustry.entities.Units;
 import mindustry.entities.units.AIController;
 import mindustry.gen.Teamc;
@@ -11,29 +12,22 @@ public class HealthOnlyAI extends AIController {
     public Teamc target(float x, float y, float range, boolean air, boolean ground) {
         t = null;
         Units.nearby(unit.team, x, y, range, u -> {
-            if (u.health <= u.maxHealth * 0.85f) {
+            if (u.damaged()) {
                 t = u;
             }
         });
         if (t == null) {
-            Units.nearby(unit.team, x, y, range, u -> {
-                if (u.health < u.maxHealth) {
-                    t = u;
-                }
-            });
-            return t;
-        } else {
-            return t;
+            Units.nearby(unit.team, x, y, range, u -> t = u.type == FUnits.rejuvenate ? t : u);
         }
+        return t;
     }
 
     @Override
     public void updateMovement() {
+        target = target(unit.x, unit.y, 10000, true, true);
         if (target != null) {
             unit.lookAt(target);
             moveTo(target, 24);
-        } else {
-            target(unit.x, unit.y, 10000, true, true);
         }
     }
 }

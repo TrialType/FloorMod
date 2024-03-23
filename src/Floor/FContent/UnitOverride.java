@@ -123,8 +123,18 @@ public class UnitOverride {
         UnitTypes.eclipse.health = 77000;
         UnitTypes.eclipse.weapons.add(new Weapon() {{
             reload = 480;
-            bullet = new BulletType() {{
+            bullet = new MissileExplosionBulletType(0, 0) {{
+                withHealth = true;
+
+                hittable = false;
+                absorbable = false;
+                instantDisappear = true;
+                scaledSplashDamage = true;
+                collides = false;
+                keepVelocity = false;
+
                 lifetime = 0;
+
                 spawnUnit = new UnitType("eclipse1") {{
                     lifetime = 1260;
 
@@ -139,25 +149,44 @@ public class UnitOverride {
                         alwaysShooting = true;
                         controllable = aiControllable = false;
                         reload = 1202;
+
                         shoot = new ShootPattern() {{
                             firstShotDelay = 1200;
                         }};
+
                         bullet = new MissileExplosionBulletType(0, 0) {{
+
+                            hittable = false;
+                            lifetime = 1f;
+                            speed = 0f;
+                            rangeOverride = 20f;
+                            shootEffect = Fx.massiveExplosion;
+                            instantDisappear = true;
+                            scaledSplashDamage = true;
+                            killShooter = true;
+                            collides = false;
+                            keepVelocity = false;
+
                             spawnUnit = new UnitType("eclipse2") {{
                                 range = maxRange = 1000;
-
-                                lifetime = 1201;
-
-                                constructor = TimedKillUnit::create;
-                                controller = u -> new MissileAI_II();
                                 hidden = true;
                                 flying = true;
                                 targetable = false;
                                 hittable = false;
                                 speed = 11;
+                                lifetime = 1201;
+
+                                trailLength = 12;
+                                trailWidth = 4;
+                                trailChance = 1;
+
+                                constructor = TimedKillUnit::create;
+                                controller = u -> new MissileAI_II();
+
                                 weapons.add(new Weapon() {{
-                                    rangeOverride = 1;
-                                    bullet = new ExplosionBulletType(10000, 500);
+                                    bullet = new ExplosionBulletType(10000, 500) {{
+                                        range = rangeOverride = 24;
+                                    }};
                                 }});
                             }};
                         }};

@@ -1,10 +1,31 @@
 package Floor.FTools;
 
+import mindustry.type.UnitType;
+
 import java.util.Random;
+
+import static Floor.FContent.FUnits.*;
+import static mindustry.content.UnitTypes.*;
 
 public class UnitUpGrade {
     private static final String[] list = {
             "healthy", "damage", "reload", "speed", "again", "shield"
+    };
+    public static final UnitType[] uppers = {
+            dagger, mace, fortress, scepter, reign,
+            nova, pulsar, quasar, vela, corvus,
+            crawler, atrax, spiroct, arkyid, toxopid,
+            flare, horizon, zenith, antumbra, eclipse,
+            poly, mega, quad, oct,
+            risso, minke, bryde, sei, omura,
+            retusa, oxynoe, cyerce, aegires, navanax,
+            stell, locus, precept, vanquish, conquer,
+            merui, cleroi, anthicus, tecta, collaris,
+            elude, avert, obviate, quell, disrupt,
+
+            BulletInterception,
+            barb, Hammer, Buying, crazy, Transition, Shuttle, dive, befall,
+            recluse
     };
 
     private UnitUpGrade() {

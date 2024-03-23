@@ -639,4 +639,7 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
         sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
                 maxHealth * shieldLevel / 10, 120, 60);
     }
+    public int baseLevel() {
+        return damageLevel + shieldLevel + speedLevel + healthLevel + reloadLevel + againLevel;
+    }
 }
