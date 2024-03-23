@@ -108,9 +108,6 @@ public class GradeFactory extends UnitBlock {
 
         @Override
         public void updateTile() {
-            if (items.total() != 0) {
-                Fx.healWave.at(Vars.player.unit());
-            }
             updateItem();
 
             if (payload != null) {
@@ -125,7 +122,7 @@ public class GradeFactory extends UnitBlock {
 
             if (outing) {
                 moveOutPayload();
-            } else if (lastUnit instanceof FUnitUpGrade uug && moveInPayload() && grades.indexOf(lastUnit.type) >= 0) {
+            } else if (lastUnit instanceof FUnitUpGrade uug && moveInPayload()) {
                 update(uug);
                 if (item != null && itemUse >= 0 && items.get(item) >= itemUse && !lastUnit.type.isBanned()) {
                     float adder = Time.delta * edelta() * Math.max(0, efficiency);
@@ -156,8 +153,20 @@ public class GradeFactory extends UnitBlock {
         }
 
         private void updateNumber() {
-            if (payload != null && payload.unit instanceof FUnitUpGrade) {
-                itemUse = out ? level == 0 ? -1 : 0 : level < 10 ? (level + 1) * (level + 1) * Math.max(1, (int) payload.unit.maxHealth / 7000) : -1;
+            if (lastUnit != null && grades.indexOf(lastUnit.type) >= 0) {
+                if (out) {
+                    if (level == 0) {
+                        itemUse = -1;
+                    } else {
+                        itemUse = 0;
+                    }
+                } else {
+                    if (level < 10) {
+                        itemUse = (level + 1) * (level + 1) * Math.max(1, (int) payload.unit.maxHealth / 7000);
+                    } else {
+                        itemUse = -1;
+                    }
+                }
             } else {
                 itemUse = -1;
             }
