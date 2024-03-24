@@ -45,7 +45,7 @@ public class CaveUnit extends UnitWaterMove {
             UnitTypes.poly,
             UnitTypes.minke,
             UnitTypes.oxynoe,
-            FUnits.Hammer
+            FUnits.hammer
     });
     private static final Seq<UnitType> u3 = new Seq<>(new UnitType[]{
             UnitTypes.fortress,
@@ -56,7 +56,7 @@ public class CaveUnit extends UnitWaterMove {
             UnitTypes.bryde,
             UnitTypes.cyerce,
             UnitTypes.cyerce,
-            FUnits.Buying
+            FUnits.buying
     });
     private static final Seq<UnitType> u4 = new Seq<>(new UnitType[]{
             UnitTypes.scepter,
@@ -75,7 +75,7 @@ public class CaveUnit extends UnitWaterMove {
             UnitTypes.eclipse,
             UnitTypes.omura,
             UnitTypes.navanax,
-            FUnits.Transition
+            FUnits.transition
     });
     private MultiEffect water = null;
     private float timer = -1;

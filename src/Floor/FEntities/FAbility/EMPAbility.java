@@ -82,15 +82,15 @@ public class EMPAbility extends Ability {
         }
     }
 
-    public String localized(){
-        var type = getClass();
-        return Core.bundle.get("ability." + (type.isAnonymousClass() ? type.getSuperclass() : type).getSimpleName().replace("Ability", "").toLowerCase());
+    public String localized() {
+        return Core.bundle.get("ability." + "emp_ability" + ".name");
     }
+
     @Override
     public void addStats(Table t) {
         t.add("[lightgray]" + Stat.range.localized() + ": [white]" + range + " " + StatUnit.seconds.localized());
         t.row();
-        t.add("[lightgray]" + Stat.productionTime.localized() + ": [white]" + time / 60 + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + Core.bundle.get("stats.continue") + ": [white]" + time / 60 + " " + StatUnit.seconds.localized());
         t.row();
         t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + reload / 60 + " " + StatUnit.seconds.localized());
         t.row();

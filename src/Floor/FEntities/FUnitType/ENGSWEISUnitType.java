@@ -3,10 +3,9 @@ package Floor.FEntities.FUnitType;
 import Floor.FAI.StrongBoostAI;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
-import mindustry.gen.Teamc;
-import mindustry.type.UnitType;
+import mindustry.world.meta.Stat;
 
-public class ENGSWEISUnitType extends UnitType {
+public class ENGSWEISUnitType extends UpGradeUnitType {
     public float damage = 1;
     public float percent = 1;
     public boolean firstPercent = false;
@@ -25,5 +24,18 @@ public class ENGSWEISUnitType extends UnitType {
     public ENGSWEISUnitType(String name) {
         super(name);
         aiController = StrongBoostAI::new;
+    }
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(new Stat("speed1"),Speed1);
+        stats.add(new Stat("health2"),Health2);
+        stats.add(new Stat("change_time"),exchangeTime);
+        stats.add(new Stat("min_number"),number);
+        stats.add(new Stat("boost_reload"),reload);
+        stats.add(new Stat("hit_damage"),damage);
+        stats.add(new Stat("hit_percent"),percent);
+        stats.add(new Stat("first_percent"),firstPercent);
+        stats.add(new Stat("change_hel"),changeHel);
     }
 }

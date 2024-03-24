@@ -2,23 +2,32 @@ package Floor.FEntities.FUnitType;
 
 import Floor.FAI.ChainAI;
 import Floor.FTools.UnitChainAble;
+import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.scene.ui.layout.Table;
 import arc.util.Tmp;
 import mindustry.ai.UnitCommand;
+import mindustry.content.StatusEffects;
 import mindustry.entities.Leg;
 import mindustry.gen.Legsc;
+import mindustry.gen.Payloadc;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
+import mindustry.world.blocks.environment.Floor;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.StatValues;
 
 import static Floor.FContent.FCommands.*;
+import static mindustry.Vars.tilesize;
 
 
-public class ChainUnitType extends UnitType {
+public class ChainUnitType extends UpGradeUnitType {
     private static final Vec2 legOffset = new Vec2();
     public float percent = 15;
 
@@ -171,5 +180,11 @@ public class ChainUnitType extends UnitType {
             Draw.rect(baseRegion, unit.x, unit.y, rotation - 90);
         }
         Draw.reset();
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.add(new Stat("down_damage"),percent);
     }
 }

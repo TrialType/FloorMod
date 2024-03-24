@@ -1,10 +1,9 @@
 package Floor.FContent;
 
 import Floor.FEntities.FBlock.GradeFactory;
-import Floor.FTools.UnitUpGrade;
+import arc.Core;
 import mindustry.content.Items;
 import mindustry.type.Category;
-import mindustry.type.UnitType;
 import mindustry.world.Block;
 
 import static mindustry.type.ItemStack.with;
@@ -13,20 +12,20 @@ public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
 
     public static void load() {
-        outPowerFactory = new GradeFactory("outPowerFactory") {{
-            requirements(Category.units, with(Items.copper, 200, Items.lead, 120, Items.silicon, 90));
+        outPowerFactory = new GradeFactory("out_power_factory") {{
+            requirements(Category.units, with(Items.copper, 2000, Items.lead, 2000, Items.silicon, 2000));
 
-            itemCapacity = 100 * 20;
-            size = 9;
+            itemCapacity = 100 * 10;
+            size = 8;
             consumePower(500f);
 
             constructTime = 60f * 10f;
         }};
-        inputPowerFactory = new GradeFactory("inputPowerFactory") {{
-            requirements(Category.units, with(Items.copper, 200, Items.lead, 120, Items.silicon, 90));
+        inputPowerFactory = new GradeFactory("input_power_factory") {{
+            requirements(Category.units, with(Items.copper, 2000, Items.lead, 2000, Items.silicon, 2000));
 
-            itemCapacity = 100 * 20;
-            size = 9;
+            itemCapacity = 100 * 10;
+            size = 8;
             consumePower(500f);
 
             constructTime = 60f * 10f;

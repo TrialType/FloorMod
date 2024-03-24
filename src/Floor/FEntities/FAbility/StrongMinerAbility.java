@@ -83,6 +83,6 @@ public class StrongMinerAbility extends Ability {
 
     @Override
     public String localized() {
-        return Core.bundle.format("ability.unitspawn", unit.localizedName);
+        return Core.bundle.format("ability.unit_spawn.name", unit.localizedName);
     }
 }

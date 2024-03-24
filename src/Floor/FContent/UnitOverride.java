@@ -1,6 +1,7 @@
 package Floor.FContent;
 
 import Floor.FAI.MissileAI_II;
+import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.FlyContinuousLaserBulletType;
 import Floor.FEntities.FBulletType.MissileExplosionBulletType;
@@ -25,72 +26,119 @@ import mindustry.type.Weapon;
 public class UnitOverride {
     public static void load() {
         UnitTypes.dagger.constructor = FMechUnit::create;
+        UnitTypes.dagger.abilities.add(new LevelSign());
         UnitTypes.mace.constructor = FMechUnit::create;
+        UnitTypes.mace.abilities.add(new LevelSign());
         UnitTypes.fortress.constructor = FMechUnit::create;
+        UnitTypes.fortress.abilities.add(new LevelSign());
         UnitTypes.scepter.constructor = FMechUnit::create;
+        UnitTypes.scepter.abilities.add(new LevelSign());
         UnitTypes.reign.constructor = FMechUnit::create;
+        UnitTypes.reign.abilities.add(new LevelSign());
 
         UnitTypes.nova.constructor = FMechUnitLegacyNova::create;
+        UnitTypes.nova.abilities.add(new LevelSign());
         UnitTypes.pulsar.constructor = FMechUnitLegacyNova::create;
+        UnitTypes.pulsar.abilities.add(new LevelSign());
         UnitTypes.quasar.constructor = FMechUnitLegacyNova::create;
+        UnitTypes.quasar.abilities.add(new LevelSign());
         UnitTypes.vela.constructor = FMechUnitLegacyNova::create;
+        UnitTypes.vela.abilities.add(new LevelSign());
         UnitTypes.corvus.constructor = FMechUnitLegacyNova::create;
+        UnitTypes.corvus.abilities.add(new LevelSign());
 
         UnitTypes.crawler.constructor = FMechUnit::create;
+        UnitTypes.crawler.abilities.add(new LevelSign());
         UnitTypes.atrax.constructor = FLegsUnit::create;
+        UnitTypes.atrax.abilities.add(new LevelSign());
         UnitTypes.spiroct.constructor = FLegsUnit::create;
+        UnitTypes.spiroct.abilities.add(new LevelSign());
         UnitTypes.arkyid.constructor = FLegsUnit::create;
+        UnitTypes.arkyid.abilities.add(new LevelSign());
         UnitTypes.toxopid.constructor = FLegsUnit::create;
+        UnitTypes.toxopid.abilities.add(new LevelSign());
 
         UnitTypes.flare.constructor = FUnitEntity::create;
+        UnitTypes.flare.abilities.add(new LevelSign());
         UnitTypes.horizon.constructor = FUnitEntity::create;
+        UnitTypes.horizon.abilities.add(new LevelSign());
         UnitTypes.zenith.constructor = FUnitEntity::create;
+        UnitTypes.zenith.abilities.add(new LevelSign());
         UnitTypes.antumbra.constructor = FUnitEntity::create;
+        UnitTypes.antumbra.abilities.add(new LevelSign());
         UnitTypes.eclipse.constructor = TimeUpGradeUnit::create;
+        UnitTypes.eclipse.abilities.add(new LevelSign());
 
         UnitTypes.poly.constructor = FUnitEntity::create;
+        UnitTypes.poly.abilities.add(new LevelSign());
         UnitTypes.mega.constructor = FPayloadUnit::create;
+        UnitTypes.mega.abilities.add(new LevelSign());
         UnitTypes.quad.constructor = FPayloadUnit::create;
+        UnitTypes.quad.abilities.add(new LevelSign());
         UnitTypes.oct.constructor = FPayloadUnit::create;
+        UnitTypes.oct.abilities.add(new LevelSign());
 
         UnitTypes.risso.constructor = FUnitWaterMove::create;
+        UnitTypes.risso.abilities.add(new LevelSign());
         UnitTypes.minke.constructor = FUnitWaterMove::create;
+        UnitTypes.minke.abilities.add(new LevelSign());
         UnitTypes.bryde.constructor = FUnitWaterMove::create;
+        UnitTypes.bryde.abilities.add(new LevelSign());
         UnitTypes.sei.constructor = FUnitWaterMove::create;
+        UnitTypes.sei.abilities.add(new LevelSign());
         UnitTypes.omura.constructor = FUnitWaterMove::create;
+        UnitTypes.omura.abilities.add(new LevelSign());
 
         UnitTypes.retusa.constructor = FUnitWaterMove::create;
+        UnitTypes.retusa.abilities.add(new LevelSign());
         UnitTypes.oxynoe.constructor = FUnitWaterMove::create;
+        UnitTypes.oxynoe.abilities.add(new LevelSign());
         UnitTypes.cyerce.constructor = FUnitWaterMove::create;
+        UnitTypes.cyerce.abilities.add(new LevelSign());
         UnitTypes.aegires.constructor = FUnitWaterMove::create;
+        UnitTypes.aegires.abilities.add(new LevelSign());
         UnitTypes.navanax.constructor = FUnitWaterMove::create;
+        UnitTypes.navanax.abilities.add(new LevelSign());
 
         UnitTypes.alpha.constructor = FUnitEntity::create;
+        UnitTypes.alpha.abilities.add(new LevelSign());
         UnitTypes.beta.constructor = FUnitEntity::create;
+        UnitTypes.beta.abilities.add(new LevelSign());
         UnitTypes.gamma.constructor = FUnitEntity::create;
+        UnitTypes.gamma.abilities.add(new LevelSign());
 
         UnitTypes.stell.constructor = FTankUnit::create;
+        UnitTypes.stell.abilities.add(new LevelSign());
         UnitTypes.locus.constructor = FTankUnit::create;
+        UnitTypes.locus.abilities.add(new LevelSign());
         UnitTypes.precept.constructor = FTankUnit::create;
+        UnitTypes.precept.abilities.add(new LevelSign());
         UnitTypes.vanquish.constructor = FTankUnit::create;
+        UnitTypes.vanquish.abilities.add(new LevelSign());
         UnitTypes.conquer.constructor = FTankUnit::create;
+        UnitTypes.conquer.abilities.add(new LevelSign());
 
         UnitTypes.merui.constructor = FLegsUnit::create;
+        UnitTypes.merui.abilities.add(new LevelSign());
         UnitTypes.cleroi.constructor = FLegsUnit::create;
+        UnitTypes.cleroi.abilities.add(new LevelSign());
         UnitTypes.anthicus.constructor = FLegsUnit::create;
+        UnitTypes.anthicus.abilities.add(new LevelSign());
         UnitTypes.tecta.constructor = FLegsUnit::create;
+        UnitTypes.tecta.abilities.add(new LevelSign());
         UnitTypes.collaris.constructor = FLegsUnit::create;
+        UnitTypes.collaris.abilities.add(new LevelSign());
 
         UnitTypes.elude.constructor = FElevationMoveUnit::create;
+        UnitTypes.elude.abilities.add(new LevelSign());
         UnitTypes.avert.constructor = FUnitEntity::create;
+        UnitTypes.avert.abilities.add(new LevelSign());
         UnitTypes.obviate.constructor = FUnitEntity::create;
+        UnitTypes.obviate.abilities.add(new LevelSign());
         UnitTypes.quell.constructor = FPayloadUnit::create;
+        UnitTypes.quell.abilities.add(new LevelSign());
         UnitTypes.disrupt.constructor = FPayloadUnit::create;
-
-        UnitTypes.evoke.constructor = FPayloadUnit::create;
-        UnitTypes.incite.constructor = FPayloadUnit::create;
-        UnitTypes.emanate.constructor = FPayloadUnit::create;
-
+        UnitTypes.disrupt.abilities.add(new LevelSign());
         /*=================================================================*/
         /*=================================================================*/
         /*=================================================================*/
@@ -360,6 +408,5 @@ public class UnitOverride {
         }});
 
         /*-----------------------------------------------------------------------------*/
-
     }
 }

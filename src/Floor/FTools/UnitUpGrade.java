@@ -23,8 +23,8 @@ public class UnitUpGrade {
             merui, cleroi, anthicus, tecta, collaris,
             elude, avert, obviate, quell, disrupt,
 
-            BulletInterception,
-            barb, Hammer, Buying, crazy, Transition, Shuttle, dive, befall,
+            bulletInterception,
+            barb, hammer, buying, crazy, transition, shuttle, dive, befall,
             recluse
     };
 

@@ -7,20 +7,22 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Scaling;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.gen.Building;
-import mindustry.gen.Groups;
-import mindustry.gen.Sounds;
-import mindustry.gen.Unit;
+import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
+import mindustry.ui.Bar;
+import mindustry.ui.ItemDisplay;
 import mindustry.ui.Styles;
 import mindustry.world.blocks.ItemSelection;
 import mindustry.world.blocks.units.UnitBlock;
+import mindustry.world.meta.Stat;
 
 public class GradeFactory extends UnitBlock {
     private final static Item[] Items = {
@@ -33,7 +35,7 @@ public class GradeFactory extends UnitBlock {
     };
     public Seq<UnitType> grades = new Seq<>(UnitUpGrade.uppers);
     public boolean out = true;
-    public float constructTime = 60f * 3f;
+    public float constructTime = 60f * 5f;
 
     public GradeFactory(String name) {
         super(name);
@@ -59,6 +61,35 @@ public class GradeFactory extends UnitBlock {
         });
     }
 
+    @Override
+    public void setBars() {
+        super.setBars();
+        addBar("progress", (GradeBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+
+        stats.remove(Stat.itemCapacity);
+
+        if (out) {
+            stats.add(Stat.output, table -> {
+                table.row();
+
+                table.table(Styles.grayPanel, t -> {
+                    t.image(FItems.healthPower.uiIcon).size(40).pad(10).left().scaling(Scaling.fit);
+
+                    t.table(gre -> {
+                        gre.right();
+                        gre.add(new ItemDisplay(FItems.healthPower, 1, false)).pad(10);
+                    }).right().grow().pad(10f);
+                }).growX().pad(5);
+                table.row();
+            });
+        }
+    }
+
     private static int findIndex(Item i) {
         for (int j = 0; j < Items.length; j++) {
             if (Items[j] == i) {
@@ -75,8 +106,11 @@ public class GradeFactory extends UnitBlock {
         public int level = 0;
         public int choose = -1;
         public Item item = null;
-        public float timer;
         public Unit lastUnit;
+
+        public float fraction() {
+            return choose == -1 ? 0 : progress / constructTime;
+        }
 
         @Override
         public void buildConfiguration(Table table) {
@@ -99,7 +133,8 @@ public class GradeFactory extends UnitBlock {
 
             if (lastUnit != null) {
                 Draw.draw(Layer.blockOver,
-                        () -> Drawf.construct(this, lastUnit.type, rotdeg() - 90f, timer / constructTime, speedScl, time));
+                        () -> Drawf.construct(this, lastUnit.type, rotdeg() - 90f,
+                                progress / constructTime, 0.8f, progress));
             }
 
             Draw.z(Layer.blockOver);
@@ -124,7 +159,7 @@ public class GradeFactory extends UnitBlock {
             if (payload != null) {
                 if (lastUnit != payload.unit) {
                     outing = false;
-                    timer = 0;
+                    progress = 0;
                 }
 
                 lastUnit = payload.unit;
@@ -143,9 +178,9 @@ public class GradeFactory extends UnitBlock {
 
                 if (item != null && itemUse >= 0 && items.get(item) >= itemUse && in && efficiency >= 0) {
                     float adder = Time.delta * edelta() * Math.max(0, efficiency);
-                    timer = out ? level > 0 ? timer + adder : constructTime :
-                            level >= 10 ? constructTime : timer + adder;
-                    if (timer >= constructTime) {
+                    progress = out ? level > 0 ? progress + adder : constructTime :
+                            level >= 10 ? constructTime : progress + adder;
+                    if (progress >= constructTime) {
                         if (out) {
                             outing = true;
                             items.add(item, level);
@@ -256,7 +291,7 @@ public class GradeFactory extends UnitBlock {
             super.write(write);
 
             write.i(choose);
-            write.f(timer);
+            write.f(progress);
             write.i(lastUnit == null ? -1 : lastUnit.id);
         }
 
@@ -265,7 +300,7 @@ public class GradeFactory extends UnitBlock {
             super.read(read, revision);
 
             choose = read.i();
-            timer = read.f();
+            progress = read.f();
             lastId = read.i();
         }
     }

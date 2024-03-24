@@ -8,12 +8,9 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
-import Floor.FEntities.FUnitType.ChainUnitType;
-import Floor.FEntities.FUnitType.ENGSWEISUnitType;
+import Floor.FEntities.FUnitType.*;
 import Floor.FEntities.FBulletType.PercentBulletType;
 import Floor.FEntities.FBulletType.PercentEmpBulletType;
-import Floor.FEntities.FUnitType.TileMinerUnitType;
-import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
 import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -46,13 +43,13 @@ import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 
 public class FUnits {
-    public static UnitType transfer, shuttlev_I, bulletInterception;
+    public static UnitType transfer, shuttlev_I, bulletInterception_a;
 
     ////ENGSWEISBoss
-    public static UnitType velocity, AVelocity, Velocity, hidden, cave;
+    public static UnitType velocity, velocity_d, velocity_s, hidden, cave;
 
     //ENGSWEISFlying
-    public static UnitType barb, Hammer, Buying, crazy, Transition, Shuttle;
+    public static UnitType barb, hammer, buying, crazy, transition, shuttle;
 
     //ENGSWEISLand
     public static UnitType dive, befall;
@@ -61,7 +58,7 @@ public class FUnits {
     public static UnitType recluse;
 
     //special
-    public static UnitType BulletInterception, rejuvenate;
+    public static UnitType bulletInterception, rejuvenate;
 
     public static void load() {
         rejuvenate = new UnitType("rejuvenate") {{
@@ -74,6 +71,7 @@ public class FUnits {
             accel = 0.9f;
             drag = 0.9f;
             range = maxRange = 1000;
+            isEnemy = false;
 
             abilities.add(new StatusFieldAbility(new StatusEffect("Health_V") {{
                 healthMultiplier = 500;
@@ -92,7 +90,7 @@ public class FUnits {
                 fractionRepairSpeed = 0.4f;
             }});
         }};
-        bulletInterception = new UnitType("bulletInterception") {{
+        bulletInterception_a = new UnitType("bulletInterception_a") {{
             constructor = UnitEntity::create;
             controller = u -> new WeaponDefendAI();
 
@@ -142,7 +140,7 @@ public class FUnits {
                 }};
             }});
         }};
-        BulletInterception = new UnitType("BulletInterception") {{
+        bulletInterception = new UpGradeUnitType("bulletInterception") {{
             constructor = FLegsUnit::create;
 
             range = 1000;
@@ -332,7 +330,7 @@ public class FUnits {
                 }};
             }});
         }};
-        Shuttle = new ENGSWEISUnitType("Shuttle") {{
+        shuttle = new ENGSWEISUnitType("shuttle") {{
             constructor = ENGSWEISUnitEntity::create;
             aiController = StrongBoostAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
@@ -412,12 +410,12 @@ public class FUnits {
                 }};
             }});
         }};
-        Velocity = new ENGSWEISUnitType("Velocity") {{
+        velocity_s = new ENGSWEISUnitType("velocity_s") {{
             constructor = ENGSWEISUnitEntity::create;
             speed = 6;
             hidden = true;
         }};
-        AVelocity = new UnitType("AVelocity") {{
+        velocity_d = new UnitType("velocity_d") {{
             constructor = PayloadUnit::create;
             health = 50000;
             armor = 12;
@@ -463,7 +461,7 @@ public class FUnits {
                     damage = 0;
                     splashDamage = 5000;
                     splashDamageRadius = 160;
-                    spawnUnit = Velocity;
+                    spawnUnit = velocity_s;
                 }};
             }});
         }};
@@ -576,7 +574,7 @@ public class FUnits {
             createScorch = false;
             createWreck = false;
 
-            abilities.add(new SpawnDeathAbility(AVelocity, 1, 0));
+            abilities.add(new SpawnDeathAbility(velocity_d, 1, 0));
 
             weapons.add(new Weapon() {{
                 reload = 300;
@@ -611,7 +609,7 @@ public class FUnits {
                         barrels = new float[]{0, -20, 70};
                     }};
                     bullet = new BasicBulletType() {{
-                        sprite = "Floor-Jamming_bomb";
+                        sprite = "jamming_bomb";
                         absorbable = false;
                         reflectable = false;
                         width = 24;
@@ -658,7 +656,7 @@ public class FUnits {
                     barrels = new float[]{0, -25, 50};
                 }};
                 bullet = new MissileBulletType() {{
-                    sprite = "Fire_bomb";
+                    sprite = "fire_bomb";
                     absorbable = false;
                     reflectable = false;
                     width = 15;
@@ -704,7 +702,7 @@ public class FUnits {
                     barrels = new float[]{0, -30, 30};
                 }};
                 bullet = new MissileBulletType() {{
-                    sprite = "High_explosive_projectile";
+                    sprite = "high_explosive_projectile";
                     absorbable = false;
                     reflectable = false;
                     splashDamagePierce = true;
@@ -890,7 +888,7 @@ public class FUnits {
             mineSpeed = 1;
             mineTier = 5;
         }};
-        Buying = new ENGSWEISUnitType("Buying") {{
+        buying = new ENGSWEISUnitType("buying") {{
             constructor = TileSpawnerUnit::create;
             aiController = StrongBoostAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
@@ -954,7 +952,7 @@ public class FUnits {
                 }};
             }});
         }};
-        Hammer = new ENGSWEISUnitType("Hammer") {{
+        hammer = new ENGSWEISUnitType("hammer") {{
             constructor = ENGSWEISUnitEntity::create;
             aiController = StrongBoostAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
@@ -995,7 +993,7 @@ public class FUnits {
                 }};
             }});
         }};
-        Transition = new ENGSWEISUnitType("Transition") {{
+        transition = new ENGSWEISUnitType("transition") {{
             constructor = ENGSWEISUnitEntity::create;
             aiController = StrongBoostAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, FCommands.STB};
@@ -1115,10 +1113,10 @@ public class FUnits {
 
             abilities.add(new StatusFieldAbility(FStatusEffects.fastII, 600, 610, 100));
             abilities.add(new ShieldRegenFieldAbility(10000, 100000, 610, 100));
-            abilities.add(new UnitSpawnAbility(Hammer, 600, 1, 1));
-            abilities.add(new UnitSpawnAbility(Hammer, 600, -1, 1));
-            abilities.add(new UnitSpawnAbility(Hammer, 600, -1, -1));
-            abilities.add(new UnitSpawnAbility(Hammer, 600, 1, -1));
+            abilities.add(new UnitSpawnAbility(hammer, 600, 1, 1));
+            abilities.add(new UnitSpawnAbility(hammer, 600, -1, 1));
+            abilities.add(new UnitSpawnAbility(hammer, 600, -1, -1));
+            abilities.add(new UnitSpawnAbility(hammer, 600, 1, -1));
 
             weapons.add(new Weapon() {{
                 reload = 45f;
@@ -1270,8 +1268,8 @@ public class FUnits {
         }};
 
         BossList.list.add(velocity);
-        BossList.list.add(AVelocity);
-        BossList.list.add(Velocity);
+        BossList.list.add(velocity_d);
+        BossList.list.add(velocity_s);
         BossList.list.add(hidden);
         BossList.list.add(cave);
     }

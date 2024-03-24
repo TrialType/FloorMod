@@ -28,7 +28,7 @@ public class FDefends {
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
-        fourNet = new LiquidTurret("fourNet") {{
+        fourNet = new LiquidTurret("four_net") {{
             scaledHealth = 10000;
             armor = 55;
 

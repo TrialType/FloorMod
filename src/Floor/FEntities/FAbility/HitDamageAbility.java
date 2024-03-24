@@ -94,6 +94,6 @@ public class HitDamageAbility extends Ability {
 
     @Override
     public String localized() {
-        return Core.bundle.get("ability.HitDamageAbility.name");
+        return Core.bundle.get("ability.hit_damageAbility.name");
     }
 }

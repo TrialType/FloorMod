@@ -1,6 +1,7 @@
 package Floor.FEntities.FUnitType;
 
 import Floor.FEntities.FUnit.F.WUGENANSMechUnit;
+import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.math.Scaled;
@@ -12,12 +13,13 @@ import mindustry.entities.part.DrawPart;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
-import mindustry.type.UnitType;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.Stats;
 
 import static mindustry.Vars.player;
 
 
-public class WUGENANSMechUnitType extends UnitType {
+public class WUGENANSMechUnitType extends UpGradeUnitType {
     private final static Vec2 legOffset = new Vec2();
     public float landTime = 60;
     public float outTime = 60;
@@ -56,10 +58,14 @@ public class WUGENANSMechUnitType extends UnitType {
             drawMech(mech);
         }
         //side
-        legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f / Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+        if (mech != null) {
+            legOffset.trns(mech.baseRotation(), 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 2f / Mathf.PI, 1) * mechSideSway, 0f, unit.elevation));
+        }
 
         //front
-        legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f / Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+        if (mech != null) {
+            legOffset.add(Tmp.v1.trns(mech.baseRotation() + 90, 0f, Mathf.lerp(Mathf.sin(mech.walkExtend(true), 1f / Mathf.PI, 1) * mechFrontSway, 0f, unit.elevation)));
+        }
 
         unit.trns(legOffset.x, legOffset.y);
 
@@ -137,5 +143,18 @@ public class WUGENANSMechUnitType extends UnitType {
         unit.trns(-legOffset.x, -legOffset.y);
 
         Draw.reset();
+    }
+
+    @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(new Stat("land_time"),landTime);
+        stats.add(new Stat("out_time"),outTime);
+        stats.add(new Stat("up_damage"),upDamage);
+        stats.add(new Stat("up_range"),damageRadius);
+        stats.add(new Stat("land_reload"),landReload);
+        stats.add(new Stat("power_need"),needPower);
+        stats.add(new Stat("power_range"),powerRange);
+        stats.add(new Stat("get_range"),getRange);
     }
 }
