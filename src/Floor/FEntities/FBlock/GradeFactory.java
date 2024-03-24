@@ -8,8 +8,10 @@ import arc.graphics.g2d.Draw;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Time;
-import mindustry.Vars;
-import mindustry.content.Fx;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
+import mindustry.gen.Building;
+import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
@@ -20,11 +22,15 @@ import mindustry.ui.Styles;
 import mindustry.world.blocks.ItemSelection;
 import mindustry.world.blocks.units.UnitBlock;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class GradeFactory extends UnitBlock {
-    private final static Map<Item, Integer> itemIndex = new HashMap<>();
+    private final static Item[] Items = {
+            FItems.healthPower,
+            FItems.damagePower,
+            FItems.reloadPower,
+            FItems.speedPower,
+            FItems.againPower,
+            FItems.shieldPower
+    };
     public Seq<UnitType> grades = new Seq<>(UnitUpGrade.uppers);
     public boolean out = true;
     public float constructTime = 60f * 3f;
@@ -44,23 +50,26 @@ public class GradeFactory extends UnitBlock {
         commandable = true;
         ambientSound = Sounds.respawning;
 
-        itemIndex.put(FItems.healthPower, 0);
-        itemIndex.put(FItems.damagePower, 1);
-        itemIndex.put(FItems.reloadPower, 2);
-        itemIndex.put(FItems.speedPower, 3);
-        itemIndex.put(FItems.againPower, 4);
-        itemIndex.put(FItems.shieldPower, 5);
-
         configClear((GradeBuild b) -> b.choose = -1);
 
         config(Item.class, (GradeBuild b, Item i) -> {
-            if (b.choose != itemIndex.get(i)) {
-                b.choose = itemIndex.get(i);
+            if (b.choose != findIndex(i)) {
+                b.choose = findIndex(i);
             }
         });
     }
 
+    private static int findIndex(Item i) {
+        for (int j = 0; j < Items.length; j++) {
+            if (Items[j] == i) {
+                return j;
+            }
+        }
+        return -1;
+    }
+
     public class GradeBuild extends UnitBuild {
+        private int lastId = -1;
         private int itemUse = 0;
         private boolean outing = false;
         public int level = 0;
@@ -71,10 +80,7 @@ public class GradeFactory extends UnitBlock {
 
         @Override
         public void buildConfiguration(Table table) {
-            Seq<Item> units = new Seq<>();
-            for (Item item : itemIndex.keySet()) {
-                units.add(item);
-            }
+            Seq<Item> units = new Seq<>(Items);
 
             if (units.any()) {
                 ItemSelection.buildTable(GradeFactory.this, table, units,
@@ -108,12 +114,19 @@ public class GradeFactory extends UnitBlock {
 
         @Override
         public void updateTile() {
+            if (lastId >= 0) {
+                lastUnit = Groups.unit.getByID(lastId);
+                lastId = -1;
+            }
+
             updateItem();
 
             if (payload != null) {
                 if (lastUnit != payload.unit) {
-                    timer = constructTime;
+                    outing = false;
+                    timer = 0;
                 }
+
                 lastUnit = payload.unit;
             } else {
                 outing = false;
@@ -122,34 +135,39 @@ public class GradeFactory extends UnitBlock {
 
             if (outing) {
                 moveOutPayload();
-            } else if (lastUnit instanceof FUnitUpGrade uug && moveInPayload()) {
+            } else if (lastUnit instanceof FUnitUpGrade uug && !lastUnit.type.isBanned()) {
+
                 update(uug);
-                if (item != null && itemUse >= 0 && items.get(item) >= itemUse && !lastUnit.type.isBanned()) {
+
+                boolean in = moveInPayload();
+
+                if (item != null && itemUse >= 0 && items.get(item) >= itemUse && in && efficiency >= 0) {
                     float adder = Time.delta * edelta() * Math.max(0, efficiency);
                     timer = out ? level > 0 ? timer + adder : constructTime :
                             level >= 10 ? constructTime : timer + adder;
                     if (timer >= constructTime) {
-                        if (out && level > 0) {
+                        if (out) {
+                            outing = true;
                             items.add(item, level);
                             gradeChange(uug);
-                        } else if (!out && level < 10) {
+                        } else if (level < 10) {
                             outing = true;
                             items.remove(item, itemUse);
                             consume();
                             gradeChange(uug);
                         }
-
-                        lastUnit = null;
                     }
-                } else if (lastUnit != null && !lastUnit.type.isBanned()) {
+                } else if (lastUnit != null && !lastUnit.type.isBanned() && in) {
                     outing = true;
                 }
+            } else if (lastUnit != null && !lastUnit.type.isBanned()) {
+                outing = true;
             }
         }
 
         @Override
         public Object config() {
-            return item;
+            return choose;
         }
 
         private void updateNumber() {
@@ -161,7 +179,7 @@ public class GradeFactory extends UnitBlock {
                         itemUse = 0;
                     }
                 } else {
-                    if (level < 10) {
+                    if (level < 10 && level >= 0) {
                         itemUse = (level + 1) * (level + 1) * Math.max(1, (int) payload.unit.maxHealth / 7000);
                     } else {
                         itemUse = -1;
@@ -173,11 +191,7 @@ public class GradeFactory extends UnitBlock {
         }
 
         private void updateItem() {
-            for (Item item : itemIndex.keySet()) {
-                if (itemIndex.get(item) == choose) {
-                    this.item = item;
-                }
-            }
+            item = choose >= 0 ? Items[choose] : null;
         }
 
         private void updateLevel(FUnitUpGrade uug) {
@@ -193,6 +207,8 @@ public class GradeFactory extends UnitBlock {
                 level = uug.getAgainLevel();
             } else if (choose == 5) {
                 level = uug.getShieldLevel();
+            } else {
+                level = -1;
             }
         }
 
@@ -226,9 +242,31 @@ public class GradeFactory extends UnitBlock {
             }
         }
 
+        public boolean acceptItem(Building source, Item item) {
+            return findIndex(item) >= 0 && items.get(item) < getMaximumAccepted(item);
+        }
+
         private void update(FUnitUpGrade uug) {
             updateLevel(uug);
             updateNumber();
+        }
+
+        @Override
+        public void write(Writes write) {
+            super.write(write);
+
+            write.i(choose);
+            write.f(timer);
+            write.i(lastUnit == null ? -1 : lastUnit.id);
+        }
+
+        @Override
+        public void read(Reads read, byte revision) {
+            super.read(read, revision);
+
+            choose = read.i();
+            timer = read.f();
+            lastId = read.i();
         }
     }
 }
