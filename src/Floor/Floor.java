@@ -17,7 +17,6 @@ public class Floor extends Mod {
         UnitOverride.load();
         FUnits.load();
         FEvents.load();
-        FDefends.load();
         FBlocks.load();
     }
 }
