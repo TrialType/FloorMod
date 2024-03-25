@@ -13,6 +13,7 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
+import mindustry.content.TechTree;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -59,9 +60,8 @@ public class GradeFactory extends UnitBlock {
     public void setBars() {
         super.setBars();
         addBar("progress", (GradeBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
-        addBar("levelTo", (GradeBuild e) -> new Bar(e.level + "/" + e.levelTo, Pal.ammo,
-                () -> (float) (out ? (e.levelTo + 1) / (e.level + 1) : (e.level + 1) / (e.levelTo + 1))));
-        addBar("item", (GradeBuild e) -> new Bar(e.item == null ? "null" : Core.bundle.get(e.item.localizedName), Pal.ammo, () -> 0f));
+        addBar("item", (GradeBuild e) -> new Bar(e.item == null ? "null" : Core.bundle.get(e.item.localizedName), Pal.ammo, () -> 1f));
+        addBar("levelTo", (GradeBuild e) -> new Bar(e.level + "/" + e.levelTo, Pal.ammo, () -> 1f));
     }
 
     @Override
@@ -105,6 +105,7 @@ public class GradeFactory extends UnitBlock {
         public int level = 0;
         public Item item = null;
         public Unit lastUnit;
+        public Item lastItem;
 
         public float fraction() {
             return lastUnit == null ? 0 : progress / constructTime;
@@ -185,8 +186,10 @@ public class GradeFactory extends UnitBlock {
                 lastId = -1;
             }
 
-            //updateItem();
-
+            if (lastItem != item) {
+                progress = progress % 1f;
+            }
+            lastItem = item;
             if (payload != null) {
                 if (lastUnit != payload.unit) {
                     outing = false;

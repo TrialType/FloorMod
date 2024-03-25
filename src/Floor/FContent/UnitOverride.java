@@ -100,13 +100,6 @@ public class UnitOverride {
         UnitTypes.navanax.constructor = FUnitWaterMove::create;
         UnitTypes.navanax.abilities.add(new LevelSign());
 
-        UnitTypes.alpha.constructor = FUnitEntity::create;
-        UnitTypes.alpha.abilities.add(new LevelSign());
-        UnitTypes.beta.constructor = FUnitEntity::create;
-        UnitTypes.beta.abilities.add(new LevelSign());
-        UnitTypes.gamma.constructor = FUnitEntity::create;
-        UnitTypes.gamma.abilities.add(new LevelSign());
-
         UnitTypes.stell.constructor = FTankUnit::create;
         UnitTypes.stell.abilities.add(new LevelSign());
         UnitTypes.locus.constructor = FTankUnit::create;
