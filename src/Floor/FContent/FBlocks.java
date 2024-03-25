@@ -69,6 +69,7 @@ public class FBlocks {
             maxAmmo = 32;
             consumeAmmoOnce = false;
             shootX = shootY = 0;
+            inaccuracy = 15;
 
             reload = 5;
             size = 2;

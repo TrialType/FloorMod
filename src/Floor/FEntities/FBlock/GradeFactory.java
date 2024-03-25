@@ -3,14 +3,16 @@ package Floor.FEntities.FBlock;
 import Floor.FContent.FItems;
 import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
-import arc.graphics.Color;
+import arc.Core;
 import arc.graphics.g2d.Draw;
+import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Scaling;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.Vars;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -20,7 +22,7 @@ import mindustry.type.UnitType;
 import mindustry.ui.Bar;
 import mindustry.ui.ItemDisplay;
 import mindustry.ui.Styles;
-import mindustry.world.blocks.ItemSelection;
+import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.units.UnitBlock;
 import mindustry.world.meta.Stat;
 
@@ -51,20 +53,15 @@ public class GradeFactory extends UnitBlock {
         regionRotated1 = 1;
         commandable = true;
         ambientSound = Sounds.respawning;
-
-        configClear((GradeBuild b) -> b.choose = -1);
-
-        config(Item.class, (GradeBuild b, Item i) -> {
-            if (b.choose != findIndex(i)) {
-                b.choose = findIndex(i);
-            }
-        });
     }
 
     @Override
     public void setBars() {
         super.setBars();
         addBar("progress", (GradeBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+        addBar("levelTo", (GradeBuild e) -> new Bar(e.level + "/" + e.levelTo, Pal.ammo,
+                () -> (float) (out ? (e.levelTo + 1) / (e.level + 1) : (e.level + 1) / (e.levelTo + 1))));
+        addBar("item", (GradeBuild e) -> new Bar(e.item == null ? "null" : Core.bundle.get(e.item.localizedName), Pal.ammo, () -> 0f));
     }
 
     @Override
@@ -101,29 +98,59 @@ public class GradeFactory extends UnitBlock {
 
     public class GradeBuild extends UnitBuild {
         private int lastId = -1;
+        private int itemId = -1;
         private int itemUse = 0;
         private boolean outing = false;
+        public int levelTo = 0;
         public int level = 0;
-        public int choose = -1;
         public Item item = null;
         public Unit lastUnit;
 
         public float fraction() {
-            return choose == -1 ? 0 : progress / constructTime;
+            return lastUnit == null ? 0 : progress / constructTime;
         }
 
         @Override
         public void buildConfiguration(Table table) {
-            Seq<Item> units = new Seq<>(Items);
+            BaseDialog dialog = new BaseDialog("@settings");
+            dialog.addCloseListener();
+            dialog.cont.pane(set -> {
+                set.row();
+                set.add(Core.bundle.get("@items")).size(200, 100);
+                set.row();
+                set.table(s -> {
+                    s.button(Core.bundle.get("@health"), () -> item = FItems.healthPower).pad(50).size(60, 150).left();
+                    s.button(Core.bundle.get("@damage"), () -> item = FItems.damagePower).pad(50).size(60, 150).left();
+                    s.button(Core.bundle.get("@reload"), () -> item = FItems.reloadPower).pad(50).size(60, 150).left();
+                    s.button(Core.bundle.get("@speed"), () -> item = FItems.speedPower).pad(50).size(60, 150).left();
+                    s.button(Core.bundle.get("@again"), () -> item = FItems.againPower).pad(50).size(60, 150).left();
+                    s.button(Core.bundle.get("@shield"), () -> item = FItems.shieldPower).pad(50).size(60, 150).left();
+                }).growX().growY();
+                set.row();
+                set.add(Core.bundle.get("@number")).size(400, 100).growX();
+                set.row();
+                set.table(n -> {
+                    n.button("O", () -> levelTo = 0).pad(50).size(80, 80).left();
+                    n.button("I", () -> levelTo = 1).pad(50).size(80, 80);
+                    n.button("II", () -> levelTo = 2).pad(50).size(80, 80);
+                    n.button("III", () -> levelTo = 3).pad(50).size(80, 80);
+                    n.button("IV", () -> levelTo = 4).pad(50).size(80, 80).row();
+                    n.button("V", () -> levelTo = 5).pad(50).size(80, 80).left();
+                    n.button("VI", () -> levelTo = 6).pad(50).size(80, 80);
+                    n.button("VII", () -> levelTo = 7).pad(50).size(80, 80);
+                    n.button("VIII", () -> levelTo = 8).pad(50).size(80, 80);
+                    n.button("IX", () -> levelTo = 9).pad(50).size(80, 80);
+                    n.button("X", () -> levelTo = 10).pad(50).size(80, 80);
+                }).growX().growY();
+                set.row();
+                set.button("@back", dialog::hide).size(400, 100).growX();
+            }).growY().growX();
 
-            if (units.any()) {
-                ItemSelection.buildTable(GradeFactory.this, table, units,
-                        () -> item,
-                        this::configure,
-                        selectionRows, selectionColumns);
-            } else {
-                table.table(Styles.black3, t -> t.add("@none").color(Color.lightGray));
-            }
+            table.row();
+            table.table(Tex.paneSolid, t -> {
+                t.row();
+                t.button("settings", Icon.settings, dialog::show).size(300.0F, 60.0F).row();
+            });
         }
 
         @Override
@@ -149,21 +176,26 @@ public class GradeFactory extends UnitBlock {
 
         @Override
         public void updateTile() {
+            if (itemId >= 0) {
+                item = Vars.content.item(itemId);
+                itemId = -1;
+            }
             if (lastId >= 0) {
                 lastUnit = Groups.unit.getByID(lastId);
                 lastId = -1;
             }
 
-            updateItem();
+            //updateItem();
 
             if (payload != null) {
                 if (lastUnit != payload.unit) {
                     outing = false;
-                    progress = 0;
+                    progress = Mathf.lerpDelta(progress, 0, 0.05f);
                 }
 
                 lastUnit = payload.unit;
             } else {
+                progress = Mathf.lerpDelta(progress, 0, 0.05f);
                 outing = false;
                 lastUnit = null;
             }
@@ -172,24 +204,35 @@ public class GradeFactory extends UnitBlock {
                 moveOutPayload();
             } else if (lastUnit instanceof FUnitUpGrade uug && !lastUnit.type.isBanned()) {
 
-                update(uug);
+                updateLevel(uug);
+                updateNumber();
 
                 boolean in = moveInPayload();
+                boolean le = (item != null && items.get(item) >= itemUse && itemUse >= 0) &&
+                        (out ? level > levelTo : level < levelTo && level <= 10);
 
-                if (item != null && itemUse >= 0 && items.get(item) >= itemUse && in && efficiency >= 0) {
+                if (le && in && efficiency >= 0) {
                     float adder = Time.delta * edelta() * Math.max(0, efficiency);
                     progress = out ? level > 0 ? progress + adder : constructTime :
                             level >= 10 ? constructTime : progress + adder;
                     if (progress >= constructTime) {
                         if (out) {
-                            outing = true;
+                            if (level - 1 <= levelTo) {
+                                outing = true;
+                            } else {
+                                progress = progress % 1f;
+                            }
                             items.add(item, level);
                             gradeChange(uug);
                         } else if (level < 10) {
-                            outing = true;
                             items.remove(item, itemUse);
                             consume();
                             gradeChange(uug);
+                            if (level + 1 >= levelTo) {
+                                outing = true;
+                            } else {
+                                progress = progress % 1f;
+                            }
                         }
                     }
                 } else if (lastUnit != null && !lastUnit.type.isBanned() && in) {
@@ -198,11 +241,6 @@ public class GradeFactory extends UnitBlock {
             } else if (lastUnit != null && !lastUnit.type.isBanned()) {
                 outing = true;
             }
-        }
-
-        @Override
-        public Object config() {
-            return choose;
         }
 
         private void updateNumber() {
@@ -225,11 +263,9 @@ public class GradeFactory extends UnitBlock {
             }
         }
 
-        private void updateItem() {
-            item = choose >= 0 ? Items[choose] : null;
-        }
 
         private void updateLevel(FUnitUpGrade uug) {
+            int choose = findIndex(item);
             if (choose == 0) {
                 level = uug.getHealthLevel();
             } else if (choose == 1) {
@@ -247,10 +283,11 @@ public class GradeFactory extends UnitBlock {
             }
         }
 
+
         public void gradeChange(FUnitUpGrade uug) {
             if (out) {
                 uug.setLevel(uug.getLevel() - 1);
-                switch (choose) {
+                switch (findIndex(item)) {
                     case 0 -> uug.setHealthLevel(uug.getHealthLevel() - 1);
                     case 1 -> uug.setDamageLevel(uug.getDamageLevel() - 1);
                     case 2 -> uug.setReloadLevel(uug.getReloadLevel() - 1);
@@ -263,7 +300,7 @@ public class GradeFactory extends UnitBlock {
                 }
             } else {
                 uug.setLevel(uug.getLevel() + 1);
-                switch (choose) {
+                switch (findIndex(item)) {
                     case 0 -> uug.setHealthLevel(uug.getHealthLevel() + 1);
                     case 1 -> uug.setDamageLevel(uug.getDamageLevel() + 1);
                     case 2 -> uug.setReloadLevel(uug.getReloadLevel() + 1);
@@ -281,27 +318,31 @@ public class GradeFactory extends UnitBlock {
             return findIndex(item) >= 0 && items.get(item) < getMaximumAccepted(item);
         }
 
-        private void update(FUnitUpGrade uug) {
-            updateLevel(uug);
-            updateNumber();
+        @Override
+        public Object config() {
+            return item;
         }
 
         @Override
         public void write(Writes write) {
             super.write(write);
 
-            write.i(choose);
+            write.i(item == null ? -1 : item.id);
+            write.i(levelTo);
             write.f(progress);
             write.i(lastUnit == null ? -1 : lastUnit.id);
+            write.bool(outing);
         }
 
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
 
-            choose = read.i();
+            itemId = read.i();
+            levelTo = read.i();
             progress = read.f();
             lastId = read.i();
+            outing = read.bool();
         }
     }
 }
