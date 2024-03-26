@@ -101,12 +101,12 @@ public class FBlocks {
             ammoTypes.put(Items.coal, new BasicBulletType() {{
                 absorbable = reflectable = hittable = false;
 
-                damage = 32;
+                damage = 38;
                 lifetime = 20;
                 speed = 2.3f;
                 width = height = 0;
                 ammoMultiplier = 8;
-                shootEffect = Fx.shootSmallFlame;
+                shootEffect = Fx.shootPyraFlame;
                 status = StatusEffects.burning;
                 statusDuration = 180;
                 hitEffect = despawnEffect = Fx.none;
@@ -114,12 +114,12 @@ public class FBlocks {
             ammoTypes.put(Items.pyratite, new BasicBulletType() {{
                 absorbable = reflectable = hittable = false;
 
-                damage = 102;
-                lifetime = 40;
+                damage = 64;
+                lifetime = 30;
                 speed = 2.5f;
                 width = height = 0;
                 ammoMultiplier = 16;
-                shootEffect = Fx.shootSmallFlame;
+                shootEffect = Fx.shootPyraFlame;
                 status = StatusEffects.burning;
                 statusDuration = 300;
                 hitEffect = despawnEffect = Fx.none;
@@ -158,6 +158,8 @@ public class FBlocks {
                 splashDamageRadius = 500;
                 trailLength = 25;
                 trailChance = 1;
+                status = StatusEffects.wet;
+                statusDuration = 240;
 
                 targetRange = 1000;
                 circleRange = 160;

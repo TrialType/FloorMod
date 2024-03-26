@@ -12,7 +12,6 @@ import arc.util.Scaling;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -28,8 +27,6 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.units.UnitBlock;
 import mindustry.world.meta.Stat;
 
-import java.util.Arrays;
-
 import static mindustry.Vars.net;
 import static mindustry.Vars.state;
 
@@ -42,10 +39,10 @@ public class GradeFactory extends UnitBlock {
             FItems.againPower,
             FItems.shieldPower
     };
+    private final static String[] numbers = {"0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
     public Seq<UnitType> grades = new Seq<>(UnitUpGrade.uppers);
     public boolean out = true;
     public float constructTime = 60f * 5f;
-
     public GradeFactory(String name) {
         super(name);
 
@@ -61,15 +58,13 @@ public class GradeFactory extends UnitBlock {
         commandable = true;
         ambientSound = Sounds.respawning;
     }
-
     @Override
     public void setBars() {
         super.setBars();
         addBar("progress", (GradeBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
-        addBar("item", (GradeBuild e) -> new Bar(e.item == null ? "null" : Core.bundle.get(e.item.localizedName), Pal.ammo, () -> 1f));
+        addBar("item", (GradeBuild e) -> new Bar(e.item == null ? "null" : Core.bundle.get("item." + e.item.name + ".name"), Pal.ammo, () -> 1f));
         addBar("levelTo", (GradeBuild e) -> new Bar(e.level + "/" + e.levelTo, Pal.ammo, () -> 1f));
     }
-
     @Override
     public void setStats() {
         super.setStats();
@@ -80,19 +75,57 @@ public class GradeFactory extends UnitBlock {
             stats.add(Stat.output, table -> {
                 table.row();
 
-                table.table(Styles.grayPanel, t -> {
-                    t.image(FItems.healthPower.uiIcon).size(40).pad(10).left().scaling(Scaling.fit);
+                for (int i = 1; i < numbers.length; i++) {
+                    int finalI = i;
+                    table.table(Styles.grayPanel, t -> {
+                        t.add(numbers[finalI]).size(40).pad(10).left().scaling(Scaling.fit);
 
-                    t.table(gre -> {
-                        gre.right();
-                        gre.add(new ItemDisplay(FItems.healthPower, 1, false)).pad(10);
-                    }).right().grow().pad(10f);
-                }).growX().pad(5);
+                        t.table(gre -> {
+                            gre.add(new ItemDisplay(FItems.healthPower, finalI, false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.damagePower, finalI, false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.reloadPower, finalI, false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.speedPower, finalI, false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.againPower, finalI, false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.shieldPower, finalI, false)).pad(10).left();
+                        }).right().growX().pad(10f);
+                    }).grow().row();
+                    table.row();
+                }
+            });
+        } else {
+            stats.add(Stat.input, table -> {
                 table.row();
+
+                for (int i = 1; i < numbers.length; i++) {
+                    int finalI = i;
+                    table.table(Styles.grayPanel, t -> {
+                        t.add(numbers[finalI]).size(40).pad(10).left().scaling(Scaling.fit);
+
+                        t.table(gre -> {
+                            gre.add(new ItemDisplay(FItems.healthPower, (int) Math.pow(finalI, 2), false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.damagePower, (int) Math.pow(finalI, 2), false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.reloadPower, (int) Math.pow(finalI, 2), false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.speedPower, (int) Math.pow(finalI, 2), false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.againPower, (int) Math.pow(finalI, 2), false)).pad(10).left();
+                            gre.add("/").left();
+                            gre.add(new ItemDisplay(FItems.shieldPower, (int) Math.pow(finalI, 2), false)).pad(10).left();
+                            gre.add("*health/7000").left();
+                        }).right().growX().pad(10f);
+                    }).growX().row();
+                    table.row();
+                }
             });
         }
     }
-
     private static int findIndex(Item i) {
         for (int j = 0; j < Items.length; j++) {
             if (Items[j] == i) {
@@ -101,10 +134,9 @@ public class GradeFactory extends UnitBlock {
         }
         return -1;
     }
-
     public static class GradePlan {
         int levelTo = -1;
-        Item item;
+        Item item = null;
         String name = "";
 
         public GradePlan(int levelTo, Item item) {
@@ -151,7 +183,6 @@ public class GradeFactory extends UnitBlock {
             }
         }
     }
-
     public class GradeBuild extends UnitBuild {
         public Table list;
         public BaseDialog bd;
@@ -167,11 +198,9 @@ public class GradeFactory extends UnitBlock {
         public Item item = null;
         public Unit lastUnit;
         public Item lastItem;
-
         public float fraction() {
             return lastUnit == null ? 0 : progress / constructTime;
         }
-
         @Override
         public void buildConfiguration(Table table) {
             table.row();
@@ -183,10 +212,9 @@ public class GradeFactory extends UnitBlock {
                     }
                     addDialog();
                     bd.show();
-                }).size(60, 40.0F).row();
+                }).size(50, 40.0F).row();
             });
         }
-
         public void addDialog() {
             tables.clear();
 
@@ -199,11 +227,13 @@ public class GradeFactory extends UnitBlock {
                     list = sq;
                     sq.row();
                     for (int i = 0; i < plan.size; i++) {
+                        sq.row();
+
                         sq.table(t -> {
                             tables.add(t);
                             GradePlan gp = plan.get(tables.indexOf(t));
 
-                            t.background(Tex.button);
+                            t.background(Tex.scrollHorizontal);
 
                             t.button(gp.name, () -> {
                                 GradePlan pl = plan.get(tables.indexOf(t));
@@ -211,209 +241,7 @@ public class GradeFactory extends UnitBlock {
                                 BaseDialog baseDialog = new BaseDialog("@items");
                                 baseDialog.addCloseListener();
 
-                                baseDialog.cont.pane(tt -> {
-                                    tt.table(p -> {
-                                        p.button(Core.bundle.get("@health"), () -> {
-                                            pl.item(pl.levelTo, FItems.healthPower);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(60, 150).left();
-                                        p.button(Core.bundle.get("@damage"), () -> {
-                                            pl.item(pl.levelTo, FItems.damagePower);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(60, 150).left();
-                                        p.button(Core.bundle.get("@reload"), () -> {
-                                            pl.item(pl.levelTo, FItems.reloadPower);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(60, 150).left();
-                                        p.button(Core.bundle.get("@speed"), () -> {
-                                            pl.item(pl.levelTo, FItems.speedPower);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(60, 150).left();
-                                        p.button(Core.bundle.get("@again"), () -> {
-                                            pl.item(pl.levelTo, FItems.againPower);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(60, 150).left();
-                                        p.button(Core.bundle.get("@shield"), () -> {
-                                            pl.item(pl.levelTo, FItems.shieldPower);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(60, 150).left();
-                                    }).grow();
-                                    tt.row();
-                                    tt.button("@back", () -> {
-                                        baseDialog.hide();
-                                        bd.hide();
-                                        addDialog();
-                                        bd.show();
-                                    });
-                                }).grow();
-
-                                baseDialog.show();
-
-                            }).size(100, 50).left().pad(60);
-
-                            t.button(gp.levelTo + "", () -> {
-                                GradePlan pl = plan.get(tables.indexOf(t));
-
-                                BaseDialog baseDialog = new BaseDialog("@items");
-                                baseDialog.addCloseListener();
-
-                                baseDialog.cont.pane(tt -> {
-                                    tt.table(n -> {
-                                        n.button("0", () -> {
-                                            pl.item(0, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80).left();
-                                        n.button("I", () -> {
-                                            pl.item(1, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("II", () -> {
-                                            pl.item(2, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("III", () -> {
-                                            pl.item(3, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("IV", () -> {
-                                            pl.item(4, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80).row();
-                                        n.button("V", () -> {
-                                            pl.item(5, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80).left();
-                                        n.button("VI", () -> {
-                                            pl.item(6, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("VII", () -> {
-                                            pl.item(7, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("VIII", () -> {
-                                            pl.item(8, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("IX", () -> {
-                                            pl.item(9, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                        n.button("X", () -> {
-                                            pl.item(10, pl.item);
-                                            changed = true;
-                                            baseDialog.hide();
-                                            bd.hide();
-                                            addDialog();
-                                            bd.show();
-                                        }).pad(50).size(80, 80);
-                                    }).grow();
-
-                                    tt.row();
-
-                                    tt.button("@back", () -> {
-                                        baseDialog.hide();
-                                        bd.hide();
-                                        addDialog();
-                                        bd.show();
-                                    });
-                                }).grow();
-
-                                baseDialog.show();
-
-                            }).size(100, 50).left().pad(60);
-
-                            t.button(Icon.trash, () -> {
-                                plan.remove(tables.indexOf(t));
-                                tables.remove(t);
-                                t.remove();
-                            }).size(100, 50).right().pad(60);
-
-                        }).growX().fill().row();
-                    }
-                }).grow().row();
-
-                set.button(Icon.add, () -> {
-                    GradePlan gp = new GradePlan(-1, null);
-                    plan.add(gp);
-
-                    list.table(plans -> {
-                        tables.add(plans);
-
-                        plans.background(Tex.button);
-
-                        plans.button("", () -> {
-                            GradePlan pl = plan.get(tables.indexOf(plans));
-
-                            BaseDialog baseDialog = new BaseDialog("@items");
-                            baseDialog.addCloseListener();
-
-                            baseDialog.cont.pane(t -> {
-                                t.table(p -> {
+                                baseDialog.cont.pane(tt -> tt.table(p -> {
                                     p.button(Core.bundle.get("@health"), () -> {
                                         pl.item(pl.levelTo, FItems.healthPower);
                                         changed = true;
@@ -462,29 +290,19 @@ public class GradeFactory extends UnitBlock {
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
-                                }).grow();
+                                }).grow()).grow();
 
-                                t.row();
-                                t.button("@back", () -> {
-                                    baseDialog.hide();
-                                    bd.hide();
-                                    addDialog();
-                                    bd.show();
-                                }).size(500, 50);
-                            }).grow();
+                                baseDialog.show();
 
-                            baseDialog.show();
+                            }).size(100, 50).left().pad(30);
 
-                        }).size(100, 50).left().pad(30);
+                            t.button(gp.levelTo + "", () -> {
+                                GradePlan pl = plan.get(tables.indexOf(t));
 
-                        plans.button("", () -> {
-                            GradePlan pl = plan.get(tables.indexOf(plans));
+                                BaseDialog baseDialog = new BaseDialog("@items");
+                                baseDialog.addCloseListener();
 
-                            BaseDialog baseDialog = new BaseDialog("@items");
-                            baseDialog.addCloseListener();
-
-                            baseDialog.cont.pane(t -> {
-                                t.table(n -> {
+                                baseDialog.cont.pane(tt -> tt.table(n -> {
                                     n.button("0", () -> {
                                         pl.item(0, pl.item);
                                         changed = true;
@@ -573,16 +391,191 @@ public class GradeFactory extends UnitBlock {
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
-                                }).grow();
+                                }).grow()).grow();
 
-                                t.row();
-                                t.button("@back", () -> {
+                                baseDialog.show();
+
+                            }).size(100, 50).left().pad(30);
+
+                            t.button(Icon.trash, () -> {
+                                plan.remove(tables.indexOf(t));
+                                tables.remove(t);
+                                t.remove();
+                            }).size(100, 50).right().pad(30);
+
+                        }).center().growX();
+                    }
+                    sq.row();
+                }).center().grow().row();
+
+                set.button(Icon.add, () -> {
+                    GradePlan gp = new GradePlan(-1, null);
+                    plan.add(gp);
+
+                    list.row();
+
+                    list.table(plans -> {
+                        tables.add(plans);
+
+                        plans.background(Tex.scrollHorizontal);
+
+                        plans.button("null", () -> {
+                            GradePlan pl = plan.get(tables.indexOf(plans));
+
+                            BaseDialog baseDialog = new BaseDialog("@items");
+                            baseDialog.addCloseListener();
+
+                            baseDialog.cont.pane(t -> t.table(p -> {
+                                p.button(Core.bundle.get("@health"), () -> {
+                                    pl.item(pl.levelTo, FItems.healthPower);
+                                    changed = true;
                                     baseDialog.hide();
                                     bd.hide();
                                     addDialog();
                                     bd.show();
-                                }).size(500, 50);
-                            }).grow();
+                                }).pad(50).size(60, 150).left();
+                                p.button(Core.bundle.get("@damage"), () -> {
+                                    pl.item(pl.levelTo, FItems.damagePower);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(60, 150).left();
+                                p.button(Core.bundle.get("@reload"), () -> {
+                                    pl.item(pl.levelTo, FItems.reloadPower);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(60, 150).left();
+                                p.button(Core.bundle.get("@speed"), () -> {
+                                    pl.item(pl.levelTo, FItems.speedPower);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(60, 150).left();
+                                p.button(Core.bundle.get("@again"), () -> {
+                                    pl.item(pl.levelTo, FItems.againPower);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(60, 150).left();
+                                p.button(Core.bundle.get("@shield"), () -> {
+                                    pl.item(pl.levelTo, FItems.shieldPower);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(60, 150).left();
+                            }).grow()).grow();
+
+                            baseDialog.show();
+
+                        }).size(100, 50).left().pad(30);
+
+                        plans.button("-1", () -> {
+                            GradePlan pl = plan.get(tables.indexOf(plans));
+
+                            BaseDialog baseDialog = new BaseDialog("@items");
+                            baseDialog.addCloseListener();
+
+                            baseDialog.cont.pane(t -> t.table(n -> {
+                                n.button("0", () -> {
+                                    pl.item(0, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80).left();
+                                n.button("I", () -> {
+                                    pl.item(1, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("II", () -> {
+                                    pl.item(2, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("III", () -> {
+                                    pl.item(3, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("IV", () -> {
+                                    pl.item(4, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80).row();
+                                n.button("V", () -> {
+                                    pl.item(5, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80).left();
+                                n.button("VI", () -> {
+                                    pl.item(6, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("VII", () -> {
+                                    pl.item(7, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("VIII", () -> {
+                                    pl.item(8, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("IX", () -> {
+                                    pl.item(9, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                                n.button("X", () -> {
+                                    pl.item(10, pl.item);
+                                    changed = true;
+                                    baseDialog.hide();
+                                    bd.hide();
+                                    addDialog();
+                                    bd.show();
+                                }).pad(50).size(80, 80);
+                            }).grow()).grow();
 
                             baseDialog.show();
 
@@ -593,21 +586,22 @@ public class GradeFactory extends UnitBlock {
                             tables.remove(plans);
                             plans.remove();
                         }).size(100, 50).right().pad(30);
-                    }).growX().row();
+                    }).center().growX();
 
-                }).size(200, 50).left().pad(200);
+                }).center().size(100, 50).pad(15);
 
                 set.button("@back", () -> {
                     if (state.isGame() && !net.active()) {
                         state.set(GameState.State.playing);
                     }
                     dialog.hide();
-                }).size(200, 50).left().pad(210);
+                }).left().size(100, 50).pad(15);
 
-            }).growY().growX();
+            }).center().growY().growX();
+
+
             bd = dialog;
         }
-
         @Override
         public void draw() {
             Draw.rect(region, x, y);
@@ -628,7 +622,6 @@ public class GradeFactory extends UnitBlock {
 
             Draw.rect(topRegion, x, y);
         }
-
         @Override
         public void updateTile() {
             if (changed || usePlan.size == 0) {
@@ -688,11 +681,12 @@ public class GradeFactory extends UnitBlock {
                 updateNumber();
 
                 boolean in = moveInPayload();
-                boolean le = (lastItem != null && items.get(lastItem) >= itemUse && itemUse >= 0) &&
-                        (out ? level > levelTo : level < levelTo) && usePlan.size > 0;
+                boolean li = (lastItem != null && items.get(lastItem) >= itemUse && itemUse >= 0);
+                boolean le = (out ? level > levelTo : level < levelTo);
+                boolean si = usePlan.size > 0;
 
-                if (le && in && efficiency >= 0) {
-                    float adder = Time.delta * edelta() * Math.max(0, efficiency);
+                if (si && li && le && in && efficiency >= 0) {
+                    float adder = Time.delta * edelta() * Math.max(0, efficiency) * 0.05f;
                     progress = out ? level > 0 ? progress + adder : constructTime :
                             level >= 10 ? constructTime : progress + adder;
                     if (progress >= constructTime) {
@@ -721,14 +715,20 @@ public class GradeFactory extends UnitBlock {
                             }
                         }
                     }
-                } else if (lastUnit != null && !lastUnit.type.isBanned() && in) {
-                    outing = true;
+                } else if (in && lastUnit != null && !lastUnit.type.isBanned()) {
+                    if (!le && li && si) {
+                        usePlan.remove(0);
+                        if (usePlan.size == 0) {
+                            outing = true;
+                        }
+                    } else if (!li || !si) {
+                        outing = true;
+                    }
                 }
             } else if (lastUnit != null && !lastUnit.type.isBanned()) {
                 outing = true;
             }
         }
-
         private void updateNumber() {
             if (lastUnit != null && grades.indexOf(lastUnit.type) >= 0) {
                 if (out) {
@@ -748,8 +748,6 @@ public class GradeFactory extends UnitBlock {
                 itemUse = -1;
             }
         }
-
-
         private void updateLevel(FUnitUpGrade uug) {
             int choose = findIndex(item);
             if (choose == 0) {
@@ -768,8 +766,6 @@ public class GradeFactory extends UnitBlock {
                 level = -1;
             }
         }
-
-
         public void gradeChange(FUnitUpGrade uug) {
             if (out) {
                 uug.setLevel(uug.getLevel() - 1);
@@ -799,16 +795,13 @@ public class GradeFactory extends UnitBlock {
                 }
             }
         }
-
         public boolean acceptItem(Building source, Item item) {
             return findIndex(item) >= 0 && items.get(item) < getMaximumAccepted(item);
         }
-
         @Override
         public Object config() {
             return item;
         }
-
         @Override
         public void write(Writes write) {
             super.write(write);
@@ -830,7 +823,6 @@ public class GradeFactory extends UnitBlock {
                 write.str(usePlan.get(i).name);
             }
         }
-
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
