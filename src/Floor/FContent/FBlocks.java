@@ -33,7 +33,7 @@ public class FBlocks {
             requirements(Category.units, with(Items.copper, 2000, Items.lead, 2000, Items.silicon, 2000));
 
             itemCapacity = 100 * 10;
-            size = 8;
+            size = 9;
             consumePower(500f);
 
             constructTime = 60f * 10f;
@@ -42,7 +42,7 @@ public class FBlocks {
             requirements(Category.units, with(Items.copper, 2000, Items.lead, 2000, Items.silicon, 2000));
 
             itemCapacity = 100 * 10;
-            size = 8;
+            size = 9;
             consumePower(500f);
 
             constructTime = 60f * 10f;
