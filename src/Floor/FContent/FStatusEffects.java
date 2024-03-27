@@ -14,7 +14,7 @@ import mindustry.type.StatusEffect;
 
 public class FStatusEffects {
     public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit, High_tension, fastII, High_tensionII,
-            High_tensionIII;
+            burningV, High_tensionIII;
 
     public static void load() {
         StrongStop = new StatusEffect("StrongStop") {{
@@ -111,6 +111,9 @@ public class FStatusEffects {
             reloadTo = 0.1f;
             healthTo = 0.7f;
             damage = 90;
+        }};
+        burningV = new StatusEffect("burningII"){{
+            damage = 4.5f;
         }};
     }
 }

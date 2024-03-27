@@ -13,6 +13,7 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.core.GameState;
+import mindustry.entities.bullet.BulletType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -247,6 +248,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
@@ -255,6 +257,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
@@ -263,6 +266,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
@@ -271,6 +275,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
@@ -279,6 +284,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
@@ -287,6 +293,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(60, 150).left();
@@ -308,6 +315,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80).left();
@@ -316,6 +324,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -324,6 +333,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -332,6 +342,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -340,6 +351,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80).row();
@@ -348,6 +360,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80).left();
@@ -356,6 +369,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -364,6 +378,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -372,6 +387,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -380,6 +396,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -388,6 +405,7 @@ public class GradeFactory extends UnitBlock {
                                         changed = true;
                                         baseDialog.hide();
                                         bd.hide();
+                                        bd.remove();
                                         addDialog();
                                         bd.show();
                                     }).pad(50).size(80, 80);
@@ -400,6 +418,7 @@ public class GradeFactory extends UnitBlock {
                             t.button(Icon.trash, () -> {
                                 plan.remove(tables.indexOf(t));
                                 tables.remove(t);
+                                changed = true;
                                 t.remove();
                             }).size(100, 50).right().pad(30);
 
@@ -431,6 +450,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(60, 150).left();
@@ -439,6 +459,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(60, 150).left();
@@ -447,6 +468,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(60, 150).left();
@@ -455,6 +477,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(60, 150).left();
@@ -463,6 +486,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(60, 150).left();
@@ -471,6 +495,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(60, 150).left();
@@ -492,6 +517,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80).left();
@@ -500,6 +526,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -508,6 +535,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -516,6 +544,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -524,6 +553,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80).row();
@@ -532,6 +562,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80).left();
@@ -540,6 +571,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -548,6 +580,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -556,6 +589,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -564,6 +598,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -572,6 +607,7 @@ public class GradeFactory extends UnitBlock {
                                     changed = true;
                                     baseDialog.hide();
                                     bd.hide();
+                                    bd.remove();
                                     addDialog();
                                     bd.show();
                                 }).pad(50).size(80, 80);
@@ -585,6 +621,7 @@ public class GradeFactory extends UnitBlock {
                             plan.remove(tables.indexOf(plans));
                             tables.remove(plans);
                             plans.remove();
+                            changed = true;
                         }).size(100, 50).right().pad(30);
                     }).center().growX();
 
@@ -686,7 +723,7 @@ public class GradeFactory extends UnitBlock {
                 boolean si = usePlan.size > 0;
 
                 if (si && li && le && in && efficiency >= 0) {
-                    float adder = Time.delta * edelta() * Math.max(0, efficiency) * 0.05f;
+                    float adder = Time.delta * edelta() * Math.max(0, efficiency);
                     progress = out ? level > 0 ? progress + adder : constructTime :
                             level >= 10 ? constructTime : progress + adder;
                     if (progress >= constructTime) {

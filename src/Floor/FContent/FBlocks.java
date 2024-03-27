@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import Floor.FEntities.FBlock.GradeFactory;
 import Floor.FEntities.FBlock.KnockingTurret;
+import Floor.FEntities.FBlock.WindTurret;
 import Floor.FEntities.FBulletType.AroundBulletType;
 import arc.graphics.Color;
 import mindustry.content.Fx;
@@ -26,7 +27,7 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
-    public static Block fourNet, filariasis;
+    public static Block fourNet, filariasis, smallWind;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -56,6 +57,16 @@ public class FBlocks {
             health = 650;
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
+        }};
+
+        smallWind = new WindTurret("small_wind") {{
+            size = 2;
+            health = 114514;
+
+            liquidStatus.put(Liquids.water, FStatusEffects.burningV);
+
+            requirements(Category.effect, ItemStack.with(Items.titanium, 1,
+                    Items.copper, 1));
         }};
 
 //======================================================================================================================
