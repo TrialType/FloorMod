@@ -4,16 +4,14 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
-import arc.util.Time;
+import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
-import mindustry.entities.Effect;
+import mindustry.core.World;
 import mindustry.entities.Fires;
 import mindustry.entities.Units;
-import mindustry.entities.effect.ParticleEffect;
 import mindustry.gen.Building;
-import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
-import mindustry.graphics.Pal;
 import mindustry.type.Liquid;
 import mindustry.type.StatusEffect;
 import mindustry.world.Block;
@@ -22,14 +20,14 @@ import mindustry.world.Tile;
 import java.util.HashMap;
 import java.util.Map;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class WindTurret extends Block {
     public final Map<Liquid, StatusEffect> liquidStatus = new HashMap<>();
     public float statusTime = 240;
-    public float windLength = 500;
+    public float windLength = 200;
     public float windWidth = 100;
-    public float windPower = 0.2f;
+    public float windPower = 0.3f;
 
     public WindTurret(String name) {
         super(name);
@@ -47,24 +45,15 @@ public class WindTurret extends Block {
         public Liquid lastLiquid = null;
         public final Seq<Tile> tiles = new Seq<>();
         public final Seq<Tile> use = new Seq<>();
-        private float timer = 0;
-        private final Effect fireEffect = new ParticleEffect() {{
-            lifetime = 500;
-
-            particles = 1;
-            sizeTo = 0;
-            sizeFrom = 1;
-            colorFrom = Pal.lightFlame;
-            colorTo = Pal.darkFlame;
-            lightColor = Pal.gray;
-        }};
 
         @Override
         public void updateTile() {
             super.updateTile();
 
-            if (tiles.size == 0) {
+            if (added && tiles.size == 0) {
                 getTile();
+            } else if (!added) {
+                tiles.clear();
             }
 
             if (liquids.current() == null || liquids.current() != lastLiquid || liquids.currentAmount() == 0 || efficiency <= 0) {
@@ -73,8 +62,7 @@ public class WindTurret extends Block {
             lastLiquid = liquids.current();
 
             if (lastLiquid != null && liquids.currentAmount() > 0 && efficiency > 0) {
-                boost = Mathf.lerpDelta(boost, 1, 0.1f);
-                timer += Time.delta;
+                boost = Mathf.lerpDelta(boost, 1, 0.01f);
 
                 applyEffect = liquidStatus.get(lastLiquid);
                 if (applyEffect == null) {
@@ -82,27 +70,27 @@ public class WindTurret extends Block {
                 }
 
                 use.clear();
-                boolean hasFire = false;
                 for (int i = 0; i < tiles.size; i++) {
                     Tile t = tiles.get(i);
-                    if (inRange(t, boost)) {
+                    if (inRange(t.worldx(), t.worldy(), boost)) {
                         use.add(t);
-                        if (!hasFire && Fires.has(tiles.get(i).x, tiles.get(i).y)) {
-                            hasFire = true;
-                        }
                     }
                 }
 
                 Seq<Unit> units = new Seq<>();
 
-                Units.nearby(x, y, windLength * 1.4f, windLength * 1.4f, u -> {
-                    if (u.isGrounded() && u.physref.body.layer <= 2 && use.indexOf(u.tileOn()) >= 0) {
-                        units.add(u);
-                    }
-                });
+                Units.nearby(x, y, Math.max(windWidth / 2, windLength) * 1.4f,
+                        Math.max(windWidth / 2, windLength) * 1.4f, u -> {
+                            if (u.isGrounded() && use.indexOf(u.tileOn()) >= 0) {
+                                units.add(u);
+                            } else if (u.isFlying() && inRange(u.x, u.y, boost)) {
+                                units.add(u);
+                            }
+                        }
+                );
 
                 for (Unit u : units) {
-                    if (hasFire) {
+                    if (Fires.has(u.tileX(), u.tileY())) {
                         u.apply(applyEffect, statusTime);
                     }
                     Vec2 vec = new Vec2();
@@ -111,17 +99,19 @@ public class WindTurret extends Block {
                     u.moveAt(vec);
                 }
 
-                if (hasFire) {
-                    for (Tile til : use) {
-                        if (applyEffect.opposites.contains(StatusEffects.burning)) {
-                            Fires.extinguish(til, -1);
-                        } else {
-                            if (timer > 600) {
-                                fireEffect.at(til);
-                                Sounds.flame.at(til);
-                                timer = 0;
+                for (Tile til : use) {
+                    float tx = til.worldx();
+                    float ty = til.worldy();
+                    if (applyEffect.opposites.contains(StatusEffects.burning)) {
+                        Fires.extinguish(til, 0.5f);
+                    } else if (Fires.has(World.toTile(tx), World.toTile(ty))) {
+                        for (float x = tx - 1; x <= tx + 1; x += 1) {
+                            for (float y = ty - 1; y <= ty + 1; y += 1) {
+                                Tile t = world.tileWorld(x, y);
+                                if (t != null) {
+                                    Fires.create(t);
+                                }
                             }
-                            Fires.create(til);
                         }
                     }
                 }
@@ -139,17 +129,15 @@ public class WindTurret extends Block {
                     if (t == null) {
                         continue;
                     }
-                    if (inRange(t, 1f)) {
+                    if (inRange(t.worldx(), t.worldy(), 1f)) {
                         tiles.add(t);
                     }
                 }
             }
         }
 
-        public boolean inRange(Tile t, float boost) {
-            float bx = t.worldx();
-            float by = t.worldy();
-            float angle = Angles.angleDist(rotation + 90, Angles.angle(x, y, bx, by));
+        public boolean inRange(float bx, float by, float boost) {
+            float angle = Angles.angleDist(rotation * 90, Angles.angle(x, y, bx, by));
             float len = (float) Math.sqrt((x - bx) * (x - bx) + (y - by) * (y - by));
             return angle < 90 && len * Math.cos(Math.toRadians(angle)) <= windLength * boost &&
                     windWidth / 2 / windLength - Math.tan(Math.toRadians(angle)) >= -0.01f;

@@ -1,13 +1,9 @@
 package Floor.FContent;
 
-import Floor.FType.FStatusEffect.ADH;
-import Floor.FType.FStatusEffect.HighChangeStatus;
 import arc.graphics.Color;
 import arc.math.Interp;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
-import mindustry.entities.Effect;
-import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
@@ -56,12 +52,12 @@ public class FStatusEffects {
             }});
         }};
         slowII = new StatusEffect("slowII") {{
-            speedMultiplier = 0.33F;
+            speedMultiplier = 0.55F;
             color = new Color(0, 0, 0, 0);
             effectChance = 1;
             effect = Fx.none;
         }};
-        HardHit = new StatusEffect("HardHit") {{
+        HardHit = new StatusEffect("hard_hit") {{
             damageMultiplier = 1.2F;
             speedMultiplier = 0.75F;
             healthMultiplier = 0.4F;
@@ -91,29 +87,29 @@ public class FStatusEffects {
                 colorTo = color;
             }});
         }};
-        High_tension = new HighChangeStatus("High_tension") {{
-            speedTo = 0.8f;
-            reloadTo = 0.8f;
-            healthTo = 0.9f;
+        High_tension = new StatusEffect("high_tension") {{
+            speedMultiplier = 0.8f;
+            reloadMultiplier = 0.8f;
+            healthMultiplier = 0.9f;
         }};
         fastII = new StatusEffect("fastII") {{
             speedMultiplier = 2.4f;
             init(() -> opposite(StatusEffects.slow));
         }};
-        High_tensionII = new HighChangeStatus("High_tensionII") {{
-            speedTo = 0.5f;
-            reloadTo = 0.5f;
-            healthTo = 0.8f;
+        High_tensionII = new StatusEffect("high_tensionII") {{
+            speedMultiplier = 0.5f;
+            reloadMultiplier = 0.5f;
+            healthMultiplier = 0.8f;
             damage = 6;
         }};
-        High_tensionIII = new HighChangeStatus("High_tensionIII") {{
-            speedTo = 0.1f;
-            reloadTo = 0.1f;
-            healthTo = 0.7f;
+        High_tensionIII = new StatusEffect("high_tensionIII") {{
+            speedMultiplier = 0.1f;
+            reloadMultiplier = 0.1f;
+            healthMultiplier = 0.7f;
             damage = 90;
         }};
         burningV = new StatusEffect("burningII"){{
-            damage = 4.5f;
+            damage = 6.5f;
         }};
     }
 }

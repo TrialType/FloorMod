@@ -1,7 +1,6 @@
 package Floor.FEntities.FUnit.Override;
 
 import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.HighChange;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Bits;
@@ -16,7 +15,6 @@ import mindustry.content.Fx;
 import mindustry.ctype.ContentType;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
-import mindustry.entities.units.BuildPlan;
 import mindustry.entities.units.StatusEntry;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.Building;
@@ -26,13 +24,9 @@ import mindustry.gen.Sounds;
 import mindustry.input.InputHandler;
 import mindustry.io.TypeIO;
 import mindustry.type.Item;
-import mindustry.type.UnitType;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
 
 public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
@@ -388,42 +382,21 @@ public class FCrawlUnit extends CrawlUnit implements FUnitUpGrade {
                 }
             }
         }
-        speedMultiplier += speedLevel * 0.2f;
-        damageMultiplier += damageLevel * 0.2f;
-        reloadMultiplier += reloadLevel * 0.2f;
+
+        speedMultiplier *= (1 + speedLevel * 0.2f);
+        damageMultiplier *= (1 + damageLevel * 0.2f);
+        reloadMultiplier *= (1 + reloadLevel * 0.2f);
         heal(maxHealth * healthLevel * 0.0001f);
         if (sfa != null) {
             sfa.update(this);
         }
 
-        float damageTo = 1;
-        float speedTo = 1;
-        float reloadTo = 1;
-        float healthTo = 1;
-        float buildTo = 1;
-        float dargTo = 1;
-        for (StatusEntry se : statuses) {
-            if (se.effect instanceof HighChange hc) {
-                damageTo = Math.min(damageTo, hc.damageTo());
-                speedTo = Math.min(speedTo, hc.speedTo());
-                reloadTo = Math.min(reloadTo, hc.reloadTo());
-                healthTo = Math.min(healthTo, hc.healthTo());
-                buildTo = Math.min(buildTo, hc.buildTo());
-                dargTo = Math.min(dargTo, hc.dargTo());
-            }
-        }
-        speedMultiplier *= speedTo;
-        damageMultiplier *= damageTo;
-        reloadMultiplier *= reloadTo;
-        healthMultiplier *= healthTo;
-        buildSpeedMultiplier *= buildTo;
-        dragMultiplier *= dargTo;
-
         if (level > 60) {
             int boost2 = level - 60;
-            speedMultiplier += boost2 * 0.01f;
-            damageMultiplier += boost2 * 0.01f;
-            reloadMultiplier += boost2 * 0.01f;
+            healthMultiplier *= (float) Math.pow(1.01f, boost2);
+            speedMultiplier *= (float) Math.pow(1.01f, boost2);
+            damageMultiplier *= (float) Math.pow(1.01f, boost2);
+            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {

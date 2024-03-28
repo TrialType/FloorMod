@@ -2,7 +2,6 @@ package Floor.FEntities.FUnit.F;
 
 import Floor.FEntities.FUnit.Override.FMechUnit;
 import Floor.FEntities.FUnitType.WUGENANSMechUnitType;
-import Floor.FTools.HighChange;
 import Floor.FTools.PhysicsWorldChanger;
 import arc.math.Angles;
 import arc.math.Mathf;
@@ -276,7 +275,7 @@ public class WUGENANSMechUnit extends FMechUnit {
 
         int boost = 0;
         if (!Units.canCreate(team, type)) {
-            for (int p = (int) power, i = (int) powerNeed; p > powerNeed; i *= 2) {
+            for (float p = power, i = powerNeed; p > powerNeed; i = (float) Math.pow(i, 2)) {
                 p = p - i;
                 boost++;
             }
@@ -314,48 +313,26 @@ public class WUGENANSMechUnit extends FMechUnit {
                 }
             }
         }
-        speedMultiplier += speedLevel * 0.2f;
-        damageMultiplier += damageLevel * 0.2f;
-        reloadMultiplier += reloadLevel * 0.2f;
-        heal(maxHealth * healthLevel * 0.01f);
+        speedMultiplier *= (1 + speedLevel * 0.2f);
+        damageMultiplier *= (1 + damageLevel * 0.2f);
+        reloadMultiplier *= (1 + reloadLevel * 0.2f);
+        heal(maxHealth * healthLevel * 0.0001f);
         if (sfa != null) {
             sfa.update(this);
         }
 
-        float damageTo = 1;
-        float speedTo = 1;
-        float reloadTo = 1;
-        float healthTo = 1;
-        float buildTo = 1;
-        float dargTo = 1;
-        for (StatusEntry se : statuses) {
-            if (se.effect instanceof HighChange hc) {
-                damageTo = Math.min(damageTo, hc.damageTo());
-                speedTo = Math.min(speedTo, hc.speedTo());
-                reloadTo = Math.min(reloadTo, hc.reloadTo());
-                healthTo = Math.min(healthTo, hc.healthTo());
-                buildTo = Math.min(buildTo, hc.buildTo());
-                dargTo = Math.min(dargTo, hc.dargTo());
-            }
-        }
-        speedMultiplier *= speedTo;
-        damageMultiplier *= damageTo;
-        reloadMultiplier *= reloadTo;
-        healthMultiplier *= healthTo;
-        buildSpeedMultiplier *= buildTo;
-        dragMultiplier *= dargTo;
-
         if (level > 60) {
             int boost2 = level - 60;
-            speedMultiplier += boost2 * 0.01f;
-            damageMultiplier += boost2 * 0.01f;
-            reloadMultiplier += boost2 * 0.01f;
+            healthMultiplier *= (float) Math.pow(1.01f, boost2);
+            speedMultiplier *= (float) Math.pow(1.01f, boost2);
+            damageMultiplier *= (float) Math.pow(1.01f, boost2);
+            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
         }
 
-        speedMultiplier += boost;
-        healthMultiplier += boost;
-        damageMultiplier += boost;
-        reloadMultiplier += boost;
+        speedMultiplier *= boost;
+        healthMultiplier *= boost;
+        damageMultiplier *= boost;
+        reloadMultiplier *= boost;
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {
             this.interpolate();

@@ -138,7 +138,7 @@ public class GradeFactory extends UnitBlock {
     public static class GradePlan {
         int levelTo = -1;
         Item item = null;
-        String name = "";
+        String name = "null";
 
         public GradePlan(int levelTo, Item item) {
             GradePlan.this.levelTo = levelTo;
@@ -180,7 +180,7 @@ public class GradeFactory extends UnitBlock {
                     name = Core.bundle.get("@shield");
                 }
             } else {
-                name = "";
+                name = "null";
             }
         }
     }

@@ -1,7 +1,6 @@
 package Floor.FEntities.FUnit.F;
 
 import Floor.FEntities.FUnit.Override.FUnitEntity;
-import Floor.FTools.HighChange;
 import Floor.FTools.UpGradeTime;
 import arc.math.Angles;
 import arc.math.Mathf;
@@ -27,6 +26,7 @@ import mindustry.io.TypeIO;
 import mindustry.type.Item;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
+
 public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
     private final Seq<Integer> idList = new Seq<>();
     public float boostTime;
@@ -68,13 +68,13 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
         if (this.type.bounded) {
             offset = 0.0F;
             range = 0.0F;
-            cx = (float)Vars.world.unitHeight();
-            cy = (float)Vars.world.unitWidth();
+            cx = (float) Vars.world.unitHeight();
+            cy = (float) Vars.world.unitWidth();
             if (Vars.state.rules.limitMapArea && !this.team.isAI()) {
-                offset = (float)(Vars.state.rules.limitY * 8);
-                range = (float)(Vars.state.rules.limitX * 8);
-                cx = (float)(Vars.state.rules.limitHeight * 8) + offset;
-                cy = (float)(Vars.state.rules.limitWidth * 8) + range;
+                offset = (float) (Vars.state.rules.limitY * 8);
+                range = (float) (Vars.state.rules.limitX * 8);
+                cx = (float) (Vars.state.rules.limitHeight * 8) + offset;
+                cy = (float) (Vars.state.rules.limitWidth * 8) + range;
             }
 
             if (!Vars.net.client() || this.isLocal()) {
@@ -130,7 +130,7 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
         this.updateDrowning();
         this.hitTime -= Time.delta / 9.0F;
         this.stack.amount = Mathf.clamp(this.stack.amount, 0, this.itemCapacity());
-        this.itemTime = Mathf.lerpDelta(this.itemTime, (float)Mathf.num(this.hasItem()), 0.05F);
+        this.itemTime = Mathf.lerpDelta(this.itemTime, (float) Mathf.num(this.hasItem()), 0.05F);
         int accepted;
         if (this.mineTile != null) {
             Building core = this.closestCore();
@@ -148,11 +148,11 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
                 this.mineTimer = 0.0F;
             } else if (this.mining() && item != null) {
                 this.mineTimer += Time.delta * this.type.mineSpeed;
-                if (Mathf.chance(0.06 * (double)Time.delta)) {
+                if (Mathf.chance(0.06 * (double) Time.delta)) {
                     Fx.pulverizeSmall.at(this.mineTile.worldx() + Mathf.range(4.0F), this.mineTile.worldy() + Mathf.range(4.0F), 0.0F, item.color);
                 }
 
-                if (this.mineTimer >= 50.0F + (this.type.mineHardnessScaling ? (float)item.hardness * 15.0F : 15.0F)) {
+                if (this.mineTimer >= 50.0F + (this.type.mineHardnessScaling ? (float) item.hardness * 15.0F : 15.0F)) {
                     this.mineTimer = 0.0F;
                     if (Vars.state.rules.sector != null && this.team() == Vars.state.rules.defaultTeam) {
                         Vars.state.rules.sector.info.handleProduction(item, 1);
@@ -196,8 +196,8 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
             index = 0;
 
             label318:
-            while(true) {
-                while(true) {
+            while (true) {
+                while (true) {
                     if (index >= this.statuses.size) {
                         break label318;
                     }
@@ -222,49 +222,27 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
                 }
             }
         }
-        speedMultiplier += speedLevel * 0.2f;
-        damageMultiplier += damageLevel * 0.2f;
-        reloadMultiplier += reloadLevel * 0.2f;
+        speedMultiplier *= (1 + speedLevel * 0.2f);
+        damageMultiplier *= (1 + damageLevel * 0.2f);
+        reloadMultiplier *= (1 + reloadLevel * 0.2f);
         heal(maxHealth * healthLevel * 0.0001f);
         if (sfa != null) {
             sfa.update(this);
         }
 
-        float damageTo = 1;
-        float speedTo = 1;
-        float reloadTo = 1;
-        float healthTo = 1;
-        float buildTo = 1;
-        float dargTo = 1;
-        for (StatusEntry se : statuses) {
-            if (se.effect instanceof HighChange hc) {
-                damageTo = Math.min(damageTo, hc.damageTo());
-                speedTo = Math.min(speedTo, hc.speedTo());
-                reloadTo = Math.min(reloadTo, hc.reloadTo());
-                healthTo = Math.min(healthTo, hc.healthTo());
-                buildTo = Math.min(buildTo, hc.buildTo());
-                dargTo = Math.min(dargTo, hc.dargTo());
-            }
-        }
-        speedMultiplier *= speedTo;
-        damageMultiplier *= damageTo;
-        reloadMultiplier *= reloadTo;
-        healthMultiplier *= healthTo;
-        buildSpeedMultiplier *= buildTo;
-        dragMultiplier *= dargTo;
-
         if (level > 60) {
             int boost2 = level - 60;
-            speedMultiplier += boost2 * 0.01f;
-            damageMultiplier += boost2 * 0.01f;
-            reloadMultiplier += boost2 * 0.01f;
+            healthMultiplier *= (float) Math.pow(1.01f, boost2);
+            speedMultiplier *= (float) Math.pow(1.01f, boost2);
+            damageMultiplier *= (float) Math.pow(1.01f, boost2);
+            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
         }
 
         if (boostTime > 0) {
-            speedMultiplier = speedMultiplier + boostTime / 100;
-            damageMultiplier = damageMultiplier + boostTime / 100;
-            reloadMultiplier = reloadMultiplier + boostTime / 100;
-            healthMultiplier = healthMultiplier + boostTime / 100;
+            speedMultiplier *= (float) Math.pow(1.01f, boostTime);
+            damageMultiplier *= (float) Math.pow(1.01f, boostTime);
+            reloadMultiplier *= (float) Math.pow(1.01f, boostTime);
+            healthMultiplier *= (float) Math.pow(1.01f, boostTime);
             boostTime = Math.max(0, boostTime - Time.delta / 60);
         }
 
@@ -292,7 +270,7 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
             this.team.data().updateCount(this.type, -1);
         }
 
-        if (Vars.state.rules.unitAmmo && this.ammo < (float)this.type.ammoCapacity - 1.0E-4F) {
+        if (Vars.state.rules.unitAmmo && this.ammo < (float) this.type.ammoCapacity - 1.0E-4F) {
             this.resupplyTime += Time.delta;
             if (this.resupplyTime > 10.0F) {
                 this.type.ammoType.resupply(this);
@@ -303,7 +281,7 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
         Ability[] var10 = this.abilities;
         index = var10.length;
 
-        for(accepted = 0; accepted < index; ++accepted) {
+        for (accepted = 0; accepted < index; ++accepted) {
             Ability a = var10[accepted];
             a.update(this);
         }
@@ -382,7 +360,7 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
         WeaponMount[] var16 = this.mounts;
         index = var16.length;
 
-        for(accepted = 0; accepted < index; ++accepted) {
+        for (accepted = 0; accepted < index; ++accepted) {
             WeaponMount mount = var16[accepted];
             mount.weapon.update(this, mount);
         }
