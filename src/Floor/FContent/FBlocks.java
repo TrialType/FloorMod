@@ -1,5 +1,6 @@
 package Floor.FContent;
 
+import Floor.FEntities.FBlock.ElectricFence;
 import Floor.FEntities.FBlock.GradeFactory;
 import Floor.FEntities.FBlock.KnockingTurret;
 import Floor.FEntities.FBulletType.AroundBulletType;
@@ -28,7 +29,7 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
-    public static Block fourNet, filariasis, smallWind, smallWindTurret;
+    public static Block fourNet, filariasis, smallWindTurret,eleFence;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -211,6 +212,11 @@ public class FBlocks {
             }});
 
             requirements(Category.turret, ItemStack.with(Items.titanium, 4999,
+                    Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
+        }};
+//======================================================================================================================
+        eleFence = new ElectricFence("eleFence"){{
+            requirements(Category.defense, ItemStack.with(Items.titanium, 4999,
                     Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
         }};
     }

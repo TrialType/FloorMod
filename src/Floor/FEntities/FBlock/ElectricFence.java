@@ -1,14 +1,22 @@
 package Floor.FEntities.FBlock;
 
+import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
 import arc.math.Angles;
-import arc.math.geom.Point2;
+import arc.math.Mathf;
 import arc.struct.Seq;
+import arc.util.Time;
 import mindustry.content.StatusEffects;
+import mindustry.core.Renderer;
 import mindustry.entities.Units;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.gen.Unit;
+import mindustry.graphics.Drawf;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.world.Block;
 import mindustry.world.Tile;
@@ -21,21 +29,56 @@ import static arc.util.Time.*;
 import static mindustry.Vars.*;
 
 public class ElectricFence extends Block {
+    private final static FenceNet owner = new FenceNet();
     public boolean air = false;
-    public float maxLength = 50;
+    public float maxLength = 400;
     public int maxConnect = 2;
-    public float eleDamage = 1 * 60f;
+    public float eleDamage = 0.1f;
     public StatusEffect statusEffect = StatusEffects.burning;
     public float statusTime = 240;
-    public float maxFenceSize = 15;
+    public float maxFenceSize = 90;
     public float backTime = 600;
 
     public ElectricFence(String name) {
         super(name);
 
         update = solid = true;
+        configurable = true;
+        swapDiagonalPlacement = true;
 
-        config(Point2.class, ElectricFenceBuild::getLink);
+        config(Integer.class, (build, inter) -> {
+
+            ElectricFenceBuild e = (ElectricFenceBuild) build;
+            if (e != null) {
+                Building b = world.build(inter);
+                if (b instanceof ElectricFenceBuild efb) {
+                    FenceLine fl = new FenceLine(build.team, Math.max(e.maxFenceSizes, efb.maxFenceSizes), e, efb);
+                    if (owner.find(fl.point) == null && e.builds.size < maxConnect && efb.builds.size < efb.maxConnects) {
+                        e.builds.add(efb);
+                        efb.builds.add(e);
+                        owner.addLine(fl);
+                    } else if (e.builds.indexOf(efb) >= 0) {
+                        e.builds.remove(efb);
+                        efb.builds.remove(e);
+                        owner.removeLine(fl.point);
+                    }
+                }
+            }
+        });
+    }
+
+    protected void setupColor(float satisfaction) {
+        Draw.color(Color.white, Pal.powerLight, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f));
+        Draw.alpha(Renderer.laserOpacity);
+    }
+
+    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2) {
+        float angle1 = Angles.angle(x1, y1, x2, y2),
+                vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
+                len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
+
+        Drawf.laser(Core.atlas.find(""), Core.atlas.find(""),
+                x1 + vx * len1, y1 + vy * len1, x2 - vx * len2, y2 - vy * len2, 0.25f);
     }
 
     public static class Line2 {
@@ -70,7 +113,14 @@ public class ElectricFence extends Block {
         }
 
         public void removeLine(Line2 l) {
-            lines.remove(l);
+            Line2 rl = null;
+            for (Line2 l2 : lines.keySet()) {
+                if (l2.equals(l)) {
+                    rl = l2;
+                    break;
+                }
+            }
+            lines.remove(rl);
         }
 
         public FenceLine find(Line2 l) {
@@ -93,14 +143,19 @@ public class ElectricFence extends Block {
             if (couldUp < builds.size) return;
             couldUp = 0;
 
+            Seq<Line2> integers = new Seq<>();
             lines.forEach((i, l) -> {
                 ElectricFenceBuild[] bs = l.twoPoint();
                 if (bs[0] == null || bs[1] == null) {
-                    lines.remove(i);
+                    integers.add(i);
                 } else {
                     l.update();
                 }
             });
+            for (Line2 l2 : integers) {
+                lines.remove(l2);
+            }
+
         }
     }
 
@@ -116,6 +171,7 @@ public class ElectricFence extends Block {
         public final float maxFenceSize;
         public final Seq<Unit> stopUnits;
         public boolean broken;
+        public float go;
 
         public ElectricFenceBuild[] twoPoint() {
             ElectricFenceBuild[] builds = new ElectricFenceBuild[2];
@@ -139,8 +195,8 @@ public class ElectricFence extends Block {
             y = (y1 + y2) / 2;
             half = (float) (Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) / 2);
             rotate = Angles.angle(x1, y1, x2, y2) % 180;
-
-            point = new Line2(rotate, half);
+            float p = x * Math.max(world.width(), world.height()) * 8 * 180 + y * 180 + rotate;
+            point = new Line2(p, half);
 
             maxFenceSize = max;
             broken = false;
@@ -148,11 +204,11 @@ public class ElectricFence extends Block {
         }
 
         public void broken() {
-            float sum = 0;
+            go = 0;
             for (Unit u : stopUnits) {
-                sum += u.hitSize;
+                go += u.hitSize;
             }
-            if (sum >= maxFenceSize) {
+            if (go >= maxFenceSize) {
                 broken = true;
                 stopUnits.clear();
             }
@@ -183,6 +239,12 @@ public class ElectricFence extends Block {
                 if (inRange(len, u)) {
                     stopUnits.add(u);
 
+                    u.vel.setAngle(rotate);
+                    float udx = u.vel.x;
+                    u.vel.setZero();
+                    u.vel.set(udx, 0);
+                    u.vel.setAngle(rotate);
+
                     u.damage(eleDamage);
                     u.apply(statusEffect, statusTime);
                 }
@@ -194,7 +256,7 @@ public class ElectricFence extends Block {
             float uy = u.y;
             float angle = Angles.angleDist(rotate, Angles.angle(x, y, ux, uy));
             angle = Math.min(angle, 180 - angle);
-            if (angle <= 5f && len * Math.cos(Math.toRadians(angle)) <= half) {
+            if (angle <= 10f && len * Math.cos(Math.toRadians(angle)) <= half) {
                 if (air && !(u.physref.body.layer == 4)) {
                     return true;
                 } else return !air && u.isGrounded();
@@ -204,9 +266,9 @@ public class ElectricFence extends Block {
     }
 
     public class ElectricFenceBuild extends Building {
-        public static FenceNet owner = new FenceNet();
+        public final Seq<ElectricFenceBuild> builds = new Seq<>();
         public float maxFenceSizes;
-        public static float damageTimer = 0;
+        public float maxConnects;
 
         @Override
         public void updateTile() {
@@ -220,19 +282,42 @@ public class ElectricFence extends Block {
             super.updateTile();
         }
 
-        public void getLink(Point2 p) {
-            if (!within(p.x, p.y, maxLength)) {
-                return;
+        @Override
+        public boolean onConfigureBuildTapped(Building other) {
+            if (other instanceof ElectricFenceBuild && other.within(this, maxLength) && other != this) {
+                configure(other.pos());
+                return false;
             }
-            Building b = world.buildWorld(p.x, p.y);
-            if ( b instanceof ElectricFenceBuild efb) {
-                FenceLine fl = new FenceLine(team, Math.max(maxFenceSizes, efb.maxFenceSizes), this, efb);
-                if (owner.find(fl.point) == null) {
-                    owner.addLine(fl);
-                } else {
-                    owner.removeLine(fl.point);
+            return true;
+        }
+
+        public void drawConfigure() {
+            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
+            Drawf.circles(x, y, maxLength);
+            builds.each(i -> Drawf.square(i.x, i.y, i.block.size * tilesize / 2f + 1f, Pal.place));
+        }
+
+        @Override
+        public void draw() {
+            super.draw();
+
+            if (isPayload()) return;
+
+
+            setupColor(0.5f);
+
+            for (int i = 0; i < builds.size; i++) {
+                ElectricFenceBuild link = builds.get(i);
+                FenceLine fl = new FenceLine(team, maxConnect, this, link);
+                FenceLine f = owner.find(fl.point);
+                if(f != null){
+                    Draw.z(Layer.power);
+
+                    drawLaser(x, y, link.x, link.y, size, link.block.size);
                 }
             }
+
+            Draw.reset();
         }
 
         @Override
@@ -248,10 +333,9 @@ public class ElectricFence extends Block {
             this.rotation = rotation;
             this.tile = tile;
 
-
             owner.builds.add(this);
-            damageTimer = 0;
             maxFenceSizes = maxFenceSize;
+            maxConnects = maxConnect;
 
             this.set(tile.drawx(), tile.drawy());
             if (shouldAdd) {
