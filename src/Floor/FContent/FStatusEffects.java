@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import arc.graphics.Color;
 import arc.math.Interp;
+import arc.struct.Seq;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.effect.MultiEffect;
@@ -9,6 +10,7 @@ import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
 
 public class FStatusEffects {
+    public final static Seq<StatusEffect> burnings = new Seq<>();
     public static StatusEffect StrongStop, boostSpeed, suppressII, slowII, HardHit, High_tension, fastII, High_tensionII,
             burningV, High_tensionIII;
 
@@ -108,8 +110,11 @@ public class FStatusEffects {
             healthMultiplier = 0.7f;
             damage = 90;
         }};
-        burningV = new StatusEffect("burningII"){{
+        burningV = new StatusEffect("burningII") {{
             damage = 6.5f;
         }};
+
+
+        burnings.add(StatusEffects.burning, burningV);
     }
 }

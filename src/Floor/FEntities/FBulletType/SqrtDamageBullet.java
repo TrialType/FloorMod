@@ -14,18 +14,22 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static java.lang.Math.*;
 
 public class SqrtDamageBullet extends ContinuousBulletType {
+    private final Map<Bullet, Float> bulletsReload = new HashMap<>();
     public float sqrtLength = 320;
     public float halfWidth = 120;
-    private float timer = 12;
 
     public void applyDamage(Bullet b) {
-        timer = timer + Time.delta;
+        bulletsReload.replaceAll((bu, f) -> f + Time.delta);
+        float timer = bulletsReload.computeIfAbsent(b, f -> 0f);
         if (timer >= 6) {
             FDamage.SqrtDamage(b, b.team, damage, b.x, b.y, b.rotation(), sqrtLength, halfWidth);
-            timer = 0;
+            bulletsReload.put(b, 0f);
         }
     }
 

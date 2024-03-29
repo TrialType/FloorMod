@@ -2,14 +2,15 @@ package Floor.FContent;
 
 import Floor.FEntities.FBlock.GradeFactory;
 import Floor.FEntities.FBlock.KnockingTurret;
-import Floor.FEntities.FBlock.WindTurret;
 import Floor.FEntities.FBulletType.AroundBulletType;
+import Floor.FEntities.FBulletType.WindBulletType;
 import arc.graphics.Color;
 import mindustry.content.Fx;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.PointBulletType;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
@@ -27,7 +28,7 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
-    public static Block fourNet, filariasis, smallWind;
+    public static Block fourNet, filariasis, smallWind, smallWindTurret;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -57,16 +58,6 @@ public class FBlocks {
             health = 650;
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
-        }};
-
-        smallWind = new WindTurret("small_wind") {{
-            size = 2;
-            health = 114514;
-
-            liquidStatus.put(Liquids.water, FStatusEffects.burningV);
-
-            requirements(Category.effect, ItemStack.with(Items.titanium, 1,
-                    Items.copper, 1));
         }};
 
 //======================================================================================================================
@@ -134,6 +125,41 @@ public class FBlocks {
                 status = StatusEffects.burning;
                 statusDuration = 300;
                 hitEffect = despawnEffect = Fx.none;
+            }});
+        }};
+
+        smallWindTurret = new ItemTurret("smallWindTurret") {{
+            requirements(Category.turret, ItemStack.with(Items.titanium, 50,
+                    Items.copper, 120, Items.graphite, 120));
+
+            hasItems = true;
+            itemCapacity = 32;
+            maxAmmo = 32;
+            consumeAmmoOnce = false;
+            shootX = shootY = 0;
+
+            range = 500;
+            reload = 150;
+            size = 2;
+            clipSize = 2;
+            health = 900;
+
+            ammoTypes.put(Items.copper, new PointBulletType() {{
+                trailEffect = Fx.none;
+                damage = 0;
+                lifetime = 600;
+                speed = 500;
+                trailSpacing = 20f;
+
+                fragAngle = 0;
+                fragRandomSpread = 0;
+                fragSpread = 0;
+                fragOnAbsorb = fragOnHit = true;
+                fragBullets = 1;
+                fragBullet = new WindBulletType() {{
+                    lifetime = 600;
+                    damage = 0;
+                }};
             }});
         }};
 

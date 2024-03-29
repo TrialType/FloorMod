@@ -1,6 +1,6 @@
 package Floor.FTools;
 
-import Floor.FContent.FEvents;
+import Floor.FContent.FStatusEffects;
 import arc.Events;
 import arc.func.Cons;
 import arc.math.Angles;
@@ -9,13 +9,15 @@ import arc.math.geom.Rect;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.Nullable;
-import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.core.World;
 import mindustry.entities.Damage;
+import mindustry.entities.Fires;
 import mindustry.entities.Units;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.*;
+import mindustry.type.StatusEffect;
 import mindustry.world.Tile;
 
 import static java.lang.Math.*;
@@ -26,7 +28,9 @@ public class FDamage extends Damage {
     private static final EventType.UnitDamageEvent bulletDamageEvent = new EventType.UnitDamageEvent();
     private static final Vec2 vec = new Vec2();
     private static final Rect rect = new Rect();
-    private FDamage(){}
+
+    private FDamage() {
+    }
 
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source) {
         Cons<Unit> cons = unit -> {
@@ -132,4 +136,46 @@ public class FDamage extends Damage {
 
     }
 
+    public static void triangleDamage(Bullet bullet, Team team, float damage, float x, float y, float rotation, float length, float width, float power, StatusEffect statusEffect, float time) {
+        float maxLen = max(length, width) * 1.5f;
+        Units.nearbyEnemies(team, x, y, maxLen, u -> {
+            float angle = Angles.angleDist(rotation, Angles.angle(x, y, u.x, u.y));
+            float len = (float) sqrt((u.x - x) * (u.x - x) + (u.y - y) * (u.y - y));
+            if (angle <= 90 && (width / length) - tan(toRadians(angle)) >= -0.01f && len * cos(toRadians(angle)) - length <= 0) {
+                boolean dead = u.dead;
+                u.damage(damage);
+                u.apply(statusEffect, time);
+
+                vec.set(u.x - x, u.y - y);
+                vec.setLength(power);
+                u.moveAt(vec);
+
+                if (!dead && u.dead) {
+                    if (bullet != null) {
+                        Events.fire(new EventType.UnitBulletDestroyEvent(u, bullet));
+                    }
+                }
+            }
+        });
+        Units.nearbyBuildings(x, y, maxLen, b -> {
+            if (b.team != team) {
+                float angle = Angles.angleDist(rotation, Angles.angle(x, y, b.x, b.y));
+                float len = (float) sqrt((b.x - x) * (b.x - x) + (b.y - y) * (b.y - y));
+                if (angle <= 90 && (width / length) - tan(toRadians(angle)) >= -0.01f && len * cos(toRadians(angle)) - length <= 0) {
+                    boolean dead = b.dead;
+                    b.damage(damage);
+
+                    if (FStatusEffects.burnings.indexOf(statusEffect) >= 0) {
+                        Fires.create(b.tile);
+                    }
+
+                    if (!dead && b.dead) {
+                        if (bullet != null) {
+                            Events.fire(new EventType.BuildingBulletDestroyEvent(b, bullet));
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
