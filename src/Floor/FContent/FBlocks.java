@@ -6,22 +6,22 @@ import Floor.FEntities.FBlock.KnockingTurret;
 import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import arc.graphics.Color;
-import mindustry.content.Fx;
-import mindustry.content.Items;
-import mindustry.content.Liquids;
-import mindustry.content.StatusEffects;
+import mindustry.content.*;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.LaserBoltBulletType;
 import mindustry.entities.bullet.PointBulletType;
+import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
-import mindustry.world.consumers.Consume;
+import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.consumers.ConsumePower;
 
 import static mindustry.type.ItemStack.with;
@@ -29,7 +29,8 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
-    public static Block fourNet, filariasis, smallWindTurret, eleFence;
+    public static Block eleFence;
+    public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -63,7 +64,7 @@ public class FBlocks {
 
 //======================================================================================================================
 
-        filariasis = new ItemTurret("filariasis") {{
+        fireStream = new ItemTurret("fire_stream") {{
             requirements(Category.turret, ItemStack.with(Items.titanium, 170,
                     Items.copper, 240, Items.graphite, 350));
 
@@ -129,25 +130,53 @@ public class FBlocks {
                 hitEffect = despawnEffect = Fx.none;
             }});
         }};
+        stay = new PowerTurret("stay") {{
+            consume(new ConsumePower(12, 72, false));
 
-        smallWindTurret = new ItemTurret("smallWindTurret") {{
+            health = 200;
+            size = 2;
+
+            range = 60;
+            reload = 12;
+            consumesPower = true;
+            hasPower = true;
+            consumeAmmoOnce = false;
+
+            shootType = new LaserBoltBulletType(9, 8) {{
+                rangeOverride = 60;
+                lightColor = Pal.redLight;
+                status = FStatusEffects.StrongStop;
+                statusDuration = 12;
+                splashDamageRadius = 20;
+            }};
+
+            requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 30));
+        }};
+        smallWindTurret = new ItemTurret("small_wind_turret") {{
             requirements(Category.turret, ItemStack.with(Items.titanium, 50,
                     Items.copper, 120, Items.graphite, 120));
 
             hasItems = true;
-            itemCapacity = 32;
-            maxAmmo = 32;
+            itemCapacity = 15;
+            maxAmmo = 15;
             consumeAmmoOnce = false;
             shootX = shootY = 0;
 
-            range = 500;
-            reload = 150;
-            size = 2;
-            clipSize = 2;
-            health = 900;
+            range = 200;
+            reload = 240;
+            size = 3;
+            clipSize = 3;
+            health = 1300;
 
-            ammoTypes.put(Items.copper, new PointBulletType() {{
-                trailEffect = Fx.none;
+            ammoTypes.put(Items.blastCompound, new PointBulletType() {{
+                trailEffect = new ExplosionEffect() {{
+                    smokeColor = Pal.darkerGray;
+                    sparks = 0;
+                    waveLife = 0;
+                    smokes = 15;
+                    lifetime = 180;
+                }};
+
                 damage = 0;
                 lifetime = 600;
                 speed = 500;
@@ -158,13 +187,121 @@ public class FBlocks {
                 fragSpread = 0;
                 fragOnAbsorb = fragOnHit = true;
                 fragBullets = 1;
+
                 fragBullet = new WindBulletType() {{
+                    collides = false;
+                    absorbable = hittable = reflectable = false;
                     lifetime = 600;
-                    damage = 0;
+                    damage = 0.5f;
+                    windPower = 0.3f;
+                    applyEffect = FStatusEffects.burningIII;
                 }};
             }});
         }};
+        middleWindTurret = new ItemTurret("middle_wind_turret") {{
+            requirements(Category.turret, ItemStack.with(Items.titanium, 900,
+                    Items.copper, 1000, Items.graphite, 780));
 
+            consume(new ConsumePower(500, 1500, false));
+
+            hasItems = true;
+            itemCapacity = 32;
+            maxAmmo = 32;
+            consumeAmmoOnce = false;
+            shootX = shootY = 0;
+
+            range = 500;
+            reload = 360;
+            size = 4;
+            clipSize = 4;
+            health = 2000;
+
+            ammoTypes.put(Items.blastCompound, new PointBulletType() {{
+                ammoMultiplier = 0.5f;
+
+                trailEffect = new ExplosionEffect() {{
+                    smokeColor = Pal.darkPyraFlame;
+                    sparks = 0;
+                    waveLife = 0;
+                    smokes = 40;
+                    smokeSize = 6;
+                    lifetime = 240;
+                }};
+
+                damage = 0;
+                lifetime = 600;
+                speed = 500;
+                trailSpacing = 20f;
+
+                fragAngle = 0;
+                fragRandomSpread = 0;
+                fragSpread = 0;
+                fragOnAbsorb = fragOnHit = true;
+                fragBullets = 1;
+
+                fragBullet = new WindBulletType() {{
+                    collides = false;
+                    absorbable = hittable = reflectable = false;
+                    lifetime = 900;
+                    damage = 1f;
+                    windPower = 0.6f;
+                    applyEffect = FStatusEffects.burningIV;
+                }};
+            }});
+        }};
+        largeWindTurret = new ItemTurret("large_wind_turret") {{
+            requirements(Category.turret, ItemStack.with(Items.titanium, 2000,
+                    Items.copper, 2600, Items.graphite, 1800));
+
+            consume(new ConsumePower(5000, 20000, false));
+
+            hasItems = true;
+            itemCapacity = 90;
+            maxAmmo = 90;
+            consumeAmmoOnce = false;
+            shootX = shootY = 0;
+
+            range = 1000;
+            reload = 360;
+            size = 5;
+            clipSize = 5;
+            health = 8000;
+
+            ammoTypes.put(Items.blastCompound, new PointBulletType() {{
+                ammoMultiplier = 0.1f;
+
+                trailEffect = new ExplosionEffect() {{
+                    smokeColor = Pal.darkPyraFlame;
+                    sparks = 0;
+                    waveLife = 0;
+                    smokes = 60;
+                    smokeSize = 12;
+                    lifetime = 300;
+                }};
+
+                damage = 0;
+                lifetime = 600;
+                speed = 500;
+                trailSpacing = 20f;
+
+                fragAngle = 0;
+                fragRandomSpread = 0;
+                fragSpread = 0;
+                fragOnAbsorb = fragOnHit = true;
+                fragBullets = 1;
+
+                fragBullet = new WindBulletType() {{
+                    collides = false;
+                    absorbable = hittable = reflectable = false;
+                    lifetime = 1200;
+                    damage = 2f;
+                    windPower = 1f;
+                    windWidth = 600;
+                    windLength = 300;
+                    applyEffect = FStatusEffects.burningV;
+                }};
+            }});
+        }};
         fourNet = new LiquidTurret("four_net") {{
             scaledHealth = 10000;
             armor = 55;
@@ -174,27 +311,27 @@ public class FBlocks {
             reload = 180;
             range = 360;
             rotateSpeed = 12;
-            liquidCapacity = 5;
+            liquidCapacity = 12;
             consumeAmmoOnce = false;
             inaccuracy = 0;
 
             hasPower = true;
             consumesPower = true;
 
-            consumers = new Consume[]{new ConsumePower(1000, 100000, true)};
+            consume(new ConsumePower(1000, 100000, false));
 
             shoot = new ShootSpread() {{
                 shots = 2;
                 spread = 3;
             }};
-            ammoTypes.put(Liquids.water, new AroundBulletType() {{
-                ammoMultiplier = 100;
+            ammoTypes.putAll(Liquids.water, new AroundBulletType() {{
+                ammoMultiplier = 5;
 
                 lifetime = 3600;
                 speed = 4;
                 damage = 500;
                 splashDamage = 500;
-                splashDamageRadius = 500;
+                splashDamageRadius = 300;
                 trailLength = 25;
                 trailChance = 1;
                 status = StatusEffects.wet;
@@ -208,7 +345,30 @@ public class FBlocks {
                 frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
                 applyEffect = new WaveEffect() {{
                     colorFrom = colorTo = Color.valueOf("01066FAA");
-                    lifetime = 180;
+                    lifetime = 240;
+                }};
+            }}, Liquids.slag, new AroundBulletType() {{
+                ammoMultiplier = 5;
+
+                lifetime = 3600;
+                speed = 4;
+                damage = 700;
+                splashDamage = 700;
+                splashDamageRadius = 300;
+                trailLength = 25;
+                trailChance = 1;
+                status = FStatusEffects.burningIV;
+                statusDuration = 240;
+
+                targetRange = 1000;
+                circleRange = 160;
+
+                statusTime = 240;
+                statusEffect = FStatusEffects.burningV;
+                frontColor = backColor = lightColor = trailColor = Pal.darkFlame;
+                applyEffect = new WaveEffect() {{
+                    colorFrom = colorTo = Pal.darkFlame;
+                    lifetime = 240;
                 }};
             }});
 
@@ -216,7 +376,7 @@ public class FBlocks {
                     Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
         }};
 //======================================================================================================================
-        eleFence = new ElectricFence("eleFence") {{
+        eleFence = new ElectricFence("ele_fence") {{
             health = 300;
             size = 2;
             clipSize = 2;

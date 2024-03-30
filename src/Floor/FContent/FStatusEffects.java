@@ -108,40 +108,40 @@ public class FStatusEffects {
             healthMultiplier = 0.85f;
             damage = 13;
         }};
-        High_tensionIII = new StatusEffect("high_tensionII") {{
+        High_tensionIII = new StatusEffect("High_tensionIII") {{
             speedMultiplier = 0.45f;
             reloadMultiplier = 0.45f;
             healthMultiplier = 0.8f;
             damage = 20;
         }};
-        High_tensionIV = new StatusEffect("high_tensionII") {{
+        High_tensionIV = new StatusEffect("High_tensionIV") {{
             speedMultiplier = 0.24f;
             reloadMultiplier = 0.24f;
             healthMultiplier = 0.75f;
             damage = 34;
         }};
-        High_tensionV = new StatusEffect("high_tensionIII") {{
+        High_tensionV = new StatusEffect("High_tensionV") {{
             speedMultiplier = 0.1f;
             reloadMultiplier = 0.1f;
             healthMultiplier = 0.7f;
             damage = 90;
         }};
-        burningII = new StatusEffect("burningI") {{
+        burningII = new StatusEffect("burningII") {{
             damage = 0.7f;
             transitionDamage = 12;
             effect = Fx.burning;
         }};
-        burningIII = new StatusEffect("burningI") {{
+        burningIII = new StatusEffect("burningIII") {{
             damage = 1.2f;
             transitionDamage = 18;
             effect = Fx.burning;
         }};
-        burningIV = new StatusEffect("burningI") {{
+        burningIV = new StatusEffect("burningIV") {{
             damage = 2f;
             transitionDamage = 25;
             effect = Fx.burning;
         }};
-        burningV = new StatusEffect("burningII") {{
+        burningV = new StatusEffect("burningV") {{
             damage = 3.5f;
             transitionDamage = 34;
             effect = Fx.burning;
