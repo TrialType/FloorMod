@@ -159,6 +159,7 @@ public class FBlocks {
             hasItems = true;
             itemCapacity = 15;
             maxAmmo = 15;
+            ammoPerShot = 5;
             consumeAmmoOnce = false;
             shootX = shootY = 0;
 
@@ -207,6 +208,7 @@ public class FBlocks {
             hasItems = true;
             itemCapacity = 32;
             maxAmmo = 32;
+            ammoPerShot = 10;
             consumeAmmoOnce = false;
             shootX = shootY = 0;
 
@@ -217,7 +219,7 @@ public class FBlocks {
             health = 2000;
 
             ammoTypes.put(Items.blastCompound, new PointBulletType() {{
-                ammoMultiplier = 0.5f;
+                ammoMultiplier = 1f;
 
                 trailEffect = new ExplosionEffect() {{
                     smokeColor = Pal.darkPyraFlame;
@@ -258,6 +260,7 @@ public class FBlocks {
             hasItems = true;
             itemCapacity = 90;
             maxAmmo = 90;
+            ammoPerShot = 15;
             consumeAmmoOnce = false;
             shootX = shootY = 0;
 
@@ -268,7 +271,7 @@ public class FBlocks {
             health = 8000;
 
             ammoTypes.put(Items.blastCompound, new PointBulletType() {{
-                ammoMultiplier = 0.1f;
+                ammoMultiplier = 1f;
 
                 trailEffect = new ExplosionEffect() {{
                     smokeColor = Pal.darkPyraFlame;
