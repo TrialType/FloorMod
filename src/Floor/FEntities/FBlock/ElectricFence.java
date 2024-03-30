@@ -5,7 +5,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.io.Reads;
@@ -22,6 +21,7 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.io.TypeIO;
 import mindustry.type.StatusEffect;
+import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.power.PowerGraph;
@@ -42,6 +42,7 @@ public class ElectricFence extends Block {
     public float statusTime = 240;
     public float maxFenceSize = 90;
     public float backTime = 600;
+
     public ElectricFence(String name) {
         super(name);
 
@@ -90,10 +91,15 @@ public class ElectricFence extends Block {
     }
 
     @Override
-    public void setBars(){
+    public void setBars() {
         super.setBars();
 
+        addBar("connections", (ElectricFenceBuild b) -> new Bar(() ->
+                Core.bundle.format("bar.powerlines", b.builds.size, maxConnect),
+                () -> Pal.items,
+                () -> (float) b.builds.size / (float) maxConnect));
     }
+
     public static class Line2 {
         public float point;
         public float halfLength;
@@ -153,7 +159,6 @@ public class ElectricFence extends Block {
         public FenceLine find(Line2 l) {
             return find(l.point, l.halfLength);
         }
-
         public FenceLine find(float point, float l) {
             FenceLine fl = null;
             for (Line2 l2 : lines.keySet()) {
@@ -163,11 +168,6 @@ public class ElectricFence extends Block {
             }
             return fl;
         }
-
-        public boolean isZero() {
-            return lines.isEmpty() && builds.isEmpty();
-        }
-
         public void update() {
             if (builds.size == 0) return;
 
@@ -188,24 +188,22 @@ public class ElectricFence extends Block {
             }
 
         }
-
         public void write(Writes write) {
             write.i(lines.size());
             lines.forEach((l, f) -> {
                 l.write(write);
                 f.write(write);
             });
-
             lines.clear();
             builds.clear();
         }
-
         public void read(Reads read) {
             int len = read.i();
             for (int i = 0; i < len; i++) {
                 Line2 l2 = new Line2(0, 0);
                 l2.read(read);
                 FenceLine fl = new FenceLine();
+                fl.point = l2;
                 fl.read(read);
                 lines.put(l2, fl);
             }
@@ -230,6 +228,7 @@ public class ElectricFence extends Block {
         public Seq<Integer> ids = new Seq<>();
         public boolean broken;
         public float go;
+
         public ElectricFenceBuild[] twoPoint() {
             ElectricFenceBuild[] builds = new ElectricFenceBuild[2];
             float dx = (float) Math.cos(Math.toRadians(rotate)) * half;
@@ -240,9 +239,11 @@ public class ElectricFence extends Block {
             builds[1] = b instanceof ElectricFenceBuild efb ? couldUse(efb) ? efb : null : null;
             return builds;
         }
+
         public boolean couldUse(ElectricFenceBuild b) {
             return !(b.dead || b.health <= 0 || !b.isAdded());
         }
+
         public FenceLine(Team team, float max, ElectricFenceBuild b1, ElectricFenceBuild b2) {
             float x1 = b1.x, x2 = b2.x, y1 = b1.y, y2 = b2.y;
             this.team = team;
@@ -250,15 +251,20 @@ public class ElectricFence extends Block {
             y = (y1 + y2) / 2;
             half = (float) (Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) / 2);
             rotate = Angles.angle(x1, y1, x2, y2);
-            float p = x * Math.max(world.width(), world.height()) * 8 * 360 + y * 360 + rotate;
+            float p = x * Math.max(world.width(), world.height()) * 8 * 180 + y * 180 + rotate % 180;
             point = new Line2(p, half);
 
             maxFenceSize = max;
             broken = false;
             stopUnits = new Seq<>();
         }
+
         public FenceLine() {
+            maxFenceSize = 40;
+            broken = false;
+            stopUnits = new Seq<>();
         }
+
         public void set(float backTime, float eleDamage, StatusEffect statusEffect, float statusTime, boolean air) {
             this.backTime = backTime;
             this.eleDamage = eleDamage;
@@ -266,6 +272,7 @@ public class ElectricFence extends Block {
             this.statusTime = statusTime;
             this.air = air;
         }
+
         public void broken() {
             go = 0;
             for (Unit u : stopUnits) {
@@ -276,6 +283,7 @@ public class ElectricFence extends Block {
                 stopUnits.clear();
             }
         }
+
         public void update() {
             if (ids.size > 0) {
                 for (int i : ids) {
@@ -297,6 +305,7 @@ public class ElectricFence extends Block {
                 }
             }
         }
+
         public void updateUnit() {
             float dx = (float) Math.cos(Math.toRadians(rotate)) * half;
             float dy = (float) Math.sin(Math.toRadians(rotate)) * half;
@@ -316,6 +325,7 @@ public class ElectricFence extends Block {
             });
             stopUnits = toStop;
         }
+
         public boolean inRange(float len, Unit u) {
             float len2 = u.vel.len();
             float ro = Angles.angleDist(u.vel.angle(), rotate);
@@ -337,6 +347,7 @@ public class ElectricFence extends Block {
             }
             return false;
         }
+
         public void write(Writes write) {
             write.f(timer);
             TypeIO.writeTeam(write, team);
@@ -346,11 +357,17 @@ public class ElectricFence extends Block {
             write.f(rotate);
             write.f(maxFenceSize);
             write.bool(broken);
+            write.f(backTime);
+            write.f(eleDamage);
+            write.str(statusEffect.name.split("-")[statusEffect.name.split("-").length - 1]);
+            write.f(statusTime);
+            write.bool(air);
             write.i(stopUnits.size);
             for (Unit u : stopUnits) {
                 write.i(u.id);
             }
         }
+
         public void read(Reads read) {
             timer = read.f();
             team = TypeIO.readTeam(read);
@@ -360,6 +377,11 @@ public class ElectricFence extends Block {
             rotate = read.f();
             maxFenceSize = read.f();
             broken = read.bool();
+            backTime = read.f();
+            eleDamage = read.f();
+            statusEffect = content.statusEffect(read.str());
+            statusTime = read.f();
+            air = read.bool();
             int num = read.i();
             for (int i = 0; i < num; i++) {
                 ids.add(read.i());
@@ -377,7 +399,7 @@ public class ElectricFence extends Block {
         public void updateTile() {
             if (ids.size > 0) {
                 for (int i = 0; i < ids.size; i++) {
-                    builds.add((ElectricFenceBuild) Groups.build.getByID(ids.get(i)));
+                    builds.add((ElectricFenceBuild) world.build(ids.get(i)));
                 }
                 ids.clear();
             }
@@ -480,28 +502,34 @@ public class ElectricFence extends Block {
 
         @Override
         public void write(Writes write) {
-            super.write(write);
-            if (!owner.isZero()) {
-                owner.write(write);
-            }
-
+            write.i(owner.lines.size());
+            owner.lines.forEach((l, f) -> {
+                l.write(write);
+                f.write(write);
+            });
             write.i(builds.size);
             for (ElectricFenceBuild b : builds) {
-                write.i(b.id);
+                write.i(b.pos());
             }
             write.f(maxFenceSizes);
             write.f(maxConnects);
-
         }
 
         @Override
         public void read(Reads read, byte revision) {
-            super.read(read, revision);
-            if (owner.isZero()) {
-                owner.read(read);
-            }
             int num = read.i();
-            for (; num > 0; num--) {
+            for (int i = 0; i < num; i++) {
+                Line2 l2 = new Line2(0, 0);
+                l2.read(read);
+                FenceLine fl = new FenceLine();
+                fl.point = l2;
+                fl.read(read);
+                if(owner.find(l2) == null){
+                    owner.lines.put(l2, fl);
+                }
+            }
+            num = read.i();
+            for (int i = 0; i < num; i++) {
                 ids.add(read.i());
             }
             maxFenceSizes = read.f();
