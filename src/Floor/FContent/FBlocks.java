@@ -29,7 +29,7 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
-    public static Block fourNet, filariasis, smallWindTurret,eleFence;
+    public static Block fourNet, filariasis, smallWindTurret, eleFence;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -215,9 +215,22 @@ public class FBlocks {
                     Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
         }};
 //======================================================================================================================
-        eleFence = new ElectricFence("eleFence"){{
-            requirements(Category.defense, ItemStack.with(Items.titanium, 4999,
-                    Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
+        eleFence = new ElectricFence("eleFence") {{
+            health = 300;
+            size = 2;
+            clipSize = 2;
+            hasPower = true;
+
+            maxLength = 200;
+            maxConnect = 5;
+            maxFenceSize = 80;
+            eleDamage = 0.3f;
+            air = true;
+
+            consume(new ConsumePower(15, 1000, true));
+
+            requirements(Category.defense, ItemStack.with(Items.titanium, 150,
+                    Items.copper, 300, Items.silicon, 150));
         }};
     }
 }
