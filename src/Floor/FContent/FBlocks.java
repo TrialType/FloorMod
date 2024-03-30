@@ -64,8 +64,8 @@ public class FBlocks {
 //======================================================================================================================
 
         filariasis = new ItemTurret("filariasis") {{
-            requirements(Category.turret, ItemStack.with(Items.titanium, 50,
-                    Items.copper, 120, Items.graphite, 120));
+            requirements(Category.turret, ItemStack.with(Items.titanium, 170,
+                    Items.copper, 240, Items.graphite, 350));
 
             hasItems = true;
             itemCapacity = 32;
@@ -73,6 +73,7 @@ public class FBlocks {
             consumeAmmoOnce = false;
             shootX = shootY = 0;
             inaccuracy = 15;
+            shootCone = 360;
 
             reload = 5;
             size = 2;
@@ -180,7 +181,7 @@ public class FBlocks {
             hasPower = true;
             consumesPower = true;
 
-            consumers = new Consume[]{new ConsumePower(1000, 1000, true)};
+            consumers = new Consume[]{new ConsumePower(1000, 100000, true)};
 
             shoot = new ShootSpread() {{
                 shots = 2;
@@ -203,7 +204,7 @@ public class FBlocks {
                 circleRange = 160;
 
                 statusTime = 240;
-                statusEffect = FStatusEffects.High_tensionIII;
+                statusEffect = FStatusEffects.High_tensionV;
                 frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
                 applyEffect = new WaveEffect() {{
                     colorFrom = colorTo = Color.valueOf("01066FAA");
