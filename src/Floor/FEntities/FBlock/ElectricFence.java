@@ -72,13 +72,13 @@ public class ElectricFence extends Block {
         Draw.alpha(Renderer.laserOpacity);
     }
 
-    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2) {
+    public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2, float thick) {
         float angle1 = Angles.angle(x1, y1, x2, y2),
                 vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1),
                 len1 = size1 * tilesize / 2f - 1.5f, len2 = size2 * tilesize / 2f - 1.5f;
 
         Drawf.laser(Core.atlas.find(""), Core.atlas.find(""),
-                x1 + vx * len1, y1 + vy * len1, x2 - vx * len2, y2 - vy * len2, 0.25f);
+                x1 + vx * len1, y1 + vy * len1, x2 - vx * len2, y2 - vy * len2, thick);
     }
 
     public static class Line2 {
@@ -169,7 +169,7 @@ public class ElectricFence extends Block {
         private final float rotate;
         public final Line2 point;
         public final float maxFenceSize;
-        public final Seq<Unit> stopUnits;
+        public Seq<Unit> stopUnits;
         public boolean broken;
         public float go;
 
@@ -194,8 +194,8 @@ public class ElectricFence extends Block {
             x = (x1 + x2) / 2;
             y = (y1 + y2) / 2;
             half = (float) (Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) / 2);
-            rotate = Angles.angle(x1, y1, x2, y2) % 180;
-            float p = x * Math.max(world.width(), world.height()) * 8 * 180 + y * 180 + rotate;
+            rotate = Angles.angle(x1, y1, x2, y2);
+            float p = x * Math.max(world.width(), world.height()) * 8 * 360 + y * 360 + rotate;
             point = new Line2(p, half);
 
             maxFenceSize = max;
@@ -231,35 +231,43 @@ public class ElectricFence extends Block {
         }
 
         public void updateUnit() {
-            stopUnits.clear();
             float dx = (float) Math.cos(Math.toRadians(rotate)) * half;
             float dy = (float) Math.sin(Math.toRadians(rotate)) * half;
             float len = (float) Math.sqrt(dx * dx + dy * dy);
+            Seq<Unit> toStop = new Seq<>();
             Units.nearbyEnemies(team, x, y, len, u -> {
                 if (inRange(len, u)) {
-                    stopUnits.add(u);
+                    toStop.add(u);
 
-                    u.vel.setAngle(rotate);
-                    float udx = u.vel.x;
-                    u.vel.setZero();
-                    u.vel.set(udx, 0);
-                    u.vel.setAngle(rotate);
+                    float ro = Angles.angleDist(u.vel.angle(), rotate);
+                    float x1 = (float) (Math.cos(Math.toRadians(ro)) * u.vel.len());
+                    u.vel.set((float) (Math.cos(Math.toRadians(ro)) * x1), (float) (Math.sin(Math.toRadians(ro)) * x1));
 
                     u.damage(eleDamage);
                     u.apply(statusEffect, statusTime);
                 }
             });
+            stopUnits = toStop;
         }
 
         public boolean inRange(float len, Unit u) {
-            float ux = u.x;
-            float uy = u.y;
-            float angle = Angles.angleDist(rotate, Angles.angle(x, y, ux, uy));
-            angle = Math.min(angle, 180 - angle);
-            if (angle <= 10f && len * Math.cos(Math.toRadians(angle)) <= half) {
-                if (air && !(u.physref.body.layer == 4)) {
-                    return true;
-                } else return !air && u.isGrounded();
+            float len2 = u.vel.len();
+            float ro = Angles.angleDist(u.vel.angle(), rotate);
+            double l = len2 * Math.sin(Math.toRadians(ro));
+
+            if (l > 0 || (stopUnits.indexOf(u) >= 0 && l >= 0)) {
+                float ux = u.x;
+                float uy = u.y;
+                float angle1 = Angles.angleDist(rotate, Angles.angle(x, y, ux, uy));
+                float len1 = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
+
+                angle1 = Math.min(angle1, 180 - angle1);
+                if (Math.sin(Math.toRadians(angle1)) * len1 <= 15f && len * Math.cos(Math.toRadians(angle1)) <= half) {
+                    if (air && !(u.physref.body.layer == 4)) {
+                        return true;
+                    } else return !air && u.isGrounded();
+                }
+                return false;
             }
             return false;
         }
@@ -272,10 +280,15 @@ public class ElectricFence extends Block {
 
         @Override
         public void updateTile() {
+            builds.removeAll(b -> b.dead || b.health <= 0 || !b.added);
+
             if (added && !dead && health > 0 && owner.builds.indexOf(this) >= 0) {
                 owner.couldUp++;
                 owner.update();
             } else {
+                for (ElectricFenceBuild b : builds) {
+                    b.builds.remove(this);
+                }
                 owner.removeBuild(this);
             }
 
@@ -303,17 +316,16 @@ public class ElectricFence extends Block {
 
             if (isPayload()) return;
 
-
-            setupColor(0.5f);
-
             for (int i = 0; i < builds.size; i++) {
                 ElectricFenceBuild link = builds.get(i);
                 FenceLine fl = new FenceLine(team, maxConnect, this, link);
                 FenceLine f = owner.find(fl.point);
-                if(f != null){
+                if (f != null) {
+                    setupColor(1 - (f.go / f.maxFenceSize));
+
                     Draw.z(Layer.power);
 
-                    drawLaser(x, y, link.x, link.y, size, link.block.size);
+                    drawLaser(x, y, link.x, link.y, size, link.block.size, 1 - 1 * (f.go / f.maxFenceSize));
                 }
             }
 
@@ -334,6 +346,7 @@ public class ElectricFence extends Block {
             this.tile = tile;
 
             owner.builds.add(this);
+            builds.clear();
             maxFenceSizes = maxFenceSize;
             maxConnects = maxConnect;
 
