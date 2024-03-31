@@ -124,26 +124,26 @@ public class FStatusEffects {
             speedMultiplier = 0.1f;
             reloadMultiplier = 0.1f;
             healthMultiplier = 0.7f;
-            damage = 90;
+            damage = 65;
         }};
         burningII = new StatusEffect("burningII") {{
-            damage = 0.7f;
-            transitionDamage = 12;
+            damage = 1.2f;
+            transitionDamage = 20;
             effect = Fx.burning;
         }};
         burningIII = new StatusEffect("burningIII") {{
-            damage = 1.2f;
-            transitionDamage = 18;
+            damage = 3.4f;
+            transitionDamage = 30;
             effect = Fx.burning;
         }};
         burningIV = new StatusEffect("burningIV") {{
-            damage = 2f;
-            transitionDamage = 25;
+            damage = 5.6f;
+            transitionDamage = 40;
             effect = Fx.burning;
         }};
         burningV = new StatusEffect("burningV") {{
-            damage = 3.5f;
-            transitionDamage = 34;
+            damage = 8f;
+            transitionDamage = 50;
             effect = Fx.burning;
         }};
 

@@ -12,7 +12,7 @@ import mindustry.gen.Bullet;
 import mindustry.graphics.Layer;
 import mindustry.type.StatusEffect;
 
-import static java.lang.Math.toRadians;
+import static java.lang.Math.*;
 
 public class WindBulletType extends BulletType {
     public float windPower = 0.15f;
@@ -22,22 +22,29 @@ public class WindBulletType extends BulletType {
     public float effectTime = 240;
     public Effect windEffect = Fx.none;
 
+    public WindBulletType() {
+        despawnEffect = hitEffect = Fx.none;
+    }
+
     public void applyDamage(Bullet b) {
-        FDamage.triangleDamage(b, b.team, damage, b.x, b.y, b.rotation(), windLength, windWidth / 2, windPower, applyEffect, effectTime);
+        FDamage.triangleDamage(b, b.team, damage, (float) (b.x - windLength / 10 * cos(toRadians(b.rotation()))),
+                (float) (b.y - windLength / 10 * sin(toRadians(b.rotation()))), b.rotation(),
+                windLength, windWidth / 2, windPower, applyEffect, effectTime);
     }
 
     @Override
     public void draw(Bullet b) {
         float rot = b.rotation();
         Draw.z(Layer.shields);
-        Lines.stroke(1.5f);
+        Lines.stroke(0.01f);
         Draw.alpha(0.09f);
-        float bx = b.x;
-        float by = b.y;
-        float x1 = (float) (bx + windLength * Math.cos(Math.toRadians(rot)));
-        float y1 = (float) (by + windLength * Math.sin(Math.toRadians(rot)));
-        float dx = (float) (windWidth * Math.cos(toRadians(rot + 90)) / 2);
-        float dy = (float) (windWidth * Math.sin(toRadians(rot + 90)) / 2);
+        Draw.color(trailColor);
+        float bx = (float) (b.x - windLength / 10 * cos(toRadians(rot)));
+        float by = (float) (b.y - windLength / 10 * sin(toRadians(rot)));
+        float x1 = (float) (bx + windLength * cos(Math.toRadians(rot)));
+        float y1 = (float) (by + windLength * sin(Math.toRadians(rot)));
+        float dx = (float) (windWidth * cos(toRadians(rot + 90)) / 2);
+        float dy = (float) (windWidth * sin(toRadians(rot + 90)) / 2);
         Fill.tri(bx, by, x1 + dx, y1 + dy, x1 - dx, y1 - dy);
         Draw.reset();
     }

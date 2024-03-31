@@ -43,6 +43,11 @@ public class AroundBulletType extends BasicBulletType {
             vec2.set((float) (tx + circleRange * Math.cos(Math.toRadians(angle)) - bx), (float) (ty + circleRange * Math.sin(Math.toRadians(angle)) - by));
             vec2.setLength(speed);
             b.vel.set(vec2);
+        } else if (b instanceof AroundBullet ab && ab.target != null) {
+            Vec2 vec2 = new Vec2();
+            vec2.set(ab.target.x - ab.x, ab.target.y - ab.y);
+            vec2.setLength(speed);
+            ab.move(vec2);
         }
     }
 

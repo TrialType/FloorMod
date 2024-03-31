@@ -11,6 +11,7 @@ import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.LaserBoltBulletType;
 import mindustry.entities.bullet.PointBulletType;
 import mindustry.entities.effect.ExplosionEffect;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
@@ -22,6 +23,7 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
 import static mindustry.type.ItemStack.with;
@@ -30,7 +32,7 @@ public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
     public static Block eleFence;
-    public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay;
+    public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay, bind;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -131,30 +133,76 @@ public class FBlocks {
             }});
         }};
         stay = new PowerTurret("stay") {{
-            consume(new ConsumePower(12, 72, false));
+            consume(new ConsumePower(12, 0, false));
 
             health = 200;
             size = 2;
 
-            range = 60;
-            reload = 12;
+            recoil = 0.8f;
+            range = 100;
+            reload = 30;
             consumesPower = true;
             hasPower = true;
             consumeAmmoOnce = false;
 
-            shootType = new LaserBoltBulletType(9, 8) {{
+            shootType = new LaserBoltBulletType(4, 8) {{
+                lifetime = 30;
                 rangeOverride = 60;
-                lightColor = Pal.redLight;
+                lightColor = frontColor = backColor = Pal.redLight;
                 status = FStatusEffects.StrongStop;
-                statusDuration = 12;
-                splashDamageRadius = 20;
+                statusDuration = 24;
+                splashDamageRadius = 45;
+
+                shootEffect = Fx.none;
+                hitEffect = new WaveEffect() {{
+                    lifetime = 26;
+                    sizeTo = sizeFrom = 45;
+                    strokeFrom = 2;
+                    strokeTo = 0;
+                    colorFrom = colorTo = Pal.redLight;
+                }};
+                despawnEffect = hitEffect;
             }};
 
             requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 30));
         }};
+        bind = new PowerTurret("bind") {{
+            consume(new ConsumePower(146, 0, false));
+
+            health = 1000;
+            size = 3;
+
+            recoil = 1.3f;
+            range = 200;
+            reload = 60;
+            consumesPower = true;
+            hasPower = true;
+            consumeAmmoOnce = false;
+
+            shootType = new LaserBoltBulletType(4.5f, 16) {{
+                rangeOverride = 200;
+                lightColor = frontColor = backColor = Pal.redLight;
+                status = FStatusEffects.StrongStop;
+                statusDuration = 45;
+                splashDamageRadius = 60;
+
+                shootEffect = Fx.none;
+                hitEffect = new WaveEffect() {{
+                    lifetime = 30;
+                    sizeTo = sizeFrom = 60;
+                    strokeFrom = 2;
+                    strokeTo = 0;
+                    colorFrom = colorTo = Pal.redLight;
+                }};
+                despawnEffect = hitEffect;
+            }};
+
+            requirements(Category.turret, ItemStack.with(Items.copper, 350, Items.titanium, 650, Items.graphite, 500));
+        }};
         smallWindTurret = new ItemTurret("small_wind_turret") {{
             requirements(Category.turret, ItemStack.with(Items.titanium, 50,
                     Items.copper, 120, Items.graphite, 120));
+            coolant = consume(new ConsumeCoolant(0.3f));
 
             hasItems = true;
             itemCapacity = 15;
@@ -164,7 +212,7 @@ public class FBlocks {
             shootX = shootY = 0;
 
             range = 200;
-            reload = 240;
+            reload = 600;
             size = 3;
             clipSize = 3;
             health = 1300;
@@ -194,7 +242,7 @@ public class FBlocks {
                     absorbable = hittable = reflectable = false;
                     lifetime = 600;
                     damage = 0.5f;
-                    windPower = 0.3f;
+                    windPower = 0.45f;
                     applyEffect = FStatusEffects.burningIII;
                 }};
             }});
@@ -204,6 +252,7 @@ public class FBlocks {
                     Items.copper, 1000, Items.graphite, 780));
 
             consume(new ConsumePower(500, 1500, false));
+            coolant = consume(new ConsumeCoolant(0.8f));
 
             hasItems = true;
             itemCapacity = 32;
@@ -213,7 +262,7 @@ public class FBlocks {
             shootX = shootY = 0;
 
             range = 500;
-            reload = 360;
+            reload = 900;
             size = 4;
             clipSize = 4;
             health = 2000;
@@ -244,9 +293,9 @@ public class FBlocks {
                 fragBullet = new WindBulletType() {{
                     collides = false;
                     absorbable = hittable = reflectable = false;
-                    lifetime = 900;
+                    lifetime = 850;
                     damage = 1f;
-                    windPower = 0.6f;
+                    windPower = 0.65f;
                     applyEffect = FStatusEffects.burningIV;
                 }};
             }});
@@ -256,6 +305,7 @@ public class FBlocks {
                     Items.copper, 2600, Items.graphite, 1800));
 
             consume(new ConsumePower(5000, 20000, false));
+            coolant = consume(new ConsumeCoolant(1.5f));
 
             hasItems = true;
             itemCapacity = 90;
@@ -265,7 +315,7 @@ public class FBlocks {
             shootX = shootY = 0;
 
             range = 1000;
-            reload = 360;
+            reload = 1200;
             size = 5;
             clipSize = 5;
             health = 8000;
@@ -296,9 +346,9 @@ public class FBlocks {
                 fragBullet = new WindBulletType() {{
                     collides = false;
                     absorbable = hittable = reflectable = false;
-                    lifetime = 1200;
+                    lifetime = 1000;
                     damage = 2f;
-                    windPower = 1f;
+                    windPower = 0.85f;
                     windWidth = 600;
                     windLength = 300;
                     applyEffect = FStatusEffects.burningV;
