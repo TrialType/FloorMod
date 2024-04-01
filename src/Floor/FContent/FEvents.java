@@ -106,7 +106,11 @@ public class FEvents {
 
         Events.on(EventType.UnitBulletDestroyEvent.class, e -> {
             if (e.bullet.owner instanceof FBuildUpGrade fug) {
-                fug.addExp(e.unit.maxHealth);
+                if (e.unit instanceof FUnitUpGrade uug) {
+                    fug.addExp(e.unit.maxHealth * Math.max(1, uug.getLevel() / 15));
+                } else {
+                    fug.addExp(e.unit.maxHealth);
+                }
             }
         });
         Events.on(EventType.BuildingBulletDestroyEvent.class, e -> {

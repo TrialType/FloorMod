@@ -69,8 +69,13 @@ public class FBlocks {
 //======================================================================================================================
 
         fireStream = new ItemTurret("fire_stream") {{
-            requirements(Category.turret, ItemStack.with(Items.titanium, 170,
-                    Items.copper, 240, Items.graphite, 350));
+            requirements(Category.turret, ItemStack.with(
+                    Items.titanium, 340,
+                    Items.copper, 300,
+                    Items.graphite, 350
+            ));
+            coolant = consume(new ConsumeCoolant(0.2f));
+            coolantMultiplier = 2f;
 
             hasItems = true;
             itemCapacity = 32;
@@ -139,26 +144,37 @@ public class FBlocks {
 
             health = 3000;
             size = 4;
-            range = 400;
+            range = 260;
             shootY = 35;
             reload = 5;
             recoil = 3;
             inaccuracy = 15;
 
-            bullet = new ownerBulletType(8f, 4) {{
-                lifetime = 6.4f;
-                splashDamage = 3;
+            bullet = new ownerBulletType(8f, 8) {{
+                absorbable = hittable = reflectable = false;
+
+                lifetime = 6.7f;
+                splashDamage = 6;
                 splashDamageRadius = 20;
+
+                despawnEffect = hitEffect = Fx.none;
+
                 pierce = true;
                 pierceBuilding = true;
                 status = FStatusEffects.burningII;
                 statusDuration = 240;
             }};
 
-            requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 30));
+            requirements(Category.turret, ItemStack.with(
+                    Items.titanium, 1540,
+                    Items.graphite, 1500,
+                    Items.graphite, 2000,
+                    Items.silicon, 1500,
+                    Items.phaseFabric, 1500
+            ));
         }};
         stay = new PowerTurret("stay") {{
-            consume(new ConsumePower(3, 0, false));
+            consume(new ConsumePower(2, 0, false));
 
             health = 200;
             size = 2;
@@ -171,17 +187,20 @@ public class FBlocks {
             consumeAmmoOnce = false;
 
             shootType = new LaserBoltBulletType(2, 8) {{
+                pierce = true;
+                pierceCap = 2;
+
                 lifetime = 30;
                 rangeOverride = 60;
                 lightColor = frontColor = backColor = Pal.redLight;
                 status = StatusEffects.unmoving;
                 statusDuration = 24;
-                splashDamageRadius = 45;
+                splashDamageRadius = 36;
 
                 shootEffect = smokeEffect = Fx.none;
                 hitEffect = new WaveEffect() {{
                     lifetime = 26;
-                    sizeTo = sizeFrom = 45;
+                    sizeTo = sizeFrom = 36;
                     strokeFrom = 2;
                     strokeTo = 0;
                     colorFrom = colorTo = Pal.redLight;
@@ -189,7 +208,10 @@ public class FBlocks {
                 despawnEffect = hitEffect;
             }};
 
-            requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 30));
+            requirements(Category.turret, ItemStack.with(
+                    Items.copper, 40,
+                    Items.graphite, 30
+            ));
         }};
         bind = new PowerTurret("bind") {{
             consume(new ConsumePower(6, 0, false));
@@ -222,14 +244,46 @@ public class FBlocks {
                     colorFrom = colorTo = Pal.redLight;
                 }};
                 despawnEffect = hitEffect;
+
+                fragAngle = 360;
+                fragBullets = 9;
+                fragLifeMax = 3;
+                fragLifeMin = 1.5f;
+                fragOnAbsorb = false;
+                fragOnHit = true;
+                fragBullet = new BulletType() {{
+                    damage = 3;
+                    speed = 2.5f;
+                    splashDamageRadius = 12;
+                    hitEffect = new WaveEffect() {{
+                        lifetime = 30;
+                        sizeTo = sizeFrom = 60;
+                        strokeFrom = 2;
+                        strokeTo = 0;
+                        colorFrom = colorTo = Pal.redderDust;
+                    }};
+                    despawnEffect = hitEffect;
+
+                    status = StatusEffects.slow;
+                    statusDuration = 240;
+                }};
             }};
 
-            requirements(Category.turret, ItemStack.with(Items.copper, 350, Items.titanium, 650, Items.graphite, 500));
+            requirements(Category.turret, ItemStack.with(
+                    Items.copper, 450,
+                    Items.titanium, 650,
+                    Items.graphite, 500
+            ));
         }};
         smallWindTurret = new ItemTurret("small_wind_turret") {{
-            requirements(Category.turret, ItemStack.with(Items.titanium, 50,
-                    Items.copper, 120, Items.graphite, 120));
+            requirements(Category.turret, ItemStack.with(
+                    Items.titanium, 300,
+                    Items.copper, 240,
+                    Items.silicon, 185
+            ));
+            consume(new ConsumePower(8.4f, 0, false));
             coolant = consume(new ConsumeCoolant(0.3f));
+            coolantMultiplier = 1.2f;
 
             hasItems = true;
             itemCapacity = 15;
@@ -246,7 +300,7 @@ public class FBlocks {
 
             ammoTypes.put(Items.blastCompound, new PointBulletType() {{
                 trailEffect = new ExplosionEffect() {{
-                    smokeColor = Pal.darkerGray;
+                    smokeColor = Pal.darkPyraFlame;
                     sparks = 0;
                     waveLife = 0;
                     smokes = 15;
@@ -267,7 +321,7 @@ public class FBlocks {
                 fragBullet = new WindBulletType() {{
                     collides = false;
                     absorbable = hittable = reflectable = false;
-                    lifetime = 600;
+                    lifetime = 400;
                     damage = 0.5f;
                     windPower = 0.45f;
                     applyEffect = FStatusEffects.burningIII;
@@ -275,11 +329,16 @@ public class FBlocks {
             }});
         }};
         middleWindTurret = new ItemTurret("middle_wind_turret") {{
-            requirements(Category.turret, ItemStack.with(Items.titanium, 900,
-                    Items.copper, 1000, Items.graphite, 780));
+            requirements(Category.turret, ItemStack.with(
+                    Items.titanium, 700,
+                    Items.copper, 800,
+                    Items.graphite, 780,
+                    Items.silicon, 750
+            ));
 
-            consume(new ConsumePower(500, 1500, false));
+            consume(new ConsumePower(17, 1500, false));
             coolant = consume(new ConsumeCoolant(0.8f));
+            coolantMultiplier = 1.2f;
 
             hasItems = true;
             itemCapacity = 32;
@@ -328,11 +387,17 @@ public class FBlocks {
             }});
         }};
         largeWindTurret = new ItemTurret("large_wind_turret") {{
-            requirements(Category.turret, ItemStack.with(Items.titanium, 2000,
-                    Items.copper, 2600, Items.graphite, 1800));
+            requirements(Category.turret, ItemStack.with(
+                    Items.titanium, 2000,
+                    Items.copper, 2600,
+                    Items.graphite, 1800,
+                    Items.silicon, 1650,
+                    Items.surgeAlloy, 300
+            ));
 
-            consume(new ConsumePower(5000, 20000, false));
-            coolant = consume(new ConsumeCoolant(1.5f));
+            consume(new ConsumePower(1000, 20000, false));
+            coolant = consume(new ConsumeCoolant(1.3f));
+            coolantMultiplier = 1.2f;
 
             hasItems = true;
             itemCapacity = 90;
@@ -470,8 +535,11 @@ public class FBlocks {
 
             consume(new ConsumePower(15, 1000, true));
 
-            requirements(Category.defense, ItemStack.with(Items.titanium, 150,
-                    Items.copper, 300, Items.silicon, 150));
+            requirements(Category.defense, ItemStack.with(
+                    Items.titanium, 150,
+                    Items.copper, 300,
+                    Items.silicon, 150
+            ));
         }};
     }
 }

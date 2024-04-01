@@ -53,7 +53,6 @@ public class OwnerTurret extends Turret {
         @Override
         public void updateTile() {
             boost = (1 + exp / maxHealth / 10);
-            exp = Math.max(0, exp - Time.delta * maxHealth / 300);
 
             reloadCounter += exp;
             heal(exp / 100);
@@ -64,7 +63,7 @@ public class OwnerTurret extends Turret {
                     fireEffect = new Effect(33f, 80f, e -> {
                         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-                        randLenVectors(e.id, 35, e.finpow() * (range + boost), e.rotation, 10f,
+                        randLenVectors(e.id, 35, e.finpow() * range * boost, e.rotation, 10f,
                                 (x, y) -> Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f));
                     });
                 }
@@ -75,6 +74,7 @@ public class OwnerTurret extends Turret {
         @Override
         protected void bullet(BulletType type, float xOffset, float yOffset, float angleOffset, Mover mover) {
             queuedBullets--;
+            exp = Math.max(0, exp - Time.delta * maxHealth / 300);
 
             if (dead || (!consumeAmmoOnce && !hasAmmo())) return;
 
@@ -118,7 +118,6 @@ public class OwnerTurret extends Turret {
         @Override
         protected void handleBullet(@Nullable Bullet bullet, float offsetX, float offsetY, float angleOffset) {
             bullet.team = hitTeam ? exp > minPower ? Team.derelict : team : team;
-            ;
             bullet.lifetime *= bullet.lifetime * boost;
             bullet.damage *= bullet.damage * boost;
         }
@@ -126,17 +125,22 @@ public class OwnerTurret extends Turret {
         @Override
         protected void findTarget() {
             float range = range();
-
+            Team other;
+            if(!state.rules.pvp){
+                other = team == state.rules.defaultTeam ? state.rules.waveTeam : state.rules.defaultTeam;
+            } else {
+                other = Team.crux;
+            }
 
             if (targetAir && !targetGround) {
                 target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
                 if (target == null && hitTeam && exp >= minPower) {
-                    target = Units.bestEnemy(state.rules.waveTeam, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                    target = Units.bestEnemy(other, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
                 }
             } else {
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b) && b != this, unitSort);
                 if (target == null && hitTeam && exp >= minPower) {
-                    target = Units.bestTarget(state.rules.waveTeam, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b), unitSort);
+                    target = Units.bestTarget(other, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b) && b != this, unitSort);
                 }
             }
 
