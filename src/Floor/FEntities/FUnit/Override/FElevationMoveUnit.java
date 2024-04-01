@@ -108,10 +108,6 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
             healthLevel = read.i();
             againLevel = read.i();
             shieldLevel = read.i();
-            if (shieldLevel > 0) {
-                sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
-                        maxHealth * shieldLevel / 10, 120, 60);
-            }
         } else {
             throw new IllegalArgumentException("Unknown revision '" + REV + "' for entity type 'elude'");
         }
@@ -169,6 +165,11 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
 
     @Override
     public void update() {
+        if (shieldLevel > 0 && sfa == null) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
+
         float offset;
         float range;
         if (!Vars.net.client() || this.isLocal()) {

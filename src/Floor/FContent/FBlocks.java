@@ -3,15 +3,17 @@ package Floor.FContent;
 import Floor.FEntities.FBlock.ElectricFence;
 import Floor.FEntities.FBlock.GradeFactory;
 import Floor.FEntities.FBlock.KnockingTurret;
+import Floor.FEntities.FBlock.OwnerTurret;
 import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
+import Floor.FEntities.FBulletType.ownerBulletType;
 import arc.graphics.Color;
 import mindustry.content.*;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LaserBoltBulletType;
 import mindustry.entities.bullet.PointBulletType;
 import mindustry.entities.effect.ExplosionEffect;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
@@ -32,7 +34,7 @@ public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
     public static Block eleFence;
-    public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay, bind;
+    public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay, bind, fireBoost;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -127,13 +129,36 @@ public class FBlocks {
                 width = height = 0;
                 ammoMultiplier = 16;
                 shootEffect = Fx.shootPyraFlame;
-                status = StatusEffects.burning;
+                status = FStatusEffects.burningII;
                 statusDuration = 300;
                 hitEffect = despawnEffect = Fx.none;
             }});
         }};
+        fireBoost = new OwnerTurret("fire_boost") {{
+            targetAir = targetGround = true;
+
+            health = 3000;
+            size = 4;
+            range = 400;
+            shootY = 35;
+            reload = 5;
+            recoil = 3;
+            inaccuracy = 15;
+
+            bullet = new ownerBulletType(8f, 4) {{
+                lifetime = 6.4f;
+                splashDamage = 3;
+                splashDamageRadius = 20;
+                pierce = true;
+                pierceBuilding = true;
+                status = FStatusEffects.burningII;
+                statusDuration = 240;
+            }};
+
+            requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 30));
+        }};
         stay = new PowerTurret("stay") {{
-            consume(new ConsumePower(12, 0, false));
+            consume(new ConsumePower(3, 0, false));
 
             health = 200;
             size = 2;
@@ -145,15 +170,15 @@ public class FBlocks {
             hasPower = true;
             consumeAmmoOnce = false;
 
-            shootType = new LaserBoltBulletType(4, 8) {{
+            shootType = new LaserBoltBulletType(2, 8) {{
                 lifetime = 30;
                 rangeOverride = 60;
                 lightColor = frontColor = backColor = Pal.redLight;
-                status = FStatusEffects.StrongStop;
+                status = StatusEffects.unmoving;
                 statusDuration = 24;
                 splashDamageRadius = 45;
 
-                shootEffect = Fx.none;
+                shootEffect = smokeEffect = Fx.none;
                 hitEffect = new WaveEffect() {{
                     lifetime = 26;
                     sizeTo = sizeFrom = 45;
@@ -167,7 +192,7 @@ public class FBlocks {
             requirements(Category.turret, ItemStack.with(Items.copper, 40, Items.graphite, 30));
         }};
         bind = new PowerTurret("bind") {{
-            consume(new ConsumePower(146, 0, false));
+            consume(new ConsumePower(6, 0, false));
 
             health = 1000;
             size = 3;
@@ -180,13 +205,15 @@ public class FBlocks {
             consumeAmmoOnce = false;
 
             shootType = new LaserBoltBulletType(4.5f, 16) {{
+                pierce = true;
+                pierceCap = 2;
                 rangeOverride = 200;
                 lightColor = frontColor = backColor = Pal.redLight;
-                status = FStatusEffects.StrongStop;
+                status = StatusEffects.unmoving;
                 statusDuration = 45;
                 splashDamageRadius = 60;
 
-                shootEffect = Fx.none;
+                shootEffect = smokeEffect = Fx.none;
                 hitEffect = new WaveEffect() {{
                     lifetime = 30;
                     sizeTo = sizeFrom = 60;

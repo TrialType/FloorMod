@@ -100,10 +100,6 @@ public class FTankUnit extends TankUnit implements FUnitUpGrade {
             healthLevel = read.i();
             againLevel = read.i();
             shieldLevel = read.i();
-            if (shieldLevel > 0) {
-                sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
-                        maxHealth * shieldLevel / 10, 120, 60);
-            }
         } else {
             throw new IllegalArgumentException("Unknown revision '" + REV + "' for entity type 'stell'");
         }
@@ -157,6 +153,11 @@ public class FTankUnit extends TankUnit implements FUnitUpGrade {
 
     @Override
     public void update(){
+        if (shieldLevel > 0 && sfa == null) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
+
         float offset;
         float range;
         if (!Vars.net.client() || this.isLocal()) {

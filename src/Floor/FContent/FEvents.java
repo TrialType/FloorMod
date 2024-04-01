@@ -1,5 +1,6 @@
 package Floor.FContent;
 
+import Floor.FTools.FBuildUpGrade;
 import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
 import Floor.FTools.UpGradeTime;
@@ -100,6 +101,17 @@ public class FEvents {
                 if (e.killer.controller() instanceof MissileAI ai && ai.shooter instanceof UpGradeTime ugt) {
                     ugt.add(1);
                 }
+            }
+        });
+
+        Events.on(EventType.UnitBulletDestroyEvent.class, e -> {
+            if (e.bullet.owner instanceof FBuildUpGrade fug) {
+                fug.addExp(e.unit.maxHealth);
+            }
+        });
+        Events.on(EventType.BuildingBulletDestroyEvent.class, e -> {
+            if (e.bullet.owner instanceof FBuildUpGrade fug) {
+                fug.addExp(e.build.maxHealth);
             }
         });
     }

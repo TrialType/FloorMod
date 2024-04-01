@@ -299,6 +299,16 @@ public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner
         for (int i = 0; i < number; i++) {
             minerId.add(read.i());
         }
+
+        level = read.i();
+        exp = read.f();
+
+        damageLevel = read.i();
+        speedLevel = read.i();
+        reloadLevel = read.i();
+        healthLevel = read.i();
+        againLevel = read.i();
+        shieldLevel = read.i();
         this.afterRead();
     }
 
@@ -347,6 +357,15 @@ public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner
         for (int i = 0; i < miners.size; i++) {
             write.i(miners.get(i).id);
         }
+
+        write.i(level);
+        write.f(exp);
+        write.i(damageLevel);
+        write.i(speedLevel);
+        write.i(reloadLevel);
+        write.i(healthLevel);
+        write.i(againLevel);
+        write.i(shieldLevel);
     }
 
     @Override

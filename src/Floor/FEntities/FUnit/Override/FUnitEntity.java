@@ -313,10 +313,6 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
         healthLevel = read.i();
         againLevel = read.i();
         shieldLevel = read.i();
-        if (shieldLevel > 0) {
-            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
-                    maxHealth * shieldLevel / 10, 120, 60);
-        }
         this.afterRead();
     }
 
@@ -372,6 +368,11 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
 
     @Override
     public void update() {
+        if (shieldLevel > 0 && sfa == null) {
+            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
+                    maxHealth * shieldLevel / 10, 120, 60);
+        }
+
         if (units.size == 0 && idList.size > 0) {
             for (int i : idList) {
                 units.add(Groups.unit.getByID(i));

@@ -16,7 +16,6 @@ public class FStatusEffects {
             slowII, fastII,
             High_tension, High_tensionII, High_tensionIII, High_tensionIV, High_tensionV,
             burningII, burningIII, burningIV, burningV;
-
     public static void load() {
         StrongStop = new StatusEffect("StrongStop") {{
             speedMultiplier = 0;
@@ -29,12 +28,12 @@ public class FStatusEffects {
             permanent = false;
         }};
         HardHit = new StatusEffect("hard_hit") {{
-            damageMultiplier = 1.2F;
+            damageMultiplier = 0.8F;
             speedMultiplier = 0.75F;
             healthMultiplier = 0.4F;
             reloadMultiplier = 0.5F;
             color = new Color(145, 75, 0, 255);
-            effectChance = 1;
+            effectChance = 0.3f;
             effect = new MultiEffect(new ParticleEffect() {{
                 baseLength = 0;
                 length = 25;

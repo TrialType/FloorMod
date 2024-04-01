@@ -81,7 +81,6 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
 
     @Override
     public void update() {
-
         if (crazy.indexOf(this) < 0) {
             crazy.add(this);
             change();
@@ -413,10 +412,6 @@ public class ENGSWEISUnitEntity extends FUnitEntity {
         healthLevel = read.i();
         againLevel = read.i();
         shieldLevel = read.i();
-        if (shieldLevel > 0) {
-            sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
-                    maxHealth * shieldLevel / 10, 120, 60);
-        }
         this.afterRead();
     }
 
