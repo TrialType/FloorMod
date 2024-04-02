@@ -52,7 +52,7 @@ public class ElectricFence extends Block {
             ElectricFenceBuild e = (ElectricFenceBuild) build;
             if (e != null) {
                 Building b = world.build(inter);
-                if (e.team == b.team && b instanceof ElectricFenceBuild efb) {
+                if (b instanceof ElectricFenceBuild efb) {
                     ElectricFence ef = (ElectricFence) efb.block;
                     if (ef != null) {
                         if (e.builds.indexOf(efb.pos()) >= 0) {
@@ -194,12 +194,9 @@ public class ElectricFence extends Block {
         }
 
         public void updateUnit() {
-            float dx = (float) Math.cos(Math.toRadians(rotate)) * half;
-            float dy = (float) Math.sin(Math.toRadians(rotate)) * half;
-            float len = (float) Math.sqrt(dx * dx + dy * dy);
             Seq<Unit> toStop = new Seq<>();
-            Units.nearbyEnemies(team, x, y, len, u -> {
-                if (inRange(len, u)) {
+            Units.nearbyEnemies(team, x, y, half, u -> {
+                if (inRange(half, u)) {
                     toStop.add(u);
 
                     float ro = u.vel.angle() - rotate;
@@ -215,18 +212,32 @@ public class ElectricFence extends Block {
         }
 
         public boolean inRange(float len, Unit u) {
-            float len2 = u.vel.len();
-            float ro = Angles.angleDist(u.vel.angle(), rotate);
-            double l = len2 * Math.sin(Math.toRadians(ro));
+            float ux = u.x;
+            float uy = u.y;
+            float ro2 = Angles.angleDist(Angles.angle(ux, uy, x, y), u.vel.angle());
+            float ro4 = Angles.angleDist(rotate, u.vel.angle());
+            float ro3 = Angles.angleDist(Angles.angle(x, y, ux, uy), rotate);
+            boolean close;
+//            if (ro3 >= 90) {
+                if (ro4 + ro3 >= 180) {
+                    close = ro2 < ro3 + 1;
+                } else {
+                    close = ro2 + ro3 < 181;
+                }
+//            } else {
+//                if (ro4 + ro3 >= 180) {
+//                    close = ro2 + ro3 < 181;
+//                } else {
+//                    close = ro2 < ro3 + 1;
+//                }
+//            }
 
-            if (l > 0 || (stopUnits.indexOf(u) >= 0 && l >= 0)) {
-                float ux = u.x;
-                float uy = u.y;
+            if (close) {
                 float angle1 = Angles.angleDist(rotate, Angles.angle(x, y, ux, uy));
                 float len1 = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
 
                 angle1 = Math.min(angle1, 180 - angle1);
-                if (Math.sin(Math.toRadians(angle1)) * len1 <= 10f && len * Math.cos(Math.toRadians(angle1)) <= half) {
+                if (Math.sin(Math.toRadians(angle1)) * len1 <= 6f && len1 * Math.cos(Math.toRadians(angle1)) <= len) {
                     if (air && !(u.physref.body.layer == 4)) {
                         return true;
                     } else return !air && u.isGrounded();
@@ -238,13 +249,12 @@ public class ElectricFence extends Block {
     }
 
     public class ElectricFenceBuild extends Building {
-        private boolean loaded;
+        protected boolean loaded;
         protected final Seq<Float> timers = new Seq<>();
         protected final Seq<Boolean> booleans = new Seq<>();
         public final Map<Integer, Float> times = new HashMap<>();
         public final IntSeq builds = new IntSeq();
         public final ObjectMap<Integer, FenceLine> linesMap = new ObjectMap<>();
-
 
         @Override
         public void updateTile() {
@@ -296,7 +306,7 @@ public class ElectricFence extends Block {
 
         @Override
         public boolean onConfigureBuildTapped(Building other) {
-            if (other instanceof ElectricFenceBuild && other.within(this, maxLength) && other != this) {
+            if (other instanceof ElectricFenceBuild && other.within(this, maxLength) && other != this && other.team == team) {
                 configure(other.pos());
                 return false;
             }
@@ -341,9 +351,15 @@ public class ElectricFence extends Block {
                 Building e = world.build(builds.get(i));
                 FenceLine fl = linesMap.get(builds.get(i));
                 if (fl != null && e != null) {
-                    setupColor(1 - (fl.go / fl.maxFenceSize));
+                    float thick;
+                    if (fl.broken) {
+                        thick = 0.01f;
+                    } else {
+                        thick = 1 - (fl.go / fl.maxFenceSize);
+                    }
+                    setupColor(thick);
                     Draw.z(Layer.power);
-                    drawLaser(x, y, e.x, e.y, size, e.block.size, 1 - (fl.go / fl.maxFenceSize));
+                    drawLaser(x, y, e.x, e.y, size, e.block.size, thick);
                 }
             }
 

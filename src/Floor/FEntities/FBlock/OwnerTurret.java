@@ -63,7 +63,7 @@ public class OwnerTurret extends Turret {
                     fireEffect = new Effect(33f, 80f, e -> {
                         color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
 
-                        randLenVectors(e.id, 35, e.finpow() * range * boost, e.rotation, 10f,
+                        randLenVectors(e.id, 35, e.finpow() * range * boost * 1.3f, e.rotation, 10f,
                                 (x, y) -> Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f));
                     });
                 }

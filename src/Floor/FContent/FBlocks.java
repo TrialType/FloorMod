@@ -283,7 +283,7 @@ public class FBlocks {
             ));
             consume(new ConsumePower(8.4f, 0, false));
             coolant = consume(new ConsumeCoolant(0.3f));
-            coolantMultiplier = 1.2f;
+            coolantMultiplier = 1.05f;
 
             hasItems = true;
             itemCapacity = 15;
@@ -338,7 +338,7 @@ public class FBlocks {
 
             consume(new ConsumePower(17, 1500, false));
             coolant = consume(new ConsumeCoolant(0.8f));
-            coolantMultiplier = 1.2f;
+            coolantMultiplier = 1.05f;
 
             hasItems = true;
             itemCapacity = 32;
@@ -397,7 +397,7 @@ public class FBlocks {
 
             consume(new ConsumePower(1000, 20000, false));
             coolant = consume(new ConsumeCoolant(1.3f));
-            coolantMultiplier = 1.2f;
+            coolantMultiplier = 1.05f;
 
             hasItems = true;
             itemCapacity = 90;
