@@ -246,15 +246,15 @@ public class FBlocks {
                 despawnEffect = hitEffect;
 
                 fragAngle = 360;
-                fragBullets = 9;
-                fragLifeMax = 3;
-                fragLifeMin = 1.5f;
+                fragBullets = 6;
+                fragLifeMax = 4;
+                fragLifeMin = 3.5f;
                 fragOnAbsorb = false;
                 fragOnHit = true;
                 fragBullet = new BulletType() {{
                     damage = 3;
                     speed = 2.5f;
-                    splashDamageRadius = 12;
+                    splashDamageRadius = 6;
                     hitEffect = new WaveEffect() {{
                         lifetime = 30;
                         sizeTo = sizeFrom = 60;
@@ -264,7 +264,7 @@ public class FBlocks {
                     }};
                     despawnEffect = hitEffect;
 
-                    status = StatusEffects.slow;
+                    status = FStatusEffects.suppressI;
                     statusDuration = 240;
                 }};
             }};

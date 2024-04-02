@@ -12,17 +12,18 @@ import mindustry.type.StatusEffect;
 public class FStatusEffects {
     public final static Seq<StatusEffect> burnings = new Seq<>();
     public static StatusEffect StrongStop, boostSpeed, HardHit,
-            suppressII,
+            suppressI,suppressII,suppressIII,suppressIV,
             slowII, fastII,
             High_tension, High_tensionII, High_tensionIII, High_tensionIV, High_tensionV,
             burningII, burningIII, burningIV, burningV;
+
     public static void load() {
-        StrongStop = new StatusEffect("StrongStop") {{
+        StrongStop = new StatusEffect("strong_stop") {{
             speedMultiplier = 0;
             buildSpeedMultiplier = 0;
             disarm = true;
         }};
-        boostSpeed = new StatusEffect("boostSpeed") {{
+        boostSpeed = new StatusEffect("boost_speed") {{
             speedMultiplier = 15;
             show = false;
             permanent = false;
@@ -57,9 +58,9 @@ public class FStatusEffects {
                 colorTo = color;
             }});
         }};
-        suppressII = new StatusEffect("suppressII") {{
-            speedMultiplier = 0.8F;
-            reloadMultiplier = 0.55F;
+        suppressI = new StatusEffect("suppress_I") {{
+            speedMultiplier = 0.9F;
+            reloadMultiplier = 0.9F;
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
             effect = new MultiEffect(new ParticleEffect() {{
@@ -70,6 +71,7 @@ public class FStatusEffects {
                 sizeTo = 0;
                 colorFrom = color;
                 colorTo = color;
+                interp = Interp.circleIn;
             }}, new ParticleEffect() {{
                 particles = 2;
                 line = true;
@@ -83,15 +85,106 @@ public class FStatusEffects {
                 lifetime = 10;
                 colorFrom = new Color(170, 170, 0, 255);
                 colorTo = color;
+                interp = Interp.circleIn;
             }});
         }};
-        slowII = new StatusEffect("slowII") {{
+        suppressII = new StatusEffect("suppress_II") {{
+            speedMultiplier = 0.8F;
+            reloadMultiplier = 0.8F;
+            color = new Color(170, 170, 153, 255);
+            effectChance = 1;
+            effect = new MultiEffect(new ParticleEffect() {{
+                baseLength = 0;
+                length = 25;
+                lifetime = 10;
+                sizeFrom = 2;
+                sizeTo = 0;
+                colorFrom = color;
+                colorTo = color;
+                interp = Interp.circleIn;
+            }}, new ParticleEffect() {{
+                particles = 2;
+                line = true;
+                interp = Interp.slowFast;
+                strokeFrom = 2;
+                strokeTo = 0;
+                lenFrom = 10;
+                lenTo = 0;
+                length = 23;
+                baseLength = 0;
+                lifetime = 10;
+                colorFrom = new Color(170, 170, 0, 255);
+                colorTo = color;
+                interp = Interp.circleIn;
+            }});
+        }};
+        suppressIII = new StatusEffect("suppress_III") {{
+            speedMultiplier = 0.7F;
+            reloadMultiplier = 0.7F;
+            color = new Color(170, 170, 153, 255);
+            effectChance = 1;
+            effect = new MultiEffect(new ParticleEffect() {{
+                baseLength = 0;
+                length = 25;
+                lifetime = 10;
+                sizeFrom = 2;
+                sizeTo = 0;
+                colorFrom = color;
+                colorTo = color;
+                interp = Interp.circleIn;
+            }}, new ParticleEffect() {{
+                particles = 2;
+                line = true;
+                interp = Interp.slowFast;
+                strokeFrom = 2;
+                strokeTo = 0;
+                lenFrom = 10;
+                lenTo = 0;
+                length = 23;
+                baseLength = 0;
+                lifetime = 10;
+                colorFrom = new Color(170, 170, 0, 255);
+                colorTo = color;
+                interp = Interp.circleIn;
+            }});
+        }};
+        suppressIV = new StatusEffect("suppress_IV") {{
+            speedMultiplier = 0.6F;
+            reloadMultiplier = 0.6F;
+            color = new Color(170, 170, 153, 255);
+            effectChance = 1;
+            effect = new MultiEffect(new ParticleEffect() {{
+                baseLength = 0;
+                length = 25;
+                lifetime = 10;
+                sizeFrom = 2;
+                sizeTo = 0;
+                colorFrom = color;
+                colorTo = color;
+                interp = Interp.circleIn;
+            }}, new ParticleEffect() {{
+                particles = 2;
+                line = true;
+                interp = Interp.slowFast;
+                strokeFrom = 2;
+                strokeTo = 0;
+                lenFrom = 10;
+                lenTo = 0;
+                length = 23;
+                baseLength = 0;
+                lifetime = 10;
+                colorFrom = new Color(170, 170, 0, 255);
+                colorTo = color;
+                interp = Interp.circleIn;
+            }});
+        }};
+        slowII = new StatusEffect("slow_II") {{
             speedMultiplier = 0.55F;
             color = new Color(0, 0, 0, 0);
             effectChance = 1;
             effect = Fx.none;
         }};
-        fastII = new StatusEffect("fastII") {{
+        fastII = new StatusEffect("fast_II") {{
             speedMultiplier = 2.4f;
             init(() -> opposite(StatusEffects.slow));
         }};

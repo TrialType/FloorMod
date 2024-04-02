@@ -582,7 +582,7 @@ public class FUnits {
                 mirror = false;
                 alwaysShooting = true;
                 shootSound = Sounds.none;
-                bullet = new EmpBulletType() {{
+                bullet = new BasicBulletType() {{
                     despawnEffect = Fx.none;
                     hitEffect = Fx.none;
                     width = 0;
@@ -590,13 +590,10 @@ public class FUnits {
                     speed = 0;
                     damage = 0;
                     lifetime = 0;
-                    radius = 56;
                     splashDamage = 20000;
                     splashDamageRadius = 56;
                     splashDamagePierce = true;
                     shootEffect = Fx.none;
-                    powerSclDecrease = 0;
-                    unitDamageScl = 1;
                 }};
             }});
             weapons.add(new Weapon() {
@@ -610,39 +607,38 @@ public class FUnits {
                     }};
                     bullet = new BasicBulletType() {{
                         sprite = "jamming_bomb";
-                        absorbable = false;
-                        reflectable = false;
                         width = 24;
                         height = 55;
                         trailLength = 23;
                         trailWidth = 5;
                         speed = 11;
                         damage = 300;
-                        lifetime = 100;
+                        lifetime = 210;
                         homingRange = 1000;
                         homingDelay = 30;
                         homingPower = 0.4F;
                         hitEffect = Fx.none;
-                        keepVelocity = false;
                         despawnEffect = Fx.none;
-                        fragBullets = 1;
-                        fragRandomSpread = 0;
-                        fragVelocityMax = 7;
-                        fragVelocityMin = 7;
-                        fragBullet = new BasicBulletType() {{
-                            damage = 10;
+                        absorbable = false;
+                        reflectable = false;
+                        keepVelocity = false;
+
+                        intervalBullets = 9;
+                        intervalDelay = 100;
+                        bulletInterval = 10;
+                        intervalSpread = 12;
+                        intervalBullet = new BasicBulletType(8, 2) {{
                             lifetime = 120;
-                            width = 24;
-                            height = 55;
-                            bulletInterval = 10;
-                            intervalBullets = 5;
-                            intervalRandomSpread = 10;
-                            intervalBullet = new BasicBulletType() {{
-                                damage = 10;
-                                speed = 12;
-                                trailChance = 1;
-                                trailEffect = Fx.artilleryTrail;
-                            }};
+                            trailChance = -1;
+                            trailLength = 9;
+                            trailColor = Pal.lightTrail;
+                            trailInterp = Interp.slope;
+
+                            statusDuration = 480;
+
+                            homingPower = 0.3f;
+                            homingRange = 1000;
+                            homingDelay = 20;
                         }};
                     }};
                 }
@@ -676,21 +672,30 @@ public class FUnits {
                     statusDuration = 1200;
                     keepVelocity = false;
                     status = FStatusEffects.HardHit;
-                    fragBullets = 4;
-                    fragVelocityMax = 0;
-                    fragVelocityMin = 0;
-                    fragBullet = new BasicBulletType() {{
-                        damage = 0;
-                        lifetime = 0;
-                        puddles = 35;
-                        puddleRange = 35;
-                        puddleAmount = 25;
-                        puddleLiquid = Liquids.oil;
+
+                    intervalBullets = 3;
+                    intervalDelay = 30;
+                    bulletInterval = 10;
+                    intervalSpread = 180;
+                    intervalBullet = new BasicBulletType(8, 20) {{
+                        lifetime = 120;
+                        trailChance = -1;
+                        trailLength = 9;
+                        trailColor = Pal.darkFlame;
+                        trailInterp = Interp.fastSlow;
+
+                        status = FStatusEffects.burningV;
+                        statusDuration = 480;
+
+                        makeFire = true;
+                        incendAmount = 15;
+                        incendChance = 0.8f;
+                        incendSpread = 60;
+
+                        homingPower = 0.3f;
+                        homingRange = 1000;
+                        homingDelay = 60;
                     }};
-                    puddles = 35;
-                    puddleRange = 35;
-                    puddleAmount = 15;
-                    puddleLiquid = Liquids.slag;
                 }};
             }});
             weapons.add(new Weapon() {{

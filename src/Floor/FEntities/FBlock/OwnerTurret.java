@@ -9,6 +9,7 @@ import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Mover;
@@ -19,6 +20,8 @@ import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.io.TypeIO;
+import mindustry.world.blocks.ControlBlock;
+import mindustry.world.blocks.defense.Wall;
 import mindustry.world.blocks.defense.turrets.Turret;
 
 import static arc.graphics.g2d.Draw.color;
@@ -38,14 +41,16 @@ public class OwnerTurret extends Turret {
     public Effect defaultEffect = null;
 
     public OwnerTurret(String name) {
+
         super(name);
 
+        breakable = false;
         hasItems = false;
         update = solid = true;
         itemCapacity = maxAmmo = 0;
     }
 
-    public class ownerBuild extends TurretBuild implements FBuildUpGrade {
+    public class ownerBuild extends TurretBuild implements FBuildUpGrade, ControlBlock {
         private float exp = 0;
         private float boost = 1;
         private Effect fireEffect;
@@ -126,7 +131,7 @@ public class OwnerTurret extends Turret {
         protected void findTarget() {
             float range = range();
             Team other;
-            if(!state.rules.pvp){
+            if (!state.rules.pvp) {
                 other = team == state.rules.defaultTeam ? state.rules.waveTeam : state.rules.defaultTeam;
             } else {
                 other = Team.crux;
@@ -195,6 +200,11 @@ public class OwnerTurret extends Turret {
 
         @Override
         public void upgrade() {
+        }
+
+        @Override
+        public boolean canControl() {
+            return exp <= maxHealth * 2;
         }
     }
 }
