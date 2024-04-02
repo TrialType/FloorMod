@@ -55,10 +55,10 @@ public class ElectricFence extends Block {
                 Building b = world.build(inter);
                 if (e.team == b.team && b instanceof ElectricFenceBuild efb) {
                     ElectricFence ef = (ElectricFence) efb.block;
-                    if(ef != null){
+                    if (ef != null) {
                         if (e.builds.indexOf(efb) >= 0) {
                             if (e.linesMap.get(efb).broken) {
-                                ElectricFenceBuild putter = efb.backTimes > e.backTimes ? efb : e;
+                                ElectricFenceBuild putter = ef.backTime > backTime ? efb : e;
                                 putter.times.put(putter == e ? efb : e, putter.linesMap.get(efb).timer);
                             }
                             e.builds.remove(efb);
@@ -599,7 +599,7 @@ public class ElectricFence extends Block {
                 float len1 = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
 
                 angle1 = Math.min(angle1, 180 - angle1);
-                if (Math.sin(Math.toRadians(angle1)) * len1 <= 15f && len * Math.cos(Math.toRadians(angle1)) <= half) {
+                if (Math.sin(Math.toRadians(angle1)) * len1 <= 10f && len * Math.cos(Math.toRadians(angle1)) <= half) {
                     if (air && !(u.physref.body.layer == 4)) {
                         return true;
                     } else return !air && u.isGrounded();
@@ -621,20 +621,16 @@ public class ElectricFence extends Block {
     }
 
     public class ElectricFenceBuild extends Building {
-        private final Seq<Integer> tid = new Seq<>();
-        private final Seq<Float> tts = new Seq<>();
-        private final Seq<Integer> ids = new Seq<>();
+        protected final Seq<Integer> tid = new Seq<>();
+        protected final Seq<Float> tts = new Seq<>();
+        protected final Seq<Integer> ids = new Seq<>();
+        protected final Seq<Float> timers = new Seq<>();
+        protected final Seq<Boolean> booleans = new Seq<>();
+
         public final Map<ElectricFenceBuild, Float> times = new HashMap<>();
         public final Seq<ElectricFenceBuild> builds = new Seq<>();
         public final ObjectMap<ElectricFenceBuild, FenceLine> linesMap = new ObjectMap<>();
-        public final Seq<Float> timers = new Seq<>();
-        public final Seq<Boolean> booleans = new Seq<>();
-        public float maxFenceSizes;
-        public float maxConnects;
-        public float backTimes;
-        public float eleDamages;
-        public float statusTimes;
-        public boolean airs;
+
 
         @Override
         public void updateTile() {
@@ -648,10 +644,11 @@ public class ElectricFence extends Block {
             if (ids.size > 0) {
                 for (int i = 0; i < ids.size; i++) {
                     ElectricFenceBuild efb = (ElectricFenceBuild) world.build(ids.get(i));
+                    ElectricFence ef = (ElectricFence) efb.block;
                     if (builds.indexOf(efb) < 0) {
-                        FenceLine fl = new FenceLine(team, Math.min(efb.maxFenceSizes, maxFenceSizes), this, efb);
-                        fl.set(Math.max(efb.backTimes, backTimes), Math.min(efb.eleDamages, eleDamages), statusEffect,
-                                Math.min(efb.statusTimes, statusTimes), airs && efb.airs);
+                        FenceLine fl = new FenceLine(team, Math.min(ef.maxFenceSize, maxFenceSize), this, efb);
+                        fl.set(Math.max(ef.backTime, backTime), Math.min(ef.eleDamage, eleDamage), statusEffect,
+                                Math.min(ef.statusTime, statusTime), air && ef.air);
                         fl.broken = booleans.get(i);
                         fl.timer = timers.get(i);
                         builds.add(efb);
@@ -668,13 +665,14 @@ public class ElectricFence extends Block {
             Seq<ElectricFenceBuild> removes = new Seq<>();
             times.replaceAll((b, f) -> f + delta);
             for (ElectricFenceBuild build : times.keySet()) {
-                if (build.dead || build.health <= 0 || !build.added || times.get(build) >= backTimes) {
+                if (build.dead || build.health <= 0 || !build.added || times.get(build) >= backTime) {
                     removes.add(build);
                 }
             }
             for (ElectricFenceBuild build : removes) {
                 times.remove(build);
             }
+
             removes.clear();
             builds.removeAll(b -> {
                 if (b.dead || b.health <= 0 || !b.added) {
@@ -687,7 +685,7 @@ public class ElectricFence extends Block {
                 linesMap.remove(efb);
             }
 
-            if (added && !dead && health > 0 && efficiency > 0) {
+            if (added && !dead && health > 0) {
 //                if (!FenceNet.run) {
 //                    Time.run(delta / 2, owner::update);
 //                    FenceNet.run = true;
@@ -706,6 +704,7 @@ public class ElectricFence extends Block {
                     b.linesMap.remove(this);
                 }
                 builds.clear();
+                times.clear();
                 linesMap.clear();
 
                 //owner.removeBuild(this);
@@ -737,13 +736,13 @@ public class ElectricFence extends Block {
             for (int i = 0; i < builds.size; i++) {
                 ElectricFenceBuild link = builds.get(i);
                 FenceLine fl = linesMap.get(link);
-                if (!fl.broken) {
-                    //FenceLine f = owner.find(fl.point);
-                    //FenceLine f = owner.find(fl);
-                    setupColor(1 - (fl.go / fl.maxFenceSize));
-                    Draw.z(Layer.power);
-                    drawLaser(x, y, link.x, link.y, size, link.block.size, 1 - (fl.go / fl.maxFenceSize));
-                }
+                //if (!fl.broken) {
+                //FenceLine f = owner.find(fl.point);
+                //FenceLine f = owner.find(fl);
+                setupColor(1 - (fl.go / fl.maxFenceSize));
+                Draw.z(Layer.power);
+                drawLaser(x, y, link.x, link.y, size, link.block.size, 1 - (fl.go / fl.maxFenceSize));
+                //}
             }
 
             Draw.reset();
@@ -757,15 +756,9 @@ public class ElectricFence extends Block {
                 if (this.power != null) {
                     this.power.graph.checkAdd();
                 }
-                builds.clear();
-                linesMap.clear();
-                times.clear();
-                maxFenceSizes = maxFenceSize;
-                maxConnects = maxConnect;
-                backTimes = backTime;
-                eleDamages = eleDamage;
-                statusTimes = statusTime;
-                airs = air;
+//                builds.clear();
+//                linesMap.clear();
+//                times.clear();
 
                 this.added = true;
             }
@@ -797,33 +790,65 @@ public class ElectricFence extends Block {
 
         @Override
         public void write(Writes write) {
-            write.i(times.size());
-            for (ElectricFenceBuild e : times.keySet()) {
-                write.i(e.pos());
-                write.f(times.get(e));
+            if(!builds.isEmpty()){
+                Seq<ElectricFenceBuild> removes = new Seq<>();
+                builds.removeAll(b -> {
+                    if (b.dead || b.health <= 0 || !b.added) {
+                        removes.add(b);
+                        return true;
+                    }
+                    return false;
+                });
+                for (ElectricFenceBuild efb : removes) {
+                    linesMap.remove(efb);
+                    times.remove(efb);
+                }
+            }
+
+            if (times.isEmpty()) {
+                write.i(tid.size);
+                for (int i = 0; i < tid.size; i++) {
+                    write.i(tid.get(i));
+                    write.f(tts.get(i));
+                }
+            } else {
+                write.i(times.size());
+                for (ElectricFenceBuild e : times.keySet()) {
+                    write.i(e.pos());
+                    write.f(times.get(e));
+                }
             }
             //write.i(owner.lines.size());
             //write.i(owner.lines.size);
-            write.i(builds.size);
-            for (int i = 0; i < builds.size; i++) {
-                write.i(builds.get(i).pos());
-                //FenceLine fl = owner.lines.get(i);
-                FenceLine fl = linesMap.get(builds.get(i));
-                write.f(fl.timer);
-                //TypeIO.writeTeam(write, fl.team);
-                //write.f(fl.x);
-                //write.f(fl.y);
-                //write.f(fl.half);
-                //write.f(fl.rotate);
-                //write.f(fl.maxFenceSize);
-                write.bool(fl.broken);
-                //write.f(fl.backTime);
-                //write.f(fl.eleDamage);
-                //write.str(fl.statusEffect.name.split("-")[statusEffect.name.split("-").length - 1]);
-                //write.f(fl.statusTime);
-                //write.bool(fl.air);
-                //write.i(fl.e1 == null ? fl.p1 : fl.e1.pos());
-                //write.i(fl.e2 == null ? fl.p2 : fl.e2.pos());
+            if (builds.isEmpty()) {
+                write.i(ids.size);
+                for (int i = 0; i < ids.size; i++) {
+                    write.i(ids.get(i));
+                    write.f(timers.get(i));
+                    write.bool(booleans.get(i));
+                }
+            } else {
+                write.i(builds.size);
+                for (int i = 0; i < builds.size; i++) {
+                    write.i(builds.get(i).pos());
+                    //FenceLine fl = owner.lines.get(i);
+                    FenceLine fl = linesMap.get(builds.get(i));
+                    write.f(fl.timer);
+                    //TypeIO.writeTeam(write, fl.team);
+                    //write.f(fl.x);
+                    //write.f(fl.y);
+                    //write.f(fl.half);
+                    //write.f(fl.rotate);
+                    //write.f(fl.maxFenceSize);
+                    write.bool(fl.broken);
+                    //write.f(fl.backTime);
+                    //write.f(fl.eleDamage);
+                    //write.str(fl.statusEffect.name.split("-")[statusEffect.name.split("-").length - 1]);
+                    //write.f(fl.statusTime);
+                    //write.bool(fl.air);
+                    //write.i(fl.e1 == null ? fl.p1 : fl.e1.pos());
+                    //write.i(fl.e2 == null ? fl.p2 : fl.e2.pos());
+                }
             }
 //            owner.lines.forEach(l -> {
 //                //l.write(write);
@@ -833,16 +858,16 @@ public class ElectricFence extends Block {
 //            for (ElectricFenceBuild b : builds) {
 //                write.i(b.pos());
 //            }
-            write.f(maxFenceSizes);
-            write.f(maxConnects);
-            write.f(backTimes);
-            write.f(eleDamages);
-            write.f(statusTimes);
-            write.bool(airs);
         }
 
         @Override
         public void read(Reads read, byte revision) {
+            ids.clear();
+            timers.clear();
+            times.clear();
+            booleans.clear();
+            tid.clear();
+            tts.clear();
             int num = read.i();
             for (int i = 0; i < num; i++) {
                 tid.add(read.i());
@@ -881,12 +906,6 @@ public class ElectricFence extends Block {
 //            for (int i = 0; i < num; i++) {
 //                ids.add(read.i());
 //            }
-            maxFenceSizes = read.f();
-            maxConnects = read.f();
-            backTimes = read.f();
-            eleDamages = read.f();
-            statusTimes = read.f();
-            airs = read.bool();
             //owner.addBuild(this);
         }
     }

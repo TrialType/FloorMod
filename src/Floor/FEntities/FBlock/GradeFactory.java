@@ -158,7 +158,7 @@ public class GradeFactory extends UnitBlock {
                     name = Core.bundle.get("@shield");
                 }
             } else {
-                name = "";
+                name = "null";
             }
         }
 
