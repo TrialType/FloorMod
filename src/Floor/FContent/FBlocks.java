@@ -323,7 +323,7 @@ public class FBlocks {
                     absorbable = hittable = reflectable = false;
                     lifetime = 400;
                     damage = 0.5f;
-                    windPower = 0.45f;
+                    windPower = 0.3f;
                     applyEffect = FStatusEffects.burningIII;
                 }};
             }});
@@ -381,7 +381,7 @@ public class FBlocks {
                     absorbable = hittable = reflectable = false;
                     lifetime = 850;
                     damage = 1f;
-                    windPower = 0.65f;
+                    windPower = 0.45f;
                     applyEffect = FStatusEffects.burningIV;
                 }};
             }});
@@ -440,7 +440,7 @@ public class FBlocks {
                     absorbable = hittable = reflectable = false;
                     lifetime = 1000;
                     damage = 2f;
-                    windPower = 0.85f;
+                    windPower = 0.65f;
                     windWidth = 600;
                     windLength = 300;
                     applyEffect = FStatusEffects.burningV;
