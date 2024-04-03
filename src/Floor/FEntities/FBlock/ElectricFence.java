@@ -217,19 +217,11 @@ public class ElectricFence extends Block {
                 float ro4 = Angles.angleDist(rotate, u.vel.angle());
                 float ro3 = Angles.angleDist(Angles.angle(x, y, ux, uy), rotate);
                 boolean close;
-//            if (ro3 >= 90) {
                 if (ro4 + ro3 >= 180) {
                     close = ro2 < ro3 + 1;
                 } else {
                     close = ro2 + ro3 < 181;
                 }
-//            } else {
-//                if (ro4 + ro3 >= 180) {
-//                    close = ro2 + ro3 < 181;
-//                } else {
-//                    close = ro2 < ro3 + 1;
-//                }
-//            }
                 if (close && air && !(u.physref.body.layer == 4)) {
                     return true;
                 } else return close && !air && u.isGrounded();
@@ -245,7 +237,6 @@ public class ElectricFence extends Block {
         public final Map<Integer, Float> times = new HashMap<>();
         public final IntSeq builds = new IntSeq();
         public final ObjectMap<Integer, FenceLine> linesMap = new ObjectMap<>();
-
         @Override
         public void updateTile() {
             if (dead || health <= 0) {
@@ -288,7 +279,6 @@ public class ElectricFence extends Block {
             }
             super.updateTile();
         }
-
         @Override
         public boolean onConfigureBuildTapped(Building other) {
             if (other instanceof ElectricFenceBuild && other.within(this, maxLength) && other != this && other.team == team) {
@@ -301,10 +291,20 @@ public class ElectricFence extends Block {
         public void drawConfigure() {
             Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
             Drawf.circles(x, y, maxLength);
+            Seq<Integer> is = new Seq<>();
             builds.each(i -> {
                 Building b = world.build(i);
-                Drawf.square(b.x, b.y, b.block.size * tilesize / 2f + 1f, Pal.place);
+                if (b != null) {
+                    Drawf.square(b.x, b.y, b.block.size * tilesize / 2f + 1f, Pal.place);
+                } else {
+                    is.add(i);
+                }
             });
+            for (int i = 0; i < is.size; i++) {
+                builds.removeValue(is.get(i));
+                linesMap.remove(is.get(i));
+                times.remove(is.get(i));
+            }
         }
 
         public boolean hasPos(int pos) {
@@ -382,10 +382,18 @@ public class ElectricFence extends Block {
             for (int i = 0; i < builds.size; i++) {
                 write.i(builds.get(i));
             }
-            write.i(linesMap.size);
-            for (Integer i : linesMap.keys()) {
-                write.f(linesMap.get(i).timer);
-                write.bool(linesMap.get(i).broken);
+            if (linesMap.size == 0) {
+                write.i(booleans.size);
+                for (int i = 0; i < booleans.size; i++) {
+                    write.f(timers.get(i));
+                    write.bool(booleans.get(i));
+                }
+            } else {
+                write.i(linesMap.size);
+                for (Integer i : linesMap.keys()) {
+                    write.f(linesMap.get(i).timer);
+                    write.bool(linesMap.get(i).broken);
+                }
             }
             write.i(times.size());
             for (Integer i : times.keySet()) {

@@ -626,15 +626,16 @@ public class FUnits {
                         intervalBullets = 9;
                         intervalDelay = 100;
                         bulletInterval = 10;
-                        intervalSpread = 12;
-                        intervalBullet = new BasicBulletType(8, 2) {{
+                        intervalSpread = 5;
+                        intervalBullet = new BasicBulletType(11, 2) {{
                             lifetime = 120;
                             trailChance = -1;
                             trailLength = 9;
                             trailColor = Pal.lightTrail;
                             trailInterp = Interp.slope;
 
-                            statusDuration = 480;
+                            weaveMag = 2;
+                            weaveScale = 45;
 
                             homingPower = 0.3f;
                             homingRange = 1000;
@@ -678,11 +679,12 @@ public class FUnits {
                     bulletInterval = 10;
                     intervalSpread = 180;
                     intervalBullet = new BasicBulletType(8, 20) {{
+                        width = height = 0;
                         lifetime = 120;
                         trailChance = -1;
                         trailLength = 9;
                         trailColor = Pal.darkFlame;
-                        trailInterp = Interp.fastSlow;
+                        trailInterp = Interp.smoother;
 
                         status = FStatusEffects.burningV;
                         statusDuration = 480;
