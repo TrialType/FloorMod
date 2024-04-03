@@ -8,7 +8,10 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
 import arc.graphics.Color;
+import arc.graphics.g2d.Fill;
+import arc.math.Rand;
 import mindustry.content.*;
+import mindustry.entities.Effect;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LaserBoltBulletType;
@@ -28,6 +31,8 @@ import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
+import static arc.graphics.g2d.Draw.color;
+import static arc.math.Angles.randLenVectors;
 import static mindustry.type.ItemStack.with;
 
 public class FBlocks {
@@ -185,6 +190,7 @@ public class FBlocks {
             consumesPower = true;
             hasPower = true;
             consumeAmmoOnce = false;
+            canOverdrive = false;
 
             shootType = new LaserBoltBulletType(2, 8) {{
                 pierce = true;
@@ -225,6 +231,7 @@ public class FBlocks {
             consumesPower = true;
             hasPower = true;
             consumeAmmoOnce = false;
+            canOverdrive = false;
 
             shootType = new LaserBoltBulletType(4.5f, 16) {{
                 pierce = true;
@@ -319,12 +326,18 @@ public class FBlocks {
                 fragBullets = 1;
 
                 fragBullet = new WindBulletType() {{
-                    collides = false;
-                    absorbable = hittable = reflectable = false;
                     lifetime = 400;
                     damage = 0.5f;
                     windPower = 0.3f;
                     applyEffect = FStatusEffects.burningIII;
+
+                    fillRange = false;
+                    windEffect = new Effect(66, 80f, e -> {
+                        color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
+
+                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 0.95f, e.rotation, 40,
+                                (x, y) -> Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f));
+                    });
                 }};
             }});
         }};
@@ -336,7 +349,7 @@ public class FBlocks {
                     Items.silicon, 750
             ));
 
-            consume(new ConsumePower(17, 1500, false));
+            consume(new ConsumePower(100, 1500, false));
             coolant = consume(new ConsumeCoolant(0.8f));
             coolantMultiplier = 1.05f;
 
@@ -377,8 +390,6 @@ public class FBlocks {
                 fragBullets = 1;
 
                 fragBullet = new WindBulletType() {{
-                    collides = false;
-                    absorbable = hittable = reflectable = false;
                     lifetime = 850;
                     damage = 1f;
                     windPower = 0.45f;
@@ -397,7 +408,7 @@ public class FBlocks {
 
             consume(new ConsumePower(1000, 20000, false));
             coolant = consume(new ConsumeCoolant(1.3f));
-            coolantMultiplier = 1.05f;
+            coolantMultiplier = 1.01f;
 
             hasItems = true;
             itemCapacity = 90;
@@ -436,8 +447,6 @@ public class FBlocks {
                 fragBullets = 1;
 
                 fragBullet = new WindBulletType() {{
-                    collides = false;
-                    absorbable = hittable = reflectable = false;
                     lifetime = 1000;
                     damage = 2f;
                     windPower = 0.65f;
