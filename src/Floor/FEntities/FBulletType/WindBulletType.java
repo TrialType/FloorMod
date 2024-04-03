@@ -16,6 +16,7 @@ import static java.lang.Math.*;
 
 public class WindBulletType extends BulletType {
     public float windPower = 0.15f;
+    public float bossPowerExpand = 0;
     public float windLength = 200;
     public float windWidth = 400;
     public StatusEffect applyEffect = FStatusEffects.burningV;
@@ -29,7 +30,7 @@ public class WindBulletType extends BulletType {
     public void applyDamage(Bullet b) {
         FDamage.triangleDamage(b, b.team, damage, (float) (b.x - windLength / 10 * cos(toRadians(b.rotation()))),
                 (float) (b.y - windLength / 10 * sin(toRadians(b.rotation()))), b.rotation(),
-                windLength, windWidth / 2, windPower, applyEffect, effectTime);
+                windLength, windWidth / 2, windPower, applyEffect, effectTime,bossPowerExpand);
     }
 
     @Override

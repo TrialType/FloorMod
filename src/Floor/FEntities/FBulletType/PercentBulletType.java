@@ -33,12 +33,14 @@ public class PercentBulletType extends BasicBulletType {
                 lightningDamage = ((h.maxHealth()) * lightningPercent * 1.503F / 100);
             }
             if ((firstPercent && h.health() > changeHel) || (!firstPercent && h.health() <= changeHel)) {
+                b.damage = h.health() - (h.maxHealth() * percent / 100);
                 h.health(h.health() - (h.maxHealth() * percent / 100));
                 h.damage(0);
                 if (h.health() <= 0) {
                     h.dead(true);
                 }
             } else {
+                b.damage = damage;
                 if (pierceArmor) {
                     h.damagePierce(damage);
                 } else {

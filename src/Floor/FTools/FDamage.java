@@ -28,8 +28,10 @@ public class FDamage extends Damage {
     private static final EventType.UnitDamageEvent bulletDamageEvent = new EventType.UnitDamageEvent();
     private static final Vec2 vec = new Vec2();
     private static final Rect rect = new Rect();
+
     private FDamage() {
     }
+
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source) {
         Cons<Unit> cons = unit -> {
             if (unit.team == team || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))) {
@@ -133,7 +135,7 @@ public class FDamage extends Damage {
 
     }
 
-    public static void triangleDamage(Bullet bullet, Team team, float damage, float x, float y, float rotation, float length, float width, float power, StatusEffect statusEffect, float time) {
+    public static void triangleDamage(Bullet bullet, Team team, float damage, float x, float y, float rotation, float length, float width, float power, StatusEffect statusEffect, float time, float boss) {
         float maxLen = max(length, width) * 1.5f;
         Units.nearbyEnemies(team, x, y, maxLen, u -> {
             float angle = Angles.angleDist(rotation, Angles.angle(x, y, u.x, u.y));
@@ -144,7 +146,11 @@ public class FDamage extends Damage {
                 u.apply(statusEffect, time);
 
                 vec.set(u.x - x, u.y - y);
-                vec.setLength(power);
+                if (BossList.list.indexOf(u.type) >= 0) {
+                    vec.setLength(power * boss);
+                } else {
+                    vec.setLength(power);
+                }
                 u.moveAt(vec);
 
                 if (!dead && u.dead) {
