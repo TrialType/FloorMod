@@ -136,51 +136,51 @@ public class GradeFactory extends UnitBlock {
         return -1;
     }
     public static class GradePlan {
-        int levelTo = -1;
-        Item item = null;
+        int levelTo;
+        Item item;
         String name = "null";
 
         public GradePlan(int levelTo, Item item) {
-            GradePlan.this.levelTo = levelTo;
-            GradePlan.this.item = item;
+            this.levelTo = levelTo;
+            this.item = item;
             if (item != null) {
                 if (item == FItems.healthPower) {
-                    name = Core.bundle.get("@health");
+                    this.name = Core.bundle.get("@health");
                 } else if (item == FItems.damagePower) {
-                    name = Core.bundle.get("@damage");
+                    this.name = Core.bundle.get("@damage");
                 } else if (item == FItems.reloadPower) {
-                    name = Core.bundle.get("@reload");
+                    this.name = Core.bundle.get("@reload");
                 } else if (item == FItems.speedPower) {
-                    name = Core.bundle.get("@speed");
+                    this.name = Core.bundle.get("@speed");
                 } else if (item == FItems.againPower) {
-                    name = Core.bundle.get("@again");
+                    this.name = Core.bundle.get("@again");
                 } else if (item == FItems.shieldPower) {
-                    name = Core.bundle.get("@shield");
+                    this.name = Core.bundle.get("@shield");
                 }
             } else {
-                name = "null";
+                this.name = "null";
             }
         }
 
         public void item(int levelTo, Item item) {
-            GradePlan.this.levelTo = levelTo;
-            GradePlan.this.item = item;
+            this.levelTo = levelTo;
+            this.item = item;
             if (item != null) {
                 if (item == FItems.healthPower) {
-                    name = Core.bundle.get("@health");
+                    this.name = Core.bundle.get("@health");
                 } else if (item == FItems.damagePower) {
-                    name = Core.bundle.get("@damage");
+                    this.name = Core.bundle.get("@damage");
                 } else if (item == FItems.reloadPower) {
-                    name = Core.bundle.get("@reload");
+                    this.name = Core.bundle.get("@reload");
                 } else if (item == FItems.speedPower) {
-                    name = Core.bundle.get("@speed");
+                    this.name = Core.bundle.get("@speed");
                 } else if (item == FItems.againPower) {
-                    name = Core.bundle.get("@again");
+                    this.name = Core.bundle.get("@again");
                 } else if (item == FItems.shieldPower) {
-                    name = Core.bundle.get("@shield");
+                    this.name = Core.bundle.get("@shield");
                 }
             } else {
-                name = "null";
+                this.name = "null";
             }
         }
     }
@@ -661,7 +661,7 @@ public class GradeFactory extends UnitBlock {
         }
         @Override
         public void updateTile() {
-            if (changed || usePlan.size == 0) {
+            if (changed || usePlan.isEmpty()) {
                 usePlan.clear();
                 for (GradePlan gp : plan) {
                     usePlan.add(gp);
@@ -718,7 +718,7 @@ public class GradeFactory extends UnitBlock {
                 updateNumber();
 
                 boolean in = moveInPayload();
-                boolean li = (lastItem != null && items.get(lastItem) >= itemUse && itemUse >= 0);
+                boolean li = lastItem != null && items.get(lastItem) >= itemUse && itemUse >= 0;
                 boolean le = (out ? level > levelTo : level < levelTo);
                 boolean si = usePlan.size > 0;
 
@@ -753,12 +753,12 @@ public class GradeFactory extends UnitBlock {
                         }
                     }
                 } else if (in && lastUnit != null && !lastUnit.type.isBanned()) {
-                    if (!le && li && si) {
+                    if ((!le || !li) && si) {
                         usePlan.remove(0);
                         if (usePlan.size == 0) {
                             outing = true;
                         }
-                    } else if (!li || !si) {
+                    } else {
                         outing = true;
                     }
                 }
