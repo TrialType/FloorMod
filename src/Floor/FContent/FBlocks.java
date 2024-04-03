@@ -8,16 +8,19 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.math.Angles;
 import arc.math.Rand;
+import arc.util.Time;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.bullet.BasicBulletType;
-import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.LaserBoltBulletType;
-import mindustry.entities.bullet.PointBulletType;
+import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.WaveEffect;
+import mindustry.entities.part.DrawPart;
+import mindustry.entities.part.FlarePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
@@ -38,7 +41,7 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
-    public static Block eleFence;
+    public static Block eleFence, eleFenceII, eleFenceIII;
     public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay, bind, fireBoost;
 
     public static void load() {
@@ -192,9 +195,9 @@ public class FBlocks {
             consumeAmmoOnce = false;
             canOverdrive = false;
 
-            shootType = new LaserBoltBulletType(2, 8) {{
-                pierce = true;
-                pierceCap = 2;
+            shootType = new EmpBulletType() {{
+                speed = 2;
+                damage = 8;
 
                 lifetime = 30;
                 rangeOverride = 60;
@@ -204,19 +207,13 @@ public class FBlocks {
                 splashDamageRadius = 36;
 
                 shootEffect = smokeEffect = Fx.none;
-                hitEffect = new WaveEffect() {{
-                    lifetime = 26;
-                    sizeTo = sizeFrom = 36;
-                    strokeFrom = 2;
-                    strokeTo = 0;
-                    colorFrom = colorTo = Pal.redLight;
-                }};
+                hitEffect = Fx.none;
                 despawnEffect = hitEffect;
             }};
 
             requirements(Category.turret, ItemStack.with(
-                    Items.copper, 40,
-                    Items.graphite, 30
+                    Items.copper, 60,
+                    Items.graphite, 60
             ));
         }};
         bind = new PowerTurret("bind") {{
@@ -233,9 +230,10 @@ public class FBlocks {
             consumeAmmoOnce = false;
             canOverdrive = false;
 
-            shootType = new LaserBoltBulletType(4.5f, 16) {{
-                pierce = true;
-                pierceCap = 2;
+            shootType = new EmpBulletType() {{
+                speed = 4.5f;
+                damage = 12;
+
                 rangeOverride = 200;
                 lightColor = frontColor = backColor = Pal.redLight;
                 status = StatusEffects.unmoving;
@@ -243,13 +241,7 @@ public class FBlocks {
                 splashDamageRadius = 60;
 
                 shootEffect = smokeEffect = Fx.none;
-                hitEffect = new WaveEffect() {{
-                    lifetime = 30;
-                    sizeTo = sizeFrom = 60;
-                    strokeFrom = 2;
-                    strokeTo = 0;
-                    colorFrom = colorTo = Pal.redLight;
-                }};
+                hitEffect = Fx.none;
                 despawnEffect = hitEffect;
 
                 fragAngle = 360;
@@ -258,17 +250,11 @@ public class FBlocks {
                 fragLifeMin = 3.5f;
                 fragOnAbsorb = false;
                 fragOnHit = true;
-                fragBullet = new BulletType() {{
+                fragBullet = new EmpBulletType() {{
                     damage = 3;
                     speed = 2.5f;
                     splashDamageRadius = 6;
-                    hitEffect = new WaveEffect() {{
-                        lifetime = 30;
-                        sizeTo = sizeFrom = 60;
-                        strokeFrom = 2;
-                        strokeTo = 0;
-                        colorFrom = colorTo = Pal.redderDust;
-                    }};
+                    hitEffect = Fx.none;
                     despawnEffect = hitEffect;
 
                     status = FStatusEffects.suppressI;
@@ -277,9 +263,9 @@ public class FBlocks {
             }};
 
             requirements(Category.turret, ItemStack.with(
-                    Items.copper, 450,
-                    Items.titanium, 650,
-                    Items.graphite, 500
+                    Items.copper, 500,
+                    Items.titanium, 350,
+                    Items.graphite, 400
             ));
         }};
         smallWindTurret = new ItemTurret("small_wind_turret") {{
@@ -306,13 +292,7 @@ public class FBlocks {
             health = 1300;
 
             ammoTypes.put(Items.blastCompound, new PointBulletType() {{
-                trailEffect = new ExplosionEffect() {{
-                    smokeColor = Pal.darkPyraFlame;
-                    sparks = 0;
-                    waveLife = 0;
-                    smokes = 15;
-                    lifetime = 180;
-                }};
+                trailEffect = Fx.none;
 
                 damage = 0;
                 lifetime = 600;
@@ -332,11 +312,98 @@ public class FBlocks {
                     applyEffect = FStatusEffects.burningIII;
 
                     fillRange = false;
-                    windEffect = new Effect(66, 80f, e -> {
+                    windEffect = new Effect(20, 80f, e -> {
+                        FlarePart fp = new FlarePart() {{
+                            sides = 3;
+                            color1 = color2 = Pal.darkPyraFlame;
+                            radius = radiusTo = 3;
+                            innerRadScl = 0.4f;
+                        }};
+                        Effect ef = new ExplosionEffect() {{
+                            lifetime = 90;
+                            sparks = 0;
+                            waveLife = 90;
+                            waveColor = Pal.darkPyraFlame;
+                            waveRadBase = 24;
+                            smokes = 15;
+                            smokeRad = 18;
+                            smokeColor = Pal.darkPyraFlame;
+                            smokeSizeBase = 1.5f;
+                        }};
+
                         color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
 
-                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 0.95f, e.rotation, 40,
-                                (x, y) -> Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f));
+                        randLenVectors(e.id, 1, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
+                                (x, y) -> {
+                                    float angle = Angles.angle(x, y);
+                                    float x1 = e.x + x;
+                                    float y1 = e.y + y;
+                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
+                                    DrawPart.params.life = e.fin();
+                                    fp.draw(DrawPart.params);
+                                    if (e.lifetime - e.time <= Time.delta) {
+                                        ef.at(x1, y1, angle, Pal.darkPyraFlame);
+                                    }
+                                }
+                        );
+                    });
+                }};
+            }});
+            ammoTypes.put(Items.metaglass, new PointBulletType() {{
+                trailEffect = Fx.none;
+
+                damage = 0;
+                lifetime = 600;
+                speed = 500;
+                trailSpacing = 20f;
+
+                fragAngle = 0;
+                fragRandomSpread = 0;
+                fragSpread = 0;
+                fragOnAbsorb = fragOnHit = true;
+                fragBullets = 1;
+
+                fragBullet = new WindBulletType() {{
+                    lifetime = 400;
+                    damage = 0.5f;
+                    windPower = 0.3f;
+                    applyEffect = FStatusEffects.breakHelII;
+
+                    fillRange = false;
+                    windEffect = new Effect(20, 80f, e -> {
+                        FlarePart fp = new FlarePart() {{
+                            sides = 3;
+                            color1 = color2 = Color.valueOf("ebeef5");
+                            radius = radiusTo = 3;
+                            innerRadScl = 0.4f;
+                        }};
+                        Effect ef = new ExplosionEffect() {{
+                            lifetime = 90;
+                            sparks = 0;
+                            waveLife = 90;
+                            waveColor = Color.valueOf("ebeef5");
+                            waveRadBase = 24;
+                            smokes = 15;
+                            smokeRad = 18;
+                            smokeColor = Color.valueOf("ebeef5");
+                            smokeSizeBase = 1.5f;
+                        }};
+
+                        color(Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), e.fin());
+
+                        randLenVectors(e.id, 1, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
+                                (x, y) -> {
+                                    float angle = Angles.angle(x, y);
+                                    float x1 = e.x + x;
+                                    float y1 = e.y + y;
+                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
+                                    DrawPart.params.life = e.fin();
+                                    fp.draw(DrawPart.params);
+                                    if (e.lifetime - e.time <= Time.delta) {
+                                        ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
+                                    }
+                                }
+                        );
                     });
                 }};
             }});
@@ -369,14 +436,7 @@ public class FBlocks {
             ammoTypes.put(Items.blastCompound, new PointBulletType() {{
                 ammoMultiplier = 1f;
 
-                trailEffect = new ExplosionEffect() {{
-                    smokeColor = Pal.darkPyraFlame;
-                    sparks = 0;
-                    waveLife = 0;
-                    smokes = 40;
-                    smokeSize = 6;
-                    lifetime = 240;
-                }};
+                trailEffect = Fx.none;
 
                 damage = 0;
                 lifetime = 600;
@@ -394,6 +454,101 @@ public class FBlocks {
                     damage = 1f;
                     windPower = 0.45f;
                     applyEffect = FStatusEffects.burningIV;
+
+                    fillRange = false;
+                    windEffect = new Effect(20, 80f, e -> {
+                        FlarePart fp = new FlarePart() {{
+                            sides = 3;
+                            color1 = color2 = Pal.darkPyraFlame;
+                            radius = radiusTo = 3;
+                            innerRadScl = 0.4f;
+                        }};
+                        Effect ef = new ExplosionEffect() {{
+                            lifetime = 90;
+                            sparks = 0;
+                            waveLife = 90;
+                            waveColor = Pal.darkPyraFlame;
+                            waveRadBase = 26;
+                            smokes = 20;
+                            smokeRad = 22;
+                            smokeColor = Pal.darkPyraFlame;
+                            smokeSizeBase = 1.75f;
+                        }};
+
+                        color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
+
+                        randLenVectors(e.id, 2, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
+                                (x, y) -> {
+                                    float angle = Angles.angle(x, y);
+                                    float x1 = e.x + x;
+                                    float y1 = e.y + y;
+                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
+                                    DrawPart.params.life = e.fin();
+                                    fp.draw(DrawPart.params);
+                                    if (e.lifetime - e.time <= Time.delta) {
+                                        ef.at(x1, y1, angle, Pal.darkPyraFlame);
+                                    }
+                                }
+                        );
+                    });
+                }};
+            }});
+            ammoTypes.put(Items.metaglass, new PointBulletType() {{
+                trailEffect = Fx.none;
+
+                damage = 0;
+                lifetime = 600;
+                speed = 500;
+                trailSpacing = 20f;
+
+                fragAngle = 0;
+                fragRandomSpread = 0;
+                fragSpread = 0;
+                fragOnAbsorb = fragOnHit = true;
+                fragBullets = 1;
+
+                fragBullet = new WindBulletType() {{
+                    lifetime = 850;
+                    damage = 1f;
+                    windPower = 0.45f;
+                    applyEffect = FStatusEffects.breakHelIII;
+
+                    fillRange = false;
+                    windEffect = new Effect(20, 80f, e -> {
+                        FlarePart fp = new FlarePart() {{
+                            sides = 3;
+                            color1 = color2 = Color.valueOf("ebeef5");
+                            radius = radiusTo = 3;
+                            innerRadScl = 0.4f;
+                        }};
+                        Effect ef = new ExplosionEffect() {{
+                            lifetime = 90;
+                            sparks = 0;
+                            waveLife = 90;
+                            waveColor = Color.valueOf("ebeef5");
+                            waveRadBase = 26;
+                            smokes = 20;
+                            smokeRad = 22;
+                            smokeColor = Color.valueOf("ebeef5");
+                            smokeSizeBase = 1.75f;
+                        }};
+
+                        color(Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), e.fin());
+
+                        randLenVectors(e.id, 2, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
+                                (x, y) -> {
+                                    float angle = Angles.angle(x, y);
+                                    float x1 = e.x + x;
+                                    float y1 = e.y + y;
+                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
+                                    DrawPart.params.life = e.fin();
+                                    fp.draw(DrawPart.params);
+                                    if (e.lifetime - e.time <= Time.delta) {
+                                        ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
+                                    }
+                                }
+                        );
+                    });
                 }};
             }});
         }};
@@ -426,14 +581,7 @@ public class FBlocks {
             ammoTypes.put(Items.blastCompound, new PointBulletType() {{
                 ammoMultiplier = 1f;
 
-                trailEffect = new ExplosionEffect() {{
-                    smokeColor = Pal.darkPyraFlame;
-                    sparks = 0;
-                    waveLife = 0;
-                    smokes = 60;
-                    smokeSize = 12;
-                    lifetime = 300;
-                }};
+                trailEffect = Fx.none;
 
                 damage = 0;
                 lifetime = 600;
@@ -453,6 +601,105 @@ public class FBlocks {
                     windWidth = 600;
                     windLength = 300;
                     applyEffect = FStatusEffects.burningV;
+
+                    fillRange = false;
+                    windEffect = new Effect(20, 80f, e -> {
+                        FlarePart fp = new FlarePart() {{
+                            sides = 3;
+                            color1 = color2 = Pal.darkPyraFlame;
+                            radius = radiusTo = 3;
+                            innerRadScl = 0.4f;
+                        }};
+                        Effect ef = new ExplosionEffect() {{
+                            lifetime = 90;
+                            sparks = 0;
+                            waveLife = 90;
+                            waveColor = Pal.darkPyraFlame;
+                            waveRadBase = 30;
+                            smokes = 24;
+                            smokeRad = 30;
+                            smokeColor = Pal.darkPyraFlame;
+                            smokeSizeBase = 2;
+                        }};
+
+                        color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
+
+                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
+                                (x, y) -> {
+                                    float angle = Angles.angle(x, y);
+                                    float x1 = e.x + x;
+                                    float y1 = e.y + y;
+                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
+                                    DrawPart.params.life = e.fin();
+                                    fp.draw(DrawPart.params);
+                                    if (e.lifetime - e.time <= Time.delta) {
+                                        ef.at(x1, y1, angle, Pal.darkPyraFlame);
+                                    }
+                                }
+                        );
+                    });
+                }};
+            }});
+            ammoTypes.put(Items.metaglass, new PointBulletType() {{
+                ammoMultiplier = 1f;
+
+                trailEffect = Fx.none;
+
+                damage = 0;
+                lifetime = 600;
+                speed = 500;
+                trailSpacing = 20f;
+
+                fragAngle = 0;
+                fragRandomSpread = 0;
+                fragSpread = 0;
+                fragOnAbsorb = fragOnHit = true;
+                fragBullets = 1;
+
+                fragBullet = new WindBulletType() {{
+                    lifetime = 1000;
+                    damage = 2f;
+                    windPower = 0.65f;
+                    windWidth = 600;
+                    windLength = 300;
+                    applyEffect = FStatusEffects.breakHelIV;
+
+                    fillRange = false;
+                    windEffect = new Effect(20, 80f, e -> {
+                        FlarePart fp = new FlarePart() {{
+                            sides = 3;
+                            color1 = color2 = Color.valueOf("ebeef5");
+                            radius = radiusTo = 3;
+                            innerRadScl = 0.4f;
+                        }};
+                        Effect ef = new ExplosionEffect() {{
+                            lifetime = 90;
+                            sparks = 0;
+                            waveLife = 90;
+                            waveColor = Color.valueOf("ebeef5");
+                            waveRadBase = 30;
+                            smokes = 24;
+                            smokeRad = 30;
+                            smokeColor = Color.valueOf("ebeef5");
+                            smokeSizeBase = 2;
+                        }};
+
+                        color(Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), e.fin());
+
+                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
+                                (x, y) -> {
+                                    float angle = Angles.angle(x, y);
+                                    float x1 = e.x + x;
+                                    float y1 = e.y + y;
+                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
+                                    DrawPart.params.life = e.fin();
+                                    fp.draw(DrawPart.params);
+                                    if (e.lifetime - e.time <= Time.delta) {
+                                        ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
+                                    }
+                                }
+                        );
+                    });
                 }};
             }});
         }};
@@ -539,15 +786,59 @@ public class FBlocks {
             maxLength = 200;
             maxConnect = 5;
             maxFenceSize = 80;
-            eleDamage = 0.3f;
+            eleDamage = 0.6f;
             air = true;
 
-            consume(new ConsumePower(15, 1000, true));
+            consume(new ConsumePower(10, 1000, false));
 
             requirements(Category.defense, ItemStack.with(
                     Items.titanium, 150,
                     Items.copper, 300,
                     Items.silicon, 150
+            ));
+        }};
+        eleFenceII = new ElectricFence("eleFenceII") {{
+            health = 1500;
+            size = 3;
+            clipSize = 3;
+            hasPower = true;
+
+            maxLength = 400;
+            maxConnect = 15;
+            maxFenceSize = 150;
+            eleDamage = 1.2f;
+            air = true;
+            statusEffect = FStatusEffects.burningIV;
+            statusTime = 300;
+
+            consume(new ConsumePower(25, 5000, false));
+
+            requirements(Category.defense, ItemStack.with(
+                    Items.titanium, 350,
+                    Items.copper, 600,
+                    Items.silicon, 300
+            ));
+        }};
+        eleFenceIII = new ElectricFence("eleFenceIII") {{
+            health = 3000;
+            size = 4;
+            clipSize = 4;
+            hasPower = true;
+
+            maxLength = 650;
+            maxConnect = 25;
+            maxFenceSize = 300;
+            eleDamage = 2.5f;
+            air = true;
+            statusEffect = FStatusEffects.burningV;
+            statusTime = 420;
+
+            consume(new ConsumePower(75, 15000, false));
+
+            requirements(Category.defense, ItemStack.with(
+                    Items.titanium, 450,
+                    Items.copper, 1000,
+                    Items.silicon, 500
             ));
         }};
     }

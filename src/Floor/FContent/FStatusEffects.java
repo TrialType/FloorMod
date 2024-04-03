@@ -1,21 +1,19 @@
 package Floor.FContent;
 
 import arc.graphics.Color;
-import arc.math.Interp;
 import arc.struct.Seq;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
-import mindustry.entities.effect.MultiEffect;
-import mindustry.entities.effect.ParticleEffect;
 import mindustry.type.StatusEffect;
 
 public class FStatusEffects {
     public final static Seq<StatusEffect> burnings = new Seq<>();
     public static StatusEffect StrongStop, boostSpeed, HardHit,
-            suppressI,suppressII,suppressIII,suppressIV,
+            suppressI, suppressII, suppressIII, suppressIV,
             slowII, fastII,
             High_tension, High_tensionII, High_tensionIII, High_tensionIV, High_tensionV,
-            burningII, burningIII, burningIV, burningV;
+            burningII, burningIII, burningIV, burningV,
+            breakHel, breakHelII, breakHelIII, breakHelIV, breakHelV;
 
     public static void load() {
         StrongStop = new StatusEffect("strong_stop") {{
@@ -35,148 +33,30 @@ public class FStatusEffects {
             reloadMultiplier = 0.5F;
             color = new Color(145, 75, 0, 255);
             effectChance = 0.3f;
-            effect = new MultiEffect(new ParticleEffect() {{
-                baseLength = 0;
-                length = 25;
-                lifetime = 10;
-                sizeFrom = 2;
-                sizeTo = 0;
-                colorFrom = color;
-                colorTo = color;
-            }}, new ParticleEffect() {{
-                particles = 2;
-                line = true;
-                interp = Interp.slowFast;
-                strokeFrom = 2;
-                strokeTo = 0;
-                lenFrom = 10;
-                lenTo = 0;
-                length = 23;
-                baseLength = 0;
-                lifetime = 10;
-                colorFrom = color;
-                colorTo = color;
-            }});
         }};
         suppressI = new StatusEffect("suppress_I") {{
             speedMultiplier = 0.9F;
             reloadMultiplier = 0.9F;
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
-            effect = new MultiEffect(new ParticleEffect() {{
-                baseLength = 0;
-                length = 25;
-                lifetime = 10;
-                sizeFrom = 2;
-                sizeTo = 0;
-                colorFrom = color;
-                colorTo = color;
-                interp = Interp.circleIn;
-            }}, new ParticleEffect() {{
-                particles = 2;
-                line = true;
-                interp = Interp.slowFast;
-                strokeFrom = 2;
-                strokeTo = 0;
-                lenFrom = 10;
-                lenTo = 0;
-                length = 23;
-                baseLength = 0;
-                lifetime = 10;
-                colorFrom = new Color(170, 170, 0, 255);
-                colorTo = color;
-                interp = Interp.circleIn;
-            }});
         }};
         suppressII = new StatusEffect("suppress_II") {{
             speedMultiplier = 0.8F;
             reloadMultiplier = 0.8F;
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
-            effect = new MultiEffect(new ParticleEffect() {{
-                baseLength = 0;
-                length = 25;
-                lifetime = 10;
-                sizeFrom = 2;
-                sizeTo = 0;
-                colorFrom = color;
-                colorTo = color;
-                interp = Interp.circleIn;
-            }}, new ParticleEffect() {{
-                particles = 2;
-                line = true;
-                interp = Interp.slowFast;
-                strokeFrom = 2;
-                strokeTo = 0;
-                lenFrom = 10;
-                lenTo = 0;
-                length = 23;
-                baseLength = 0;
-                lifetime = 10;
-                colorFrom = new Color(170, 170, 0, 255);
-                colorTo = color;
-                interp = Interp.circleIn;
-            }});
         }};
         suppressIII = new StatusEffect("suppress_III") {{
             speedMultiplier = 0.7F;
             reloadMultiplier = 0.7F;
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
-            effect = new MultiEffect(new ParticleEffect() {{
-                baseLength = 0;
-                length = 25;
-                lifetime = 10;
-                sizeFrom = 2;
-                sizeTo = 0;
-                colorFrom = color;
-                colorTo = color;
-                interp = Interp.circleIn;
-            }}, new ParticleEffect() {{
-                particles = 2;
-                line = true;
-                interp = Interp.slowFast;
-                strokeFrom = 2;
-                strokeTo = 0;
-                lenFrom = 10;
-                lenTo = 0;
-                length = 23;
-                baseLength = 0;
-                lifetime = 10;
-                colorFrom = new Color(170, 170, 0, 255);
-                colorTo = color;
-                interp = Interp.circleIn;
-            }});
         }};
         suppressIV = new StatusEffect("suppress_IV") {{
             speedMultiplier = 0.6F;
             reloadMultiplier = 0.6F;
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
-            effect = new MultiEffect(new ParticleEffect() {{
-                baseLength = 0;
-                length = 25;
-                lifetime = 10;
-                sizeFrom = 2;
-                sizeTo = 0;
-                colorFrom = color;
-                colorTo = color;
-                interp = Interp.circleIn;
-            }}, new ParticleEffect() {{
-                particles = 2;
-                line = true;
-                interp = Interp.slowFast;
-                strokeFrom = 2;
-                strokeTo = 0;
-                lenFrom = 10;
-                lenTo = 0;
-                length = 23;
-                baseLength = 0;
-                lifetime = 10;
-                colorFrom = new Color(170, 170, 0, 255);
-                colorTo = color;
-                interp = Interp.circleIn;
-            }});
         }};
         slowII = new StatusEffect("slow_II") {{
             speedMultiplier = 0.55F;
@@ -237,6 +117,26 @@ public class FStatusEffects {
             damage = 8f;
             transitionDamage = 50;
             effect = Fx.burning;
+        }};
+        breakHel = new StatusEffect("break_hel") {{
+            healthMultiplier = 0.9f;
+            damage = 12;
+        }};
+        breakHelII = new StatusEffect("break_helII") {{
+            healthMultiplier = 0.8f;
+            damage = 24;
+        }};
+        breakHelIII = new StatusEffect("break_helIII") {{
+            healthMultiplier = 0.65f;
+            damage = 48;
+        }};
+        breakHelIV = new StatusEffect("break_helIV") {{
+            healthMultiplier = 0.5f;
+            damage = 96;
+        }};
+        breakHelV = new StatusEffect("break_helV") {{
+            healthMultiplier = 0.3f;
+            damage = 192;
         }};
 
         burnings.addAll(StatusEffects.burning, burningII, burningIII, burningIV, burningV);

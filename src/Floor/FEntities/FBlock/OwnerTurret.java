@@ -58,6 +58,9 @@ public class OwnerTurret extends Turret {
         @Override
         public void updateTile() {
             boost = (1 + exp / maxHealth / 10);
+            float percent = health / maxHealth;
+            maxHealth = maxHealth * boost;
+            this.health = maxHealth * percent;
 
             reloadCounter += exp;
             heal(exp / 100);

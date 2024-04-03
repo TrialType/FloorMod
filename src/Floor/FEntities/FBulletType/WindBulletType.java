@@ -16,6 +16,7 @@ import mindustry.type.StatusEffect;
 import static java.lang.Math.*;
 
 public class WindBulletType extends BulletType {
+    public float effectTimer = 0.01f;
     public boolean fillRange = true;
     public float windPower = 0.15f;
     public float bossPowerExpand = 0;
@@ -38,6 +39,7 @@ public class WindBulletType extends BulletType {
 
     @Override
     public void draw(Bullet b) {
+        super.drawParts(b);
         float rot = b.rotation();
         float bx = (float) (b.x - windLength / 10 * cos(toRadians(rot)));
         float by = (float) (b.y - windLength / 10 * sin(toRadians(rot)));
@@ -54,7 +56,7 @@ public class WindBulletType extends BulletType {
 
             Fill.tri(bx, by, x1 + dx, y1 + dy, x1 - dx, y1 - dy);
         }
-        if (windEffect != null) {
+        if (b.fin() % effectTimer >= effectTimer / 2 && windEffect != null) {
             windEffect.at(bx, by, rot, Pal.darkerGray);
         }
         Draw.reset();

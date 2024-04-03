@@ -1,5 +1,7 @@
 package Floor.FEntities.FBlock;
 
+import Floor.FTools.BossList;
+import Floor.FTools.FUnitUpGrade;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -156,7 +158,11 @@ public class ElectricFence extends Block {
             go = 0;
             for (Unit u : stopUnits) {
                 if (u != null) {
-                    go += u.hitSize;
+                    if (u instanceof FUnitUpGrade uug) {
+                        go = go + u.hitSize * Math.max(1, uug.getSpeedLevel() * 0.75f);
+                    } else {
+                        go += u.hitSize;
+                    }
                 }
             }
             if (go >= maxFenceSize) {
@@ -207,24 +213,26 @@ public class ElectricFence extends Block {
         }
 
         public boolean inRange(float len, Unit u) {
-            float ux = u.x;
-            float uy = u.y;
-            float angle1 = Angles.angleDist(rotate, Angles.angle(x, y, ux, uy));
-            float len1 = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
-            angle1 = Math.min(angle1, 180 - angle1);
-            if (Math.sin(Math.toRadians(angle1)) * len1 <= 6f && len1 * Math.cos(Math.toRadians(angle1)) <= len) {
-                float ro2 = Angles.angleDist(Angles.angle(ux, uy, x, y), u.vel.angle());
-                float ro4 = Angles.angleDist(rotate, u.vel.angle());
-                float ro3 = Angles.angleDist(Angles.angle(x, y, ux, uy), rotate);
-                boolean close;
-                if (ro4 + ro3 >= 180) {
-                    close = ro2 < ro3 + 1;
-                } else {
-                    close = ro2 + ro3 < 181;
+            if (BossList.list.indexOf(u.type) < 0) {
+                float ux = u.x;
+                float uy = u.y;
+                float angle1 = Angles.angleDist(rotate, Angles.angle(x, y, ux, uy));
+                float len1 = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
+                angle1 = Math.min(angle1, 180 - angle1);
+                if (Math.sin(Math.toRadians(angle1)) * len1 <= size * 4 && len1 * Math.cos(Math.toRadians(angle1)) <= len) {
+                    float ro2 = Angles.angleDist(Angles.angle(ux, uy, x, y), u.vel.angle());
+                    float ro4 = Angles.angleDist(rotate, u.vel.angle());
+                    float ro3 = Angles.angleDist(Angles.angle(x, y, ux, uy), rotate);
+                    boolean close;
+                    if (ro4 + ro3 >= 180) {
+                        close = ro2 < ro3 + 1;
+                    } else {
+                        close = ro2 + ro3 < 181;
+                    }
+                    if (close && air && !(u.physref.body.layer == 4)) {
+                        return true;
+                    } else return close && !air && u.isGrounded();
                 }
-                if (close && air && !(u.physref.body.layer == 4)) {
-                    return true;
-                } else return close && !air && u.isGrounded();
             }
             return false;
         }
@@ -237,6 +245,7 @@ public class ElectricFence extends Block {
         public final Map<Integer, Float> times = new HashMap<>();
         public final IntSeq builds = new IntSeq();
         public final ObjectMap<Integer, FenceLine> linesMap = new ObjectMap<>();
+
         @Override
         public void updateTile() {
             if (dead || health <= 0) {
@@ -279,6 +288,7 @@ public class ElectricFence extends Block {
             }
             super.updateTile();
         }
+
         @Override
         public boolean onConfigureBuildTapped(Building other) {
             if (other instanceof ElectricFenceBuild && other.within(this, maxLength) && other != this && other.team == team) {
