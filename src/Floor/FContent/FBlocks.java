@@ -40,7 +40,6 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
-import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
@@ -54,10 +53,15 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks {
     static Rand rand = new Rand();
     static Vec2 rv = new Vec2();
-    public static Block outPowerFactory, inputPowerFactory;
+    public static Block outPowerFactory, inputPowerFactory,
+            outPowerFactoryII, inputPowerFactoryII,
+            outPowerFactoryIII, inputPowerFactoryIII;
     public static Block kt;
     public static Block eleFence, eleFenceII, eleFenceIII;
-    public static Block fourNet, fireStream, smallWindTurret, middleWindTurret, largeWindTurret, stay, bind, fireBoost;
+    public static Block fourNet, fireBoost,
+            smallWindTurret, middleWindTurret, largeWindTurret,
+            stay, bind,
+            fireStream;
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -79,18 +83,14 @@ public class FBlocks {
             constructTime = 60f * 10f;
             out = false;
         }};
-
 //======================================================================================================================
-
         kt = new KnockingTurret("kt") {{
             hasPower = true;
             health = 650;
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
-
 //======================================================================================================================
-
         fireStream = new ItemTurret("fire_stream") {{
             requirements(Category.turret, ItemStack.with(
                     Items.titanium, 340,
