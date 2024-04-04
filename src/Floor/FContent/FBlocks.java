@@ -40,6 +40,7 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
@@ -859,7 +860,7 @@ public class FBlocks {
                         radiusTo = 0;
                         rotMove = 1000;
                         stroke = 40;
-                        innerScl = 0.4f;
+                        innerScl = 0.2f;
                         color1 = Color.valueOf("EBEEF5");
                         color2 = Color.valueOf("EBEEF5");
                     }});

@@ -16,10 +16,12 @@ import mindustry.entities.Mover;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
+import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.io.TypeIO;
+import mindustry.world.Tile;
 import mindustry.world.blocks.ControlBlock;
 import mindustry.world.blocks.defense.Wall;
 import mindustry.world.blocks.defense.turrets.Turret;
@@ -44,10 +46,15 @@ public class OwnerTurret extends Turret {
 
         super(name);
 
-        breakable = false;
         hasItems = false;
         update = solid = true;
         itemCapacity = maxAmmo = 0;
+    }
+
+    @Override
+    public boolean canBreak(Tile tile) {
+        Building b = tile.build;
+        return !(b instanceof ownerBuild) || ((ownerBuild) b).exp <= health * 2;
     }
 
     public class ownerBuild extends TurretBuild implements FBuildUpGrade, ControlBlock {
@@ -207,7 +214,7 @@ public class OwnerTurret extends Turret {
 
         @Override
         public boolean canControl() {
-            return exp <= maxHealth * 2;
+            return exp <= OwnerTurret.this.health * 2;
         }
     }
 }
