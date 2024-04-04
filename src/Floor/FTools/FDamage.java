@@ -12,6 +12,7 @@ import arc.util.Nullable;
 import mindustry.content.StatusEffects;
 import mindustry.core.World;
 import mindustry.entities.Damage;
+import mindustry.entities.Effect;
 import mindustry.entities.Fires;
 import mindustry.entities.Units;
 import mindustry.game.EventType;
@@ -135,7 +136,7 @@ public class FDamage extends Damage {
 
     }
 
-    public static void triangleDamage(Bullet bullet, Team team, float damage, float x, float y, float rotation, float length, float width, float power, StatusEffect statusEffect, float time, float boss) {
+    public static void triangleDamage(Bullet bullet, Team team, float damage, float x, float y, float rotation, float length, float width, float power, StatusEffect statusEffect, float time, float boss, Effect effect) {
         float maxLen = max(length, width) * 1.5f;
         Units.nearbyEnemies(team, x, y, maxLen, u -> {
             float angle = Angles.angleDist(rotation, Angles.angle(x, y, u.x, u.y));
@@ -144,6 +145,9 @@ public class FDamage extends Damage {
                 boolean dead = u.dead;
                 u.damage(damage);
                 u.apply(statusEffect, time);
+                if (effect != null) {
+                    effect.at(x, y, Angles.angle(x, y, u.x, u.y), u);
+                }
 
                 vec.set(u.x - x, u.y - y);
                 if (BossList.list.indexOf(u.type) >= 0) {
@@ -167,6 +171,9 @@ public class FDamage extends Damage {
                 if (angle <= 90 && (width / length) - tan(toRadians(angle)) >= -0.01f && len * cos(toRadians(angle)) - length <= 0) {
                     boolean dead = b.dead;
                     b.damage(damage);
+                    if (effect != null) {
+                        effect.at(b.x, b.y, Angles.angle(x, y, b.x, b.y), b);
+                    }
 
                     if (FStatusEffects.burnings.indexOf(statusEffect) >= 0) {
                         Fires.create(b.tile);

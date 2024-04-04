@@ -5,28 +5,33 @@ import Floor.FEntities.FBlock.GradeFactory;
 import Floor.FEntities.FBlock.KnockingTurret;
 import Floor.FEntities.FBlock.OwnerTurret;
 import Floor.FEntities.FBulletType.AroundBulletType;
+import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
+import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
+import arc.math.Mathf;
 import arc.math.Rand;
-import arc.util.Time;
+import arc.math.geom.Vec2;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.WaveEffect;
-import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.FlarePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.game.EventType;
+import mindustry.gen.Building;
+import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
@@ -39,9 +44,13 @@ import mindustry.world.consumers.ConsumePower;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
+import static arc.util.Time.time;
+import static java.lang.Math.abs;
 import static mindustry.type.ItemStack.with;
 
 public class FBlocks {
+    static Rand rand = new Rand();
+    static Vec2 rv = new Vec2();
     public static Block outPowerFactory, inputPowerFactory;
     public static Block kt;
     public static Block eleFence, eleFenceII, eleFenceIII;
@@ -248,7 +257,7 @@ public class FBlocks {
                     lifetime = 45;
                     waveColor = Pal.redLight;
                     waveRadBase = 60;
-                    waveRad = 65;
+                    waveRad = 61;
                     waveStroke = 4;
                     waveLife = 45;
                     smokes = 28;
@@ -262,6 +271,8 @@ public class FBlocks {
                 fragBullets = 6;
                 fragLifeMax = 4;
                 fragLifeMin = 3.5f;
+                fragVelocityMin = 0.2f;
+                fragVelocityMax = 0.5f;
                 fragOnAbsorb = false;
                 fragOnHit = true;
                 fragBullet = new BulletType() {{
@@ -269,27 +280,23 @@ public class FBlocks {
                     speed = 2.5f;
                     splashDamageRadius = 6;
                     status = FStatusEffects.suppressI;
-                    statusDuration = 24;
+                    statusDuration = 240;
 
                     hitEffect = new ExplosionEffect() {{
-                        lifetime = 24;
+                        lifetime = 240;
 
                         waveColor = Pal.redLight;
                         waveRadBase = 6;
                         waveRad = 6;
                         waveStroke = 1;
-                        waveLife = 24;
+                        waveLife = 240;
 
                         smokes = 4;
                         smokeRad = 6;
                         smokeColor = Pal.redLight;
                         smokeSizeBase = 1;
                     }};
-                    ;
                     despawnEffect = hitEffect;
-
-                    status = FStatusEffects.suppressI;
-                    statusDuration = 240;
                 }};
             }};
 
@@ -322,13 +329,17 @@ public class FBlocks {
             clipSize = 3;
             health = 1300;
 
-            ammoTypes.put(Items.blastCompound, new PointBulletType() {{
+            ammoTypes.put(Items.blastCompound, new BasicBulletType() {{
                 trailEffect = Fx.none;
 
                 damage = 0;
-                lifetime = 600;
-                speed = 500;
-                trailSpacing = 20f;
+                lifetime = 1800;
+                speed = 0.7f;
+                width = height = 36;
+                shrinkX = shrinkY = 0;
+                backColor = frontColor = Pal.darkPyraFlame;
+
+                reflectable = absorbable = false;
 
                 fragAngle = 0;
                 fragRandomSpread = 0;
@@ -343,31 +354,57 @@ public class FBlocks {
                     applyEffect = FStatusEffects.burningIII;
 
                     fillRange = false;
-                    windEffect = new Effect(20, 80f, e -> {
-                        Effect ef = new ExplosionEffect() {{
-                            lifetime = 90;
-                            sparks = 0;
-                            waveLife = 90;
-                            waveColor = Pal.darkPyraFlame;
-                            waveRadBase = 24;
-                            smokes = 15;
-                            smokeRad = 18;
-                            smokeColor = Pal.darkPyraFlame;
-                            smokeSizeBase = 1.5f;
-                        }};
-
-                        color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
-
-                        randLenVectors(e.id, 1, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
-                                (x, y) -> {
-                                    float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
-                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
-                                    if (e.lifetime - e.time <= Time.delta) {
-                                        ef.at(x1, y1, angle, Pal.darkPyraFlame);
-                                    }
-                                }
+                    windEffect = new Effect(120, 80f, e -> {
+                        Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 50,
+                                (x, y) -> Fill.circle(e.x + x, e.y + y, 1 * (1 - e.fin()))
                         );
+                    });
+                    everyHit = new Effect(120, e -> {
+                        if (e.data instanceof Unit u) {
+                            float size = u.hitSize;
+                            float angle = Angles.angle(e.x, e.y, u.x, u.y);
+                            float x = u.x - Angles.trnsx(angle, size / 1.2f);
+                            float y = u.y - Angles.trnsy(angle, size / 1.2f);
+                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
+                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
+                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                                } else {
+                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
+                                }
+                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
+                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
+                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
+                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                            }
+                        }
+                        if (e.data instanceof Building b) {
+                            float size = b.hitSize();
+                            float angle = Angles.angle(e.x, e.y, b.x, b.y);
+                            float x = b.x - Angles.trnsx(angle, size / 1.2f);
+                            float y = b.y - Angles.trnsy(angle, size / 1.2f);
+                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
+                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
+                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                                } else {
+                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
+                                }
+                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
+                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
+                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
+                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                            }
+                        }
                     });
                 }};
             }});
@@ -379,44 +416,96 @@ public class FBlocks {
                 speed = 500;
                 trailSpacing = 20f;
 
+                //point = true;
+
                 fragAngle = 0;
                 fragRandomSpread = 0;
                 fragSpread = 0;
                 fragOnAbsorb = fragOnHit = true;
                 fragBullets = 1;
 
-                fragBullet = new WindBulletType() {{
+                fragBullet = new FreeBulletType() {{
                     lifetime = 400;
-                    damage = 0.5f;
-                    windPower = 0.18f;
-                    applyEffect = FStatusEffects.breakHelII;
+                    damage = 18f;
+                    speed = 0;
+                    hittable = absorbable = reflectable = collides = false;
+                    despawnEffect = hitEffect = Fx.none;
 
-                    fillRange = false;
-                    windEffect = new Effect(20, 80f, e -> {
+                    parts.add(new FlarePart() {{
+                        sides = 3;
+                        radius = 36;
+                        radiusTo = 0;
+                        rotMove = 1000;
+                        stroke = 24;
+                        innerScl = 0.2f;
+                        color1 = Color.valueOf("EBEEF588");
+                        color2 = Color.valueOf("EBEEF5");
+                    }});
+
+                    damageEffect = new Effect(8, 80f, e -> {
                         Effect ef = new ExplosionEffect() {{
-                            lifetime = 90;
+                            lifetime = 45;
                             sparks = 0;
-                            waveLife = 90;
-                            waveColor = Color.valueOf("ebeef5");
-                            waveRadBase = 24;
-                            smokes = 15;
-                            smokeRad = 18;
-                            smokeColor = Color.valueOf("ebeef5");
-                            smokeSizeBase = 1.5f;
+                            waveLife = 0;
+                            smokes = 20;
+                            smokeRad = 35;
+                            smokeColor = Color.valueOf("EBEEF522");
+                            smokeSizeBase = 2.5f;
+
+                            renderer = f -> {
+                                Draw.color(this.waveColor);
+                                f.scaled(this.waveLife, (i) -> {
+                                    Lines.stroke(this.waveStroke * i.fout());
+                                    Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
+                                });
+                                Draw.color(this.smokeColor);
+                                if (this.smokeSize > 0.0F) {
+                                    Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
+                                }
+
+                                Draw.color(this.sparkColor);
+                                Lines.stroke(f.fout() * this.sparkStroke);
+                                Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
+                                    Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
+                                    Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
+                                });
+
+                                if (f.data instanceof Vec2 v) {
+                                    color(Color.valueOf("EBEEF522"));
+                                    Lines.stroke(7.5f * (1 - f.fin()));
+                                    Lines.line(f.x, f.y, v.x, v.y);
+                                }
+                            };
                         }};
 
-                        color(Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), e.fin());
+                        for (int i = 0; i < 1; ++i) {
+                            rand.setSeed((long) (e.id + time));
+                            rv.trns(rand.range(360),
+                                    abs(rand.range(100)));
+                            float angle = Angles.angle(rv.x, rv.y);
+                            float x1 = e.x + rv.x + Angles.trnsx(angle, 40);
+                            float y1 = e.y + rv.y + Angles.trnsy(angle, 40);
+                            ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
 
-                        randLenVectors(e.id, 1, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
-                                (x, y) -> {
-                                    float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
-                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
-                                    if (e.lifetime - e.time <= Time.delta) {
-                                        ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
+                            if (e.data instanceof Bullet b) {
+                                Units.nearbyEnemies(b.team, x1, y1, 20, u -> {
+                                    boolean wasDead = u.dead;
+                                    u.damage(12);
+                                    if (!wasDead && u.dead) {
+                                        Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
                                     }
-                                }
-                        );
+                                });
+                                Units.nearbyBuildings(x1, y1, 20, bu -> {
+                                    if (bu.team != b.team) {
+                                        boolean dead = bu.dead;
+                                        bu.damage(12);
+                                        if (!dead && bu.dead) {
+                                            Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                        }
+                                    }
+                                });
+                            }
+                        }
                     });
                 }};
             }});
@@ -446,15 +535,17 @@ public class FBlocks {
             clipSize = 4;
             health = 2000;
 
-            ammoTypes.put(Items.blastCompound, new PointBulletType() {{
+            ammoTypes.put(Items.blastCompound, new BasicBulletType() {{
                 ammoMultiplier = 1f;
 
                 trailEffect = Fx.none;
 
                 damage = 0;
-                lifetime = 600;
-                speed = 500;
-                trailSpacing = 20f;
+                lifetime = 1800;
+                speed = 1.5f;
+                width = height = 77;
+                shrinkX = shrinkY = 0;
+                backColor = frontColor = Pal.darkPyraFlame;
 
                 fragAngle = 0;
                 fragRandomSpread = 0;
@@ -469,31 +560,58 @@ public class FBlocks {
                     applyEffect = FStatusEffects.burningIV;
 
                     fillRange = false;
-                    windEffect = new Effect(20, 80f, e -> {
-                        Effect ef = new ExplosionEffect() {{
-                            lifetime = 90;
-                            sparks = 0;
-                            waveLife = 90;
-                            waveColor = Pal.darkPyraFlame;
-                            waveRadBase = 26;
-                            smokes = 20;
-                            smokeRad = 22;
-                            smokeColor = Pal.darkPyraFlame;
-                            smokeSizeBase = 1.75f;
-                        }};
-
-                        color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
-
-                        randLenVectors(e.id, 2, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
-                                (x, y) -> {
-                                    float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
-                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
-                                    if (e.lifetime - e.time <= Time.delta) {
-                                        ef.at(x1, y1, angle, Pal.darkPyraFlame);
-                                    }
-                                }
+                    windEffect = new Effect(120, 80f, e -> {
+                        Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                        randLenVectors(e.id, 5, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 50,
+                                (x, y) -> Fill.circle(e.x + x, e.y + y, 1 * (1 - e.fin()))
                         );
+                    });
+                    everyHit = new Effect(120, e -> {
+                        Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                        if (e.data instanceof Unit u) {
+                            float size = u.hitSize;
+                            float angle = Angles.angle(e.x, e.y, u.x, u.y);
+                            float x = u.x - Angles.trnsx(angle, size / 1.2f);
+                            float y = u.y - Angles.trnsy(angle, size / 1.2f);
+                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
+                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
+                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                                } else {
+                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
+                                }
+                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
+                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
+                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
+                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                            }
+                        }
+                        if (e.data instanceof Building b) {
+                            float size = b.hitSize();
+                            float angle = Angles.angle(e.x, e.y, b.x, b.y);
+                            float x = b.x - Angles.trnsx(angle, size / 1.2f);
+                            float y = b.y - Angles.trnsy(angle, size / 1.2f);
+                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
+                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
+                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
+                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
+                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
+                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                                } else {
+                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
+                                }
+                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                            }
+                        }
                     });
                 }};
             }});
@@ -511,38 +629,88 @@ public class FBlocks {
                 fragOnAbsorb = fragOnHit = true;
                 fragBullets = 1;
 
-                fragBullet = new WindBulletType() {{
-                    lifetime = 850;
-                    damage = 1f;
-                    windPower = 0.3f;
-                    applyEffect = FStatusEffects.breakHelIII;
+                fragBullet = new FreeBulletType() {{
+                    lifetime = 700;
+                    damage = 36;
+                    speed = 0;
+                    hittable = absorbable = reflectable = collides = false;
+                    despawnEffect = hitEffect = Fx.none;
 
-                    fillRange = false;
-                    windEffect = new Effect(20, 80f, e -> {
+                    parts.add(new FlarePart() {{
+                        sides = 3;
+                        radius = 45;
+                        radiusTo = 0;
+                        rotMove = 1000;
+                        stroke = 30;
+                        innerScl = 0.3f;
+                        color1 = Color.valueOf("EBEEF5");
+                        color2 = Color.valueOf("EBEEF5");
+                    }});
+
+                    damageEffect = new Effect(8, 80f, e -> {
                         Effect ef = new ExplosionEffect() {{
-                            lifetime = 90;
+                            lifetime = 45;
                             sparks = 0;
-                            waveLife = 90;
-                            waveColor = Color.valueOf("ebeef5");
-                            waveRadBase = 26;
+                            waveLife = 0;
                             smokes = 20;
-                            smokeRad = 22;
-                            smokeColor = Color.valueOf("ebeef5");
-                            smokeSizeBase = 1.75f;
+                            smokeRad = 45;
+                            smokeColor = Color.valueOf("EBEEF522");
+                            smokeSizeBase = 3;
+
+                            renderer = f -> {
+                                Draw.color(this.waveColor);
+                                f.scaled(this.waveLife, (i) -> {
+                                    Lines.stroke(this.waveStroke * i.fout());
+                                    Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
+                                });
+                                Draw.color(this.smokeColor);
+                                if (this.smokeSize > 0.0F) {
+                                    Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
+                                }
+
+                                Draw.color(this.sparkColor);
+                                Lines.stroke(f.fout() * this.sparkStroke);
+                                Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
+                                    Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
+                                    Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
+                                });
+
+                                if (f.data instanceof Vec2 v) {
+                                    color(Color.valueOf("EBEEF522"));
+                                    Lines.stroke(7.5f * (1 - f.fin()));
+                                    Lines.line(f.x, f.y, v.x, v.y);
+                                }
+                            };
                         }};
 
-                        color(Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), e.fin());
+                        for (int i = 0; i < 3; ++i) {
+                            rand.setSeed((long) (e.id + time));
+                            rv.trns(rand.range(360),
+                                    rand.range(200));
+                            float angle = Angles.angle(rv.x, rv.y);
+                            float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
+                            float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
+                            ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
 
-                        randLenVectors(e.id, 2, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
-                                (x, y) -> {
-                                    float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
-                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
-                                    if (e.lifetime - e.time <= Time.delta) {
-                                        ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
+                            if (e.data instanceof Bullet b) {
+                                Units.nearbyEnemies(b.team, x1, y1, 35, u -> {
+                                    boolean wasDead = u.dead;
+                                    u.damage(35);
+                                    if (!wasDead && u.dead) {
+                                        Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
                                     }
-                                }
-                        );
+                                });
+                                Units.nearbyBuildings(x1, y1, 35, bu -> {
+                                    if (bu.team != b.team) {
+                                        boolean dead = bu.dead;
+                                        bu.damage(35);
+                                        if (!dead && bu.dead) {
+                                            Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                        }
+                                    }
+                                });
+                            }
+                        }
                     });
                 }};
             }});
@@ -573,15 +741,17 @@ public class FBlocks {
             clipSize = 5;
             health = 8000;
 
-            ammoTypes.put(Items.blastCompound, new PointBulletType() {{
+            ammoTypes.put(Items.blastCompound, new BasicBulletType() {{
                 ammoMultiplier = 1f;
 
                 trailEffect = Fx.none;
 
                 damage = 0;
-                lifetime = 600;
-                speed = 500;
-                trailSpacing = 20f;
+                lifetime = 1800;
+                speed = 2.4f;
+                width = height = 104;
+                shrinkX = shrinkY = 0;
+                backColor = frontColor = Pal.darkPyraFlame;
 
                 fragAngle = 0;
                 fragRandomSpread = 0;
@@ -598,32 +768,60 @@ public class FBlocks {
                     applyEffect = FStatusEffects.burningV;
 
                     fillRange = false;
-                    windEffect = new Effect(20, 80f, e -> {
-                        Effect ef = new ExplosionEffect() {{
-                            lifetime = 90;
-                            sparks = 0;
-                            waveLife = 90;
-                            waveColor = Pal.darkPyraFlame;
-                            waveRadBase = 30;
-                            smokes = 24;
-                            smokeRad = 30;
-                            smokeColor = Pal.darkPyraFlame;
-                            smokeSizeBase = 2;
-                        }};
-
-                        color(Pal.darkPyraFlame, Pal.darkPyraFlame, Pal.darkPyraFlame, e.fin());
-
-                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
-                                (x, y) -> {
-                                    float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
-                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
-                                    if (e.lifetime - e.time <= Time.delta) {
-                                        ef.at(x1, y1, angle, Pal.darkPyraFlame);
-                                    }
-                                }
+                    windEffect = new Effect(120, 80f, e -> {
+                        Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                        randLenVectors(e.id, 9, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 50,
+                                (x, y) -> Fill.circle(e.x + x, e.y + y, 1 * (1 - e.fin()))
                         );
                     });
+                    everyHit = new Effect(120, e -> {
+                        Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                        if (e.data instanceof Unit u) {
+                            float size = u.hitSize;
+                            float angle = Angles.angle(e.x, e.y, u.x, u.y);
+                            float x = u.x - Angles.trnsx(angle, size / 1.2f);
+                            float y = u.y - Angles.trnsy(angle, size / 1.2f);
+                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
+                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
+                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                                } else {
+                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
+                                }
+                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
+                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
+                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
+                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                            }
+                        }
+                        if (e.data instanceof Building b) {
+                            float size = b.hitSize();
+                            float angle = Angles.angle(e.x, e.y, b.x, b.y);
+                            float x = b.x - Angles.trnsx(angle, size / 1.2f);
+                            float y = b.y - Angles.trnsy(angle, size / 1.2f);
+                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
+                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
+                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                                } else {
+                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
+                                }
+                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
+                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
+                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
+                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
+                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
+                                );
+                            }
+                        }
+                    });
+
                 }};
             }});
             ammoTypes.put(Items.metaglass, new PointBulletType() {{
@@ -642,40 +840,88 @@ public class FBlocks {
                 fragOnAbsorb = fragOnHit = true;
                 fragBullets = 1;
 
-                fragBullet = new WindBulletType() {{
+                fragBullet = new FreeBulletType() {{
                     lifetime = 1000;
-                    damage = 2f;
-                    windPower = 0.4f;
-                    windWidth = 600;
-                    windLength = 300;
-                    applyEffect = FStatusEffects.breakHelIV;
+                    damage = 60;
+                    speed = 0;
+                    hittable = absorbable = reflectable = collides = false;
+                    despawnEffect = hitEffect = Fx.none;
 
-                    fillRange = false;
-                    windEffect = new Effect(20, 80f, e -> {
+                    parts.add(new FlarePart() {{
+                        sides = 3;
+                        radius = 55;
+                        radiusTo = 0;
+                        rotMove = 1000;
+                        stroke = 40;
+                        innerScl = 0.4f;
+                        color1 = Color.valueOf("EBEEF5");
+                        color2 = Color.valueOf("EBEEF5");
+                    }});
+
+                    damageEffect = new Effect(8, 80f, e -> {
                         Effect ef = new ExplosionEffect() {{
-                            lifetime = 90;
+                            lifetime = 24;
                             sparks = 0;
-                            waveLife = 90;
-                            waveColor = Color.valueOf("ebeef5");
-                            waveRadBase = 30;
-                            smokes = 24;
-                            smokeRad = 30;
-                            smokeColor = Color.valueOf("ebeef5");
-                            smokeSizeBase = 2;
+                            waveLife = 0;
+                            smokes = 20;
+                            smokeRad = 60;
+                            smokeColor = Color.valueOf("EBEEF522");
+                            smokeSizeBase = 3.5f;
+
+                            renderer = f -> {
+                                Draw.color(this.waveColor);
+                                f.scaled(this.waveLife, (i) -> {
+                                    Lines.stroke(this.waveStroke * i.fout());
+                                    Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
+                                });
+                                Draw.color(this.smokeColor);
+                                if (this.smokeSize > 0.0F) {
+                                    Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
+                                }
+
+                                Draw.color(this.sparkColor);
+                                Lines.stroke(f.fout() * this.sparkStroke);
+                                Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
+                                    Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
+                                    Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
+                                });
+
+                                if (f.data instanceof Vec2 v) {
+                                    color(Color.valueOf("EBEEF522"));
+                                    Lines.stroke(7.5f * (1 - f.fin()));
+                                    Lines.line(f.x, f.y, v.x, v.y);
+                                }
+                            };
                         }};
 
-                        color(Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), Color.valueOf("ebeef5"), e.fin());
+                        for (int i = 0; i < 5; ++i) {
+                            rand.setSeed((long) (e.id + time));
+                            rv.trns(rand.range(360),
+                                    rand.range(300));
+                            float angle = Angles.angle(rv.x, rv.y);
+                            float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
+                            float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
+                            ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
 
-                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
-                                (x, y) -> {
-                                    float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
-                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
-                                    if (e.lifetime - e.time <= Time.delta) {
-                                        ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
+                            if (e.data instanceof Bullet b) {
+                                Units.nearbyEnemies(b.team, x1, y1, 60, u -> {
+                                    boolean wasDead = u.dead;
+                                    u.damage(60);
+                                    if (!wasDead && u.dead) {
+                                        Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
                                     }
-                                }
-                        );
+                                });
+                                Units.nearbyBuildings(x1, y1, 60, bu -> {
+                                    if (bu.team != b.team) {
+                                        boolean dead = bu.dead;
+                                        bu.damage(60);
+                                        if (!dead && bu.dead) {
+                                            Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                        }
+                                    }
+                                });
+                            }
+                        }
                     });
                 }};
             }});
