@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Fill;
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.scene.ui.layout.Table;
 import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.io.Reads;
@@ -50,7 +51,6 @@ public class OwnerTurret extends Turret {
         update = solid = true;
         itemCapacity = maxAmmo = 0;
     }
-
     @Override
     public boolean canBreak(Tile tile) {
         Building b = tile.build;

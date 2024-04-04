@@ -268,8 +268,8 @@ public class UnitOverride {
         /*-----------------------------------------------------------------------------*/
 
         UnitTypes.aegires.health = 42000;
-        UnitTypes.aegires.abilities.add(new TimeLargeDamageAbility(1.8f, 180) {{
-            buildingExpand = 0.5f;
+        UnitTypes.aegires.abilities.add(new TimeLargeDamageAbility(1.95f, 180) {{
+            buildingExpand = 0.15f;
         }});
 
         UnitTypes.navanax.health = 70000;

@@ -89,13 +89,15 @@ public class TimeLargeDamageAbility extends Ability {
 
     @Override
     public void addStats(Table t) {
-        t.add("[lightgray]" + Stat.range.localized() + ": [white]" + damageRange + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + Stat.range.localized() + ": [white]" + damageRange);
         t.row();
-        t.add("[lightgray]" + Core.bundle.get("stats.base_damage") + ": [white]" + baseDamage + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + Core.bundle.get("stats.base_damage") + ": [white]" + baseDamage);
         t.row();
         t.add("[lightgray]" + Core.bundle.get("stats.formula") + ": [white]" +
                 Core.bundle.get("stats.base_damage") + "^ (" + Core.bundle.get("stats.continue") + "/120 + 1) / 4" +
                 StatUnit.seconds.localized());
+        t.row();
+        t.add("[lightgray]" + Core.bundle.get("stats.building_expand") + ": [white]" + buildingExpand);
     }
 
     @Override
