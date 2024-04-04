@@ -269,8 +269,8 @@ public class FBlocks {
 
                 fragAngle = 360;
                 fragBullets = 6;
-                fragLifeMax = 4;
-                fragLifeMin = 3.5f;
+                fragLifeMax = 3.5f;
+                fragLifeMin = 3f;
                 fragVelocityMin = 0.2f;
                 fragVelocityMax = 0.5f;
                 fragOnAbsorb = false;
@@ -478,32 +478,34 @@ public class FBlocks {
                             };
                         }};
 
-                        for (int i = 0; i < 1; ++i) {
-                            rand.setSeed((long) (e.id + time));
-                            rv.trns(rand.range(360),
-                                    abs(rand.range(100)));
-                            float angle = Angles.angle(rv.x, rv.y);
-                            float x1 = e.x + rv.x + Angles.trnsx(angle, 40);
-                            float y1 = e.y + rv.y + Angles.trnsy(angle, 40);
-                            ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
+                        if (e.lifetime != 0) {
+                            for (int i = 0; i < 1; ++i) {
+                                rand.setSeed((long) (e.id + time));
+                                rv.trns(rand.range(360),
+                                        abs(rand.range(100)));
+                                float angle = Angles.angle(rv.x, rv.y);
+                                float x1 = e.x + rv.x + Angles.trnsx(angle, 40);
+                                float y1 = e.y + rv.y + Angles.trnsy(angle, 40);
+                                ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
 
-                            if (e.data instanceof Bullet b) {
-                                Units.nearbyEnemies(b.team, x1, y1, 20, u -> {
-                                    boolean wasDead = u.dead;
-                                    u.damage(12);
-                                    if (!wasDead && u.dead) {
-                                        Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
-                                    }
-                                });
-                                Units.nearbyBuildings(x1, y1, 20, bu -> {
-                                    if (bu.team != b.team) {
-                                        boolean dead = bu.dead;
-                                        bu.damage(12);
-                                        if (!dead && bu.dead) {
-                                            Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                if (e.data instanceof Bullet b) {
+                                    Units.nearbyEnemies(b.team, x1, y1, 20, u -> {
+                                        boolean wasDead = u.dead;
+                                        u.damage(12);
+                                        if (!wasDead && u.dead) {
+                                            Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
                                         }
-                                    }
-                                });
+                                    });
+                                    Units.nearbyBuildings(x1, y1, 20, bu -> {
+                                        if (bu.team != b.team) {
+                                            boolean dead = bu.dead;
+                                            bu.damage(12);
+                                            if (!dead && bu.dead) {
+                                                Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
                     });
@@ -683,32 +685,34 @@ public class FBlocks {
                             };
                         }};
 
-                        for (int i = 0; i < 3; ++i) {
-                            rand.setSeed((long) (e.id + time));
-                            rv.trns(rand.range(360),
-                                    rand.range(200));
-                            float angle = Angles.angle(rv.x, rv.y);
-                            float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
-                            float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
-                            ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
+                        if (e.lifetime != 0) {
+                            for (int i = 0; i < 3; ++i) {
+                                rand.setSeed((long) (e.id + time));
+                                rv.trns(rand.range(360),
+                                        rand.range(200));
+                                float angle = Angles.angle(rv.x, rv.y);
+                                float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
+                                float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
+                                ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
 
-                            if (e.data instanceof Bullet b) {
-                                Units.nearbyEnemies(b.team, x1, y1, 35, u -> {
-                                    boolean wasDead = u.dead;
-                                    u.damage(35);
-                                    if (!wasDead && u.dead) {
-                                        Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
-                                    }
-                                });
-                                Units.nearbyBuildings(x1, y1, 35, bu -> {
-                                    if (bu.team != b.team) {
-                                        boolean dead = bu.dead;
-                                        bu.damage(35);
-                                        if (!dead && bu.dead) {
-                                            Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                if (e.data instanceof Bullet b) {
+                                    Units.nearbyEnemies(b.team, x1, y1, 35, u -> {
+                                        boolean wasDead = u.dead;
+                                        u.damage(35);
+                                        if (!wasDead && u.dead) {
+                                            Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
                                         }
-                                    }
-                                });
+                                    });
+                                    Units.nearbyBuildings(x1, y1, 35, bu -> {
+                                        if (bu.team != b.team) {
+                                            boolean dead = bu.dead;
+                                            bu.damage(35);
+                                            if (!dead && bu.dead) {
+                                                Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
                     });
@@ -894,32 +898,34 @@ public class FBlocks {
                             };
                         }};
 
-                        for (int i = 0; i < 5; ++i) {
-                            rand.setSeed((long) (e.id + time));
-                            rv.trns(rand.range(360),
-                                    rand.range(300));
-                            float angle = Angles.angle(rv.x, rv.y);
-                            float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
-                            float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
-                            ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
+                        if (e.lifetime != 0) {
+                            for (int i = 0; i < 5; ++i) {
+                                rand.setSeed((long) (e.id + time));
+                                rv.trns(rand.range(360),
+                                        rand.range(300));
+                                float angle = Angles.angle(rv.x, rv.y);
+                                float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
+                                float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
+                                ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
 
-                            if (e.data instanceof Bullet b) {
-                                Units.nearbyEnemies(b.team, x1, y1, 60, u -> {
-                                    boolean wasDead = u.dead;
-                                    u.damage(60);
-                                    if (!wasDead && u.dead) {
-                                        Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
-                                    }
-                                });
-                                Units.nearbyBuildings(x1, y1, 60, bu -> {
-                                    if (bu.team != b.team) {
-                                        boolean dead = bu.dead;
-                                        bu.damage(60);
-                                        if (!dead && bu.dead) {
-                                            Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                if (e.data instanceof Bullet b) {
+                                    Units.nearbyEnemies(b.team, x1, y1, 60, u -> {
+                                        boolean wasDead = u.dead;
+                                        u.damage(60);
+                                        if (!wasDead && u.dead) {
+                                            Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
                                         }
-                                    }
-                                });
+                                    });
+                                    Units.nearbyBuildings(x1, y1, 60, bu -> {
+                                        if (bu.team != b.team) {
+                                            boolean dead = bu.dead;
+                                            bu.damage(60);
+                                            if (!dead && bu.dead) {
+                                                Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
+                                            }
+                                        }
+                                    });
+                                }
                             }
                         }
                     });

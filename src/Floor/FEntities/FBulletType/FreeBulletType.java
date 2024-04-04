@@ -1,7 +1,6 @@
 package Floor.FEntities.FBulletType;
 
 import arc.math.geom.Geometry;
-import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.Vars;
