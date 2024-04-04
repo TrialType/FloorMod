@@ -25,6 +25,7 @@ import mindustry.ui.Bar;
 import mindustry.ui.ItemDisplay;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.world.blocks.logic.LogicBlock;
 import mindustry.world.blocks.units.UnitBlock;
 import mindustry.world.meta.Stat;
 

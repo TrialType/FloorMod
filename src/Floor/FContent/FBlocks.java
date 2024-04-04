@@ -18,6 +18,7 @@ import arc.math.Mathf;
 import arc.math.Rand;
 import arc.math.geom.Vec2;
 import mindustry.content.*;
+import mindustry.core.GameState;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.*;
@@ -46,6 +47,7 @@ import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
 import static arc.util.Time.time;
 import static java.lang.Math.abs;
+import static mindustry.Vars.state;
 import static mindustry.type.ItemStack.with;
 
 public class FBlocks {
@@ -478,7 +480,7 @@ public class FBlocks {
                             };
                         }};
 
-                        if (e.lifetime != 0) {
+                        if (e.lifetime != 0 && !state.is(GameState.State.paused)) {
                             for (int i = 0; i < 1; ++i) {
                                 rand.setSeed((long) (e.id + time));
                                 rv.trns(rand.range(360),
@@ -685,7 +687,7 @@ public class FBlocks {
                             };
                         }};
 
-                        if (e.lifetime != 0) {
+                        if (e.lifetime != 0 && !state.is(GameState.State.paused)) {
                             for (int i = 0; i < 3; ++i) {
                                 rand.setSeed((long) (e.id + time));
                                 rv.trns(rand.range(360),
@@ -898,7 +900,7 @@ public class FBlocks {
                             };
                         }};
 
-                        if (e.lifetime != 0) {
+                        if (e.lifetime != 0 && !state.is(GameState.State.paused)) {
                             for (int i = 0; i < 5; ++i) {
                                 rand.setSeed((long) (e.id + time));
                                 rv.trns(rand.range(360),
