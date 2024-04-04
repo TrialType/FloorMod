@@ -46,7 +46,7 @@ public class TimeLargeDamageAbility extends Ability {
             float damage = (float) Math.pow(baseDamage, timer / 120) * baseDamage / 4;
             boolean dead = u.dead;
             u.damage(damage);
-            if (dead && !u.dead) {
+            if (!dead && u.dead) {
                 Events.fire(new FEvents.UnitDestroyOtherEvent(unit, u));
             }
         });
@@ -56,7 +56,7 @@ public class TimeLargeDamageAbility extends Ability {
                 float damage = (float) Math.pow(baseDamage, timer / 120) * baseDamage / 4;
                 boolean dead = b.dead;
                 b.damage(damage * buildingExpand);
-                if (dead && !b.dead) {
+                if (!dead && b.dead) {
                     Events.fire(new FEvents.UnitDestroyOtherEvent(unit, b));
                 }
             }

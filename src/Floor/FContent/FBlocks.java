@@ -419,8 +419,6 @@ public class FBlocks {
                 speed = 500;
                 trailSpacing = 20f;
 
-                //point = true;
-
                 fragAngle = 0;
                 fragRandomSpread = 0;
                 fragSpread = 0;

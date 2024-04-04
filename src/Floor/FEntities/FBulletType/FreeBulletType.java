@@ -35,11 +35,14 @@ public class FreeBulletType extends BulletType {
         super.update(b);
 
 
-        if (ti >= damageReload && damageEffect != null) {
-            damageEffect.at(b.x, b.y, 0, b);
-            damages.put(b, 0f);
+        if (b.isAdded()) {
+            if (ti >= damageReload && damageEffect != null) {
+                damageEffect.at(b.x, b.y, 0, b);
+                damages.put(b, 0f);
+            }
+        } else {
+            damages.remove(b);
         }
-
     }
 
     public void init(Bullet b) {
