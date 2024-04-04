@@ -16,6 +16,8 @@ import arc.math.Rand;
 import arc.util.Time;
 import mindustry.content.*;
 import mindustry.entities.Effect;
+import mindustry.entities.Lightning;
+import mindustry.entities.Units;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.WaveEffect;
@@ -24,6 +26,7 @@ import mindustry.entities.part.FlarePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
+import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
@@ -230,18 +233,29 @@ public class FBlocks {
             consumeAmmoOnce = false;
             canOverdrive = false;
 
-            shootType = new EmpBulletType() {{
+            shootType = new BulletType() {{
                 speed = 4.5f;
                 damage = 12;
 
                 rangeOverride = 200;
-                lightColor = frontColor = backColor = Pal.redLight;
+                lightColor = Pal.redLight;
                 status = StatusEffects.unmoving;
                 statusDuration = 45;
                 splashDamageRadius = 60;
 
                 shootEffect = smokeEffect = Fx.none;
-                hitEffect = Fx.none;
+                hitEffect = new ExplosionEffect() {{
+                    lifetime = 45;
+                    waveColor = Pal.redLight;
+                    waveRadBase = 60;
+                    waveRad = 65;
+                    waveStroke = 4;
+                    waveLife = 45;
+                    smokes = 28;
+                    smokeRad = 60;
+                    smokeColor = Pal.redLight;
+                    smokeSizeBase = 4;
+                }};
                 despawnEffect = hitEffect;
 
                 fragAngle = 360;
@@ -250,11 +264,28 @@ public class FBlocks {
                 fragLifeMin = 3.5f;
                 fragOnAbsorb = false;
                 fragOnHit = true;
-                fragBullet = new EmpBulletType() {{
+                fragBullet = new BulletType() {{
                     damage = 3;
                     speed = 2.5f;
                     splashDamageRadius = 6;
-                    hitEffect = Fx.none;
+                    status = FStatusEffects.suppressI;
+                    statusDuration = 24;
+
+                    hitEffect = new ExplosionEffect() {{
+                        lifetime = 24;
+
+                        waveColor = Pal.redLight;
+                        waveRadBase = 6;
+                        waveRad = 6;
+                        waveStroke = 1;
+                        waveLife = 24;
+
+                        smokes = 4;
+                        smokeRad = 6;
+                        smokeColor = Pal.redLight;
+                        smokeSizeBase = 1;
+                    }};
+                    ;
                     despawnEffect = hitEffect;
 
                     status = FStatusEffects.suppressI;
@@ -313,12 +344,6 @@ public class FBlocks {
 
                     fillRange = false;
                     windEffect = new Effect(20, 80f, e -> {
-                        FlarePart fp = new FlarePart() {{
-                            sides = 3;
-                            color1 = color2 = Pal.darkPyraFlame;
-                            radius = radiusTo = 3;
-                            innerRadScl = 0.4f;
-                        }};
                         Effect ef = new ExplosionEffect() {{
                             lifetime = 90;
                             sparks = 0;
@@ -336,11 +361,8 @@ public class FBlocks {
                         randLenVectors(e.id, 1, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
                                 (x, y) -> {
                                     float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x;
-                                    float y1 = e.y + y;
-                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
-                                    DrawPart.params.life = e.fin();
-                                    fp.draw(DrawPart.params);
+                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
+                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
                                     if (e.lifetime - e.time <= Time.delta) {
                                         ef.at(x1, y1, angle, Pal.darkPyraFlame);
                                     }
@@ -366,17 +388,11 @@ public class FBlocks {
                 fragBullet = new WindBulletType() {{
                     lifetime = 400;
                     damage = 0.5f;
-                    windPower = 0.3f;
+                    windPower = 0.18f;
                     applyEffect = FStatusEffects.breakHelII;
 
                     fillRange = false;
                     windEffect = new Effect(20, 80f, e -> {
-                        FlarePart fp = new FlarePart() {{
-                            sides = 3;
-                            color1 = color2 = Color.valueOf("ebeef5");
-                            radius = radiusTo = 3;
-                            innerRadScl = 0.4f;
-                        }};
                         Effect ef = new ExplosionEffect() {{
                             lifetime = 90;
                             sparks = 0;
@@ -394,11 +410,8 @@ public class FBlocks {
                         randLenVectors(e.id, 1, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
                                 (x, y) -> {
                                     float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x;
-                                    float y1 = e.y + y;
-                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
-                                    DrawPart.params.life = e.fin();
-                                    fp.draw(DrawPart.params);
+                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
+                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
                                     if (e.lifetime - e.time <= Time.delta) {
                                         ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
                                     }
@@ -457,12 +470,6 @@ public class FBlocks {
 
                     fillRange = false;
                     windEffect = new Effect(20, 80f, e -> {
-                        FlarePart fp = new FlarePart() {{
-                            sides = 3;
-                            color1 = color2 = Pal.darkPyraFlame;
-                            radius = radiusTo = 3;
-                            innerRadScl = 0.4f;
-                        }};
                         Effect ef = new ExplosionEffect() {{
                             lifetime = 90;
                             sparks = 0;
@@ -480,11 +487,8 @@ public class FBlocks {
                         randLenVectors(e.id, 2, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
                                 (x, y) -> {
                                     float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x;
-                                    float y1 = e.y + y;
-                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
-                                    DrawPart.params.life = e.fin();
-                                    fp.draw(DrawPart.params);
+                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
+                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
                                     if (e.lifetime - e.time <= Time.delta) {
                                         ef.at(x1, y1, angle, Pal.darkPyraFlame);
                                     }
@@ -510,17 +514,11 @@ public class FBlocks {
                 fragBullet = new WindBulletType() {{
                     lifetime = 850;
                     damage = 1f;
-                    windPower = 0.45f;
+                    windPower = 0.3f;
                     applyEffect = FStatusEffects.breakHelIII;
 
                     fillRange = false;
                     windEffect = new Effect(20, 80f, e -> {
-                        FlarePart fp = new FlarePart() {{
-                            sides = 3;
-                            color1 = color2 = Color.valueOf("ebeef5");
-                            radius = radiusTo = 3;
-                            innerRadScl = 0.4f;
-                        }};
                         Effect ef = new ExplosionEffect() {{
                             lifetime = 90;
                             sparks = 0;
@@ -538,11 +536,8 @@ public class FBlocks {
                         randLenVectors(e.id, 2, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
                                 (x, y) -> {
                                     float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x;
-                                    float y1 = e.y + y;
-                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
-                                    DrawPart.params.life = e.fin();
-                                    fp.draw(DrawPart.params);
+                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
+                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
                                     if (e.lifetime - e.time <= Time.delta) {
                                         ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
                                     }
@@ -604,12 +599,6 @@ public class FBlocks {
 
                     fillRange = false;
                     windEffect = new Effect(20, 80f, e -> {
-                        FlarePart fp = new FlarePart() {{
-                            sides = 3;
-                            color1 = color2 = Pal.darkPyraFlame;
-                            radius = radiusTo = 3;
-                            innerRadScl = 0.4f;
-                        }};
                         Effect ef = new ExplosionEffect() {{
                             lifetime = 90;
                             sparks = 0;
@@ -627,11 +616,8 @@ public class FBlocks {
                         randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
                                 (x, y) -> {
                                     float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x;
-                                    float y1 = e.y + y;
-                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
-                                    DrawPart.params.life = e.fin();
-                                    fp.draw(DrawPart.params);
+                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
+                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
                                     if (e.lifetime - e.time <= Time.delta) {
                                         ef.at(x1, y1, angle, Pal.darkPyraFlame);
                                     }
@@ -659,19 +645,13 @@ public class FBlocks {
                 fragBullet = new WindBulletType() {{
                     lifetime = 1000;
                     damage = 2f;
-                    windPower = 0.65f;
+                    windPower = 0.4f;
                     windWidth = 600;
                     windLength = 300;
                     applyEffect = FStatusEffects.breakHelIV;
 
                     fillRange = false;
                     windEffect = new Effect(20, 80f, e -> {
-                        FlarePart fp = new FlarePart() {{
-                            sides = 3;
-                            color1 = color2 = Color.valueOf("ebeef5");
-                            radius = radiusTo = 3;
-                            innerRadScl = 0.4f;
-                        }};
                         Effect ef = new ExplosionEffect() {{
                             lifetime = 90;
                             sparks = 0;
@@ -689,11 +669,8 @@ public class FBlocks {
                         randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 40,
                                 (x, y) -> {
                                     float angle = Angles.angle(x, y);
-                                    float x1 = e.x + x;
-                                    float y1 = e.y + y;
-                                    DrawPart.params.set(e.fin(), 0f, 0f, 0f, 0f, 0f, x1, y1, angle);
-                                    DrawPart.params.life = e.fin();
-                                    fp.draw(DrawPart.params);
+                                    float x1 = e.x + x + Angles.trnsx(angle, 9);
+                                    float y1 = e.y + y + Angles.trnsy(angle, 9);
                                     if (e.lifetime - e.time <= Time.delta) {
                                         ef.at(x1, y1, angle, Color.valueOf("ebeef5"));
                                     }

@@ -120,23 +120,23 @@ public class FStatusEffects {
         }};
         breakHel = new StatusEffect("break_hel") {{
             healthMultiplier = 0.9f;
-            damage = 12;
+            transitionDamage = 12;
         }};
         breakHelII = new StatusEffect("break_helII") {{
             healthMultiplier = 0.8f;
-            damage = 24;
+            transitionDamage = 24;
         }};
         breakHelIII = new StatusEffect("break_helIII") {{
             healthMultiplier = 0.65f;
-            damage = 48;
+            transitionDamage = 48;
         }};
         breakHelIV = new StatusEffect("break_helIV") {{
             healthMultiplier = 0.5f;
-            damage = 96;
+            transitionDamage = 96;
         }};
         breakHelV = new StatusEffect("break_helV") {{
             healthMultiplier = 0.3f;
-            damage = 192;
+            transitionDamage = 192;
         }};
 
         burnings.addAll(StatusEffects.burning, burningII, burningIII, burningIV, burningV);
