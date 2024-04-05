@@ -13,7 +13,10 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
+import mindustry.core.GameState;
 import mindustry.core.Renderer;
 import mindustry.entities.Units;
 import mindustry.game.Team;
@@ -23,6 +26,7 @@ import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.logic.LogicDialog;
 import mindustry.type.StatusEffect;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
@@ -239,7 +243,7 @@ public class ElectricFence extends Block {
     }
 
     public class ElectricFenceBuild extends Building {
-        protected boolean loaded;
+        protected boolean loaded = true;
         protected final Seq<Float> timers = new Seq<>();
         protected final Seq<Boolean> booleans = new Seq<>();
         public final Map<Integer, Float> times = new HashMap<>();
@@ -378,6 +382,7 @@ public class ElectricFence extends Block {
                 if (this.power != null) {
                     this.power.graph.checkAdd();
                 }
+
                 builds.clear();
                 linesMap.clear();
                 times.clear();
