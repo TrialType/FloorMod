@@ -22,6 +22,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.part.FlarePart;
+import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Building;
@@ -51,7 +52,7 @@ public class FBlocks {
     public static Block eleFence, eleFenceII, eleFenceIII;
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
-            stay, bind,
+            stay, bind, tranquil,
             fireStream;
 
     public static void load() {
@@ -128,7 +129,7 @@ public class FBlocks {
                     UnitTypes.anthicus, UnitTypes.tecta,
                     UnitTypes.obviate, UnitTypes.quell,
                     FUnits.buying, FUnits.crazy,
-                    FUnits.dive,FUnits.befall
+                    FUnits.dive, FUnits.befall
             });
         }};
         inputPowerFactoryII = new GradeFactory("input_power_factory_II") {{
@@ -161,7 +162,7 @@ public class FBlocks {
                     UnitTypes.anthicus, UnitTypes.tecta,
                     UnitTypes.obviate, UnitTypes.quell,
                     FUnits.buying, FUnits.crazy,
-                    FUnits.dive,FUnits.befall
+                    FUnits.dive, FUnits.befall
             });
             out = false;
         }};
@@ -304,7 +305,7 @@ public class FBlocks {
             size = 2;
 
             recoil = 0.8f;
-            range = 100;
+            range = 200;
             reload = 30;
             consumesPower = true;
             hasPower = true;
@@ -339,7 +340,7 @@ public class FBlocks {
             size = 3;
 
             recoil = 1.3f;
-            range = 200;
+            range = 280;
             reload = 60;
             consumesPower = true;
             hasPower = true;
@@ -350,6 +351,9 @@ public class FBlocks {
                 speed = 4.5f;
                 damage = 12;
 
+                trailLength = 14;
+                trailColor = Pal.redLight;
+                trailChance = 1;
                 rangeOverride = 200;
                 lightColor = Pal.redLight;
                 status = StatusEffects.unmoving;
@@ -408,6 +412,136 @@ public class FBlocks {
                     Items.copper, 500,
                     Items.titanium, 350,
                     Items.graphite, 400
+            ));
+        }};
+        tranquil = new PowerTurret("tranquil") {{
+            consume(new ConsumePower(20, 0, false));
+
+            health = 2000;
+            size = 4;
+
+            recoil = 2f;
+            range = 400;
+            reload = 90;
+            consumesPower = true;
+            hasPower = true;
+            consumeAmmoOnce = false;
+            canOverdrive = false;
+
+            shootType = new BulletType() {{
+                hittable = reflectable = absorbable = false;
+
+                speed = 4.5f;
+                lifetime = 90;
+                damage = 32;
+
+                trailLength = 14;
+                trailColor = Pal.redLight;
+                lightColor = Pal.redLight;
+                trailChance = 1;
+                trailInterval = 2;
+                rangeOverride = 200;
+
+                status = StatusEffects.unmoving;
+                statusDuration = 45;
+                splashDamageRadius = 60;
+
+                shootEffect = smokeEffect = Fx.none;
+                hitEffect = new ExplosionEffect() {{
+                    lifetime = 360;
+                    waveColor = Pal.redLight;
+                    waveRadBase = 60;
+                    waveRad = 61;
+                    waveStroke = 4;
+                    waveLife = 45;
+                    smokes = 13;
+                    smokeRad = 60;
+                    smokeColor = Pal.redLight;
+                    smokeSizeBase = 0;
+                    smokeSize = 5;
+                }};
+                despawnEffect = hitEffect;
+
+                parts.add(new ShapePart() {{
+                    radius = 2;
+                    radiusTo = 0;
+                    circle = true;
+                    color = colorTo = Pal.redLight;
+                }});
+
+                fragRandomSpread = 360;
+                fragBullets = 6;
+                fragLifeMax = 2.5f;
+                fragLifeMin = 2f;
+                fragVelocityMin = 0.4f;
+                fragVelocityMax = 0.5f;
+                fragOnAbsorb = true;
+                fragOnHit = true;
+                fragBullet = new BulletType() {{
+                    damage = 12;
+                    splashDamageRadius = 24;
+                    status = FStatusEffects.suppressIII;
+                    statusDuration = 240;
+
+                    hitEffect = new ExplosionEffect() {{
+                        lifetime = 300;
+
+                        waveColor = Pal.redLight;
+                        waveRadBase = 28;
+                        waveRad = 24;
+                        waveStroke = 1;
+                        waveLife = 240;
+
+                        smokes = 14;
+                        smokeRad = 16;
+                        smokeColor = Pal.redLight;
+                        smokeSizeBase = 0;
+                        smokeSize = 3;
+                    }};
+                    despawnEffect = hitEffect;
+                }};
+
+                intervalDelay = 3;
+                bulletInterval = 4;
+                intervalSpread = 22;
+                intervalAngle = -11;
+                intervalBullets = 2;
+                intervalBullet = new BasicBulletType() {{
+                    speed = 1.5f;
+                    lifetime = 180;
+
+                    frontColor = backColor = trailColor = Pal.redLight;
+                    trailLength = 7;
+
+                    status = FStatusEffects.suppressII;
+                    statusDuration = 180;
+
+                    splashDamageRadius = 16;
+                    splashDamage = 12;
+
+                    hitEffect = new ExplosionEffect() {{
+                        lifetime = 240;
+
+                        waveColor = Pal.redLight;
+                        waveRadBase = 16;
+                        waveRad = 18;
+                        waveStroke = 1;
+                        waveLife = 240;
+
+                        smokes = 12;
+                        smokeRad = 16;
+                        smokeColor = Pal.redLight;
+                        smokeSizeBase = 0;
+                        smokeSize = 3;
+                    }};
+                    despawnEffect = hitEffect;
+                }};
+            }};
+
+            requirements(Category.turret, ItemStack.with(
+                    Items.copper, 1000,
+                    Items.titanium, 700,
+                    Items.graphite, 800
             ));
         }};
         smallWindTurret = new ItemTurret("small_wind_turret") {{
@@ -1002,53 +1136,58 @@ public class FBlocks {
                 shots = 2;
                 spread = 3;
             }};
-            ammoTypes.putAll(Liquids.water, new AroundBulletType() {{
-                ammoMultiplier = 5;
+            ammoTypes.putAll(
+                    Liquids.water, new AroundBulletType() {{
+                        ammoMultiplier = 5;
 
-                lifetime = 3600;
-                speed = 4;
-                damage = 500;
-                splashDamage = 500;
-                splashDamageRadius = 300;
-                trailLength = 25;
-                trailChance = 1;
-                status = StatusEffects.wet;
-                statusDuration = 240;
+                        lifetime = 3600;
+                        speed = 4;
+                        damage = 500;
+                        splashDamage = 500;
+                        splashDamageRadius = 300;
+                        trailLength = 25;
+                        trailChance = 1;
+                        status = StatusEffects.wet;
+                        statusDuration = 240;
 
-                targetRange = 1000;
-                circleRange = 160;
+                        targetRange = 1000;
+                        circleRange = 160;
 
-                statusTime = 240;
-                statusEffect = FStatusEffects.High_tensionV;
-                frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
-                applyEffect = new WaveEffect() {{
-                    colorFrom = colorTo = Color.valueOf("01066FAA");
-                    lifetime = 240;
-                }};
-            }}, Liquids.slag, new AroundBulletType() {{
-                ammoMultiplier = 5;
+                        statusTime = 35;
+                        statusEffect = FStatusEffects.High_tensionV;
+                        frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
+                        applyEffect = new WaveEffect() {{
+                            colorFrom = colorTo = Color.valueOf("01066FAA");
+                            lifetime = 240;
+                        }};
+                    }},
+                    Liquids.slag, new BulletType() {{
+                        ammoMultiplier = 1;
+                        lifetime = 0;
+                        damage = 0;
+                        absorbable = hittable = reflectable = collides = false;
 
-                lifetime = 3600;
-                speed = 4;
-                damage = 700;
-                splashDamage = 700;
-                splashDamageRadius = 300;
-                trailLength = 25;
-                trailChance = 1;
-                status = FStatusEffects.burningIV;
-                statusDuration = 240;
+                        fragRandomSpread = 30;
+                        fragBullets = 24;
+                        fragLifeMax = fragLifeMin = 3;
+                        fragVelocityMin = 1.5f;
+                        fragVelocityMax = 1.8f;
+                        fragBullet = new LiquidBulletType() {{
+                            liquid = Liquids.slag;
 
-                targetRange = 1000;
-                circleRange = 160;
+                            homingDelay = 90;
+                            homingPower = 0.1f;
+                            homingRange = 500;
 
-                statusTime = 240;
-                statusEffect = FStatusEffects.burningV;
-                frontColor = backColor = lightColor = trailColor = Pal.darkFlame;
-                applyEffect = new WaveEffect() {{
-                    colorFrom = colorTo = Pal.darkFlame;
-                    lifetime = 240;
-                }};
-            }});
+                            damage = 700;
+                            splashDamage = 700;
+                            splashDamageRadius = 300;
+
+                            status = FStatusEffects.burningIV;
+                            statusDuration = 300;
+                            lightColor = trailColor = Pal.darkFlame;
+                        }};
+                    }});
 
             requirements(Category.turret, ItemStack.with(Items.titanium, 4999,
                     Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
