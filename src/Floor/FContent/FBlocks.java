@@ -1175,9 +1175,13 @@ public class FBlocks {
                         fragBullet = new LiquidBulletType() {{
                             liquid = Liquids.slag;
 
-                            homingDelay = 90;
+                            trailColor = Color.valueOf("ffa166");
+                            trailLength = 6;
+                            trailInterval = 2;
+
+                            homingDelay = 35;
                             homingPower = 0.1f;
-                            homingRange = 500;
+                            homingRange = 400;
 
                             damage = 700;
                             splashDamage = 700;
@@ -1185,7 +1189,7 @@ public class FBlocks {
 
                             status = FStatusEffects.burningIV;
                             statusDuration = 300;
-                            lightColor = trailColor = Pal.darkFlame;
+                            lightColor = Pal.darkFlame;
                         }};
                     }});
 

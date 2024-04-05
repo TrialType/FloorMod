@@ -1,6 +1,7 @@
 package Floor.FContent;
 
 import arc.graphics.Color;
+import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
@@ -121,6 +122,15 @@ public class FStatusEffects {
             damage = 5.6f;
             transitionDamage = 480;
             effect = Fx.burning;
+
+            init(() -> {
+                opposite(StatusEffects.wet, StatusEffects.freezing);
+                affinity(StatusEffects.tarred, (unit, result, time) -> {
+                    unit.damagePierce(transitionDamage);
+                    Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
+                    result.set(burningIV, Math.min(time + result.time, 300f));
+                });
+            });
         }};
         burningV = new StatusEffect("burningV") {{
             damage = 8f;
