@@ -1,9 +1,6 @@
 package Floor.FContent;
 
-import Floor.FEntities.FBlock.ElectricFence;
-import Floor.FEntities.FBlock.GradeFactory;
-import Floor.FEntities.FBlock.KnockingTurret;
-import Floor.FEntities.FBlock.OwnerTurret;
+import Floor.FEntities.FBlock.*;
 import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
@@ -34,6 +31,7 @@ import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
+import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
@@ -49,6 +47,7 @@ public class FBlocks {
             outPowerFactoryII, inputPowerFactoryII,
             outPowerFactoryIII, inputPowerFactoryIII;
     public static Block kt;
+    public static Block slowProject;
     public static Block eleFence, eleFenceII, eleFenceIII;
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
@@ -1256,6 +1255,16 @@ public class FBlocks {
                     Items.copper, 1000,
                     Items.silicon, 500
             ));
+        }};
+//======================================================================================================================
+        slowProject = new DownProject("slow_project") {{
+            requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
+            range = 16;
+            downSpeed = 0.1f;
+
+            consumePower(3.50f);
+            size = 2;
+            consumeItem(Items.phaseFabric).boost();
         }};
     }
 }

@@ -4,7 +4,6 @@ import Floor.FAI.*;
 import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
-import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
@@ -14,12 +13,8 @@ import Floor.FEntities.FBulletType.PercentEmpBulletType;
 import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.Fill;
 import arc.math.Interp;
-import arc.math.Mathf;
-import arc.math.Rand;
-import arc.math.geom.Position;
-import arc.util.Tmp;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -1147,40 +1142,14 @@ public class FUnits {
                 }};
             }});
         }};
-
         recluse = new WUGENANSMechUnitType("recluse") {{
             constructor = WUGENANSMechUnit::create;
             aiController = LandMoveAI::new;
             commands = new UnitCommand[]{UnitCommand.moveCommand, new UnitCommand("lm", "lm", u -> new LandMoveAI())};
 
-            health = 120;
+            health = 1200;
             upDamage = 13;
-
-            weapons.add(new Weapon() {{
-                rotate = true;
-                rotateSpeed = 12;
-                reload = 90;
-                x = 25;
-                y = 15;
-                shootSound = Sounds.none;
-
-                shoot = new ShootPattern() {{
-                    shots = 1;
-                    firstShotDelay = 30;
-                    shotDelay = 10;
-                }};
-
-                bullet = new BasicBulletType() {{
-                    range = maxRange = 1000;
-                    lifetime = 240;
-                    speed = 3;
-                    damage = 100;
-
-                    frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
-                    hitEffect = despawnEffect = Fx.none;
-                    shootEffect = Fx.none;
-                }};
-            }});
+            speed = 1.2f;
         }};
         cave = new UnitType("cave") {{
             constructor = CaveUnit::create;
@@ -1211,67 +1180,98 @@ public class FUnits {
                     shootSound = Sounds.none;
 
                     shoot = new ShootBarrel() {{
-                        shots = 4;
+                        shots = 24;
                         firstShotDelay = 30;
                         shotDelay = 10;
                     }};
 
-                    bullet = new AroundBulletType() {{
+                    bullet = new LiquidBulletType() {{
+                        liquid = Liquids.water;
+
                         range = maxRange = 1000;
                         lifetime = 600;
                         speed = 3;
-                        damage = 5000;
-                        splashDamage = 200;
-                        splashDamageRadius = 20;
+                        damage = 80;
+                        splashDamage = 10;
+                        splashDamageRadius = 40;
                         splashDamagePierce = true;
 
-                        frontColor = backColor = lightColor = trailColor = Color.valueOf("01066FAA");
+                        lightColor = trailColor = Color.valueOf("01066FAA");
                         hitEffect = despawnEffect = Fx.none;
                         shootEffect = Fx.none;
 
-                        targetRange = 1000;
-                        circleRange = 120;
-                        statusEffect = FStatusEffects.High_tensionII;
-                        applyEffect = new Effect(30f, 300f, e -> {
-                            Rand rand = new Rand();
-                            if (!(e.data instanceof Position p)) return;
-                            float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
-                            Tmp.v1.set(p).sub(e.x, e.y).nor();
-
-                            float n = Tmp.v1.x, normy = Tmp.v1.y;
-                            float range = 6f;
-                            int links = Mathf.ceil(dst / range);
-                            float spacing = dst / links;
-
-                            Lines.stroke(4f * e.fout());
-                            Draw.color(Color.white, Color.valueOf("01066FAA"), e.fin());
-
-                            Lines.beginLine();
-
-                            Lines.linePoint(e.x, e.y);
-
-                            rand.setSeed(e.id);
-
-                            for (int i = 0; i < links; i++) {
-                                float nx, ny;
-                                if (i == links - 1) {
-                                    nx = tx;
-                                    ny = ty;
-                                } else {
-                                    float len = (i + 1) * spacing;
-                                    Tmp.v1.setToRandomDirection(rand).scl(range / 2f);
-                                    nx = e.x + n * len + Tmp.v1.x;
-                                    ny = e.y + normy * len + Tmp.v1.y;
-                                }
-
-                                Lines.linePoint(nx, ny);
-                            }
-
-                            Lines.endLine();
-                        }).followParent(false).rotWithParent(false);
+                        status = FStatusEffects.High_tensionII;
+                        statusDuration = 240;
                     }};
                 }});
             }
+
+            weapons.add(new Weapon() {{
+                reload = 20;
+                x = y = 0;
+                mirror = false;
+                shootSound = Sounds.laser;
+
+                bullet = new LaserBulletType(135) {{
+                    rangeOverride = 600;
+                    length = 600;
+                    sideLength = 20;
+
+                    status = FStatusEffects.slowII;
+                    statusDuration = 240;
+
+                    laserAbsorb = true;
+                    colors = new Color[]{Color.blue, Pal.techBlue, Color.brown};
+                }};
+            }});
+
+            weapons.add(new Weapon() {{
+                reload = 3;
+                x = y = shootY = shootX = 0;
+                mirror = false;
+                inaccuracy = 360;
+                rotate = false;
+                alwaysShooting = true;
+
+                bullet = new BasicBulletType() {{
+                    width = height = 12;
+                    shrinkX = shrinkY = 0;
+                    damage = 14;
+                    speed = 5;
+                    lifetime = 1200;
+                    status = FStatusEffects.High_tension;
+                    statusDuration = 90;
+                    spin = 12;
+                    frontColor = backColor = Pal.techBlue;
+                    trailChance = 0.05f;
+                    trailEffect = new Effect(90, e -> {
+                        Draw.color(Pal.techBlue);
+                        Fill.circle(e.x, e.y, 3);
+                    });
+                    weaveMag = 0.1f;
+                    weaveScale = 25;
+                    shootEffect = Fx.none;
+                    hitEffect = despawnEffect = Fx.smoke;
+                }};
+            }});
+
+            weapons.add(new Weapon() {{
+                reload = 20;
+                shootSound = Sounds.laser;
+
+                bullet = new LaserBulletType(135) {{
+                    rangeOverride = range = 2000;
+                    length = 2000;
+                    width = 45;
+                    sideLength = 20;
+
+                    status = FStatusEffects.slowII;
+                    statusDuration = 240;
+
+                    laserAbsorb = true;
+                    colors = new Color[]{Pal.techBlue, Pal.techBlue, Pal.techBlue};
+                }};
+            }});
         }};
 
         BossList.list.add(velocity);

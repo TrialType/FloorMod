@@ -126,7 +126,7 @@ public class CaveUnit extends UnitWaterMove {
             allTimer += Time.delta;
             if (timer >= 676) {
                 water.at(this);
-                timer = 0;
+                timer = timer % 676;
             }
             if (allTimer >= max(world.width(), world.height()) * 13.44f && allTimer % 1800 < Time.delta) {
                 back = true;

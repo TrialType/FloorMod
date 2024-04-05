@@ -285,6 +285,7 @@ public class WUGENANSMechUnit extends FMechUnit {
                 boost++;
             }
         }
+        boost = Math.max(1, boost);
 
         power = Math.max(0, power - Time.delta / 60f * 1000f);
 
@@ -340,7 +341,7 @@ public class WUGENANSMechUnit extends FMechUnit {
             reloadMultiplier *= lBoost;
         }
 
-        if(speedMultiplier >= 18){
+        if (speedMultiplier >= 18) {
             healthMultiplier *= boost;
         } else {
             speedMultiplier *= boost;
