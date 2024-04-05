@@ -1074,7 +1074,7 @@ public class FBlocks {
                     Items.silicon, 150
             ));
         }};
-        eleFenceII = new ElectricFence("eleFenceII") {{
+        eleFenceII = new ElectricFence("ele_fenceII") {{
             health = 1500;
             size = 3;
             clipSize = 3;
@@ -1096,7 +1096,7 @@ public class FBlocks {
                     Items.silicon, 300
             ));
         }};
-        eleFenceIII = new ElectricFence("eleFenceIII") {{
+        eleFenceIII = new ElectricFence("ele_fenceIII") {{
             health = 3000;
             size = 4;
             clipSize = 4;

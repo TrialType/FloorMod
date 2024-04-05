@@ -34,6 +34,7 @@ public class FStatusEffects {
             color = new Color(145, 75, 0, 255);
             effectChance = 0.3f;
         }};
+
         suppressI = new StatusEffect("suppress_I") {{
             speedMultiplier = 0.9F;
             reloadMultiplier = 0.9F;
@@ -58,6 +59,7 @@ public class FStatusEffects {
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
         }};
+
         slowII = new StatusEffect("slow_II") {{
             speedMultiplier = 0.55F;
             color = new Color(0, 0, 0, 0);
@@ -66,8 +68,12 @@ public class FStatusEffects {
         }};
         fastII = new StatusEffect("fast_II") {{
             speedMultiplier = 2.4f;
-            init(() -> opposite(StatusEffects.slow));
+            init(() -> {
+                opposite(StatusEffects.slow);
+                opposite(slowII);
+            });
         }};
+
         High_tension = new StatusEffect("high_tension") {{
             speedMultiplier = 0.85f;
             reloadMultiplier = 0.85f;
@@ -96,26 +102,29 @@ public class FStatusEffects {
             speedMultiplier = 0.1f;
             reloadMultiplier = 0.1f;
             healthMultiplier = 0.7f;
-            damage = 65;
+            damage = 54;
         }};
+
+        StatusEffects.burning.transitionDamage = 54;
+        StatusEffects.burning.damage = 0.7f;
         burningII = new StatusEffect("burningII") {{
             damage = 1.2f;
-            transitionDamage = 20;
+            transitionDamage = 130;
             effect = Fx.burning;
         }};
         burningIII = new StatusEffect("burningIII") {{
             damage = 3.4f;
-            transitionDamage = 30;
+            transitionDamage = 340;
             effect = Fx.burning;
         }};
         burningIV = new StatusEffect("burningIV") {{
             damage = 5.6f;
-            transitionDamage = 40;
+            transitionDamage = 480;
             effect = Fx.burning;
         }};
         burningV = new StatusEffect("burningV") {{
             damage = 8f;
-            transitionDamage = 50;
+            transitionDamage = 650;
             effect = Fx.burning;
         }};
         breakHel = new StatusEffect("break_hel") {{

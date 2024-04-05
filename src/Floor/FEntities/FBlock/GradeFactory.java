@@ -26,6 +26,8 @@ import mindustry.ui.ItemDisplay;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.logic.LogicBlock;
+import mindustry.world.blocks.payloads.Payload;
+import mindustry.world.blocks.payloads.UnitPayload;
 import mindustry.world.blocks.units.UnitBlock;
 import mindustry.world.meta.Stat;
 
@@ -850,6 +852,11 @@ public class GradeFactory extends UnitBlock {
 
         public boolean acceptItem(Building source, Item item) {
             return findIndex(item) >= 0 && items.get(item) < getMaximumAccepted(item);
+        }
+
+        @Override
+        public boolean acceptPayload(Building source, Payload payload) {
+            return this.payload == null && payload instanceof UnitPayload up && grades.indexOf(up.unit.type) >= 0;
         }
 
         @Override
