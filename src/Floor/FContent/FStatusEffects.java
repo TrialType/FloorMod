@@ -108,6 +108,7 @@ public class FStatusEffects {
 
         StatusEffects.burning.transitionDamage = 54;
         StatusEffects.burning.damage = 0.7f;
+
         burningII = new StatusEffect("burningII") {{
             damage = 1.2f;
             transitionDamage = 130;
