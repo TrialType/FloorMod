@@ -1,6 +1,9 @@
 package Floor.FEntities.FBulletType;
 
+import arc.math.Mathf;
+import arc.math.Rand;
 import arc.math.geom.Geometry;
+import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.Vars;
@@ -17,6 +20,8 @@ import java.util.Map;
 
 public class FreeBulletType extends BulletType {
     private final static Map<Bullet, Float> damages = new HashMap<>();
+    public boolean intervalPoint = true;
+    public Effect intervalHitEffect = Fx.none;
     public boolean pointWithFrag = true;
     public boolean pointWithUnit = true;
     public boolean point = false;
@@ -42,6 +47,25 @@ public class FreeBulletType extends BulletType {
             }
         } else {
             damages.remove(b);
+        }
+    }
+
+    public void updateBulletInterval(Bullet b) {
+        if (intervalBullet != null && b.time >= intervalDelay && b.timer.get(2, bulletInterval)) {
+            float ang = b.rotation();
+            if (intervalPoint) {
+                for (int i = 0; i < intervalBullets; i++) {
+                    float bx = b.x + Mathf.range(intervalBullet.range);
+                    float by = b.y + Mathf.range(intervalBullet.range);
+                    intervalBullet.create(b, bx, by, ang + Mathf.range(intervalRandomSpread) +
+                            intervalAngle + ((i - (intervalBullets - 1f) / 2f) * intervalSpread));
+                    intervalHitEffect.at(bx, by, 0, new Vec2(b.x, b.y));
+                }
+            } else {
+                for (int i = 0; i < intervalBullets; i++) {
+                    intervalBullet.create(b, b.x, b.y, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f) / 2f) * intervalSpread));
+                }
+            }
         }
     }
 

@@ -8,28 +8,22 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
-import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.math.Rand;
 import arc.math.geom.Vec2;
 import mindustry.content.*;
-import mindustry.core.GameState;
 import mindustry.entities.Effect;
-import mindustry.entities.Units;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.part.FlarePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.game.EventType;
 import mindustry.gen.Building;
-import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
@@ -45,14 +39,9 @@ import mindustry.world.consumers.ConsumePower;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
-import static arc.util.Time.time;
-import static java.lang.Math.abs;
-import static mindustry.Vars.state;
 import static mindustry.type.ItemStack.with;
 
 public class FBlocks {
-    static Rand rand = new Rand();
-    static Vec2 rv = new Vec2();
     public static Block outPowerFactory, inputPowerFactory,
             outPowerFactoryII, inputPowerFactoryII,
             outPowerFactoryIII, inputPowerFactoryIII;
@@ -427,7 +416,7 @@ public class FBlocks {
 
                 fragBullet = new FreeBulletType() {{
                     lifetime = 400;
-                    damage = 18f;
+                    damage = 0;
                     speed = 0;
                     hittable = absorbable = reflectable = collides = false;
                     despawnEffect = hitEffect = Fx.none;
@@ -443,73 +432,55 @@ public class FBlocks {
                         color2 = Color.valueOf("EBEEF5");
                     }});
 
-                    damageEffect = new Effect(8, 80f, e -> {
-                        Effect ef = new ExplosionEffect() {{
-                            lifetime = 45;
-                            sparks = 0;
-                            waveLife = 0;
-                            smokes = 20;
-                            smokeRad = 35;
-                            smokeColor = Color.valueOf("EBEEF522");
-                            smokeSizeBase = 2.5f;
+                    intervalBullets = 1;
+                    intervalRandomSpread = 360;
+                    bulletInterval = 1;
+                    intervalDelay = 0;
+                    intervalBullet = new BulletType(0, 0) {{
+                        rangeOverride = 60;
+                        lifetime = 0;
+                        splashDamageRadius = 40;
+                        splashDamage = 26;
+                        status = FStatusEffects.breakHelII;
+                        statusDuration = 240;
 
-                            renderer = f -> {
-                                Draw.color(this.waveColor);
-                                f.scaled(this.waveLife, (i) -> {
-                                    Lines.stroke(this.waveStroke * i.fout());
-                                    Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
-                                });
-                                Draw.color(this.smokeColor);
-                                if (this.smokeSize > 0.0F) {
-                                    Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
-                                }
+                        collides = hittable = absorbable = reflectable = false;
+                    }};
 
-                                Draw.color(this.sparkColor);
-                                Lines.stroke(f.fout() * this.sparkStroke);
-                                Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
-                                    Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
-                                    Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
-                                });
+                    intervalHitEffect = new ExplosionEffect() {{
+                        lifetime = 45;
+                        sparks = 0;
+                        waveLife = 0;
+                        smokes = 20;
+                        smokeRad = 35;
+                        smokeColor = Color.valueOf("EBEEF522");
+                        smokeSizeBase = 2.5f;
 
-                                if (f.data instanceof Vec2 v) {
-                                    color(Color.valueOf("EBEEF522"));
-                                    Lines.stroke(7.5f * (1 - f.fin()));
-                                    Lines.line(f.x, f.y, v.x, v.y);
-                                }
-                            };
-                        }};
-
-                        if (e.lifetime != 0 && !state.is(GameState.State.paused)) {
-                            for (int i = 0; i < 1; ++i) {
-                                rand.setSeed((long) (e.id + time));
-                                rv.trns(rand.range(360),
-                                        abs(rand.range(100)));
-                                float angle = Angles.angle(rv.x, rv.y);
-                                float x1 = e.x + rv.x + Angles.trnsx(angle, 40);
-                                float y1 = e.y + rv.y + Angles.trnsy(angle, 40);
-                                ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
-
-                                if (e.data instanceof Bullet b) {
-                                    Units.nearbyEnemies(b.team, x1, y1, 20, u -> {
-                                        boolean wasDead = u.dead;
-                                        u.damage(12);
-                                        if (!wasDead && u.dead) {
-                                            Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
-                                        }
-                                    });
-                                    Units.nearbyBuildings(x1, y1, 20, bu -> {
-                                        if (bu.team != b.team) {
-                                            boolean dead = bu.dead;
-                                            bu.damage(12);
-                                            if (!dead && bu.dead) {
-                                                Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
-                                            }
-                                        }
-                                    });
-                                }
+                        renderer = f -> {
+                            Draw.color(this.waveColor);
+                            f.scaled(this.waveLife, (i) -> {
+                                Lines.stroke(this.waveStroke * i.fout());
+                                Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
+                            });
+                            Draw.color(this.smokeColor);
+                            if (this.smokeSize > 0.0F) {
+                                Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
                             }
-                        }
-                    });
+
+                            Draw.color(this.sparkColor);
+                            Lines.stroke(f.fout() * this.sparkStroke);
+                            Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
+                                Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
+                                Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
+                            });
+
+                            if (f.data instanceof Vec2 v) {
+                                color(Color.valueOf("EBEEF522"));
+                                Lines.stroke(7.5f * (1 - f.fin()));
+                                Lines.line(f.x, f.y, v.x, v.y);
+                            }
+                        };
+                    }};
                 }};
             }});
         }};
@@ -650,73 +621,55 @@ public class FBlocks {
                         color2 = Color.valueOf("EBEEF5");
                     }});
 
-                    damageEffect = new Effect(8, 80f, e -> {
-                        Effect ef = new ExplosionEffect() {{
-                            lifetime = 45;
-                            sparks = 0;
-                            waveLife = 0;
-                            smokes = 20;
-                            smokeRad = 45;
-                            smokeColor = Color.valueOf("EBEEF522");
-                            smokeSizeBase = 3;
+                    intervalBullets = 3;
+                    intervalRandomSpread = 360;
+                    bulletInterval = 1;
+                    intervalDelay = 0;
+                    intervalBullet = new BulletType(0, 0) {{
+                        rangeOverride = 120;
+                        lifetime = 0;
+                        splashDamageRadius = 60;
+                        splashDamage = 45;
+                        status = FStatusEffects.breakHelIII;
+                        statusDuration = 300;
 
-                            renderer = f -> {
-                                Draw.color(this.waveColor);
-                                f.scaled(this.waveLife, (i) -> {
-                                    Lines.stroke(this.waveStroke * i.fout());
-                                    Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
-                                });
-                                Draw.color(this.smokeColor);
-                                if (this.smokeSize > 0.0F) {
-                                    Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
-                                }
+                        collides = hittable = absorbable = reflectable = false;
+                    }};
 
-                                Draw.color(this.sparkColor);
-                                Lines.stroke(f.fout() * this.sparkStroke);
-                                Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
-                                    Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
-                                    Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
-                                });
+                    intervalHitEffect = new ExplosionEffect() {{
+                        lifetime = 45;
+                        sparks = 0;
+                        waveLife = 0;
+                        smokes = 20;
+                        smokeRad = 45;
+                        smokeColor = Color.valueOf("EBEEF522");
+                        smokeSizeBase = 3;
 
-                                if (f.data instanceof Vec2 v) {
-                                    color(Color.valueOf("EBEEF522"));
-                                    Lines.stroke(7.5f * (1 - f.fin()));
-                                    Lines.line(f.x, f.y, v.x, v.y);
-                                }
-                            };
-                        }};
-
-                        if (e.lifetime != 0 && !state.is(GameState.State.paused)) {
-                            for (int i = 0; i < 3; ++i) {
-                                rand.setSeed((long) (e.id + time));
-                                rv.trns(rand.range(360),
-                                        rand.range(200));
-                                float angle = Angles.angle(rv.x, rv.y);
-                                float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
-                                float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
-                                ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
-
-                                if (e.data instanceof Bullet b) {
-                                    Units.nearbyEnemies(b.team, x1, y1, 35, u -> {
-                                        boolean wasDead = u.dead;
-                                        u.damage(35);
-                                        if (!wasDead && u.dead) {
-                                            Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
-                                        }
-                                    });
-                                    Units.nearbyBuildings(x1, y1, 35, bu -> {
-                                        if (bu.team != b.team) {
-                                            boolean dead = bu.dead;
-                                            bu.damage(35);
-                                            if (!dead && bu.dead) {
-                                                Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
-                                            }
-                                        }
-                                    });
-                                }
+                        renderer = f -> {
+                            Draw.color(this.waveColor);
+                            f.scaled(this.waveLife, (i) -> {
+                                Lines.stroke(this.waveStroke * i.fout());
+                                Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
+                            });
+                            Draw.color(this.smokeColor);
+                            if (this.smokeSize > 0.0F) {
+                                Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
                             }
-                        }
-                    });
+
+                            Draw.color(this.sparkColor);
+                            Lines.stroke(f.fout() * this.sparkStroke);
+                            Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
+                                Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
+                                Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
+                            });
+
+                            if (f.data instanceof Vec2 v) {
+                                color(Color.valueOf("EBEEF522"));
+                                Lines.stroke(7.5f * (1 - f.fin()));
+                                Lines.line(f.x, f.y, v.x, v.y);
+                            }
+                        };
+                    }};
                 }};
             }});
         }};
@@ -847,7 +800,7 @@ public class FBlocks {
 
                 fragBullet = new FreeBulletType() {{
                     lifetime = 1000;
-                    damage = 60;
+                    damage = 0;
                     speed = 0;
                     hittable = absorbable = reflectable = collides = false;
                     despawnEffect = hitEffect = Fx.none;
@@ -863,73 +816,55 @@ public class FBlocks {
                         color2 = Color.valueOf("EBEEF5");
                     }});
 
-                    damageEffect = new Effect(8, 80f, e -> {
-                        Effect ef = new ExplosionEffect() {{
-                            lifetime = 24;
-                            sparks = 0;
-                            waveLife = 0;
-                            smokes = 20;
-                            smokeRad = 60;
-                            smokeColor = Color.valueOf("EBEEF522");
-                            smokeSizeBase = 3.5f;
+                    intervalBullets = 5;
+                    intervalRandomSpread = 360;
+                    bulletInterval = 1;
+                    intervalDelay = 0;
+                    intervalBullet = new BulletType(0, 0) {{
+                        rangeOverride = 160;
+                        lifetime = 0;
+                        splashDamageRadius = 80;
+                        splashDamage = 75;
+                        status = FStatusEffects.breakHelIV;
+                        statusDuration = 360;
 
-                            renderer = f -> {
-                                Draw.color(this.waveColor);
-                                f.scaled(this.waveLife, (i) -> {
-                                    Lines.stroke(this.waveStroke * i.fout());
-                                    Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
-                                });
-                                Draw.color(this.smokeColor);
-                                if (this.smokeSize > 0.0F) {
-                                    Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
-                                }
+                        collides = hittable = absorbable = reflectable = false;
+                    }};
 
-                                Draw.color(this.sparkColor);
-                                Lines.stroke(f.fout() * this.sparkStroke);
-                                Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
-                                    Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
-                                    Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
-                                });
+                    intervalHitEffect = new ExplosionEffect() {{
+                        lifetime = 24;
+                        sparks = 0;
+                        waveLife = 0;
+                        smokes = 20;
+                        smokeRad = 60;
+                        smokeColor = Color.valueOf("EBEEF522");
+                        smokeSizeBase = 3.5f;
 
-                                if (f.data instanceof Vec2 v) {
-                                    color(Color.valueOf("EBEEF522"));
-                                    Lines.stroke(7.5f * (1 - f.fin()));
-                                    Lines.line(f.x, f.y, v.x, v.y);
-                                }
-                            };
-                        }};
-
-                        if (e.lifetime != 0 && !state.is(GameState.State.paused)) {
-                            for (int i = 0; i < 5; ++i) {
-                                rand.setSeed((long) (e.id + time));
-                                rv.trns(rand.range(360),
-                                        rand.range(300));
-                                float angle = Angles.angle(rv.x, rv.y);
-                                float x1 = e.x + rv.x + Angles.trnsx(angle, 20);
-                                float y1 = e.y + rv.y + Angles.trnsy(angle, 20);
-                                ef.at(x1, y1, 0, Color.valueOf("EBEEF522"), new Vec2(e.x, e.y));
-
-                                if (e.data instanceof Bullet b) {
-                                    Units.nearbyEnemies(b.team, x1, y1, 60, u -> {
-                                        boolean wasDead = u.dead;
-                                        u.damage(60);
-                                        if (!wasDead && u.dead) {
-                                            Events.fire(new EventType.UnitBulletDestroyEvent(u, b));
-                                        }
-                                    });
-                                    Units.nearbyBuildings(x1, y1, 60, bu -> {
-                                        if (bu.team != b.team) {
-                                            boolean dead = bu.dead;
-                                            bu.damage(60);
-                                            if (!dead && bu.dead) {
-                                                Events.fire(new EventType.BuildingBulletDestroyEvent(bu, b));
-                                            }
-                                        }
-                                    });
-                                }
+                        renderer = f -> {
+                            Draw.color(this.waveColor);
+                            f.scaled(this.waveLife, (i) -> {
+                                Lines.stroke(this.waveStroke * i.fout());
+                                Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
+                            });
+                            Draw.color(this.smokeColor);
+                            if (this.smokeSize > 0.0F) {
+                                Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
                             }
-                        }
-                    });
+
+                            Draw.color(this.sparkColor);
+                            Lines.stroke(f.fout() * this.sparkStroke);
+                            Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
+                                Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
+                                Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
+                            });
+
+                            if (f.data instanceof Vec2 v) {
+                                color(Color.valueOf("EBEEF522"));
+                                Lines.stroke(7.5f * (1 - f.fin()));
+                                Lines.line(f.x, f.y, v.x, v.y);
+                            }
+                        };
+                    }};
                 }};
             }});
         }};

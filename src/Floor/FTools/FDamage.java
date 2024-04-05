@@ -172,7 +172,7 @@ public class FDamage extends Damage {
                     boolean dead = b.dead;
                     b.damage(damage);
                     if (effect != null) {
-                        effect.at(b.x, b.y, Angles.angle(x, y, b.x, b.y), b);
+                        effect.at(x, y, Angles.angle(x, y, b.x, b.y), b);
                     }
 
                     if (FStatusEffects.burnings.indexOf(statusEffect) >= 0) {
