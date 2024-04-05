@@ -15,6 +15,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
@@ -30,6 +31,7 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
+import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
@@ -54,20 +56,130 @@ public class FBlocks {
 
     public static void load() {
         outPowerFactory = new GradeFactory("out_power_factory") {{
-            requirements(Category.units, with(Items.copper, 2000, Items.lead, 2000, Items.silicon, 2000));
+            requirements(Category.units, with(Items.copper, 500, Items.lead, 600, Items.silicon, 800));
 
-            itemCapacity = 100 * 10;
-            size = 9;
-            consumePower(500f);
+            itemCapacity = 770;
+            size = 3;
+            consumePower(50f);
+
+            constructTime = 60f * 10f;
+            grades = new Seq<>(new UnitType[]{
+                    UnitTypes.flare, UnitTypes.nova,
+                    UnitTypes.pulsar, UnitTypes.dagger,
+                    UnitTypes.mace, UnitTypes.crawler,
+                    UnitTypes.atrax, UnitTypes.horizon,
+                    UnitTypes.poly, UnitTypes.risso,
+                    UnitTypes.minke, UnitTypes.retusa,
+                    UnitTypes.oxynoe, UnitTypes.stell,
+                    UnitTypes.locus, UnitTypes.merui,
+                    UnitTypes.cleroi, UnitTypes.elude,
+                    UnitTypes.avert, FUnits.barb, FUnits.hammer
+            });
+        }};
+        inputPowerFactory = new GradeFactory("input_power_factory") {{
+            requirements(Category.units, with(Items.copper, 500, Items.lead, 600, Items.silicon, 800));
+
+            itemCapacity = 770;
+            size = 3;
+            consumePower(50f);
+
+            constructTime = 60f * 10f;
+            grades = new Seq<>(new UnitType[]{
+                    UnitTypes.flare, UnitTypes.nova,
+                    UnitTypes.pulsar, UnitTypes.dagger,
+                    UnitTypes.mace, UnitTypes.crawler,
+                    UnitTypes.atrax, UnitTypes.horizon,
+                    UnitTypes.poly, UnitTypes.risso,
+                    UnitTypes.minke, UnitTypes.retusa,
+                    UnitTypes.oxynoe, UnitTypes.stell,
+                    UnitTypes.locus, UnitTypes.merui,
+                    UnitTypes.cleroi, UnitTypes.elude,
+                    UnitTypes.avert, FUnits.barb, FUnits.hammer
+            });
+            out = false;
+        }};
+        outPowerFactoryII = new GradeFactory("out_power_factory_II") {{
+            requirements(Category.units, with(Items.copper, 1000, Items.lead, 1200, Items.silicon, 2000));
+
+            itemCapacity = 770;
+            size = 7;
+            consumePower(200);
+
+            constructTime = 60f * 10f;
+            grades = new Seq<>(new UnitType[]{
+                    UnitTypes.flare, UnitTypes.nova,
+                    UnitTypes.pulsar, UnitTypes.dagger,
+                    UnitTypes.mace, UnitTypes.crawler,
+                    UnitTypes.atrax, UnitTypes.horizon,
+                    UnitTypes.poly, UnitTypes.risso,
+                    UnitTypes.minke, UnitTypes.retusa,
+                    UnitTypes.oxynoe, UnitTypes.stell,
+                    UnitTypes.locus, UnitTypes.merui,
+                    UnitTypes.cleroi, UnitTypes.elude,
+                    UnitTypes.avert, FUnits.barb, FUnits.hammer,
+                    UnitTypes.fortress, UnitTypes.scepter,
+                    UnitTypes.quasar, UnitTypes.vela,
+                    UnitTypes.spiroct, UnitTypes.arkyid,
+                    UnitTypes.zenith, UnitTypes.antumbra,
+                    UnitTypes.mega, UnitTypes.quad,
+                    UnitTypes.bryde, UnitTypes.sei,
+                    UnitTypes.cyerce, UnitTypes.aegires,
+                    UnitTypes.precept, UnitTypes.vanquish,
+                    UnitTypes.anthicus, UnitTypes.tecta,
+                    UnitTypes.obviate, UnitTypes.quell,
+                    FUnits.buying, FUnits.crazy,
+                    FUnits.dive,FUnits.befall
+            });
+        }};
+        inputPowerFactoryII = new GradeFactory("input_power_factory_II") {{
+            requirements(Category.units, with(Items.copper, 1000, Items.lead, 1200, Items.silicon, 2000));
+
+            itemCapacity = 770;
+            size = 7;
+            consumePower(200);
+
+            constructTime = 60f * 10f;
+            grades = new Seq<>(new UnitType[]{
+                    UnitTypes.flare, UnitTypes.nova,
+                    UnitTypes.pulsar, UnitTypes.dagger,
+                    UnitTypes.mace, UnitTypes.crawler,
+                    UnitTypes.atrax, UnitTypes.horizon,
+                    UnitTypes.poly, UnitTypes.risso,
+                    UnitTypes.minke, UnitTypes.retusa,
+                    UnitTypes.oxynoe, UnitTypes.stell,
+                    UnitTypes.locus, UnitTypes.merui,
+                    UnitTypes.cleroi, UnitTypes.elude,
+                    UnitTypes.avert, FUnits.barb, FUnits.hammer,
+                    UnitTypes.fortress, UnitTypes.scepter,
+                    UnitTypes.quasar, UnitTypes.vela,
+                    UnitTypes.spiroct, UnitTypes.arkyid,
+                    UnitTypes.zenith, UnitTypes.antumbra,
+                    UnitTypes.mega, UnitTypes.quad,
+                    UnitTypes.bryde, UnitTypes.sei,
+                    UnitTypes.cyerce, UnitTypes.aegires,
+                    UnitTypes.precept, UnitTypes.vanquish,
+                    UnitTypes.anthicus, UnitTypes.tecta,
+                    UnitTypes.obviate, UnitTypes.quell,
+                    FUnits.buying, FUnits.crazy,
+                    FUnits.dive,FUnits.befall
+            });
+            out = false;
+        }};
+        outPowerFactoryIII = new GradeFactory("out_power_factory_III") {{
+            requirements(Category.units, with(Items.copper, 2000, Items.lead, 2400, Items.silicon, 2800));
+
+            itemCapacity = 770;
+            size = 11;
+            consumePower(500);
 
             constructTime = 60f * 10f;
         }};
-        inputPowerFactory = new GradeFactory("input_power_factory") {{
-            requirements(Category.units, with(Items.copper, 2000, Items.lead, 2000, Items.silicon, 2000));
+        inputPowerFactoryIII = new GradeFactory("input_power_factory_III") {{
+            requirements(Category.units, with(Items.copper, 2000, Items.lead, 2400, Items.silicon, 2800));
 
-            itemCapacity = 100 * 10;
-            size = 9;
-            consumePower(500f);
+            itemCapacity = 770;
+            size = 11;
+            consumePower(500);
 
             constructTime = 60f * 10f;
             out = false;

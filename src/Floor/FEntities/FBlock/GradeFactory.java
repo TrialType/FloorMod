@@ -45,6 +45,7 @@ public class GradeFactory extends UnitBlock {
     public Seq<UnitType> grades = new Seq<>(UnitUpGrade.uppers);
     public boolean out = true;
     public float constructTime = 60f * 5f;
+
     public GradeFactory(String name) {
         super(name);
 
@@ -60,6 +61,7 @@ public class GradeFactory extends UnitBlock {
         commandable = true;
         ambientSound = Sounds.respawning;
     }
+
     @Override
     public void setBars() {
         super.setBars();
@@ -67,6 +69,7 @@ public class GradeFactory extends UnitBlock {
         addBar("item", (GradeBuild e) -> new Bar(e.item == null ? "null" : Core.bundle.get("item." + e.item.name + ".name"), Pal.ammo, () -> 1f));
         addBar("levelTo", (GradeBuild e) -> new Bar(e.level + "/" + e.levelTo, Pal.ammo, () -> 1f));
     }
+
     @Override
     public void setStats() {
         super.setStats();
@@ -128,6 +131,7 @@ public class GradeFactory extends UnitBlock {
             });
         }
     }
+
     private static int findIndex(Item i) {
         for (int j = 0; j < Items.length; j++) {
             if (Items[j] == i) {
@@ -136,6 +140,7 @@ public class GradeFactory extends UnitBlock {
         }
         return -1;
     }
+
     public static class GradePlan {
         int levelTo;
         Item item;
@@ -185,6 +190,7 @@ public class GradeFactory extends UnitBlock {
             }
         }
     }
+
     public class GradeBuild extends UnitBuild {
         public Table list;
         public BaseDialog bd;
@@ -200,9 +206,11 @@ public class GradeFactory extends UnitBlock {
         public Item item = null;
         public Unit lastUnit;
         public Item lastItem;
+
         public float fraction() {
             return lastUnit == null ? 0 : progress / constructTime;
         }
+
         @Override
         public void buildConfiguration(Table table) {
             table.row();
@@ -217,6 +225,7 @@ public class GradeFactory extends UnitBlock {
                 }).size(50, 40.0F).row();
             });
         }
+
         public void addDialog() {
             tables.clear();
 
@@ -640,6 +649,7 @@ public class GradeFactory extends UnitBlock {
 
             bd = dialog;
         }
+
         @Override
         public void draw() {
             Draw.rect(region, x, y);
@@ -660,6 +670,7 @@ public class GradeFactory extends UnitBlock {
 
             Draw.rect(topRegion, x, y);
         }
+
         @Override
         public void updateTile() {
             if (changed || usePlan.isEmpty()) {
@@ -767,6 +778,7 @@ public class GradeFactory extends UnitBlock {
                 outing = true;
             }
         }
+
         private void updateNumber() {
             if (lastUnit != null && grades.indexOf(lastUnit.type) >= 0) {
                 if (out) {
@@ -783,9 +795,10 @@ public class GradeFactory extends UnitBlock {
                     }
                 }
             } else {
-                itemUse = -1;
+                usePlan.clear();
             }
         }
+
         private void updateLevel(FUnitUpGrade uug) {
             int choose = findIndex(item);
             if (choose == 0) {
@@ -804,6 +817,7 @@ public class GradeFactory extends UnitBlock {
                 level = -1;
             }
         }
+
         public void gradeChange(FUnitUpGrade uug) {
             if (out) {
                 uug.setLevel(uug.getLevel() - 1);
@@ -833,13 +847,16 @@ public class GradeFactory extends UnitBlock {
                 }
             }
         }
+
         public boolean acceptItem(Building source, Item item) {
             return findIndex(item) >= 0 && items.get(item) < getMaximumAccepted(item);
         }
+
         @Override
         public Object config() {
             return item;
         }
+
         @Override
         public void write(Writes write) {
             super.write(write);
@@ -861,6 +878,7 @@ public class GradeFactory extends UnitBlock {
                 write.str(usePlan.get(i).name);
             }
         }
+
         @Override
         public void read(Reads read, byte revision) {
             super.read(read, revision);
