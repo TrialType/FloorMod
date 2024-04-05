@@ -1192,6 +1192,7 @@ public class FUnits {
                         lifetime = 600;
                         speed = 3;
                         damage = 80;
+                        buildingDamageMultiplier = 0.75f;
                         splashDamage = 10;
                         splashDamageRadius = 40;
                         splashDamagePierce = true;

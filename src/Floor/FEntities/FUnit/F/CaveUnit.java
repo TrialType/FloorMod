@@ -174,6 +174,8 @@ public class CaveUnit extends UnitWaterMove {
 
         length = max(world.width(), world.height()) * 9;
         water = new MultiEffect(effects);
+        WaterWave.back = false;
+        back = false;
         timer = 676;
         allTimer = 0;
     }
