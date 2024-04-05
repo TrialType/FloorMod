@@ -433,7 +433,6 @@ public class FBlocks {
 
                 speed = 4.5f;
                 lifetime = 90;
-                damage = 32;
 
                 trailLength = 14;
                 trailColor = Pal.redLight;
@@ -445,6 +444,7 @@ public class FBlocks {
                 status = StatusEffects.unmoving;
                 statusDuration = 45;
                 splashDamageRadius = 60;
+                splashDamage = 32;
 
                 shootEffect = smokeEffect = Fx.none;
                 hitEffect = new ExplosionEffect() {{
