@@ -313,7 +313,7 @@ public class FBlocks {
             canOverdrive = false;
 
             shootType = new EmpBulletType() {{
-                speed = 2;
+                speed = 2.4f;
                 damage = 8;
 
                 lifetime = 30;
@@ -348,7 +348,7 @@ public class FBlocks {
             canOverdrive = false;
 
             shootType = new BulletType() {{
-                speed = 4.5f;
+                speed = 4.8f;
                 damage = 12;
 
                 trailLength = 14;
@@ -1168,16 +1168,12 @@ public class FBlocks {
                         absorbable = hittable = reflectable = collides = false;
 
                         fragRandomSpread = 30;
-                        fragBullets = 24;
+                        fragBullets = 36;
                         fragLifeMax = fragLifeMin = 3;
                         fragVelocityMin = 1.5f;
                         fragVelocityMax = 1.8f;
                         fragBullet = new LiquidBulletType() {{
                             liquid = Liquids.slag;
-
-                            trailColor = Color.valueOf("ffa166");
-                            trailLength = 6;
-                            trailInterval = 2;
 
                             homingDelay = 35;
                             homingPower = 0.1f;

@@ -5,12 +5,10 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Fill;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.scene.ui.layout.Table;
 import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Mover;
@@ -19,12 +17,12 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
+import mindustry.gen.Player;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.io.TypeIO;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ControlBlock;
-import mindustry.world.blocks.defense.Wall;
 import mindustry.world.blocks.defense.turrets.Turret;
 
 import static arc.graphics.g2d.Draw.color;
@@ -148,14 +146,20 @@ public class OwnerTurret extends Turret {
             }
 
             if (targetAir && !targetGround) {
-                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                target = Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() &&
+                        unitFilter.get(e) && !e.isPlayer(), unitSort);
                 if (target == null && hitTeam && exp >= minPower) {
-                    target = Units.bestEnemy(other, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), unitSort);
+                    target = Units.bestEnemy(other, x, y, range, e -> !e.dead() && !e.isGrounded() &&
+                            unitFilter.get(e) && !e.isPlayer(), unitSort);
                 }
             } else {
-                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b) && b != this, unitSort);
+                target = Units.bestTarget(team, x, y, range, e -> !e.dead() && unitFilter.get(e) &&
+                        (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && !e.isPlayer(),
+                        b -> targetGround && buildingFilter.get(b) && b != this, unitSort);
                 if (target == null && hitTeam && exp >= minPower) {
-                    target = Units.bestTarget(other, x, y, range, e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround), b -> targetGround && buildingFilter.get(b) && b != this, unitSort);
+                    target = Units.bestTarget(other, x, y, range, e -> !e.dead() && unitFilter.get(e) &&
+                            (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && !e.isPlayer(),
+                            b -> targetGround && buildingFilter.get(b) && b != this, unitSort);
                 }
             }
 
