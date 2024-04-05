@@ -109,8 +109,9 @@ public class CaveUnit extends UnitWaterMove {
         if (allTimer >= 21000) {
             Fx.unitDrop.at(x, y, 0, this);
             if (allTimer >= 21600) {
-                allTimer = 0;
                 back = true;
+                time = 0;
+                water = null;
                 WaterWave.back = true;
                 destroy();
                 return;

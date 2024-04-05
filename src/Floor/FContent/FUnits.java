@@ -1205,26 +1205,6 @@ public class FUnits {
                     }};
                 }});
             }
-
-            weapons.add(new Weapon() {{
-                reload = 20;
-                x = y = 0;
-                mirror = false;
-                shootSound = Sounds.laser;
-
-                bullet = new LaserBulletType(135) {{
-                    rangeOverride = 600;
-                    length = 600;
-                    sideLength = 20;
-
-                    status = FStatusEffects.slowII;
-                    statusDuration = 240;
-
-                    laserAbsorb = true;
-                    colors = new Color[]{Color.blue, Pal.techBlue, Color.brown};
-                }};
-            }});
-
             weapons.add(new Weapon() {{
                 reload = 3;
                 x = y = shootY = shootX = 0;
@@ -1256,6 +1236,9 @@ public class FUnits {
             }});
 
             weapons.add(new Weapon() {{
+                rotate = true;
+                shootCone = 360;
+                rotateSpeed = 120;
                 reload = 20;
                 shootSound = Sounds.laser;
 
