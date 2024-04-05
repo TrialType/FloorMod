@@ -769,10 +769,16 @@ public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, Unit
 
         if (level > 60) {
             int boost2 = level - 60;
-            healthMultiplier *= (float) Math.pow(1.01f, boost2);
-            speedMultiplier *= (float) Math.pow(1.01f, boost2);
-            damageMultiplier *= (float) Math.pow(1.01f, boost2);
-            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
+            float lBoost = (float) Math.pow(1.01f, boost2);
+            healthMultiplier *= lBoost;
+            if (lBoost >= 9) {
+                speedMultiplier *= 9;
+                healthMultiplier *= (lBoost - 8);
+            } else {
+                speedMultiplier *= lBoost;
+            }
+            damageMultiplier *= lBoost;
+            reloadMultiplier *= lBoost;
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {

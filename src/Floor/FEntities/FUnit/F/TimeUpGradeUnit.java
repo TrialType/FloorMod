@@ -237,18 +237,29 @@ public class TimeUpGradeUnit extends FUnitEntity implements UpGradeTime {
 
         if (level > 60) {
             int boost2 = level - 60;
-            healthMultiplier *= (float) Math.pow(1.01f, boost2);
-            speedMultiplier *= (float) Math.pow(1.01f, boost2);
-            damageMultiplier *= (float) Math.pow(1.01f, boost2);
-            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
+            float lBoost = (float) Math.pow(1.01f, boost2);
+            healthMultiplier *= lBoost;
+            if (lBoost >= 6) {
+                speedMultiplier *= 6;
+                healthMultiplier *= (lBoost - 5);
+            } else {
+                speedMultiplier *= lBoost;
+            }
+            damageMultiplier *= lBoost;
+            reloadMultiplier *= lBoost;
         }
 
         if (boostTime > 0) {
-            speedMultiplier *= (float) Math.pow(1.01f, boostTime);
-            damageMultiplier *= (float) Math.pow(1.01f, boostTime);
-            reloadMultiplier *= (float) Math.pow(1.01f, boostTime);
-            healthMultiplier *= (float) Math.pow(1.01f, boostTime);
-            boostTime = Math.max(0, boostTime - Time.delta / 60);
+            float lBoost = (float) Math.max(1, Math.pow(1.01f, boostTime));
+            if(speedMultiplier >= 18){
+                healthMultiplier *= lBoost;
+            } else {
+                speedMultiplier *= lBoost;
+            }
+            damageMultiplier *= lBoost;
+            reloadMultiplier *= lBoost;
+            healthMultiplier *= lBoost;
+            boostTime = Math.max(0, boostTime - Time.delta / 30);
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {

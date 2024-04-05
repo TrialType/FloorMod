@@ -1,6 +1,7 @@
 package Floor.FEntities.FUnit.Override;
 
 import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.UnitUpGrade;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Bits;
@@ -342,13 +343,13 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
         if (this.type.bounded) {
             offset = 0.0F;
             range = 0.0F;
-            cx = (float)Vars.world.unitHeight();
-            cy = (float)Vars.world.unitWidth();
+            cx = (float) Vars.world.unitHeight();
+            cy = (float) Vars.world.unitWidth();
             if (Vars.state.rules.limitMapArea && !this.team.isAI()) {
-                offset = (float)(Vars.state.rules.limitY * 8);
-                range = (float)(Vars.state.rules.limitX * 8);
-                cx = (float)(Vars.state.rules.limitHeight * 8) + offset;
-                cy = (float)(Vars.state.rules.limitWidth * 8) + range;
+                offset = (float) (Vars.state.rules.limitY * 8);
+                range = (float) (Vars.state.rules.limitX * 8);
+                cx = (float) (Vars.state.rules.limitHeight * 8) + offset;
+                cy = (float) (Vars.state.rules.limitWidth * 8) + range;
             }
 
             if (!Vars.net.client() || this.isLocal()) {
@@ -404,7 +405,7 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
         this.updateDrowning();
         this.hitTime -= Time.delta / 9.0F;
         this.stack.amount = Mathf.clamp(this.stack.amount, 0, this.itemCapacity());
-        this.itemTime = Mathf.lerpDelta(this.itemTime, (float)Mathf.num(this.hasItem()), 0.05F);
+        this.itemTime = Mathf.lerpDelta(this.itemTime, (float) Mathf.num(this.hasItem()), 0.05F);
         int accepted;
         if (this.mineTile != null) {
             Building core = this.closestCore();
@@ -422,11 +423,11 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
                 this.mineTimer = 0.0F;
             } else if (this.mining() && item != null) {
                 this.mineTimer += Time.delta * this.type.mineSpeed;
-                if (Mathf.chance(0.06 * (double)Time.delta)) {
+                if (Mathf.chance(0.06 * (double) Time.delta)) {
                     Fx.pulverizeSmall.at(this.mineTile.worldx() + Mathf.range(4.0F), this.mineTile.worldy() + Mathf.range(4.0F), 0.0F, item.color);
                 }
 
-                if (this.mineTimer >= 50.0F + (this.type.mineHardnessScaling ? (float)item.hardness * 15.0F : 15.0F)) {
+                if (this.mineTimer >= 50.0F + (this.type.mineHardnessScaling ? (float) item.hardness * 15.0F : 15.0F)) {
                     this.mineTimer = 0.0F;
                     if (Vars.state.rules.sector != null && this.team() == Vars.state.rules.defaultTeam) {
                         Vars.state.rules.sector.info.handleProduction(item, 1);
@@ -470,8 +471,8 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
             i = 0;
 
             label346:
-            while(true) {
-                while(true) {
+            while (true) {
+                while (true) {
                     if (i >= this.statuses.size) {
                         break label346;
                     }
@@ -507,10 +508,16 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
 
         if (level > 60) {
             int boost2 = level - 60;
-            healthMultiplier *= (float) Math.pow(1.01f, boost2);
-            speedMultiplier *= (float) Math.pow(1.01f, boost2);
-            damageMultiplier *= (float) Math.pow(1.01f, boost2);
-            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
+            float lBoost = (float) Math.pow(1.01f, boost2);
+            healthMultiplier *= lBoost;
+            if (lBoost >= 6) {
+                speedMultiplier *= 6;
+                healthMultiplier *= (lBoost - 5);
+            } else {
+                speedMultiplier *= lBoost;
+            }
+            damageMultiplier *= lBoost;
+            reloadMultiplier *= lBoost;
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {
@@ -537,7 +544,7 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
             this.team.data().updateCount(this.type, -1);
         }
 
-        if (Vars.state.rules.unitAmmo && this.ammo < (float)this.type.ammoCapacity - 1.0E-4F) {
+        if (Vars.state.rules.unitAmmo && this.ammo < (float) this.type.ammoCapacity - 1.0E-4F) {
             this.resupplyTime += Time.delta;
             if (this.resupplyTime > 10.0F) {
                 this.type.ammoType.resupply(this);
@@ -548,7 +555,7 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
         Ability[] var10 = this.abilities;
         i = var10.length;
 
-        for(accepted = 0; accepted < i; ++accepted) {
+        for (accepted = 0; accepted < i; ++accepted) {
             Ability a = var10[accepted];
             a.update(this);
         }
@@ -626,19 +633,19 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
 
         boolean flying = this.isFlying();
 
-        for(i = 0; i < 2; ++i) {
+        for (i = 0; i < 2; ++i) {
             Trail t = i == 0 ? this.tleft : this.tright;
             t.length = this.type.trailLength;
             int sign = i == 0 ? -1 : 1;
-            cx = Angles.trnsx(this.rotation - 90.0F, this.type.waveTrailX * (float)sign, this.type.waveTrailY) + this.x;
-            cy = Angles.trnsy(this.rotation - 90.0F, this.type.waveTrailX * (float)sign, this.type.waveTrailY) + this.y;
+            cx = Angles.trnsx(this.rotation - 90.0F, this.type.waveTrailX * (float) sign, this.type.waveTrailY) + this.x;
+            cy = Angles.trnsy(this.rotation - 90.0F, this.type.waveTrailX * (float) sign, this.type.waveTrailY) + this.y;
             t.update(cx, cy, Vars.world.floorWorld(cx, cy).isLiquid && !flying ? 1.0F : 0.0F);
         }
 
         WeaponMount[] var18 = this.mounts;
         i = var18.length;
 
-        for(accepted = 0; accepted < i; ++accepted) {
+        for (accepted = 0; accepted < i; ++accepted) {
             WeaponMount mount = var18[accepted];
             mount.weapon.update(this, mount);
         }
@@ -697,12 +704,17 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
             fu.x(x);
             fu.y(y);
             fu.rotation(rotation);
-            fu.setDamageLevel(damageLevel / 2);
-            fu.setHealthLevel(healthLevel / 2);
-            fu.setSpeedLevel(speedLevel / 2);
-            fu.setShieldLevel(shieldLevel / 2);
-            fu.setReloadLevel(reloadLevel / 2);
-            fu.setLevel(damageLevel / 2 + healthLevel / 2 + speedLevel / 2 + shieldLevel / 2 + reloadLevel / 2);
+            if (level >= 120) {
+                UnitUpGrade.getPower(fu, 0, false, true);
+                fu.setLevel(level / 2);
+            } else {
+                fu.setDamageLevel(damageLevel / 2);
+                fu.setHealthLevel(healthLevel / 2);
+                fu.setSpeedLevel(speedLevel / 2);
+                fu.setShieldLevel(shieldLevel / 2);
+                fu.setReloadLevel(reloadLevel / 2);
+                fu.setLevel(damageLevel / 2 + healthLevel / 2 + speedLevel / 2 + shieldLevel / 2 + reloadLevel / 2);
+            }
             if (shieldLevel >= 2) {
                 fu.sfa = new ShieldRegenFieldAbility(maxHealth / 200 * shieldLevel,
                         maxHealth * shieldLevel / 20, 120, 60);
@@ -791,11 +803,13 @@ public class FUnitWaterMove extends UnitWaterMove implements FUnitUpGrade {
     public void setShieldLevel(int shieldLevel) {
         this.shieldLevel = shieldLevel;
     }
+
     @Override
     public void sfa(int level) {
         sfa = new ShieldRegenFieldAbility(maxHealth / 100 * shieldLevel,
                 maxHealth * shieldLevel / 10, 120, 60);
     }
+
     public int baseLevel() {
         return damageLevel + shieldLevel + speedLevel + healthLevel + reloadLevel + againLevel;
     }

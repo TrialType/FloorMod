@@ -1,6 +1,7 @@
 package Floor.FEntities.FUnit.Override;
 
 import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.UnitUpGrade;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Rect;
@@ -344,10 +345,16 @@ public class FTankUnit extends TankUnit implements FUnitUpGrade {
 
         if (level > 60) {
             int boost2 = level - 60;
-            healthMultiplier *= (float) Math.pow(1.01f, boost2);
-            speedMultiplier *= (float) Math.pow(1.01f, boost2);
-            damageMultiplier *= (float) Math.pow(1.01f, boost2);
-            reloadMultiplier *= (float) Math.pow(1.01f, boost2);
+            float lBoost = (float) Math.pow(1.01f, boost2);
+            healthMultiplier *= lBoost;
+            if (lBoost >= 6) {
+                speedMultiplier *= 6;
+                healthMultiplier *= (lBoost - 5);
+            } else {
+                speedMultiplier *= lBoost;
+            }
+            damageMultiplier *= lBoost;
+            reloadMultiplier *= lBoost;
         }
 
         if (Vars.net.client() && !this.isLocal() || this.isRemote()) {
@@ -521,12 +528,17 @@ public class FTankUnit extends TankUnit implements FUnitUpGrade {
             fu.x(x);
             fu.y(y);
             fu.rotation(rotation);
-            fu.setDamageLevel(damageLevel / 2);
-            fu.setHealthLevel(healthLevel / 2);
-            fu.setSpeedLevel(speedLevel / 2);
-            fu.setShieldLevel(shieldLevel / 2);
-            fu.setReloadLevel(reloadLevel / 2);
-            fu.setLevel(damageLevel / 2 + healthLevel / 2 + speedLevel / 2 + shieldLevel / 2 + reloadLevel / 2);
+            if (level >= 120) {
+                UnitUpGrade.getPower(fu, 0, false, true);
+                fu.setLevel(level / 2);
+            } else {
+                fu.setDamageLevel(damageLevel / 2);
+                fu.setHealthLevel(healthLevel / 2);
+                fu.setSpeedLevel(speedLevel / 2);
+                fu.setShieldLevel(shieldLevel / 2);
+                fu.setReloadLevel(reloadLevel / 2);
+                fu.setLevel(damageLevel / 2 + healthLevel / 2 + speedLevel / 2 + shieldLevel / 2 + reloadLevel / 2);
+            }
             if(shieldLevel >= 2){
                 fu.sfa = new ShieldRegenFieldAbility(maxHealth / 200 * shieldLevel,
                         maxHealth * shieldLevel / 20, 120, 60);
