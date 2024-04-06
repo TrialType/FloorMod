@@ -25,6 +25,13 @@ import mindustry.type.Weapon;
 
 public class UnitOverride {
     public static void load() {
+        UnitTypes.alpha.buildSpeed = 1f;
+        UnitTypes.alpha.mineSpeed = 8f;
+        UnitTypes.beta.buildSpeed = 1.5f;
+        UnitTypes.beta.mineSpeed = 9f;
+        UnitTypes.gamma.buildSpeed = 2f;
+        UnitTypes.gamma.mineSpeed = 12f;
+
         UnitTypes.dagger.constructor = FMechUnit::create;
         UnitTypes.dagger.abilities.add(new LevelSign());
         UnitTypes.mace.constructor = FMechUnit::create;

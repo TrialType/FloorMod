@@ -10,6 +10,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
+import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
@@ -17,6 +18,7 @@ import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.part.FlarePart;
 import mindustry.entities.part.ShapePart;
@@ -290,11 +292,12 @@ public class FBlocks {
             }};
 
             requirements(Category.turret, ItemStack.with(
-                    Items.titanium, 1540,
+                    Items.titanium, 1500,
                     Items.graphite, 1500,
                     Items.graphite, 2000,
                     Items.silicon, 1500,
-                    Items.phaseFabric, 1500
+                    Items.phaseFabric, 1500,
+                    Items.plastanium, 900
             ));
         }};
         stay = new PowerTurret("stay") {{
@@ -311,13 +314,12 @@ public class FBlocks {
             consumeAmmoOnce = false;
             canOverdrive = false;
 
-            shootType = new EmpBulletType() {{
-                speed = 2.4f;
+            shootType = new PointBulletType() {{
+                speed = 100;
                 damage = 8;
+                lifetime = 180;
 
-                lifetime = 30;
-                rangeOverride = 60;
-                lightColor = frontColor = backColor = Pal.redLight;
+                lightColor = Pal.redLight;
                 status = StatusEffects.unmoving;
                 statusDuration = 24;
                 splashDamageRadius = 36;
@@ -433,11 +435,11 @@ public class FBlocks {
                 speed = 4.5f;
                 lifetime = 90;
 
-                trailLength = 14;
-                trailColor = Pal.redLight;
-                lightColor = Pal.redLight;
-                trailChance = 1;
-                trailInterval = 2;
+                trailChance = 1f;
+                trailInterp = Interp.slope;
+                trailWidth = 4.5f;
+                trailLength = 19;
+                trailEffect = new MultiEffect(Fx.artilleryTrail, Fx.artilleryTrailSmoke);
                 rangeOverride = 200;
 
                 status = StatusEffects.unmoving;
@@ -462,8 +464,8 @@ public class FBlocks {
                 despawnEffect = hitEffect;
 
                 parts.add(new ShapePart() {{
-                    radius = 2;
-                    radiusTo = 0;
+                    radius = 5.5f;
+                    radiusTo = 5.5f;
                     circle = true;
                     color = colorTo = Pal.redLight;
                 }});
@@ -1260,7 +1262,6 @@ public class FBlocks {
         slowProject = new DownProject("slow_project") {{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
             range = 16;
-            downSpeed = 0.1f;
 
             consumePower(3.50f);
             size = 2;

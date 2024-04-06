@@ -577,68 +577,68 @@ public class FUnits {
                 mirror = false;
                 alwaysShooting = true;
                 shootSound = Sounds.none;
-                bullet = new BasicBulletType() {{
+                bullet = new BulletType() {{
                     despawnEffect = Fx.none;
                     hitEffect = Fx.none;
-                    width = 0;
-                    height = 0;
                     speed = 0;
                     damage = 0;
                     lifetime = 0;
                     splashDamage = 20000;
                     splashDamageRadius = 56;
                     splashDamagePierce = true;
-                    shootEffect = Fx.none;
+                    shootEffect = new WaveEffect() {{
+                        lifetime = 120;
+                        colorTo = Color.white;
+                        colorFrom = Pal.darkPyraFlame;
+                        sizeTo = 56;
+                    }};
                 }};
             }});
-            weapons.add(new Weapon() {
-                {
-                    reload = 50;
-                    mirror = true;
-                    x = 0;
-                    y = 0;
-                    shoot = new ShootBarrel() {{
-                        barrels = new float[]{0, -20, 70};
-                    }};
-                    bullet = new BasicBulletType() {{
-                        sprite = "jamming_bomb";
-                        width = 24;
-                        height = 55;
-                        trailLength = 23;
-                        trailWidth = 5;
-                        speed = 11;
-                        damage = 300;
-                        lifetime = 210;
+            weapons.add(new Weapon() {{
+                reload = 50;
+                mirror = true;
+                x = 0;
+                y = 0;
+                shoot = new ShootBarrel() {{
+                    barrels = new float[]{0, -20, 70};
+                }};
+                bullet = new BasicBulletType() {{
+                    sprite = "jamming_bomb";
+                    width = 24;
+                    height = 55;
+                    trailLength = 23;
+                    trailWidth = 5;
+                    speed = 11;
+                    damage = 300;
+                    lifetime = 210;
+                    homingRange = 1000;
+                    homingDelay = 30;
+                    homingPower = 0.4F;
+                    hitEffect = Fx.none;
+                    despawnEffect = Fx.none;
+                    absorbable = false;
+                    reflectable = false;
+                    keepVelocity = false;
+
+                    intervalBullets = 5;
+                    intervalDelay = 100;
+                    bulletInterval = 5;
+                    intervalAngle = 5;
+                    intervalBullet = new BasicBulletType(11, 2) {{
+                        lifetime = 120;
+                        trailChance = 1;
+                        trailColor = Pal.lightTrail;
+                        trailInterp = Interp.swingOut;
+
+                        weaveMag = 3;
+                        weaveScale = 15;
+
+                        homingPower = 0.3f;
                         homingRange = 1000;
-                        homingDelay = 30;
-                        homingPower = 0.4F;
-                        hitEffect = Fx.none;
-                        despawnEffect = Fx.none;
-                        absorbable = false;
-                        reflectable = false;
-                        keepVelocity = false;
-
-                        intervalBullets = 9;
-                        intervalDelay = 100;
-                        bulletInterval = 10;
-                        intervalSpread = 5;
-                        intervalBullet = new BasicBulletType(11, 2) {{
-                            lifetime = 120;
-                            trailChance = -1;
-                            trailLength = 9;
-                            trailColor = Pal.lightTrail;
-                            trailInterp = Interp.slope;
-
-                            weaveMag = 2;
-                            weaveScale = 45;
-
-                            homingPower = 0.3f;
-                            homingRange = 1000;
-                            homingDelay = 20;
-                        }};
+                        homingDelay = 20;
                     }};
-                }
-            });
+                }};
+            }});
             weapons.add(new Weapon() {{
                 reload = 50;
                 mirror = true;
@@ -647,7 +647,7 @@ public class FUnits {
                 shoot = new ShootBarrel() {{
                     barrels = new float[]{0, -25, 50};
                 }};
-                bullet = new MissileBulletType() {{
+                bullet = new BasicBulletType() {{
                     sprite = "fire_bomb";
                     absorbable = false;
                     reflectable = false;
@@ -665,33 +665,31 @@ public class FUnits {
                     splashDamage = 0;
                     splashDamageRadius = 156;
                     splashDamagePierce = true;
-                    statusDuration = 1200;
+                    statusDuration = 300;
                     keepVelocity = false;
-                    status = FStatusEffects.HardHit;
+                    status = FStatusEffects.burningV;
+                    incendSpread = 360;
+                    incendChance = 1;
+                    incendAmount = 15;
 
-                    intervalBullets = 3;
-                    intervalDelay = 30;
-                    bulletInterval = 10;
-                    intervalSpread = 180;
-                    intervalBullet = new BasicBulletType(8, 20) {{
-                        width = height = 0;
-                        lifetime = 120;
-                        trailChance = -1;
-                        trailLength = 9;
-                        trailColor = Pal.darkFlame;
-                        trailInterp = Interp.smoother;
-
-                        status = FStatusEffects.burningV;
-                        statusDuration = 480;
-
-                        makeFire = true;
-                        incendAmount = 15;
-                        incendChance = 0.8f;
-                        incendSpread = 60;
-
-                        homingPower = 0.3f;
-                        homingRange = 1000;
-                        homingDelay = 60;
+                    fragBullets = 20;
+                    fragRandomSpread = 360;
+                    fragLifeMin = 1;
+                    fragLifeMax = 4;
+                    fragVelocityMin = 0.8f;
+                    fragVelocityMax = 2f;
+                    fragBullet = new BasicBulletType() {{
+                        damage = 0;
+                        status = FStatusEffects.breakHelIV;
+                        statusDuration = 240;
+                        trailEffect = new ExplosionEffect() {{
+                            lifetime = 90;
+                            smokes = 2;
+                            smokeColor = Pal.darkPyraFlame;
+                        }};
+                        incendSpread = 360;
+                        incendChance = 1;
+                        incendAmount = 25;
                     }};
                 }};
             }});
@@ -703,94 +701,114 @@ public class FUnits {
                 shoot = new ShootBarrel() {{
                     barrels = new float[]{0, -30, 30};
                 }};
-                bullet = new MissileBulletType() {{
-                    sprite = "high_explosive_projectile";
-                    absorbable = false;
-                    reflectable = false;
-                    splashDamagePierce = true;
-                    width = 15;
-                    height = 40;
-                    trailLength = 20;
-                    trailWidth = 4;
-                    speed = 6;
+                bullet = new BulletType() {{
                     damage = 0;
-                    lifetime = 300;
+                    speed = 1f;
+                    lifetime = 120;
+                    hittable = absorbable = reflectable = collides = false;
+                    hitEffect = despawnEffect = new ExplosionEffect() {{
+                        lifetime = 180;
+
+                        smokeColor = Color.valueOf("110000DD");
+                        sparks = 40;
+                        smokes = 60;
+                        smokeRad = 100;
+                        smokeSize = 24;
+                        smokeSizeBase = 2;
+                    }};
+                    hitSound = despawnSound = Sounds.artillery;
+
+                    fragBullets = 15;
+                    fragRandomSpread = 360;
+                    fragLifeMin = 300;
+                    fragLifeMax = 300;
+                    fragVelocityMax = fragVelocityMin = 1.5f;
+                    fragBullet = new MissileBulletType() {{
+                        sprite = "high_explosive_projectile";
+                        absorbable = false;
+                        reflectable = false;
+                        splashDamagePierce = true;
+
+                        trailEffect = Fx.missileTrailSmoke;
+                        trailChance = 1;
+
+                        width = 5;
+                        height = 10;
+                        speed = 6;
+                        damage = 0;
+                        lifetime = 300;
+
+                        homingRange = 1000;
+                        homingDelay = 0;
+                        homingPower = 0.2F;
+                        splashDamage = 20;
+                        splashDamageRadius = 156;
+
+                        status = FStatusEffects.breakHelIII;
+                        statusDuration = 180;
+                        keepVelocity = false;
+                        despawnEffect = new WaveEffect() {{
+                            strokeFrom = 14;
+                            strokeTo = 10;
+                            lifetime = 160;
+                            sizeTo = 168;
+                            colorFrom = Color.valueOf("110000AA");
+                            colorTo = colorFrom;
+                        }};
+                        hitEffect = despawnEffect;
+                    }};
+                }};
+            }});
+            weapons.add(new Weapon() {{
+                reload = 1200;
+                bullet = new PercentBulletType() {{
+                    width = 0;
+                    height = 0;
+                    speed = 0.5F;
+                    damage = 20000;
+                    lifetime = 1200;
+                    splashDamageRadius = 0;
+                    shootEffect = Fx.none;
                     homingRange = 1000;
                     homingDelay = 50;
                     homingPower = 0.2F;
-                    splashDamage = 300;
-                    splashDamageRadius = 156;
-                    statusDuration = 1200;
-                    hitSound = Sounds.explosion;
                     keepVelocity = false;
-                    despawnEffect = new WaveEffect() {{
-                        strokeFrom = 14;
-                        strokeTo = 10;
-                        lifetime = 160;
-                        sizeTo = 168;
-                        colorFrom = Color.valueOf("110000AA");
+                    lightColor = Color.valueOf("8D0000FF");
+                    scaleLife = false;
+                    shrinkY = 0;
+                    trailLength = 0;
+                    trailChance = 1;
+                    WL = true;
+                    lightningPercent = 12;
+                    lightning = 12;
+                    lightningLength = 10;
+                    trailEffect = new ParticleEffect() {{
+                        particles = 80;
+                        cone = 360;
+                        lifetime = 4;
+                        line = true;
+                        lenFrom = 7;
+                        lenTo = 7;
+                        strokeFrom = 1;
+                        strokeTo = 1;
+                        cap = false;
+                        colorFrom = Color.valueOf("914B00FF");
                         colorTo = colorFrom;
                     }};
-                    hitEffect = despawnEffect;
+                    parts.add(new ShapePart() {{
+                        circle = true;
+                        radius = 11.5F;
+                        radiusTo = 11.5F;
+                        color = Color.valueOf("914B00FF");
+                    }});
+                    parts.add(new HoverPart() {{
+                        radius = 56;
+                        color = Color.valueOf("914B00FF");
+                        phase = 150;
+                        sides = 18;
+                    }});
                 }};
             }});
-            weapons.add(new Weapon() {
-                {
-                    reload = 1200;
-                    bullet = new PercentEmpBulletType() {
-                        {
-                            width = 0;
-                            height = 0;
-                            speed = 0.5F;
-                            damage = 20000;
-                            lifetime = 1200;
-                            radius = 78;
-                            splashDamageRadius = 0;
-                            shootEffect = Fx.none;
-                            powerSclDecrease = 0;
-                            unitDamageScl = 1;
-                            homingRange = 1000;
-                            homingDelay = 50;
-                            homingPower = 0.2F;
-                            keepVelocity = false;
-                            lightColor = Color.valueOf("8D0000FF");
-                            scaleLife = false;
-                            shrinkY = 0;
-                            trailLength = 0;
-                            trailChance = 1;
-                            WL = true;
-                            lightningPercent = 12;
-                            lightning = 12;
-                            lightningLength = 10;
-                            trailEffect = new ParticleEffect() {{
-                                particles = 80;
-                                cone = 360;
-                                lifetime = 4;
-                                line = true;
-                                lenFrom = 7;
-                                lenTo = 7;
-                                strokeFrom = 1;
-                                strokeTo = 1;
-                                cap = false;
-                                colorFrom = Color.valueOf("914B00FF");
-                                colorTo = colorFrom;
-                            }};
-                            parts.add(new ShapePart() {{
-                                circle = true;
-                                radius = 11.5F;
-                                radiusTo = 11.5F;
-                                color = Color.valueOf("914B00FF");
-                            }});
-                            parts.add(new HoverPart() {{
-                                radius = 56;
-                                color = Color.valueOf("914B00FF");
-                                phase = 150;
-                                sides = 18;
-                            }});
-                        }
-                    };
-                }
-            });
         }};
         crazy = new ENGSWEISUnitType("crazy") {{
             constructor = ENGSWEISUnitEntity::create;
