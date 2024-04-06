@@ -325,7 +325,7 @@ public class FBlocks {
                 splashDamageRadius = 36;
 
                 shootEffect = smokeEffect = Fx.none;
-                hitEffect = Fx.none;
+                hitEffect = Fx.smokeCloud;
                 despawnEffect = hitEffect;
             }};
 

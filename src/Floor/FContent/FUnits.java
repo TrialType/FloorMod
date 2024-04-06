@@ -4,6 +4,7 @@ import Floor.FAI.*;
 import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
+import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
@@ -603,6 +604,7 @@ public class FUnits {
                     barrels = new float[]{0, -20, 70};
                 }};
                 bullet = new BasicBulletType() {{
+                    rangeOverride = 500;
                     sprite = "jamming_bomb";
                     width = 24;
                     height = 55;
@@ -622,8 +624,7 @@ public class FUnits {
 
                     intervalBullets = 5;
                     intervalDelay = 100;
-                    bulletInterval = 5;
-                    intervalAngle = 5;
+                    bulletInterval = 15;
                     intervalBullet = new BasicBulletType(11, 2) {{
                         lifetime = 120;
                         trailChance = 1;
@@ -672,24 +673,30 @@ public class FUnits {
                     incendChance = 1;
                     incendAmount = 15;
 
-                    fragBullets = 20;
-                    fragRandomSpread = 360;
-                    fragLifeMin = 1;
-                    fragLifeMax = 4;
-                    fragVelocityMin = 0.8f;
-                    fragVelocityMax = 2f;
-                    fragBullet = new BasicBulletType() {{
-                        damage = 0;
-                        status = FStatusEffects.breakHelIV;
-                        statusDuration = 240;
-                        trailEffect = new ExplosionEffect() {{
-                            lifetime = 90;
-                            smokes = 2;
-                            smokeColor = Pal.darkPyraFlame;
+                    fragBullets = 1;
+                    fragLifeMin = 6;
+                    fragLifeMax = 6;
+                    fragVelocityMin = 0;
+                    fragVelocityMax = 0;
+                    fragBullet = new FreeBulletType() {{
+                        collides = absorbable = hittable = reflectable = false;
+
+                        intervalRandomSpread = 360;
+                        intervalBullets = 2;
+                        intervalDelay = 10;
+                        bulletInterval = 10;
+                        intervalHitEffect = Fx.shootPyraFlame;
+                        intervalBullet = new BulletType() {{
+                            speed = 1.2f;
+                            damage = 75;
+
+                            incendSpread = 360;
+                            incendChance = 1;
+                            incendAmount = 6;
+
+                            status = FStatusEffects.breakHelIII;
+                            statusDuration = 240;
                         }};
-                        incendSpread = 360;
-                        incendChance = 1;
-                        incendAmount = 25;
                     }};
                 }};
             }});
@@ -723,14 +730,14 @@ public class FUnits {
                     fragLifeMin = 300;
                     fragLifeMax = 300;
                     fragVelocityMax = fragVelocityMin = 1.5f;
-                    fragBullet = new MissileBulletType() {{
+                    fragBullet = new BasicBulletType() {{
                         sprite = "high_explosive_projectile";
                         absorbable = false;
                         reflectable = false;
                         splashDamagePierce = true;
 
                         trailEffect = Fx.missileTrailSmoke;
-                        trailChance = 1;
+                        trailChance = 0.4f;
 
                         width = 5;
                         height = 10;
@@ -741,7 +748,7 @@ public class FUnits {
                         homingRange = 1000;
                         homingDelay = 0;
                         homingPower = 0.2F;
-                        splashDamage = 20;
+                        splashDamage = 80;
                         splashDamageRadius = 156;
 
                         status = FStatusEffects.breakHelIII;
@@ -752,7 +759,7 @@ public class FUnits {
                             strokeTo = 10;
                             lifetime = 160;
                             sizeTo = 168;
-                            colorFrom = Color.valueOf("110000AA");
+                            colorFrom = Color.valueOf("110000DD");
                             colorTo = colorFrom;
                         }};
                         hitEffect = despawnEffect;

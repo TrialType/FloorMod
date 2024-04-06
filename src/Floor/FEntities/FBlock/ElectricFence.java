@@ -289,6 +289,8 @@ public class ElectricFence extends Block {
                 for (FenceLine fl : linesMap.values()) {
                     fl.update();
                 }
+            } else {
+                draw();
             }
             super.updateTile();
         }

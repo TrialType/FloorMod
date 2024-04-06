@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FreeBulletType extends BulletType {
-    private final static Map<Bullet, Float> damages = new HashMap<>();
     public boolean intervalPoint = true;
     public Effect intervalHitEffect = Fx.none;
     public boolean pointWithFrag = true;
@@ -29,25 +28,9 @@ public class FreeBulletType extends BulletType {
     private Unit result;
     public float trailSpacing = 10.0F;
 
-    public Effect damageEffect = Fx.none;
-    public float damageReload = 10;
-
     @Override
     public void update(Bullet b) {
-        float ti = damages.computeIfAbsent(b, bu -> damageReload);
-        damages.put(b, damages.get(b) + Time.delta);
-
         super.update(b);
-
-
-        if (b.isAdded()) {
-            if (ti >= damageReload && damageEffect != null) {
-                damageEffect.at(b.x, b.y, 0, b);
-                damages.put(b, 0f);
-            }
-        } else {
-            damages.remove(b);
-        }
     }
 
     public void updateBulletInterval(Bullet b) {
@@ -63,7 +46,11 @@ public class FreeBulletType extends BulletType {
                 }
             } else {
                 for (int i = 0; i < intervalBullets; i++) {
-                    intervalBullet.create(b, b.x, b.y, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f) / 2f) * intervalSpread));
+                    float rot = ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f) / 2f) * intervalSpread);
+                    Bullet bu = intervalBullet.create(b, b.x, b.y, rot);
+                    if (intervalHitEffect != null) {
+                        intervalHitEffect.at(b.x, b.y, rot, bu);
+                    }
                 }
             }
         }
