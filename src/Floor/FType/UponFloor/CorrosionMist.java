@@ -41,7 +41,7 @@ public class CorrosionMist {
     public static void update() {
         if (world == null || Vars.editor.isLoading()) return;
 
-        Units.nearby(world.width() * 4, world.height() * 4, world.width() * 8, world.height() * 8, u -> {
+        Units.nearby(0, 0, world.width() * 8, world.height() * 8, u -> {
             Tile t = u.tileOn();
             if (t != null && clear.indexOf(t.pos()) < 0) {
                 Floor f = t.floor();
@@ -61,7 +61,7 @@ public class CorrosionMist {
                         bo = 1;
                     }
 
-                    b.damage(Math.max(1, b.maxHealth() / c.baseDamage()) * bo);
+                    b.damage(Math.max(0.5f / 15, b.maxHealth() / c.baseDamage()) * bo * 15);
                 }
             }
         });
