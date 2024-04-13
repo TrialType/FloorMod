@@ -1,50 +1,70 @@
 package Floor.FType.UponFloor;
 
 import Floor.FTools.Corrosion;
+import arc.struct.IntMap;
+import arc.struct.IntSeq;
 import arc.struct.ObjectSet;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.gen.Unit;
+import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 
 import static arc.util.Time.delta;
+import static mindustry.Vars.*;
 
 public class CorrosionMist {
-    public final static ObjectSet<Building> clearB = new ObjectSet<>();
-    public final static ObjectSet<Unit> clearU = new ObjectSet<>();
+    public final static IntSeq clear = new IntSeq();
+    public final static IntMap<Integer> boost = new IntMap<>();
+    public static boolean update = false;
 
     public static void init() {
-        clearB.clear();
-        clearU.clear();
+        boost.clear();
+        clear.clear();
+        update = false;
+        world.tiles.eachTile(t -> {
+            if (!update) {
+                if (t.floor() instanceof Corrosion) {
+                    update = true;
+                }
+            }
+        });
 
-        Time.run(delta * 60, CorrosionMist::update);
+        if (update) {
+            Time.run(delta * 60, CorrosionMist::update);
+        }
     }
 
     public static void update() {
-        if (Vars.world == null || Vars.editor.isLoading()) return;
+        if (world == null || Vars.editor.isLoading()) return;
 
         Groups.unit.each(u -> {
-            if(clearU.contains(u)){
-                return;
-            }
-            Floor t = u.floorOn();
-            if (t instanceof Corrosion) {
-                u.apply(t.status, 30);
-            }
-        });
-
-        Groups.build.each(b -> {
-            if(clearB.contains(b)){
-                return;
-            }
-            Floor t = b.floorOn();
-            if (t instanceof Corrosion c) {
-                b.damage(c.baseDamage());
+            Tile t = u.tileOn();
+            if (t != null && clear.indexOf(t.pos()) < 0) {
+                Floor f = t.floor();
+                if (f instanceof Corrosion) {
+                    u.apply(f.status, 60);
+                }
             }
         });
 
-        Time.run(delta * 30, CorrosionMist::update);
+        indexer.allBuildings(world.width() * 4, world.height() * 4, Math.max(world.width(), world.height()) * 6, b -> {
+            Tile t = world.tileWorld(b.x, b.y);
+            if (t != null && clear.indexOf(t.pos()) < 0) {
+                Floor f = t.floor();
+                if (f instanceof Corrosion c) {
+                    Integer bo = boost.get(t.pos());
+                    if (bo == null) {
+                        bo = 1;
+                    }
+
+                    b.damage(c.baseDamage() * bo);
+                }
+            }
+        });
+
+        Time.run(delta * 15, CorrosionMist::update);
     }
 }

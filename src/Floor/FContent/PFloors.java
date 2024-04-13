@@ -16,9 +16,25 @@ public class PFloors {
             pSand, pDarksand, pDirt, pMud, pEmpty, pDacite, pRhyolite, pRhyoliteCrater, pRoughRhyolite, pRegolith, pYellowStone, pCarbonStone,
             pFerricStone, pFerricCraters, pBeryllicStone, pCrystallineStone, pCrystalFloor, pYellowStonePlates, pRedStone, pDenseRedStone,
             pRedIce, pArkyciteFloor, pArkyicStone, pRhyoliteVent, pCarbonVent, pArkyicVent, pYellowStoneVent, pRedStoneVent, pCrystallineVent,
-            pRedmat, pBluemat, pGrass, pSalt, pSnow, pIce, pIceSnow, pShale, pMoss, pCoreZone, pSporeMoss;
+            pRedmat, pBluemat, pGrass, pSalt, pSnow, pIce, pIceSnow, pShale, pMoss, pCoreZone, pSporeMoss, pMetalFloor, pMetalFloorDamaged,
+            pMetalFloor2, pMetalFloor3, pMetalFloor4, pMetalFloor5, pDarkPanel1, pDarkPanel2, pDarkPanel3, pDarkPanel4, pDarkPanel5, pDarkPanel6;
 
     public static void load() {
+        pMetalFloor = new CorrosionFloor("p-metal-floor", 0);
+        pMetalFloorDamaged = new CorrosionFloor("p-metal-floor-damaged", 3);
+
+        pMetalFloor2 = new CorrosionFloor("p-metal-floor-2", 0);
+        pMetalFloor3 = new CorrosionFloor("p-metal-floor-3", 0);
+        pMetalFloor4 = new CorrosionFloor("p-metal-floor-4", 0);
+        pMetalFloor5 = new CorrosionFloor("p-metal-floor-5", 0);
+
+        pDarkPanel1 = new CorrosionFloor("p-dark-panel-1", 0);
+        pDarkPanel2 = new CorrosionFloor("p-dark-panel-2", 0);
+        pDarkPanel3 = new CorrosionFloor("p-dark-panel-3", 0);
+        pDarkPanel4 = new CorrosionFloor("p-dark-panel-4", 0);
+        pDarkPanel5 = new CorrosionFloor("p-dark-panel-5", 0);
+        pDarkPanel6 = new CorrosionFloor("p-dark-panel-6", 0);
+
         pDeepwater = new CorrosionFloor("p-deep-water") {{
             baseDamage = 0.001f;
             speedMultiplier = 0.15f;

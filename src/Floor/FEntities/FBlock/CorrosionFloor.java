@@ -11,6 +11,9 @@ public class CorrosionFloor extends Floor implements Corrosion {
         super(name);
         status = FStatusEffects.corrosionI;
     }
+    public CorrosionFloor(String name, int variants){
+        super(name,variants);
+    }
 
     @Override
     public float baseDamage() {
