@@ -9,7 +9,7 @@ import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
 
 public class corrosionStatus extends StatusEffect {
-    public Seq<StatusEffect> with;
+    public final Seq<StatusEffect> with = new Seq<>();
     public float damageBoost = 1;
 
     @Override

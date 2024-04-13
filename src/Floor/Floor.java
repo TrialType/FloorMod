@@ -19,5 +19,6 @@ public class Floor extends Mod {
         FBlocks.load();
         FPlanets.load();
         TechChange.load();
+        PFloors.load();
     }
 }

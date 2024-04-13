@@ -22,7 +22,7 @@ public class FStatusEffects {
             burningII, burningIII, burningIV, burningV,
             breakHel, breakHelII, breakHelIII, breakHelIV, breakHelV, pureA, pureT;
     public static corrosionStatus catalyzeI, catalyzeII, catalyzeIII, catalyzeIV, catalyzeV,
-            pWet,
+            pWet, pTarred, pFreezing, pMelting, pMuddy,
             corrosionI, corrosionII, corrosionIII, corrosionIV, corrosionV;
 
     public static void load() {
@@ -38,11 +38,22 @@ public class FStatusEffects {
         pWet = new corrosionStatus("p-wet") {{
             damage = 0.01f;
             with.add(StatusEffects.wet);
-            init(() -> {
-                affinity(catalyzeI, (u, r, t) -> {
-
-                });
-            });
+        }};
+        pTarred = new corrosionStatus("p-tarred") {{
+            damage = 0.01f;
+            with.add(StatusEffects.tarred);
+        }};
+        pFreezing = new corrosionStatus("p-freezing") {{
+            damage = 0.01f;
+            with.add(StatusEffects.freezing);
+        }};
+        pMelting = new corrosionStatus("p-melting") {{
+            damage = 0.01f;
+            with.add(StatusEffects.melting);
+        }};
+        pMuddy = new corrosionStatus("p-muddy") {{
+            damage = 0.01f;
+            with.add(StatusEffects.muddy);
         }};
 
 
