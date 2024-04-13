@@ -51,7 +51,7 @@ public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory,
             outPowerFactoryII, inputPowerFactoryII,
             outPowerFactoryIII, inputPowerFactoryIII;
-    public static Block kt;
+    public static Block kt,pu;
     public static Block slowProject;
     public static Block eleFence, eleFenceII, eleFenceIII;
     public static Block fourNet, fireBoost,
@@ -60,6 +60,12 @@ public class FBlocks {
             fireStream;
 
     public static void load() {
+        pu = new pureText("pu"){{
+            health = 650;
+
+            requirements(Category.effect, ItemStack.with(Items.copper, 1));
+        }};
+
         outPowerFactory = new GradeFactory("out_power_factory") {{
             requirements(Category.units, with(Items.copper, 500, Items.lead, 600, Items.silicon, 800));
 
@@ -191,7 +197,6 @@ public class FBlocks {
         }};
 //======================================================================================================================
         kt = new KnockingTurret("kt") {{
-            hasPower = true;
             health = 650;
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
