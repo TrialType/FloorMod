@@ -21,6 +21,13 @@ public class FStatusEffects {
     public static WithMoreStatus pWet, pTarred, pFreezing, pMelting, pMuddy;
 
     public static void load() {
+        pureA = new StatusEffect("pure-a") {{
+            show = false;
+            permanent = true;
+        }};
+        pureT = new StatusEffect("pure-t") {{
+            show = false;
+        }};
         catalyzeI = new StatusEffect("catalyze-1") {{
             show = false;
         }};
@@ -331,37 +338,30 @@ public class FStatusEffects {
                 u.unapply(catalyzeV);
             }));
         }};
-        pureA = new StatusEffect("pure-a") {{
-            show = false;
-            permanent = true;
-        }};
-        pureT = new StatusEffect("pure-t") {{
-            show = false;
-        }};
         pWet = new WithMoreStatus("p-wet") {{
             show = false;
             sign = true;
-            with.addAll(StatusEffects.wet, catalyzeI);
+            with.addAll(StatusEffects.wet, corrosionI);
         }};
         pTarred = new WithMoreStatus("p-tarred") {{
             show = false;
             sign = true;
-            with.addAll(StatusEffects.tarred, catalyzeI);
+            with.addAll(StatusEffects.tarred, corrosionI);
         }};
         pFreezing = new WithMoreStatus("p-freezing") {{
             show = false;
             sign = true;
-            with.addAll(StatusEffects.freezing, catalyzeI);
+            with.addAll(StatusEffects.freezing, corrosionI);
         }};
         pMelting = new WithMoreStatus("p-melting") {{
             show = false;
             sign = true;
-            with.addAll(StatusEffects.melting, catalyzeI);
+            with.addAll(StatusEffects.melting, corrosionI);
         }};
         pMuddy = new WithMoreStatus("p-muddy") {{
             show = false;
             sign = true;
-            with.addAll(StatusEffects.muddy, catalyzeI);
+            with.addAll(StatusEffects.muddy, corrosionI);
         }};
         StrongStop = new StatusEffect("strong_stop") {{
             speedMultiplier = 0;
@@ -381,7 +381,6 @@ public class FStatusEffects {
             color = new Color(145, 75, 0, 255);
             effectChance = 0.3f;
         }};
-
         suppressI = new StatusEffect("suppress_I") {{
             speedMultiplier = 0.9F;
             reloadMultiplier = 0.9F;
@@ -406,7 +405,6 @@ public class FStatusEffects {
             color = new Color(170, 170, 153, 255);
             effectChance = 1;
         }};
-
         slowII = new StatusEffect("slow_II") {{
             speedMultiplier = 0.55F;
             color = new Color(0, 0, 0, 0);
@@ -420,7 +418,6 @@ public class FStatusEffects {
                 opposite(slowII);
             });
         }};
-
         High_tension = new StatusEffect("high_tension") {{
             speedMultiplier = 0.85f;
             reloadMultiplier = 0.85f;
@@ -451,10 +448,8 @@ public class FStatusEffects {
             healthMultiplier = 0.7f;
             damage = 54;
         }};
-
         StatusEffects.burning.transitionDamage = 54;
         StatusEffects.burning.damage = 0.7f;
-
         burningII = new StatusEffect("burningII") {{
             damage = 1.2f;
             transitionDamage = 130;

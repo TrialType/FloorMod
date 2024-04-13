@@ -6,6 +6,7 @@ import arc.struct.IntSeq;
 import arc.struct.ObjectSet;
 import arc.util.Time;
 import mindustry.Vars;
+import mindustry.entities.Units;
 import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.gen.Unit;
@@ -40,7 +41,7 @@ public class CorrosionMist {
     public static void update() {
         if (world == null || Vars.editor.isLoading()) return;
 
-        Groups.unit.each(u -> {
+        Units.nearby(world.width() * 4, world.height() * 4, world.width() * 8, world.height() * 8, u -> {
             Tile t = u.tileOn();
             if (t != null && clear.indexOf(t.pos()) < 0) {
                 Floor f = t.floor();
@@ -60,7 +61,7 @@ public class CorrosionMist {
                         bo = 1;
                     }
 
-                    b.damage(c.baseDamage() * bo);
+                    b.damage(Math.max(1, b.maxHealth() / c.baseDamage()) * bo);
                 }
             }
         });

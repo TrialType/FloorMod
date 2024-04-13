@@ -20,23 +20,22 @@ public class PFloors {
             pMetalFloor2, pMetalFloor3, pMetalFloor4, pMetalFloor5, pDarkPanel1, pDarkPanel2, pDarkPanel3, pDarkPanel4, pDarkPanel5, pDarkPanel6;
 
     public static void load() {
-        pMetalFloor = new CorrosionFloor("p-metal-floor", 0);
-        pMetalFloorDamaged = new CorrosionFloor("p-metal-floor-damaged", 3);
+        pMetalFloor = new CorrosionFloor("p-metal-floor", 0, FStatusEffects.corrosionI);
+        pMetalFloorDamaged = new CorrosionFloor("p-metal-floor-damaged", 3, FStatusEffects.corrosionI);
 
-        pMetalFloor2 = new CorrosionFloor("p-metal-floor-2", 0);
-        pMetalFloor3 = new CorrosionFloor("p-metal-floor-3", 0);
-        pMetalFloor4 = new CorrosionFloor("p-metal-floor-4", 0);
-        pMetalFloor5 = new CorrosionFloor("p-metal-floor-5", 0);
+        pMetalFloor2 = new CorrosionFloor("p-metal-floor-2", 0, FStatusEffects.corrosionI);
+        pMetalFloor3 = new CorrosionFloor("p-metal-floor-3", 0, FStatusEffects.corrosionI);
+        pMetalFloor4 = new CorrosionFloor("p-metal-floor-4", 0, FStatusEffects.corrosionI);
+        pMetalFloor5 = new CorrosionFloor("p-metal-floor-5", 0, FStatusEffects.corrosionI);
 
-        pDarkPanel1 = new CorrosionFloor("p-dark-panel-1", 0);
-        pDarkPanel2 = new CorrosionFloor("p-dark-panel-2", 0);
-        pDarkPanel3 = new CorrosionFloor("p-dark-panel-3", 0);
-        pDarkPanel4 = new CorrosionFloor("p-dark-panel-4", 0);
-        pDarkPanel5 = new CorrosionFloor("p-dark-panel-5", 0);
-        pDarkPanel6 = new CorrosionFloor("p-dark-panel-6", 0);
+        pDarkPanel1 = new CorrosionFloor("p-dark-panel-1", 0, FStatusEffects.corrosionI);
+        pDarkPanel2 = new CorrosionFloor("p-dark-panel-2", 0, FStatusEffects.corrosionI);
+        pDarkPanel3 = new CorrosionFloor("p-dark-panel-3", 0, FStatusEffects.corrosionI);
+        pDarkPanel4 = new CorrosionFloor("p-dark-panel-4", 0, FStatusEffects.corrosionI);
+        pDarkPanel5 = new CorrosionFloor("p-dark-panel-5", 0, FStatusEffects.corrosionI);
+        pDarkPanel6 = new CorrosionFloor("p-dark-panel-6", 0, FStatusEffects.corrosionI);
 
         pDeepwater = new CorrosionFloor("p-deep-water") {{
-            baseDamage = 0.001f;
             speedMultiplier = 0.15f;
             variants = 0;
             liquidDrop = Liquids.water;
@@ -132,24 +131,26 @@ public class PFloors {
             lightColor = Color.orange.cpy().a(0.38f);
         }};
 
-        pEmpty = new CorrosionEmptyFloor("p-empty");
+        pEmpty = new CorrosionEmptyFloor("p-empty") {{
+            status = FStatusEffects.corrosionI;
+        }};
 
-        pStone = new CorrosionFloor("p-stone");
+        pStone = new CorrosionFloor("p-stone", FStatusEffects.corrosionI);
 
-        pCraters = new CorrosionFloor("p-crater-stone") {{
+        pCraters = new CorrosionFloor("p-crater-stone", FStatusEffects.corrosionI) {{
             variants = 3;
             blendGroup = pStone;
         }};
 
-        pCharr = new CorrosionFloor("p-char") {{
+        pCharr = new CorrosionFloor("p-char", FStatusEffects.corrosionI) {{
             blendGroup = pStone;
         }};
 
-        pBasalt = new CorrosionFloor("p-basalt") {{
+        pBasalt = new CorrosionFloor("p-basalt", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -0.25f);
         }};
 
-        pHotrock = new CorrosionFloor("p-hotrock") {{
+        pHotrock = new CorrosionFloor("p-hotrock", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.heat, 0.5f);
             attributes.set(Attribute.water, -0.5f);
             blendGroup = pBasalt;
@@ -159,7 +160,7 @@ public class PFloors {
             lightColor = Color.orange.cpy().a(0.15f);
         }};
 
-        pMagmarock = new CorrosionFloor("p-magmarock") {{
+        pMagmarock = new CorrosionFloor("p-magmarock", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.heat, 0.75f);
             attributes.set(Attribute.water, -0.75f);
             blendGroup = pBasalt;
@@ -169,19 +170,19 @@ public class PFloors {
             lightColor = Color.orange.cpy().a(0.3f);
         }};
 
-        pSand = new CorrosionFloor("p-sand-floor") {{
+        pSand = new CorrosionFloor("p-sand-floor", FStatusEffects.corrosionI) {{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 0.7f);
         }};
 
-        pDarksand = new CorrosionFloor("p-darksand") {{
+        pDarksand = new CorrosionFloor("p-darksand", FStatusEffects.corrosionI) {{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 1.5f);
         }};
 
-        pDirt = new CorrosionFloor("p-dirt");
+        pDirt = new CorrosionFloor("p-dirt", FStatusEffects.corrosionI);
 
         pMud = new CorrosionFloor("p-mud") {{
             speedMultiplier = 0.6f;
@@ -195,83 +196,62 @@ public class PFloors {
             walkSoundPitchMin = 0.4f;
             walkSoundPitchMax = 0.5f;
         }};
-
-//        ((ShallowLiquid) pDarksandTaintedWater).set(pTaintedWater, pDarksand);
-//        ((ShallowLiquid) pSandWater).set(pWater, pSand);
-//        ((ShallowLiquid) pDarksandWater).set(pWater, pDarksand);
-
-        pDacite = new CorrosionFloor("p-dacite");
-
-        pRhyolite = new CorrosionFloor("p-rhyolite") {{
+        pDacite = new CorrosionFloor("p-dacite", FStatusEffects.corrosionI);
+        pRhyolite = new CorrosionFloor("p-rhyolite", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
         }};
-
-        pRhyoliteCrater = new CorrosionFloor("p-rhyolite-crater") {{
+        pRhyoliteCrater = new CorrosionFloor("p-rhyolite-crater", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
             blendGroup = pRhyolite;
         }};
-
-        pRoughRhyolite = new CorrosionFloor("p-rough-rhyolite") {{
+        pRoughRhyolite = new CorrosionFloor("p-rough-rhyolite", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
             variants = 3;
         }};
-
-        pRegolith = new CorrosionFloor("p-regolith") {{
+        pRegolith = new CorrosionFloor("p-regolith", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
         }};
-
-        pYellowStone = new CorrosionFloor("p-yellow-stone") {{
+        pYellowStone = new CorrosionFloor("p-yellow-stone", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
         }};
-
-        pCarbonStone = new CorrosionFloor("p-carbon-stone") {{
+        pCarbonStone = new CorrosionFloor("p-carbon-stone", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
             variants = 4;
         }};
-
-        pFerricStone = new CorrosionFloor("p-ferric-stone") {{
+        pFerricStone = new CorrosionFloor("p-ferric-stone", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
         }};
-
-        pFerricCraters = new CorrosionFloor("p-ferric-craters") {{
+        pFerricCraters = new CorrosionFloor("p-ferric-craters", FStatusEffects.corrosionI) {{
             variants = 3;
             attributes.set(Attribute.water, -1f);
             blendGroup = pFerricStone;
         }};
-
-        pBeryllicStone = new CorrosionFloor("p-beryllic-stone") {{
+        pBeryllicStone = new CorrosionFloor("p-beryllic-stone", FStatusEffects.corrosionI) {{
             variants = 4;
         }};
-
-        pCrystallineStone = new CorrosionFloor("p-crystalline-stone") {{
+        pCrystallineStone = new CorrosionFloor("p-crystalline-stone", FStatusEffects.corrosionI) {{
             variants = 5;
         }};
-
-        pCrystalFloor = new CorrosionFloor("p-crystal-floor") {{
+        pCrystalFloor = new CorrosionFloor("p-crystal-floor", FStatusEffects.corrosionI) {{
             variants = 4;
         }};
-
-        pYellowStonePlates = new CorrosionFloor("p-yellow-stone-plates") {{
+        pYellowStonePlates = new CorrosionFloor("p-yellow-stone-plates", FStatusEffects.corrosionI) {{
             variants = 3;
         }};
-
-        pRedStone = new CorrosionFloor("p-red-stone") {{
+        pRedStone = new CorrosionFloor("p-red-stone", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
             variants = 4;
         }};
-
-        pDenseRedStone = new CorrosionFloor("p-dense-red-stone") {{
+        pDenseRedStone = new CorrosionFloor("p-dense-red-stone", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, -1f);
             variants = 4;
         }};
-
-        pRedIce = new CorrosionFloor("p-red-ice") {{
+        pRedIce = new CorrosionFloor("p-red-ice", FStatusEffects.corrosionI) {{
             dragMultiplier = 0.4f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
         }};
-
-        pArkyciteFloor = new CorrosionFloor("p-arkycite-floor") {{
+        pArkyciteFloor = new CorrosionFloor("p-arkycite-floor", FStatusEffects.corrosionI) {{
             speedMultiplier = 0.3f;
             variants = 0;
             liquidDrop = Liquids.arkycite;
@@ -280,89 +260,78 @@ public class PFloors {
             cacheLayer = CacheLayer.arkycite;
             albedo = 0.9f;
         }};
-
-        pArkyicStone = new CorrosionFloor("p-arkyic-stone") {{
+        pArkyicStone = new CorrosionFloor("p-arkyic-stone", FStatusEffects.corrosionI) {{
             variants = 3;
         }};
-
         pRhyoliteVent = new CorrosionSteamVent("p-rhyolite-vent") {{
             parent = blendGroup = pRhyolite;
             attributes.set(Attribute.steam, 1f);
+            status = FStatusEffects.corrosionI;
         }};
-
         pCarbonVent = new CorrosionSteamVent("p-carbon-vent") {{
             parent = blendGroup = pCarbonStone;
             attributes.set(Attribute.steam, 1f);
+            status = FStatusEffects.corrosionI;
         }};
-
         pArkyicVent = new CorrosionSteamVent("p-arkyic-vent") {{
             parent = blendGroup = pArkyicStone;
             attributes.set(Attribute.steam, 1f);
+            status = FStatusEffects.corrosionI;
         }};
-
         pYellowStoneVent = new CorrosionSteamVent("p-yellow-stone-vent") {{
             parent = blendGroup = pYellowStone;
             attributes.set(Attribute.steam, 1f);
+            status = FStatusEffects.corrosionI;
         }};
-
         pRedStoneVent = new CorrosionSteamVent("p-red-stone-vent") {{
             parent = blendGroup = pDenseRedStone;
             attributes.set(Attribute.steam, 1f);
+            status = FStatusEffects.corrosionI;
         }};
-
         pCrystallineVent = new CorrosionSteamVent("p-crystalline-vent") {{
             parent = blendGroup = pCrystallineStone;
             attributes.set(Attribute.steam, 1f);
+            status = FStatusEffects.corrosionI;
         }};
-
-        pRedmat = new CorrosionFloor("p-redmat");
-        pBluemat = new CorrosionFloor("p-bluemat");
-
-        pGrass = new CorrosionFloor("p-grass") {{
+        pRedmat = new CorrosionFloor("p-redmat", FStatusEffects.corrosionI);
+        pBluemat = new CorrosionFloor("p-bluemat", FStatusEffects.corrosionI);
+        pGrass = new CorrosionFloor("p-grass", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, 0.1f);
         }};
-
-        pSalt = new CorrosionFloor("p-salt") {{
+        pSalt = new CorrosionFloor("p-salt", FStatusEffects.corrosionI) {{
             variants = 0;
             attributes.set(Attribute.water, -0.3f);
             attributes.set(Attribute.oil, 0.3f);
         }};
-
-        pSnow = new CorrosionFloor("p-snow") {{
+        pSnow = new CorrosionFloor("p-snow", FStatusEffects.corrosionI) {{
             attributes.set(Attribute.water, 0.2f);
             albedo = 0.7f;
         }};
-
-        pIce = new CorrosionFloor("p-ice") {{
+        pIce = new CorrosionFloor("p-ice", FStatusEffects.corrosionI) {{
             dragMultiplier = 0.35f;
             speedMultiplier = 0.9f;
             attributes.set(Attribute.water, 0.4f);
             albedo = 0.65f;
         }};
-
-        pIceSnow = new CorrosionFloor("p-ice-snow") {{
+        pIceSnow = new CorrosionFloor("p-ice-snow", FStatusEffects.corrosionI) {{
             dragMultiplier = 0.6f;
             variants = 3;
             attributes.set(Attribute.water, 0.3f);
             albedo = 0.6f;
         }};
-
-        pShale = new CorrosionFloor("p-shale") {{
+        pShale = new CorrosionFloor("p-shale", FStatusEffects.corrosionI) {{
             variants = 3;
             attributes.set(Attribute.oil, 1.6f);
         }};
-
-        pMoss = new CorrosionFloor("p-moss") {{
+        pMoss = new CorrosionFloor("p-moss", FStatusEffects.corrosionI) {{
             variants = 3;
             attributes.set(Attribute.spores, 0.15f);
         }};
-
-        pCoreZone = new CorrosionFloor("p-core-zone") {{
+        pCoreZone = new CorrosionFloor("p-core-zone", FStatusEffects.corrosionI) {{
             variants = 0;
             allowCorePlacement = true;
         }};
-
-        pSporeMoss = new CorrosionFloor("p-spore-moss") {{
+        pSporeMoss = new CorrosionFloor("p-spore-moss", FStatusEffects.corrosionI) {{
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
         }};
