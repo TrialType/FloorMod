@@ -1,22 +1,51 @@
 package Floor.FContent;
 
+import Floor.FType.FStatusEffect.corrosionStatus;
+import arc.Events;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
+import mindustry.game.EventType;
 import mindustry.type.StatusEffect;
+
+import static mindustry.Vars.state;
 
 public class FStatusEffects {
     public final static Seq<StatusEffect> burnings = new Seq<>();
+    public final static Seq<corrosionStatus> catalyze = new Seq<>();
     public static StatusEffect StrongStop, boostSpeed, HardHit,
             suppressI, suppressII, suppressIII, suppressIV,
             slowII, fastII,
             High_tension, High_tensionII, High_tensionIII, High_tensionIV, High_tensionV,
             burningII, burningIII, burningIV, burningV,
-            breakHel, breakHelII, breakHelIII, breakHelIV, breakHelV;
+            breakHel, breakHelII, breakHelIII, breakHelIV, breakHelV, pureA, pureT;
+    public static corrosionStatus catalyzeI, catalyzeII, catalyzeIII, catalyzeIV, catalyzeV,
+            pWet,
+            corrosionI, corrosionII, corrosionIII, corrosionIV, corrosionV;
 
     public static void load() {
+        pureA = new StatusEffect("pure-a") {{
+            show = false;
+            permanent = true;
+        }};
+        pureT = new StatusEffect("pure-t") {{
+            show = false;
+        }};
+
+
+        pWet = new corrosionStatus("p-wet") {{
+            damage = 0.01f;
+            with.add(StatusEffects.wet);
+            init(() -> {
+                affinity(catalyzeI, (u, r, t) -> {
+
+                });
+            });
+        }};
+
+
         StrongStop = new StatusEffect("strong_stop") {{
             speedMultiplier = 0;
             buildSpeedMultiplier = 0;
@@ -160,5 +189,6 @@ public class FStatusEffects {
         }};
 
         burnings.addAll(StatusEffects.burning, burningII, burningIII, burningIV, burningV);
+        catalyze.addAll(catalyzeI);
     }
 }

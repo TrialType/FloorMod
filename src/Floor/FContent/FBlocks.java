@@ -14,8 +14,10 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
+import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.entities.Effect;
+import mindustry.entities.Units;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
@@ -33,6 +35,7 @@ import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
+import mindustry.world.Edges;
 import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
@@ -213,7 +216,6 @@ public class FBlocks {
 
             reload = 5;
             size = 2;
-            clipSize = 2;
             health = 900;
 
             shootSound = Sounds.flame;

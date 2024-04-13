@@ -681,11 +681,12 @@ public class FUnits {
                     fragBullet = new FreeBulletType() {{
                         collides = absorbable = hittable = reflectable = false;
 
+                        point = false;
                         intervalRandomSpread = 360;
                         intervalBullets = 2;
                         intervalDelay = 10;
                         bulletInterval = 10;
-                        intervalHitEffect = Fx.shootPyraFlame;
+                        //intervalHitEffect = ;
                         intervalBullet = new BulletType() {{
                             speed = 1.2f;
                             damage = 75;

@@ -4,6 +4,7 @@ import Floor.FTools.FBuildUpGrade;
 import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
 import Floor.FTools.UpGradeTime;
+import Floor.FType.UponFloor.CorrosionMist;
 import arc.Events;
 import mindustry.Vars;
 import mindustry.ai.types.MissileAI;
@@ -21,6 +22,8 @@ public class FEvents {
     private static final Random r = new Random();
 
     public static void load() {
+        Events.on(EventType.WorldLoadEndEvent.class, e -> CorrosionMist.init());
+
         Events.on(GetPowerEvent.class, e -> {
             if (e.getter instanceof FUnitUpGrade uug) {
                 if (e.full) {
