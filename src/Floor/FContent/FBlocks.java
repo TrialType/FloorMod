@@ -14,10 +14,8 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
-import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.Units;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
@@ -35,8 +33,6 @@ import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
-import mindustry.world.Edges;
-import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
@@ -60,7 +56,7 @@ public class FBlocks {
             fireStream;
 
     public static void load() {
-        pu = new pureText("pu"){{
+        pu = new PureText("pu"){{
             health = 650;
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
