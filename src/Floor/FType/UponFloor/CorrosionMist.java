@@ -34,7 +34,7 @@ public class CorrosionMist {
         });
 
         if (update) {
-            Time.run(delta * 60, CorrosionMist::update);
+            Time.run(delta * 15, CorrosionMist::update);
         }
     }
 
