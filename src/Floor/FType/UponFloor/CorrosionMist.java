@@ -14,6 +14,7 @@ import static arc.util.Time.delta;
 import static mindustry.Vars.*;
 
 public class CorrosionMist {
+    private static float reload = 15 * delta;
     public final static Seq<RangePure> clearer = new Seq<>();
     public final static IntMap<IntSeq> clear = new IntMap<>();
     public final static IntMap<Float> boost = new IntMap<>();
@@ -32,20 +33,21 @@ public class CorrosionMist {
         });
 
         if (update) {
-            Time.run(delta * 15, CorrosionMist::update);
+            Time.run(reload, CorrosionMist::update);
         }
     }
 
     public static void update() {
-        if (world == null || state.isEditor()) return;
+        reload = 15 * delta;
+        if (state.map == null || editor.isLoading() || state.isEditor()) return;
 
         IntSeq removes = new IntSeq();
         for (int i = 0; i < boost.size; i++) {
             int key = boost.keys().toArray().get(i);
-            if (boost.get(key) - 15 * delta <= 0) {
+            if (boost.get(key) - reload <= 0) {
                 removes.add(key);
             } else {
-                boost.put(key, boost.get(i) - 1);
+                boost.put(key, boost.get(i) - reload);
             }
         }
         for (int i : removes.toArray()) {
@@ -73,7 +75,9 @@ public class CorrosionMist {
                     if (bo == null) {
                         bo = 1f;
                     }
-                    if (clear.get((int) (bo + 1)).indexOf(t.pos()) < 0) {
+                    float index = bo % 1 == 0 ? bo : (int) (bo + 1);
+                    IntSeq units = clear.get((int) index);
+                    if (units == null || !units.contains(t.pos())) {
                         u.apply(f.status, 60);
                     }
                 }
@@ -89,13 +93,15 @@ public class CorrosionMist {
                     if (bo == null) {
                         bo = 1f;
                     }
-                    if (clear.get((int) (bo + 1)).indexOf(t.pos()) < 0) {
+                    float index = bo % 1 == 0 ? bo : (int) (bo + 1);
+                    IntSeq builds = clear.get((int) index);
+                    if (builds == null || !builds.contains(t.pos())) {
                         b.damage(Math.max(0.5f / 15, b.maxHealth() / c.baseDamage()) * bo * 15);
                     }
                 }
             }
         });
 
-        Time.run(delta * 15, CorrosionMist::update);
+        Time.run(reload, CorrosionMist::update);
     }
 }
