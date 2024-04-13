@@ -2,16 +2,13 @@ package Floor.FContent;
 
 import Floor.FEntities.FBlock.CorrosionEmptyFloor;
 import Floor.FEntities.FBlock.CorrosionFloor;
-import Floor.FEntities.FBlock.CorrosionShallowLiquid;
 import Floor.FEntities.FBlock.CorrosionSteamVent;
 import arc.graphics.Color;
-import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.gen.Sounds;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.content.Liquids;
 import mindustry.graphics.CacheLayer;
-import mindustry.world.blocks.environment.ShallowLiquid;
 import mindustry.world.meta.Attribute;
 
 public class PFloors {
@@ -20,7 +17,6 @@ public class PFloors {
             pFerricStone, pFerricCraters, pBeryllicStone, pCrystallineStone, pCrystalFloor, pYellowStonePlates, pRedStone, pDenseRedStone,
             pRedIce, pArkyciteFloor, pArkyicStone, pRhyoliteVent, pCarbonVent, pArkyicVent, pYellowStoneVent, pRedStoneVent, pCrystallineVent,
             pRedmat, pBluemat, pGrass, pSalt, pSnow, pIce, pIceSnow, pShale, pMoss, pCoreZone, pSporeMoss;
-    public static Floor pDarksandTaintedWater, pSandWater, pDarksandWater;
 
     public static void load() {
         pDeepwater = new CorrosionFloor("p-deep-water") {{
@@ -74,28 +70,6 @@ public class PFloors {
             cacheLayer = CacheLayer.water;
             albedo = 0.9f;
             attributes.set(Attribute.spores, 0.15f);
-            supportsOverlay = true;
-        }};
-
-        pDarksandTaintedWater = new CorrosionShallowLiquid("p-darksand-tainted-water") {{
-            speedMultiplier = 0.75f;
-            statusDuration = 60f;
-            albedo = 0.9f;
-            attributes.set(Attribute.spores, 0.1f);
-            supportsOverlay = true;
-        }};
-
-        pSandWater = new CorrosionShallowLiquid("p-sand-water") {{
-            speedMultiplier = 0.8f;
-            statusDuration = 50f;
-            albedo = 0.9f;
-            supportsOverlay = true;
-        }};
-
-        pDarksandWater = new CorrosionShallowLiquid("p-darksand-water") {{
-            speedMultiplier = 0.8f;
-            statusDuration = 50f;
-            albedo = 0.9f;
             supportsOverlay = true;
         }};
 
@@ -206,9 +180,9 @@ public class PFloors {
             walkSoundPitchMax = 0.5f;
         }};
 
-        ((ShallowLiquid) pDarksandTaintedWater).set(Blocks.taintedWater, Blocks.darksand);
-        ((ShallowLiquid) pSandWater).set(Blocks.water, Blocks.sand);
-        ((ShallowLiquid) pDarksandWater).set(Blocks.water, Blocks.darksand);
+//        ((ShallowLiquid) pDarksandTaintedWater).set(pTaintedWater, pDarksand);
+//        ((ShallowLiquid) pSandWater).set(pWater, pSand);
+//        ((ShallowLiquid) pDarksandWater).set(pWater, pDarksand);
 
         pDacite = new CorrosionFloor("p-dacite");
 

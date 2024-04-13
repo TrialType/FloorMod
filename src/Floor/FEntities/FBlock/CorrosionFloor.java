@@ -5,7 +5,7 @@ import Floor.FTools.Corrosion;
 import mindustry.world.blocks.environment.Floor;
 
 public class CorrosionFloor extends Floor implements Corrosion {
-    public float baseDamage = 0.01f;
+    public float baseDamage = 1f;
 
     public CorrosionFloor(String name) {
         super(name);

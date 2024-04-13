@@ -1,47 +1,50 @@
 package Floor.FType.UponFloor;
 
 import Floor.FTools.Corrosion;
-import arc.struct.IntMap;
-import arc.struct.IntSeq;
+import arc.struct.ObjectSet;
 import arc.util.Time;
-import mindustry.world.Tile;
+import mindustry.Vars;
+import mindustry.gen.Building;
+import mindustry.gen.Groups;
+import mindustry.gen.Unit;
+import mindustry.world.blocks.environment.Floor;
 
 import static arc.util.Time.delta;
-import static mindustry.Vars.world;
 
 public class CorrosionMist {
-    public final static IntSeq clear = new IntSeq();
-    public final static IntMap<Integer> tiles = new IntMap<>();
+    public final static ObjectSet<Building> clearB = new ObjectSet<>();
+    public final static ObjectSet<Unit> clearU = new ObjectSet<>();
 
     public static void init() {
-        tiles.clear();
-        clear.clear();
-        for (Tile t : world.tiles) {
-            if (t.floor() instanceof Corrosion) {
-                tiles.put(t.pos(), 1);
-            }
-        }
+        clearB.clear();
+        clearU.clear();
 
-        Time.run(delta, CorrosionMist::update);
+        Time.run(delta * 60, CorrosionMist::update);
     }
 
     public static void update() {
-        if (world == null) {
-            return;
-        }
+        if (Vars.world == null || Vars.editor.isLoading()) return;
 
-        for (int i = 0; i < tiles.size; i++) {
-            int j = tiles.keys().toArray().get(i);
-            if (clear.indexOf(j) < 0) {
-                Tile t = world.tile(j);
-                Corrosion cf = (Corrosion) t.floor();
-                float damage = cf.baseDamage() * tiles.get(j);
-                if (t.build != null) {
-                    t.build.damage(damage);
-                }
+        Groups.unit.each(u -> {
+            if(clearU.contains(u)){
+                return;
             }
-        }
+            Floor t = u.floorOn();
+            if (t instanceof Corrosion) {
+                u.apply(t.status, 30);
+            }
+        });
 
-        Time.run(delta, CorrosionMist::update);
+        Groups.build.each(b -> {
+            if(clearB.contains(b)){
+                return;
+            }
+            Floor t = b.floorOn();
+            if (t instanceof Corrosion c) {
+                b.damage(c.baseDamage());
+            }
+        });
+
+        Time.run(delta * 30, CorrosionMist::update);
     }
 }

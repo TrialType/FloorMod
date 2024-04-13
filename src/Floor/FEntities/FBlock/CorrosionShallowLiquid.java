@@ -5,7 +5,7 @@ import Floor.FTools.Corrosion;
 import mindustry.world.blocks.environment.ShallowLiquid;
 
 public class CorrosionShallowLiquid extends ShallowLiquid implements Corrosion {
-    public float baseDamage = 0.01f;
+    public float baseDamage = 1f;
     public CorrosionShallowLiquid(String name) {
         super(name);
         status = FStatusEffects.corrosionI;

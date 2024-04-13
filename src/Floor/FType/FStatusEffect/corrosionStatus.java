@@ -10,8 +10,6 @@ import mindustry.type.StatusEffect;
 
 public class corrosionStatus extends StatusEffect {
     public final Seq<StatusEffect> with = new Seq<>();
-    public float damageBoost = 1;
-
     @Override
     public void init() {
         transitions.put(FStatusEffects.pureA, (u, r, t) -> {
@@ -34,12 +32,6 @@ public class corrosionStatus extends StatusEffect {
     public void update(Unit unit, float time) {
         float boost = 1;
 
-        for (corrosionStatus cs : FStatusEffects.catalyze) {
-            if (unit.hasEffect(cs)) {
-                boost *= cs.damageBoost;
-            }
-        }
-
         if (with != null && with.size > 0) {
             for (StatusEffect s : with) {
                 unit.apply(s, 2);
@@ -52,4 +44,6 @@ public class corrosionStatus extends StatusEffect {
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
     }
+
+    public void applied(Unit unit, float time, boolean extend){}
 }
