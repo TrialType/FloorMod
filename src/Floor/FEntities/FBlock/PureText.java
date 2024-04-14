@@ -20,12 +20,12 @@ public class PureText extends Block {
     }
 
     public class pureBuild extends Building implements RangePure {
-        private final IntMap<IntSeq> protects = new IntMap<>();
+        private final IntMap<Integer> protects = new IntMap<>();
 
         @Override
         public void updateTile() {
             if (protects.isEmpty()) {
-                CorrosionMist.clearer.add(this);
+                CorrosionMist.changer.add(this);
                 IntSeq ps = new IntSeq();
                 for (float px = this.x - protectRange / 2; px <= this.x + protectRange / 2; px += 1) {
                     for (float py = this.y - protectRange / 2; py <= this.y + protectRange / 2; py += 1) {
@@ -35,12 +35,15 @@ public class PureText extends Block {
                         }
                     }
                 }
-                for (int i = 1; i <= protectLevel; i++) {
-                    IntSeq add = new IntSeq();
-                    add.addAll(ps);
-                    protects.put(i, add);
+                for (int i : ps.toArray()) {
+                    protects.put(i, protectLevel);
                 }
             }
+        }
+
+        @Override
+        public int plan() {
+            return 1;
         }
 
         @Override
@@ -49,8 +52,18 @@ public class PureText extends Block {
         }
 
         @Override
-        public IntMap<IntSeq> protects() {
+        public IntMap<Integer> protects() {
             return this.protects;
+        }
+
+        @Override
+        public IntMap<Integer> timeBoost() {
+            return null;
+        }
+
+        @Override
+        public IntMap<Integer> withBoost() {
+            return null;
         }
     }
 }

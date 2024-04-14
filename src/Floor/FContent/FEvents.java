@@ -4,8 +4,10 @@ import Floor.FTools.FBuildUpGrade;
 import Floor.FTools.FUnitUpGrade;
 import Floor.FTools.UnitUpGrade;
 import Floor.FTools.UpGradeTime;
+import Floor.FType.FDialog.MoreResearchDialog;
 import Floor.FType.UponFloor.CorrosionMist;
 import arc.Events;
+import arc.util.Time;
 import mindustry.Vars;
 import mindustry.ai.types.MissileAI;
 import mindustry.game.EventType;
@@ -22,6 +24,8 @@ public class FEvents {
     private static final Random r = new Random();
 
     public static void load() {
+        Events.on(EventType.ClientLoadEvent.class, e -> Time.runTask(10f, () -> Vars.ui.research = new MoreResearchDialog()));
+
         Events.on(EventType.WorldLoadEndEvent.class, e -> CorrosionMist.init());
 
         Events.on(GetPowerEvent.class, e -> {

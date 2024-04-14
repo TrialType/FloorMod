@@ -3,26 +3,28 @@ package Floor.FType.UponFloor;
 import Floor.FTools.Corrosion;
 import Floor.FTools.RangePure;
 import arc.struct.IntMap;
-import arc.struct.IntSeq;
 import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.entities.Units;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 
+import java.util.Objects;
+
 import static arc.util.Time.delta;
 import static mindustry.Vars.*;
 
 public class CorrosionMist {
     private static float reload = 15 * delta;
-    public final static Seq<RangePure> clearer = new Seq<>();
-    public final static IntMap<IntSeq> clear = new IntMap<>();
-    public final static IntMap<Float> boost = new IntMap<>();
+    public final static Seq<RangePure> changer = new Seq<>();
+    public final static IntMap<Integer> clear = new IntMap<>();
+    public final static IntMap<Integer> withBoost = new IntMap<>();
+    public final static IntMap<BoostWithTime> timeBoost = new IntMap<>();
     public static boolean update = false;
 
     public static void init() {
-        boost.clear();
-        clearer.clear();
+        timeBoost.clear();
+        changer.clear();
         update = false;
         world.tiles.eachTile(t -> {
             if (!update) {
@@ -41,43 +43,101 @@ public class CorrosionMist {
         reload = 15 * delta;
         if (state.map == null || editor.isLoading() || state.isEditor()) return;
 
-        IntSeq removes = new IntSeq();
-        for (int i = 0; i < boost.size; i++) {
-            int key = boost.keys().toArray().get(i);
-            if (boost.get(key) - reload <= 0) {
-                removes.add(key);
-            } else {
-                boost.put(key, boost.get(i) - reload);
-            }
+        clear.clear();
+        withBoost.clear();
+        changer.removeAll(r -> !r.couldUse());
+
+        Seq<BoostWithTime> removes = new Seq<>();
+        for (BoostWithTime bwt : timeBoost.values()) {
+            bwt.go(reload, removes);
         }
-        for (int i : removes.toArray()) {
-            boost.remove(i);
+        for (BoostWithTime bwt : removes) {
+            int index = timeBoost.values().toArray().indexOf(bwt);
+            timeBoost.remove(index);
         }
 
-        clear.clear();
-        clearer.removeAll(r -> !r.couldUse());
-        for (RangePure rp : clearer) {
-            IntMap<IntSeq> its = rp.protects();
-            for (int i : its.keys().toArray().toArray()) {
-                if (clear.containsKey(i)) {
-                    clear.get(i).addAll(its.get(i));
-                } else {
-                    clear.put(i, its.get(i));
+        for (RangePure rp : changer) {
+            int plan = rp.plan();
+            if (plan == 1) {
+                IntMap<Integer> its = rp.protects();
+                for (int i : its.keys().toArray().toArray()) {
+                    Integer p = clear.get(i);
+                    if (p == null) {
+                        clear.put(i, its.get(i));
+                    } else {
+                        clear.put(i, Math.max(its.get(i), p));
+                    }
+                }
+            } else if (plan == 2) {
+                IntMap<Integer> bos = rp.withBoost();
+                for (int i : bos.keys().toArray().toArray()) {
+                    Integer p = withBoost.get(i);
+                    if (p == null) {
+                        withBoost.put(i, bos.get(i));
+                    } else {
+                        withBoost.put(i, Math.max(bos.get(i), p));
+                    }
+                }
+            } else if (plan == 3) {
+                IntMap<Integer> bos = rp.timeBoost();
+                for (int i : bos.keys().toArray().toArray()) {
+                    BoostWithTime p = timeBoost.get(i);
+                    if (p == null) {
+                        timeBoost.put(i, new BoostWithTime(i, bos.get(i)));
+                    } else {
+                        float last = p.time;
+                        if (bos.get(i) > last) {
+                            p.setTime(bos.get(i));
+                        }
+                    }
+                }
+            } else if (plan == 5) {
+                IntMap<Integer> bos = rp.withBoost();
+                for (int i : bos.keys().toArray().toArray()) {
+                    Integer p = withBoost.get(i);
+                    if (p == null) {
+                        withBoost.put(i, bos.get(i));
+                    } else {
+                        withBoost.put(i, Math.max(bos.get(i), p));
+                    }
+                }
+
+                bos = rp.timeBoost();
+                for (int i : bos.keys().toArray().toArray()) {
+                    BoostWithTime p = timeBoost.get(i);
+                    if (p == null) {
+                        timeBoost.put(i, new BoostWithTime(i, bos.get(i)));
+                    } else {
+                        float last = p.time;
+                        if (bos.get(i) > last) {
+                            p.setTime(bos.get(i));
+                        }
+                    }
                 }
             }
         }
+
+
         Units.nearby(0, 0, world.width() * 8, world.height() * 8, u -> {
             Tile t = u.tileOn();
             if (t != null && clear.keys().toArray().indexOf(t.pos()) < 0) {
                 Floor f = t.floor();
                 if (f instanceof Corrosion) {
-                    Float bo = boost.get(t.pos());
+                    BoostWithTime bo = timeBoost.get(t.pos());
+                    Integer tt = withBoost.get(t.pos());
+                    float boost;
                     if (bo == null) {
-                        bo = 1f;
+                        boost = Objects.requireNonNullElse(tt, 0);
+                    } else {
+                        if (tt == null) {
+                            boost = bo.level;
+                        } else {
+                            boost = Math.max(tt, bo.level);
+                        }
                     }
-                    float index = bo % 1 == 0 ? bo : (int) (bo + 1);
-                    IntSeq units = clear.get((int) index);
-                    if (units == null || !units.contains(t.pos())) {
+
+                    Integer po = clear.get(t.pos());
+                    if (po == null || po < boost + 1) {
                         u.apply(f.status, 60);
                     }
                 }
@@ -89,19 +149,48 @@ public class CorrosionMist {
             if (t != null) {
                 Floor f = t.floor();
                 if (f instanceof Corrosion c) {
-                    Float bo = boost.get(t.pos());
+                    BoostWithTime bo = timeBoost.get(t.pos());
+                    Integer tt = withBoost.get(t.pos());
+                    float boost;
                     if (bo == null) {
-                        bo = 1f;
+                        boost = Objects.requireNonNullElse(tt, 0);
+                    } else {
+                        if (tt == null) {
+                            boost = bo.level;
+                        } else {
+                            boost = Math.max(tt, bo.level);
+                        }
                     }
-                    float index = bo % 1 == 0 ? bo : (int) (bo + 1);
-                    IntSeq builds = clear.get((int) index);
-                    if (builds == null || !builds.contains(t.pos())) {
-                        b.damage(Math.max(0.5f / 15, b.maxHealth() / c.baseDamage()) * bo * 15);
+
+                    Integer po = clear.get(t.pos());
+                    if (po == null || po < boost + 1) {
+                        b.damage(Math.max(0.5f / 15, b.maxHealth() / c.baseDamage()) * (boost + 1) * 15);
                     }
                 }
             }
         });
 
         Time.run(reload, CorrosionMist::update);
+    }
+
+    public static class BoostWithTime {
+        public int level;
+        public float time;
+
+        public BoostWithTime(int l, float t) {
+            level = l;
+            time = t;
+        }
+
+        public void go(float time, Seq<BoostWithTime> removes) {
+            this.time -= time;
+            if (this.time <= 0) {
+                removes.add(this);
+            }
+        }
+
+        public void setTime(float t) {
+            this.time = t;
+        }
     }
 }

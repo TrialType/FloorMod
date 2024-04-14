@@ -1,9 +1,14 @@
 package Floor.FTools;
 
 import arc.struct.IntMap;
-import arc.struct.IntSeq;
 
 public interface RangePure {
+    int plan();
     boolean couldUse();
-    IntMap<IntSeq> protects();
+
+    IntMap<Integer> protects();
+
+    IntMap<Integer> timeBoost();
+
+    IntMap<Integer> withBoost();
 }
