@@ -15,9 +15,6 @@ public class TechChange {
         head = Planets.serpulo.techTree;
         head.each(t -> tn = t.content == Blocks.scorch ? t : tn);
         TechTree.TechNode tf = new TechTree.TechNode(tn, FBlocks.fireStream, ItemStack.empty);
-        tf.children.add(new TechTree.TechNode(tf, FBlocks.fireBoost, ItemStack.empty) {{
-            objectives.add(new Objectives.Research(Items.phaseFabric));
-        }});
-        tn.children.add(tf);
+        new TechTree.TechNode(tf, FBlocks.fireBoost, ItemStack.empty);
     }
 }

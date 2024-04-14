@@ -1,15 +1,14 @@
 package Floor.FContent;
 
 import arc.graphics.Color;
-import mindustry.content.Blocks;
 import mindustry.content.Planets;
 import mindustry.game.Team;
+import mindustry.graphics.Pal;
 import mindustry.graphics.g3d.HexMesh;
 import mindustry.graphics.g3d.HexSkyMesh;
 import mindustry.graphics.g3d.MultiMesh;
 import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Planet;
-import mindustry.world.meta.Attribute;
 
 public class FPlanets {
     public static Planet ENGSWEIS;
@@ -20,46 +19,37 @@ public class FPlanets {
 
         ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 3) {{
             generator = new SerpuloPlanetGenerator();
-            meshLoader = () -> new HexMesh(this, 3);
+            meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(
-                    new HexSkyMesh(this, 3, 0.6f, 0.1f, 6,
-                            Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
-                    new HexSkyMesh(this, 3, 0.6f, 0.1f, 6,
-                            Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
+                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
             );
 
-            alwaysUnlocked = true;
-            landCloudColor = Color.valueOf("ed6542");
-            atmosphereColor = Color.valueOf("f07218");
-            launchCapacityMultiplier = 0.01f;
-            startSector = 10;
-            atmosphereRadIn = 0.02f;
-            atmosphereRadOut = 0.3f;
-            tidalLock = true;
-            orbitSpacing = 2f;
-            totalRadius += 2.6f;
-            lightSrcTo = 0.5f;
-            lightDstFrom = 0.2f;
-            clearSectorOnLose = true;
-            defaultCore = Blocks.coreAcropolis;
-            iconColor = Color.valueOf("ff9266");
-            hiddenItems.clear();
-            enemyBuildSpeedMultiplier = 1.5f;
+            launchCapacityMultiplier = 0.5f;
+            sectorSeed = 2;
+            allowWaves = true;
+            allowWaveSimulation = true;
+            allowSectorInvasion = true;
+            allowLaunchSchematics = true;
+            enemyCoreSpawnReplace = true;
+            allowLaunchLoadout = true;
 
-            allowLaunchToNumbered = false;
-
-            updateLighting = false;
-
-            defaultAttributes.set(Attribute.heat, 0.8f);
-
+            prebuildBase = false;
             ruleSetter = r -> {
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.showSpawns = false;
             };
 
-            orbitTime = 12;
-            sectorSeed = 114;
+            iconColor = Color.valueOf("ed6542");
+            landCloudColor = Color.valueOf("ed6542");
+            atmosphereColor = Color.valueOf("f07218");
+
+            atmosphereRadIn = 0.02f;
+            atmosphereRadOut = 0.3f;
+
+            startSector = 10;
+            alwaysUnlocked = true;
 
             techTree = Planets.serpulo.techTree;
         }};
