@@ -8,18 +8,18 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.struct.IntMap;
 import arc.struct.IntSeq;
-import mindustry.core.UI;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.world;
 
 public class PureProject extends Block {
-    public float protectRange = 200;
+    public float protectRange = 400;
     public int protectLevel = 6;
 
     public PureProject(String name) {
@@ -28,10 +28,17 @@ public class PureProject extends Block {
     }
 
     @Override
+    public void setStats() {
+        super.setStats();
+        stats.add(new Stat("pure-range"), protectRange);
+        stats.add(new Stat("pure-max-power"), protectLevel);
+    }
+
+    @Override
     public void setBars() {
         super.setBars();
         addBar("power", build -> new Bar(
-                () -> Core.bundle.format("stat.purePower",(int) (build.efficiency * protectLevel)) +
+                () -> Core.bundle.format("stat.pure-power", (int) (build.efficiency * protectLevel)) +
                         ":" + (int) (build.efficiency * protectLevel),
                 () -> Pal.breakInvalid,
                 () -> build.efficiency));
@@ -64,6 +71,7 @@ public class PureProject extends Block {
                 }
             }
         }
+
         @Override
         public void draw() {
             super.draw();
@@ -72,14 +80,17 @@ public class PureProject extends Block {
             Lines.stroke(2);
             Fill.circle(x, y, protectRange / 2);
         }
+
         @Override
         public int plan() {
             return 1;
         }
+
         @Override
         public boolean couldUse() {
             return this.added && this.health > 0 && !this.dead;
         }
+
         @Override
         public IntMap<Integer> protects() {
             return this.protects;

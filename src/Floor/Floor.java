@@ -4,12 +4,10 @@ import Floor.FContent.*;
 import mindustry.mod.Mod;
 
 public class Floor extends Mod {
-    public Floor() {
-    }
+    public Floor() {}
 
     @Override
     public void loadContent() {
-        FPlanetGenerators.load();
         FItems.load();
         FCommands.load();
         FEntities.load();
@@ -21,5 +19,6 @@ public class Floor extends Mod {
         FPlanets.load();
         TechChange.load();
         PFloors.load();
+        FPlanetGenerators.load();
     }
 }

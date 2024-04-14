@@ -64,6 +64,6 @@ public class FPlanets {
             techTree = Planets.serpulo.techTree;
         }};
 
-        ENGSWEIS.sectors.get(ENGSWEIS.sectors.size - 1).preset = FPlanetGenerators.fullWater;
+        ENGSWEIS.sectors.get(ENGSWEIS.sectors.size - 12).preset = FPlanetGenerators.fullWater;
     }
 }
