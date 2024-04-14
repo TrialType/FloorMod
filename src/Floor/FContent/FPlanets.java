@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g3d.VertexBatch3D;
 import mindustry.content.Blocks;
 import mindustry.content.Planets;
 import mindustry.game.Team;
@@ -21,7 +22,7 @@ public class FPlanets {
         Planets.serpulo.techTree.planet = null;
         Planets.erekir.techTree.planet = null;
 
-        ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 3) {{
+        ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 5) {{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 3);
             cloudMeshLoader = () -> new MultiMesh(

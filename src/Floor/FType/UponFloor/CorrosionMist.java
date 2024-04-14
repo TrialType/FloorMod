@@ -9,8 +9,6 @@ import mindustry.entities.Units;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 
-import java.util.Objects;
-
 import static arc.util.Time.delta;
 import static mindustry.Vars.*;
 
@@ -115,6 +113,10 @@ public class CorrosionMist {
                     }
                 }
             }
+
+            if (rp.protectPos() > 0) {
+                clear.put(rp.protectPos(), rp.protectLevel());
+            }
         }
 
 
@@ -127,7 +129,11 @@ public class CorrosionMist {
                     Integer tt = withBoost.get(t.pos());
                     float boost;
                     if (bo == null) {
-                        boost = Objects.requireNonNullElse(tt, 0);
+                        if (tt == null) {
+                            boost = 0;
+                        } else {
+                            boost = tt;
+                        }
                     } else {
                         if (tt == null) {
                             boost = bo.level;
@@ -153,7 +159,11 @@ public class CorrosionMist {
                     Integer tt = withBoost.get(t.pos());
                     float boost;
                     if (bo == null) {
-                        boost = Objects.requireNonNullElse(tt, 0);
+                        if (tt == null) {
+                            boost = 0;
+                        } else {
+                            boost = tt;
+                        }
                     } else {
                         if (tt == null) {
                             boost = bo.level;

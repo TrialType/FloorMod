@@ -2,24 +2,28 @@ package Floor.FEntities.FBlock;
 
 import Floor.FTools.RangePure;
 import Floor.FType.UponFloor.CorrosionMist;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.struct.IntMap;
 import arc.struct.IntSeq;
 import mindustry.gen.Building;
+import mindustry.graphics.Layer;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 
 import static mindustry.Vars.world;
 
-public class PureText extends Block {
+public class PureProject extends Block {
     public float protectRange = 200;
     public int protectLevel = 1;
 
-    public PureText(String name) {
+    public PureProject(String name) {
         super(name);
         update = true;
     }
 
-    public class pureBuild extends Building implements RangePure {
+    public class PureBuild extends Building implements RangePure {
         private final IntMap<Integer> protects = new IntMap<>();
 
         @Override
@@ -39,6 +43,15 @@ public class PureText extends Block {
                     protects.put(i, protectLevel);
                 }
             }
+        }
+
+        @Override
+        public void draw() {
+            super.draw();
+            Draw.z(Layer.shields);
+            Draw.alpha(0.07f);
+            Lines.stroke(2);
+            Fill.circle(x, y, protectRange / 2);
         }
 
         @Override

@@ -56,7 +56,7 @@ public class FBlocks {
             fireStream;
 
     public static void load() {
-        pu = new PureText("pu"){{
+        pu = new PureProject("pu"){{
             health = 650;
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));

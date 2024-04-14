@@ -3,9 +3,7 @@ package Floor;
 import Floor.FContent.*;
 import mindustry.mod.Mod;
 public class Floor extends Mod {
-    public Floor() {
-        FVarsChange.load();
-    }
+    public Floor() {}
 
     @Override
     public void loadContent() {
