@@ -64,7 +64,6 @@ public class PureProject extends Block {
                 }
             }
         }
-
         @Override
         public void draw() {
             super.draw();
@@ -73,30 +72,17 @@ public class PureProject extends Block {
             Lines.stroke(2);
             Fill.circle(x, y, protectRange / 2);
         }
-
         @Override
         public int plan() {
             return 1;
         }
-
         @Override
         public boolean couldUse() {
             return this.added && this.health > 0 && !this.dead;
         }
-
         @Override
         public IntMap<Integer> protects() {
             return this.protects;
-        }
-
-        @Override
-        public IntMap<Integer> timeBoost() {
-            return null;
-        }
-
-        @Override
-        public IntMap<Integer> withBoost() {
-            return null;
         }
     }
 }

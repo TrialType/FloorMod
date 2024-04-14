@@ -1,8 +1,10 @@
 package Floor.FType.UponFloor;
 
+import Floor.FContent.FStatusEffects;
 import Floor.FTools.Corrosion;
 import Floor.FTools.RangePure;
 import arc.struct.IntMap;
+import arc.struct.IntSeq;
 import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.entities.Units;
@@ -36,6 +38,7 @@ public class CorrosionMist {
         }
     }
 
+    @SuppressWarnings({"ReplaceNullCheck"})
     public static void update() {
         float reload = 15 * delta;
         if (!state.isGame() || state.isEditor()) return;
@@ -76,19 +79,20 @@ public class CorrosionMist {
                     }
                 }
             } else if (plan == 3) {
-                IntMap<Integer> bos = rp.timeBoost();
-                for (int i : bos.keys().toArray().toArray()) {
+                IntSeq bos = (IntSeq) rp.timeBoost()[0];
+                int level = (int) rp.timeBoost()[1];
+                float time = (float) rp.timeBoost()[2];
+                for (int i : bos.toArray()) {
                     BoostWithTime p = timeBoost.get(i);
                     if (p == null) {
-                        timeBoost.put(i, new BoostWithTime(i, bos.get(i)));
+                        timeBoost.put(i, new BoostWithTime(level, time));
                     } else {
-                        float last = p.time;
-                        if (bos.get(i) > last) {
-                            p.setTime(bos.get(i));
+                        if (time > p.time) {
+                            p.setTime(time);
                         }
                     }
                 }
-            } else if (plan == 5) {
+            } else if (plan == 4) {
                 IntMap<Integer> bos = rp.withBoost();
                 for (int i : bos.keys().toArray().toArray()) {
                     Integer p = withBoost.get(i);
@@ -99,15 +103,16 @@ public class CorrosionMist {
                     }
                 }
 
-                bos = rp.timeBoost();
-                for (int i : bos.keys().toArray().toArray()) {
+                IntSeq boos = (IntSeq) rp.timeBoost()[0];
+                int level = (int) rp.timeBoost()[1];
+                float time = (float) rp.timeBoost()[2];
+                for (int i : boos.toArray()) {
                     BoostWithTime p = timeBoost.get(i);
                     if (p == null) {
-                        timeBoost.put(i, new BoostWithTime(i, bos.get(i)));
+                        timeBoost.put(i, new BoostWithTime(level, time));
                     } else {
-                        float last = p.time;
-                        if (bos.get(i) > last) {
-                            p.setTime(bos.get(i));
+                        if (time > p.time) {
+                            p.setTime(time);
                         }
                     }
                 }
@@ -122,7 +127,7 @@ public class CorrosionMist {
             Tile t = world.tileWorld(u.x, u.y);
             if (t != null) {
                 Floor f = t.floor();
-                if (f instanceof Corrosion) {
+                if (f instanceof Corrosion c) {
                     BoostWithTime bo = timeBoost.get(t.pos());
                     Integer tt = withBoost.get(t.pos());
                     float boost;
@@ -141,8 +146,13 @@ public class CorrosionMist {
                     }
 
                     Integer po = clear.get(t.pos());
-                    if (po == null || po < boost + 1) {
+                    if (po == null || po < c.corrosionLevel() * (boost + 1)) {
                         u.apply(f.status, 60);
+                        if (po != null) {
+                            for (int i = 0; i < c.corrosionLevel() * (boost + 1) - po; i++) {
+                                u.apply(FStatusEffects.catalyzeI, 1);
+                            }
+                        }
                     }
                 }
             }
@@ -171,8 +181,12 @@ public class CorrosionMist {
                     }
 
                     Integer po = clear.get(t.pos());
-                    if (po == null || po < boost + 1) {
-                        b.damage(Math.max(0.5f / 15, b.maxHealth() / c.baseDamage()) * (boost + 1) * 15);
+                    if (po == null || po < c.corrosionLevel() * (boost + 1)) {
+                        float boo = c.corrosionLevel() * (boost + 1);
+                        if (po != null) {
+                            boo = boo - po;
+                        }
+                        b.damage(Math.max(0.5f / 15, b.maxHealth() / c.baseDamage()) * boo * 15);
                     }
                 }
             }
