@@ -7,12 +7,15 @@ import mindustry.graphics.Pal;
 import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.maps.generators.PlanetGenerator;
 import mindustry.type.Sector;
+import mindustry.world.Tiles;
 
 public class ENGSWEISPlanetGenerator extends PlanetGenerator {
     @Override
-    public void generateSector(Sector sector){
-        if(sector.id == 0){
+    public void generateSector(Sector sector) {
+        if (sector.id == 10) {
             sector.generateEnemyBase = false;
+            sector.preset.difficulty = 4;
+            return;
         }
 
         PlanetGrid.Ptile tile = sector.tile;
@@ -21,20 +24,17 @@ public class ENGSWEISPlanetGenerator extends PlanetGenerator {
         float poles = Math.abs(tile.v.y);
         float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
 
-        if(noise + poles/7.1 > 0.12 && poles > 0.23){
+        if (noise + poles / 7.1 > 0.12 && poles > 0.23) {
             any = true;
         }
 
-        if(noise < 0.16){
-            for(PlanetGrid.Ptile other : tile.tiles){
-                var osec = sector.planet.getSector(other);
+        if (noise < 0.16) {
+            for (PlanetGrid.Ptile other : tile.tiles) {
+                Sector osec = sector.planet.getSector(other);
 
-                //no sectors near start sector!
-                if(
-                        osec.id == sector.planet.startSector || //near starting sector
-                                osec.generateEnemyBase && poles < 0.85 || //near other base
-                                (sector.preset != null && noise < 0.11) //near preset
-                ){
+                if (osec.id == sector.planet.startSector ||
+                        osec.generateEnemyBase && poles < 0.85 ||
+                        (sector.preset != null && noise < 0.11)) {
                     return;
                 }
             }
@@ -42,6 +42,12 @@ public class ENGSWEISPlanetGenerator extends PlanetGenerator {
 
         sector.generateEnemyBase = any;
     }
+
+    @Override
+    public void generate() {
+
+    }
+
     @Override
     public float getHeight(Vec3 position) {
         return 10;
