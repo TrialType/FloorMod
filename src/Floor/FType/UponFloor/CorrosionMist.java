@@ -13,7 +13,6 @@ import static arc.util.Time.delta;
 import static mindustry.Vars.*;
 
 public class CorrosionMist {
-    private static float reload = 15 * delta;
     public final static Seq<RangePure> changer = new Seq<>();
     public final static IntMap<Integer> clear = new IntMap<>();
     public final static IntMap<Integer> withBoost = new IntMap<>();
@@ -33,13 +32,13 @@ public class CorrosionMist {
         });
 
         if (update) {
-            Time.run(reload, CorrosionMist::update);
+            Time.run(delta, CorrosionMist::update);
         }
     }
 
     public static void update() {
-        reload = 15 * delta;
-        if (state.map == null || editor.isLoading() || state.isEditor()) return;
+        float reload = 15 * delta;
+        if (!state.isGame() || state.isEditor()) return;
 
         clear.clear();
         withBoost.clear();
@@ -119,10 +118,9 @@ public class CorrosionMist {
             }
         }
 
-
         Units.nearby(0, 0, world.width() * 8, world.height() * 8, u -> {
-            Tile t = u.tileOn();
-            if (t != null && clear.keys().toArray().indexOf(t.pos()) < 0) {
+            Tile t = world.tileWorld(u.x, u.y);
+            if (t != null) {
                 Floor f = t.floor();
                 if (f instanceof Corrosion) {
                     BoostWithTime bo = timeBoost.get(t.pos());

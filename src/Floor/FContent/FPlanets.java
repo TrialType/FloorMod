@@ -22,7 +22,7 @@ public class FPlanets {
         Planets.serpulo.techTree.planet = null;
         Planets.erekir.techTree.planet = null;
 
-        ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 5) {{
+        ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 3) {{
             generator = new SerpuloPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 3);
             cloudMeshLoader = () -> new MultiMesh(

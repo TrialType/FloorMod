@@ -59,6 +59,8 @@ public class FBlocks {
         pu = new PureProject("pu"){{
             health = 650;
 
+            consumePower(50f);
+
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
 

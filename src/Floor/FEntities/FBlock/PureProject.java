@@ -2,13 +2,17 @@ package Floor.FEntities.FBlock;
 
 import Floor.FTools.RangePure;
 import Floor.FType.UponFloor.CorrosionMist;
+import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.struct.IntMap;
 import arc.struct.IntSeq;
+import mindustry.core.UI;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 
@@ -16,11 +20,21 @@ import static mindustry.Vars.world;
 
 public class PureProject extends Block {
     public float protectRange = 200;
-    public int protectLevel = 1;
+    public int protectLevel = 6;
 
     public PureProject(String name) {
         super(name);
         update = true;
+    }
+
+    @Override
+    public void setBars() {
+        super.setBars();
+        addBar("power", build -> new Bar(
+                () -> Core.bundle.format("stat.purePower",(int) (build.efficiency * protectLevel)) +
+                        ":" + (int) (build.efficiency * protectLevel),
+                () -> Pal.breakInvalid,
+                () -> build.efficiency));
     }
 
     public class PureBuild extends Building implements RangePure {
@@ -41,6 +55,12 @@ public class PureProject extends Block {
                 }
                 for (int i : ps.toArray()) {
                     protects.put(i, protectLevel);
+                }
+            }
+            if (!protects.isEmpty()) {
+                IntSeq ins = protects.keys().toArray();
+                for (int i : ins.toArray()) {
+                    protects.put(i, (int) Math.max(0, efficiency * protectLevel));
                 }
             }
         }
