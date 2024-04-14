@@ -148,7 +148,7 @@ public class CorrosionMist {
                     Integer po = clear.get(t.pos());
                     if (po == null || po < c.corrosionLevel() * (boost + 1)) {
                         u.apply(f.status, 60);
-                        if (po != null) {
+                        if (po != null && po > 0) {
                             for (int i = 0; i < c.corrosionLevel() * (boost + 1) - po; i++) {
                                 u.apply(FStatusEffects.catalyzeI, 1);
                             }

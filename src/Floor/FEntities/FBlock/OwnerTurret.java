@@ -204,7 +204,7 @@ public class OwnerTurret extends Turret {
             super.write(write);
 
             write.f(exp);
-            TypeIO.writeEffect(write, fireEffect);
+            TypeIO.writeEffect(write, fireEffect == null ? Fx.none : fireEffect);
         }
 
         @Override
