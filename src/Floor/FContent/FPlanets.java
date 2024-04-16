@@ -9,6 +9,7 @@ import mindustry.graphics.g3d.HexSkyMesh;
 import mindustry.graphics.g3d.MultiMesh;
 import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Planet;
+import mindustry.world.meta.Env;
 
 public class FPlanets {
     public static Planet ENGSWEIS;
@@ -16,17 +17,20 @@ public class FPlanets {
     public static void load() {
         Planets.serpulo.techTree.planet = null;
         Planets.erekir.techTree.planet = null;
+        Planets.sun.children.clear();
+        Planets.sun.updateTotalRadius();
 
         ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 3) {{
             generator = new SerpuloPlanetGenerator();
-            meshLoader = () -> new HexMesh(this, 6);
+            meshLoader = () -> new HexMesh(this, 5);
             cloudMeshLoader = () -> new MultiMesh(
                     new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
                     new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
             );
+            defaultEnv = Env.scorching | Env.terrestrial | Env.groundOil;
 
-            launchCapacityMultiplier = 0.5f;
-            sectorSeed = 2;
+            launchCapacityMultiplier = 0.2f;
+            sectorSeed = 15;
             allowWaves = true;
             allowWaveSimulation = true;
             allowSectorInvasion = true;
@@ -48,12 +52,21 @@ public class FPlanets {
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
 
-            startSector = 10;
+            startSector = 101;
             alwaysUnlocked = true;
 
             techTree = Planets.serpulo.techTree;
         }};
 
         ENGSWEIS.sectors.get(ENGSWEIS.sectors.size - 12).preset = FPlanetGenerators.fullWater;
+
+        Planets.sun.updateTotalRadius();
+        Planets.erekir.orbitRadius =
+                Planets.erekir.parent.totalRadius + Planets.erekir.parent.orbitSpacing + Planets.erekir.totalRadius;
+        Planets.sun.children.add(Planets.erekir);
+        Planets.sun.updateTotalRadius();
+        Planets.serpulo.orbitRadius =
+                Planets.serpulo.parent.totalRadius + Planets.serpulo.parent.orbitSpacing + Planets.serpulo.totalRadius;
+        Planets.sun.children.add(Planets.serpulo);
     }
 }

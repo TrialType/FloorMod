@@ -8,6 +8,7 @@ public class Floor extends Mod {
 
     @Override
     public void loadContent() {
+        FLiquids.load();
         FItems.load();
         FCommands.load();
         FEntities.load();
