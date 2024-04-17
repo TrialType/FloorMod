@@ -4,14 +4,13 @@ import Floor.FEntities.FBlock.CorrosionEmptyFloor;
 import Floor.FEntities.FBlock.CorrosionFloor;
 import Floor.FEntities.FBlock.CorrosionSteamVent;
 import arc.graphics.Color;
-import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Sounds;
-import mindustry.graphics.Shaders;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.content.Liquids;
 import mindustry.graphics.CacheLayer;
+import mindustry.world.blocks.environment.OreBlock;
 import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.meta.Attribute;
 
@@ -23,10 +22,16 @@ public class PFloors {
             pRedmat, pBluemat, pGrass, pSalt, pSnow, pIce, pIceSnow, pShale, pMoss, pCoreZone, pSporeMoss, pMetalFloor, pMetalFloorDamaged,
             pMetalFloor2, pMetalFloor3, pMetalFloor4, pMetalFloor5, pDarkPanel1, pDarkPanel2, pDarkPanel3, pDarkPanel4, pDarkPanel5, pDarkPanel6;
     public static StaticWall igneousRock;
-    public static Floor igneousFloor,
+    public static Floor igneousFloor, metaGlassOre,
             poolCopper, poolLead, poolTitanium, poolThorium;
 
     public static void load() {
+        metaGlassOre = new OreBlock("meta-glass-ore", Items.metaglass) {{
+            oreDefault = true;
+            oreThreshold = 0.75f;
+            oreScale = 23.9f;
+        }};
+
         poolCopper = new Floor("pool-copper") {{
             drownTime = 230f;
             status = StatusEffects.melting;
@@ -40,7 +45,7 @@ public class PFloors {
 
             emitLight = true;
             lightRadius = 40f;
-            lightColor = Color.valueOf("d99d73");
+            lightColor = Color.valueOf("FF583A");
         }};
         poolLead = new Floor("pool-lead") {{
             drownTime = 230f;
@@ -55,7 +60,7 @@ public class PFloors {
 
             emitLight = true;
             lightRadius = 40f;
-            lightColor = Color.valueOf("8c7fa9");
+            lightColor = Color.valueOf("9D42FF");
         }};
         poolTitanium = new Floor("pool-titanium") {{
             drownTime = 230f;
@@ -70,7 +75,7 @@ public class PFloors {
 
             emitLight = true;
             lightRadius = 40f;
-            lightColor = Color.valueOf("8da1e3");
+            lightColor = Color.valueOf("4A45FF");
         }};
         poolThorium = new Floor("pool-thorium") {{
             drownTime = 230f;
@@ -85,11 +90,11 @@ public class PFloors {
 
             emitLight = true;
             lightRadius = 40f;
-            lightColor = Color.valueOf("f9a3c7");
+            lightColor = Color.valueOf("FA6188");
         }};
 
         igneousRock = new StaticWall("igneous-rock") {{
-            variants = 0;
+            variants = 3;
         }};
         igneousFloor = new Floor("igneous-floor") {{
             variants = 1;

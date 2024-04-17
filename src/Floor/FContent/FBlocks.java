@@ -37,7 +37,6 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
-import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
@@ -49,33 +48,140 @@ public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory,
             outPowerFactoryII, inputPowerFactoryII,
             outPowerFactoryIII, inputPowerFactoryIII;
+
+    //these twice only use on test
     public static Block kt, pu;
+
     public static Block slowProject;
     public static Block eleFence, eleFenceII, eleFenceIII;
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
             stay, bind, tranquil,
             fireStream;
-    public static Block primarySolidification;
+    public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
 
     public static void load() {
         primarySolidification = new StackCrafter("primary-solidification") {{
+            itemCapacity = 60;
+            liquidCapacity = 120;
             switchStack.add(new ProductStack(
                     ItemStack.empty,
-                    LiquidStack.with(FLiquids.fusionCopper, 2),
-                    ItemStack.with(Items.copper, 4),
-                    LiquidStack.empty, 60
+                    LiquidStack.with(FLiquids.fusionCopper, 14),
+                    ItemStack.with(Items.copper, 6),
+                    LiquidStack.empty, 120
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
-                    LiquidStack.with(FLiquids.fusionLead, 2),
-                    ItemStack.with(Items.lead, 4),
-                    LiquidStack.empty, 60
+                    LiquidStack.with(FLiquids.fusionLead, 14),
+                    ItemStack.with(Items.lead, 6),
+                    LiquidStack.empty, 120
             ));
 
             hasPower = false;
 
-            requirements(Category.crafting, ItemStack.with(Items.copper, 1));
+            requirements(Category.crafting, ItemStack.with(Items.metaglass, 35, Items.copper, 40, Items.lead, 25));
+        }};
+        intermediateSolidification = new StackCrafter("intermediate-solidification") {{
+            itemCapacity = 150;
+            liquidCapacity = 300;
+            size = 2;
+            health = 250;
+
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionCopper, 30),
+                    ItemStack.with(Items.copper, 15),
+                    LiquidStack.empty, 90
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionLead, 30),
+                    ItemStack.with(Items.lead, 15),
+                    LiquidStack.empty, 90
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionTitanium, 30),
+                    ItemStack.with(Items.titanium, 12),
+                    LiquidStack.empty, 90
+            ));
+
+            consume(new ConsumePower(5, 0, false));
+
+            requirements(Category.crafting, ItemStack.with(Items.metaglass, 125, Items.copper, 150,
+                    Items.lead, 100, Items.graphite, 140));
+        }};
+        advancedSolidification = new StackCrafter("advanced-solidification") {{
+            itemCapacity = 360;
+            liquidCapacity = 600;
+            size = 3;
+            health = 750;
+
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionCopper, 60),
+                    ItemStack.with(Items.copper, 36),
+                    LiquidStack.empty, 90
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionLead, 60),
+                    ItemStack.with(Items.lead, 36),
+                    LiquidStack.empty, 90
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionTitanium, 60),
+                    ItemStack.with(Items.titanium, 30),
+                    LiquidStack.empty, 90
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionThorium, 60),
+                    ItemStack.with(Items.thorium, 24),
+                    LiquidStack.empty, 90
+            ));
+
+            consume(new ConsumePower(20, 0, false));
+
+            requirements(Category.crafting, ItemStack.with(Items.metaglass, 500, Items.copper, 450,
+                    Items.lead, 400, Items.graphite, 350, Items.titanium, 300));
+        }};
+        ultimateSolidification = new StackCrafter("ultimate-solidification") {{
+            itemCapacity = 360;
+            liquidCapacity = 900;
+            size = 4;
+            health = 750;
+
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionCopper, 90),
+                    ItemStack.with(Items.copper, 64),
+                    LiquidStack.empty, 60
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionLead, 90),
+                    ItemStack.with(Items.lead, 64),
+                    LiquidStack.empty, 60
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionTitanium, 90),
+                    ItemStack.with(Items.titanium, 64),
+                    LiquidStack.empty, 60
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionThorium, 90),
+                    ItemStack.with(Items.thorium, 64),
+                    LiquidStack.empty, 60
+            ));
+
+            consume(new ConsumePower(100, 0, false));
+
+            requirements(Category.crafting, ItemStack.with(Items.metaglass, 1500, Items.copper, 1450,
+                    Items.lead, 1400, Items.graphite, 1350, Items.titanium, 1400, Items.thorium, 1450, Items.surgeAlloy, 500));
         }};
 
         pu = new PureProject("pu") {{
@@ -1289,6 +1395,7 @@ public class FBlocks {
         slowProject = new DownProject("slow_project") {{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
             range = 16;
+            downSpeed = 0.9f;
 
             consumePower(3.50f);
             size = 2;

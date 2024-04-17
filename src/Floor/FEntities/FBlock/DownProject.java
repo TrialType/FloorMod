@@ -55,7 +55,7 @@ public class DownProject extends OverdriveProjector {
                 float realRange = range + phaseHeat * phaseRangeBoost;
 
                 charge = 0f;
-                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applySlowdown(realDown(), reload + 1f));
+                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applySlowdown(realDown(), reload * 7));
             }
 
             if (timer(timerUse, useTime) && efficiency > 0) {

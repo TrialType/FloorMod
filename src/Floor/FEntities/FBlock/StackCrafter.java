@@ -45,20 +45,20 @@ public class StackCrafter extends GenericCrafter {
                 LiquidStack[] lss = ps.liquidsIn;
                 table.table(t -> {
                     for (ItemStack is : iss) {
-                        t.add(new ItemDisplay(is.item, is.amount)).pad(25).left();
+                        t.add(new ItemDisplay(is.item, (int) (is.amount / ps.progress))).pad(25).left();
                     }
                     for (LiquidStack ls : lss) {
-                        t.add(new LiquidDisplay(ls.liquid, ls.amount, true)).pad(25).left();
+                        t.add(new LiquidDisplay(ls.liquid, ls.amount / ps.progress, true)).pad(25).left();
                     }
                 }).grow().left();
                 ItemStack[] ios = ps.itemsOut;
                 LiquidStack[] los = ps.liquidsOut;
                 table.table(t -> {
                     for (ItemStack is : ios) {
-                        t.add(new ItemDisplay(is.item, is.amount)).pad(25).right();
+                        t.add(new ItemDisplay(is.item, (int) (is.amount / ps.progress))).pad(25).right();
                     }
                     for (LiquidStack ls : los) {
-                        t.add(new LiquidDisplay(ls.liquid, ls.amount, true)).pad(25).right();
+                        t.add(new LiquidDisplay(ls.liquid, ls.amount / ps.progress, true)).pad(25).right();
                     }
                 }).grow().right();
             }
@@ -128,24 +128,24 @@ public class StackCrafter extends GenericCrafter {
 
                     t.add(Core.bundle.get("@input") + ":");
                     for (ItemStack is : ps.itemsIn) {
-                        ItemDisplay id = new ItemDisplay(is.item, is.amount);
+                        ItemDisplay id = new ItemDisplay(is.item, (int) (is.amount / ps.progress));
                         id.sizeBy(1);
                         t.add(id).pad(3).left();
                     }
                     for (LiquidStack ls : ps.liquidsIn) {
-                        LiquidDisplay ld = new LiquidDisplay(ls.liquid, ls.amount, true);
+                        LiquidDisplay ld = new LiquidDisplay(ls.liquid, ls.amount / ps.progress, true);
                         ld.sizeBy(1);
                         t.add(ld).pad(3).left();
                     }
                     t.row();
                     t.add(Core.bundle.get("@output") + ":");
                     for (ItemStack is : ps.itemsOut) {
-                        ItemDisplay id = new ItemDisplay(is.item, is.amount);
+                        ItemDisplay id = new ItemDisplay(is.item, (int) (is.amount / ps.progress));
                         id.sizeBy(1);
                         t.add(id).pad(3).left();
                     }
                     for (LiquidStack ls : ps.liquidsOut) {
-                        LiquidDisplay ld = new LiquidDisplay(ls.liquid, ls.amount, true);
+                        LiquidDisplay ld = new LiquidDisplay(ls.liquid, ls.amount / ps.progress, true);
                         ld.sizeBy(1);
                         t.add(ld).pad(3).left();
                     }
@@ -205,13 +205,13 @@ public class StackCrafter extends GenericCrafter {
         public boolean couldProduct() {
             ItemStack[] iss = switchStack.get(chance).itemsOut;
             for (ItemStack is : iss) {
-                if (is.amount * 2 <= this.items.get(is.item)) {
+                if (is.amount * 10 <= this.items.get(is.item)) {
                     return false;
                 }
             }
             LiquidStack[] lss = switchStack.get(chance).liquidsOut;
             for (LiquidStack ls : lss) {
-                if (ls.amount <= 2 * this.liquids.get(ls.liquid)) {
+                if (ls.amount * 10 <= this.liquids.get(ls.liquid)) {
                     return false;
                 }
             }
@@ -234,7 +234,7 @@ public class StackCrafter extends GenericCrafter {
         }
 
         public void dumpOutputs() {
-            if (chance > -1 && timer(timerDump, dumpTime / timeScale)) {
+            if (chance > -1 && timer(timerDump, dumpTime / timeScale / 15)) {
                 for (ItemStack output : switchStack.get(chance).itemsOut) {
                     dump(output.item);
                 }

@@ -55,6 +55,8 @@ public class FPlanets {
             startSector = 101;
             alwaysUnlocked = true;
 
+            unlockedOnLand.add(FBlocks.primarySolidification);
+
             techTree = Planets.serpulo.techTree;
         }};
 
