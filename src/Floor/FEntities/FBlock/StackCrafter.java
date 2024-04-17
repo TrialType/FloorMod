@@ -8,7 +8,6 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.gen.Building;
-import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -18,8 +17,6 @@ import mindustry.ui.ItemDisplay;
 import mindustry.ui.LiquidDisplay;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
-import mindustry.world.meta.StatValues;
 
 public class StackCrafter extends GenericCrafter {
     public Seq<ProductStack> switchStack = new Seq<>();
@@ -53,8 +50,7 @@ public class StackCrafter extends GenericCrafter {
                     for (LiquidStack ls : lss) {
                         t.add(new LiquidDisplay(ls.liquid, ls.amount, true)).pad(25).left();
                     }
-
-                }).grow().left().row();
+                }).grow().left();
                 ItemStack[] ios = ps.itemsOut;
                 LiquidStack[] los = ps.liquidsOut;
                 table.table(t -> {
@@ -64,8 +60,7 @@ public class StackCrafter extends GenericCrafter {
                     for (LiquidStack ls : los) {
                         t.add(new LiquidDisplay(ls.liquid, ls.amount, true)).pad(25).right();
                     }
-
-                }).grow().right().row();
+                }).grow().right();
             }
         });
     }
