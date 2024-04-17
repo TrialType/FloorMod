@@ -8,6 +8,7 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.gen.Building;
+import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -39,7 +40,34 @@ public class StackCrafter extends GenericCrafter {
     @Override
     public void setStats() {
         super.setStats();
+        stats.add(Stat.input, table -> {
+            table.row();
+            for (ProductStack ps : switchStack) {
+                table.row();
+                ItemStack[] iss = ps.itemsIn;
+                LiquidStack[] lss = ps.liquidsIn;
+                table.table(t -> {
+                    for (ItemStack is : iss) {
+                        t.add(new ItemDisplay(is.item, is.amount)).pad(25).left();
+                    }
+                    for (LiquidStack ls : lss) {
+                        t.add(new LiquidDisplay(ls.liquid, ls.amount, true)).pad(25).left();
+                    }
 
+                }).grow().left().row();
+                ItemStack[] ios = ps.itemsOut;
+                LiquidStack[] los = ps.liquidsOut;
+                table.table(t -> {
+                    for (ItemStack is : ios) {
+                        t.add(new ItemDisplay(is.item, is.amount)).pad(25).right();
+                    }
+                    for (LiquidStack ls : los) {
+                        t.add(new LiquidDisplay(ls.liquid, ls.amount, true)).pad(25).right();
+                    }
+
+                }).grow().right().row();
+            }
+        });
     }
 
     public static class ProductStack {
