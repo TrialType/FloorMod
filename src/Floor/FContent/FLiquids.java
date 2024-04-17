@@ -20,13 +20,13 @@ public class FLiquids {
             effect = StatusEffects.melting;
             lightColor = Color.valueOf("7d4f79").a(0.4f);
         }};
-        fusionTitanium = new Liquid("fusion-lead", Color.valueOf("8da1e3")) {{
+        fusionTitanium = new Liquid("fusion-titanium", Color.valueOf("8da1e3")) {{
             temperature = 1.5f;
             viscosity = 0.7f;
             effect = StatusEffects.melting;
             lightColor = Color.valueOf("9e51b3").a(0.4f);
         }};
-        fusionThorium = new Liquid("fusion-lead", Color.valueOf("f9a3c7")) {{
+        fusionThorium = new Liquid("fusion-thorium", Color.valueOf("f9a3c7")) {{
             temperature = 1.5f;
             viscosity = 0.7f;
             effect = StatusEffects.melting;

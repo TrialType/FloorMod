@@ -31,11 +31,13 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
+import mindustry.type.LiquidStack;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
@@ -47,16 +49,36 @@ public class FBlocks {
     public static Block outPowerFactory, inputPowerFactory,
             outPowerFactoryII, inputPowerFactoryII,
             outPowerFactoryIII, inputPowerFactoryIII;
-    public static Block kt,pu;
+    public static Block kt, pu;
     public static Block slowProject;
     public static Block eleFence, eleFenceII, eleFenceIII;
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
             stay, bind, tranquil,
             fireStream;
+    public static Block primarySolidification;
 
     public static void load() {
-        pu = new PureProject("pu"){{
+        primarySolidification = new StackCrafter("primary-solidification") {{
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionCopper, 2),
+                    ItemStack.with(Items.copper, 4),
+                    LiquidStack.empty, 60
+            ));
+            switchStack.add(new ProductStack(
+                    ItemStack.empty,
+                    LiquidStack.with(FLiquids.fusionLead, 2),
+                    ItemStack.with(Items.lead, 4),
+                    LiquidStack.empty, 60
+            ));
+
+            hasPower = false;
+
+            requirements(Category.crafting, ItemStack.with(Items.copper, 1));
+        }};
+
+        pu = new PureProject("pu") {{
             health = 650;
 
             consumePower(50f);

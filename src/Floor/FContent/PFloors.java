@@ -8,6 +8,7 @@ import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Shaders;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.content.Liquids;
 import mindustry.graphics.CacheLayer;
@@ -23,7 +24,7 @@ public class PFloors {
             pMetalFloor2, pMetalFloor3, pMetalFloor4, pMetalFloor5, pDarkPanel1, pDarkPanel2, pDarkPanel3, pDarkPanel4, pDarkPanel5, pDarkPanel6;
     public static StaticWall igneousRock;
     public static Floor igneousFloor,
-            poolCopper, poolLead,poolTitanium,poolThorium;
+            poolCopper, poolLead, poolTitanium, poolThorium;
 
     public static void load() {
         poolCopper = new Floor("pool-copper") {{
@@ -34,7 +35,7 @@ public class PFloors {
             variants = 0;
             liquidDrop = FLiquids.fusionCopper;
             isLiquid = true;
-            cacheLayer = CacheLayer.slag;
+            cacheLayer = CacheLayer.tar;
             attributes.set(Attribute.heat, 0.85f);
 
             emitLight = true;
@@ -49,14 +50,14 @@ public class PFloors {
             variants = 0;
             liquidDrop = FLiquids.fusionLead;
             isLiquid = true;
-            cacheLayer = CacheLayer.slag;
+            cacheLayer = CacheLayer.tar;
             attributes.set(Attribute.heat, 0.85f);
 
             emitLight = true;
             lightRadius = 40f;
             lightColor = Color.valueOf("8c7fa9");
         }};
-        poolTitanium = new Floor("pool-titanium"){{
+        poolTitanium = new Floor("pool-titanium") {{
             drownTime = 230f;
             status = StatusEffects.melting;
             statusDuration = 240f;
@@ -64,14 +65,14 @@ public class PFloors {
             variants = 0;
             liquidDrop = FLiquids.fusionTitanium;
             isLiquid = true;
-            cacheLayer = CacheLayer.slag;
+            cacheLayer = CacheLayer.tar;
             attributes.set(Attribute.heat, 0.85f);
 
             emitLight = true;
             lightRadius = 40f;
             lightColor = Color.valueOf("8da1e3");
         }};
-        poolThorium = new Floor("pool-titanium"){{
+        poolThorium = new Floor("pool-thorium") {{
             drownTime = 230f;
             status = StatusEffects.melting;
             statusDuration = 240f;
@@ -79,7 +80,7 @@ public class PFloors {
             variants = 0;
             liquidDrop = FLiquids.fusionThorium;
             isLiquid = true;
-            cacheLayer = CacheLayer.slag;
+            cacheLayer = CacheLayer.tar;
             attributes.set(Attribute.heat, 0.85f);
 
             emitLight = true;
@@ -93,6 +94,7 @@ public class PFloors {
         igneousFloor = new Floor("igneous-floor") {{
             variants = 1;
         }};
+
 
         pMetalFloor = new CorrosionFloor("p-metal-floor", 0, FStatusEffects.corrosionI);
         pMetalFloorDamaged = new CorrosionFloor("p-metal-floor-damaged", 3, FStatusEffects.corrosionI);
