@@ -67,7 +67,7 @@ public class FPlanets {
                     });
                 });
             });
-            tn.parent = techTree;
+            techTree.children.add(tn);
         }};
 
         ENGSWEIS.sectors.get(ENGSWEIS.sectors.size - 12).preset = FPlanetGenerators.fullWater;
