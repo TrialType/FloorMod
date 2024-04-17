@@ -4,9 +4,11 @@ import Floor.FEntities.FBlock.CorrosionEmptyFloor;
 import Floor.FEntities.FBlock.CorrosionFloor;
 import Floor.FEntities.FBlock.CorrosionSteamVent;
 import arc.graphics.Color;
+import arc.struct.Seq;
 import mindustry.content.Items;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Sounds;
+import mindustry.world.Block;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.content.Liquids;
 import mindustry.graphics.CacheLayer;
@@ -15,6 +17,7 @@ import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.meta.Attribute;
 
 public class PFloors {
+    public final static Seq<Block> WEFloors = new Seq<>();
     public static Floor pDeepwater, pWater, pTaintedWater, pDeepTaintedWater, pTar, pCryofluid, pSlag, pStone, pCraters, pCharr, pBasalt, pHotrock, pMagmarock,
             pSand, pDarksand, pDirt, pMud, pEmpty, pDacite, pRhyolite, pRhyoliteCrater, pRoughRhyolite, pRegolith, pYellowStone, pCarbonStone,
             pFerricStone, pFerricCraters, pBeryllicStone, pCrystallineStone, pCrystalFloor, pYellowStonePlates, pRedStone, pDenseRedStone,
@@ -416,5 +419,7 @@ public class PFloors {
             variants = 3;
             attributes.set(Attribute.spores, 0.3f);
         }};
+
+        WEFloors.addAll(igneousFloor, metaGlassOre, poolCopper, poolLead, poolTitanium, poolThorium, igneousRock);
     }
 }

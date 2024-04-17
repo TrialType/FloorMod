@@ -2,11 +2,13 @@ package Floor.FType.FPlanetGenerator;
 
 import arc.graphics.Color;
 import arc.math.geom.Vec3;
+import arc.struct.Seq;
 import arc.util.noise.Noise;
 import mindustry.graphics.Pal;
 import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.maps.generators.PlanetGenerator;
 import mindustry.type.Sector;
+import mindustry.world.Block;
 import mindustry.world.Tiles;
 
 public class ENGSWEISPlanetGenerator extends PlanetGenerator {
@@ -14,7 +16,7 @@ public class ENGSWEISPlanetGenerator extends PlanetGenerator {
     public void generateSector(Sector sector) {
         if (sector.id == 10) {
             sector.generateEnemyBase = false;
-            sector.preset.difficulty = 4;
+            sector.preset.difficulty = 7;
             return;
         }
 
