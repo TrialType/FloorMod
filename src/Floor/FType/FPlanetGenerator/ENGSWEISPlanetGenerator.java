@@ -3,9 +3,7 @@ package Floor.FType.FPlanetGenerator;
 import arc.graphics.Color;
 import arc.math.geom.Vec3;
 import arc.util.noise.Noise;
-import mindustry.graphics.Pal;
 import mindustry.graphics.g3d.PlanetGrid;
-import mindustry.maps.generators.PlanetGenerator;
 import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Sector;
 
@@ -31,9 +29,7 @@ public class ENGSWEISPlanetGenerator extends SerpuloPlanetGenerator {
             for (PlanetGrid.Ptile other : tile.tiles) {
                 Sector sec = sector.planet.getSector(other);
 
-                if (sec.id == sector.planet.startSector ||
-                        sec.generateEnemyBase && poles < 0.85 ||
-                        (sector.preset != null && noise < 0.11)) {
+                if (sec.id == sector.planet.startSector || sec.generateEnemyBase && poles < 0.85 || sector.preset != null) {
                     return;
                 }
             }
