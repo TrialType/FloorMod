@@ -19,7 +19,7 @@ public class FPlanetGenerators {
             difficulty = 10;
         }};
 
-        longestDown = new SectorPreset(Core.bundle.get("map.floor-long-down"), ENGSWEIS, 13) {{
+        longestDown = new SectorPreset(Core.bundle.get("map.floor-long-down"), ENGSWEIS, 64) {{
             difficulty = 6;
         }};
 

@@ -1,5 +1,6 @@
 package Floor.FContent;
 
+import Floor.FType.FPlanetGenerator.ENGSWEISPlanetGenerator;
 import arc.graphics.Color;
 import arc.struct.Seq;
 import mindustry.content.Items;
@@ -25,7 +26,7 @@ public class FPlanets {
         Planets.sun.updateTotalRadius();
 
         ENGSWEIS = new Planet("engsweis", Planets.sun, 1, 3) {{
-            generator = new SerpuloPlanetGenerator();
+            generator = new ENGSWEISPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 6);
             cloudMeshLoader = () -> new MultiMesh(
                     new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
@@ -53,7 +54,7 @@ public class FPlanets {
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.3f;
 
-            startSector = 13;
+            startSector = 64;
             alwaysUnlocked = true;
 
             techTree = Planets.serpulo.techTree;

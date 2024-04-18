@@ -59,8 +59,19 @@ public class FBlocks {
             stay, bind, tranquil,
             fireStream;
     public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
+    public static Block buildCore;
 
     public static void load() {
+        buildCore = new DesCore("buildCore") {{
+            size = 3;
+            health = 500;
+            armor = 5;
+            itemCapacity = 2000;
+
+            unitCapModifier = 2;
+            requirements(Category.effect, ItemStack.empty);
+        }};
+
         primarySolidification = new StackCrafter("primary-solidification") {{
             itemCapacity = 60;
             liquidCapacity = 120;

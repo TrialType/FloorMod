@@ -6,14 +6,14 @@ import arc.util.noise.Noise;
 import mindustry.graphics.Pal;
 import mindustry.graphics.g3d.PlanetGrid;
 import mindustry.maps.generators.PlanetGenerator;
+import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Sector;
 
-public class ENGSWEISPlanetGenerator extends PlanetGenerator {
+public class ENGSWEISPlanetGenerator extends SerpuloPlanetGenerator {
     @Override
     public void generateSector(Sector sector) {
-        if (sector.id == 10) {
+        if (sector.id == sector.planet.startSector) {
             sector.generateEnemyBase = false;
-            sector.preset.difficulty = 7;
             return;
         }
 
@@ -29,10 +29,10 @@ public class ENGSWEISPlanetGenerator extends PlanetGenerator {
 
         if (noise < 0.16) {
             for (PlanetGrid.Ptile other : tile.tiles) {
-                Sector osec = sector.planet.getSector(other);
+                Sector sec = sector.planet.getSector(other);
 
-                if (osec.id == sector.planet.startSector ||
-                        osec.generateEnemyBase && poles < 0.85 ||
+                if (sec.id == sector.planet.startSector ||
+                        sec.generateEnemyBase && poles < 0.85 ||
                         (sector.preset != null && noise < 0.11)) {
                     return;
                 }
@@ -44,16 +44,19 @@ public class ENGSWEISPlanetGenerator extends PlanetGenerator {
 
     @Override
     public void generate() {
-
+        super.generate();
+        if (sector.preset.difficulty <= 5) {
+            sector.preset.difficulty += 5;
+        }
     }
 
     @Override
     public float getHeight(Vec3 position) {
-        return 10;
+        return super.getHeight(position);
     }
 
     @Override
     public Color getColor(Vec3 position) {
-        return Pal.accent;
+        return super.getColor(position);
     }
 }
