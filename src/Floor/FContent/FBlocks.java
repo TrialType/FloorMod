@@ -37,6 +37,8 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.blocks.units.Reconstructor;
+import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
@@ -45,33 +47,25 @@ import static arc.math.Angles.randLenVectors;
 import static mindustry.type.ItemStack.with;
 
 public class FBlocks {
-    public static Block outPowerFactory, inputPowerFactory,
-            outPowerFactoryII, inputPowerFactoryII,
-            outPowerFactoryIII, inputPowerFactoryIII;
-
-    //these twice only use on test
+    //test
     public static Block kt, pu;
-
-    public static Block slowProject;
+    //units
+    public static Block outPowerFactory, inputPowerFactory, outPowerFactoryII,
+            inputPowerFactoryII, outPowerFactoryIII, inputPowerFactoryIII,
+            specialUnitFactory;
+    //defense
     public static Block eleFence, eleFenceII, eleFenceIII;
+    //turret
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
             stay, bind, tranquil,
             fireStream;
+    //crafting
     public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
-    public static Block buildCore;
+    //effect
+    public static Block buildCore, slowProject;
 
     public static void load() {
-        buildCore = new DesCore("buildCore") {{
-            size = 3;
-            health = 500;
-            armor = 5;
-            itemCapacity = 2000;
-
-            unitCapModifier = 2;
-            requirements(Category.effect, ItemStack.empty);
-        }};
-
         primarySolidification = new StackCrafter("primary-solidification") {{
             itemCapacity = 60;
             liquidCapacity = 120;
@@ -194,13 +188,28 @@ public class FBlocks {
             requirements(Category.crafting, ItemStack.with(Items.metaglass, 1500, Items.copper, 1450,
                     Items.lead, 1400, Items.graphite, 1350, Items.titanium, 1400, Items.thorium, 1450, Items.surgeAlloy, 500));
         }};
+//======================================================================================================================
+        UnitFactory uf = (UnitFactory) Blocks.airFactory;
+        uf.plans.add(new UnitFactory.UnitPlan(FUnits.barb, 1800, ItemStack.with(Items.silicon, 20, Items.titanium, 10)));
+        Reconstructor rt = (Reconstructor) Blocks.additiveReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.barb, FUnits.hammer});
+        rt = (Reconstructor) Blocks.multiplicativeReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.hammer,FUnits.buying});
+        rt = (Reconstructor) Blocks.exponentialReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.buying,FUnits.crazy});
+        rt = (Reconstructor) Blocks.tetrativeReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.crazy,FUnits.transition});
 
-        pu = new PureProject("pu") {{
-            health = 650;
+        specialUnitFactory = new UnitFactory("special-unit-factory") {{
+            requirements(Category.units, with(Items.lead, 1500, Items.silicon, 700, Items.titanium, 1400, Items.thorium, 400, Items.plastanium, 200));
 
-            consumePower(50f);
+            size = 6;
+            health = 2000;
 
-            requirements(Category.effect, ItemStack.with(Items.copper, 1));
+            plans.addAll(new UnitPlan(FUnits.bulletInterception, 3600, ItemStack.with(Items.silicon, 500, Items.copper, 650, Items.plastanium, 350)),
+                    new UnitPlan(FUnits.rejuvenate, 3600, ItemStack.with(Items.silicon, 500, Items.copper, 650, Items.plastanium, 350)));
+
+            consume(new ConsumePower(12, 0, false));
         }};
 
         outPowerFactory = new GradeFactory("out_power_factory") {{
@@ -335,6 +344,14 @@ public class FBlocks {
 //======================================================================================================================
         kt = new KnockingTurret("kt") {{
             health = 650;
+
+            requirements(Category.effect, ItemStack.with(Items.copper, 1));
+        }};
+
+        pu = new PureProject("pu") {{
+            health = 650;
+
+            consumePower(50f);
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
@@ -1411,6 +1428,16 @@ public class FBlocks {
             consumePower(3.50f);
             size = 2;
             consumeItem(Items.phaseFabric).boost();
+        }};
+
+        buildCore = new DesCore("buildCore") {{
+            size = 3;
+            health = 500;
+            armor = 5;
+            itemCapacity = 2000;
+
+            unitCapModifier = 2;
+            requirements(Category.effect, ItemStack.with(Items.copper, 1000, Items.lead, 1000, Items.graphite, 1000, Items.silicon, 1000, Items.titanium, 1000));
         }};
     }
 }

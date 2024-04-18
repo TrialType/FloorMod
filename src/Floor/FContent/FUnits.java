@@ -10,7 +10,6 @@ import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
 import Floor.FEntities.FBulletType.PercentBulletType;
-import Floor.FEntities.FBulletType.PercentEmpBulletType;
 import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -109,6 +108,7 @@ public class FUnits {
             useUnitCap = false;
             createWreck = false;
             hidden = true;
+            alwaysUnlocked = true;
             weapons.add(new PointDefenseWeapon() {{
                 mirror = false;
                 reload = 0.1F;
@@ -283,6 +283,7 @@ public class FUnits {
             faceTarget = false;
             allowedInPayloads = false;
             rotateSpeed = 0;
+            alwaysUnlocked = true;
             hidden = true;
             engines.add(new UnitEngine(0, -2.8F, 0.3F, -90));
             engines.add(new UnitEngine(3, -2.8F, 1, -90));
@@ -899,6 +900,7 @@ public class FUnits {
             commands = new UnitCommand[]{defaultCommand, new UnitCommand("TilePut", "TilePut", TilePutAI::new)};
             controller = u -> !playerControllable || (u.team.isAI() && !u.team.rules().rtsAi) ? aiController.get() : new PoseBridgeCommand();
             hidden = true;
+            alwaysUnlocked = true;
             isEnemy = false;
             useUnitCap = false;
 

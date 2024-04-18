@@ -60,17 +60,6 @@ public class FPlanets {
             techTree = Planets.serpulo.techTree;
         }};
 
-        TechTree.TechNode tn = node(FBlocks.primarySolidification, ItemStack.with(Items.metaglass, 350, Items.copper, 400, Items.lead, 250), Seq.with(new Objectives.OnPlanet(ENGSWEIS)), () -> {
-            node(FBlocks.intermediateSolidification, ItemStack.with(Items.metaglass, 1250, Items.copper, 1500, Items.lead, 1000, Items.graphite, 1400), () -> {
-                node(FBlocks.advancedSolidification, ItemStack.with(Items.metaglass, 5000, Items.copper, 4500, Items.lead, 4000, Items.graphite, 3500, Items.titanium, 3000), () -> {
-                    node(FBlocks.ultimateSolidification, ItemStack.with(Items.metaglass, 15000, Items.copper, 14500, Items.lead, 14000, Items.graphite, 13500, Items.titanium, 14000, Items.thorium, 14500, Items.surgeAlloy, 5000), () -> {
-                    });
-                });
-            });
-        });
-        tn.parent = ENGSWEIS.techTree;
-        ENGSWEIS.techTree.children.add(tn);
-
         Planets.sun.children.add(Planets.erekir);
         Planets.sun.children.add(Planets.serpulo);
         Planets.erekir.orbitRadius = (ENGSWEIS.orbitRadius + Planets.serpulo.orbitRadius) / 2;
