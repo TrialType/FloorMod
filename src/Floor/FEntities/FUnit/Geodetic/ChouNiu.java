@@ -14,26 +14,35 @@ import mindustry.entities.Effect;
 import mindustry.entities.Fires;
 import mindustry.entities.Units;
 import mindustry.gen.Healthc;
-import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 
 import static arc.util.Time.delta;
-import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 public class ChouNiu extends FLegsUnit {
     public float stopTimer = 0;
     public float boost = 1;
     public boolean hit = false;
-    public final static Vec2 ev = new Vec2();
+    public static final Vec2 rv = new Vec2();
     public final static Rand rand = new Rand();
-    public Effect movingEffect = new Effect(120, e -> {
+    public final static Effect f = new Effect(120, e -> {
         Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
-        Unit cn = (Unit) e.data;
-        ev.rotate(e.rotation).setLength(cn.hitSize);
-        rand.setSeed(e.id);
-        Fill.circle(cn.x + ev.x, cn.y + ev.y, (1 - e.fin()));
+        Fill.circle(e.x, e.y, (1 - e.fin()));
     });
-
+    public Effect movingEffect = new Effect(1, e -> {
+        rv.set(1, 1).setAngle(e.rotation).setLength(hitSize / 3f);
+        float x = ChouNiu.this.x + rv.x;
+        float y = ChouNiu.this.y + rv.y;
+        for (int i = 1; i <= 16; i++) {
+            rand.setSeed(e.id + 100000 * i);
+            float len = rand.range(hitSize) - hitSize / 2;
+            float len2 = (float) sqrt((hitSize) * (hitSize) / 4 - len * len);
+            float x2 = (float) (x + len * Math.cos(Math.toRadians(e.rotation + 90))),
+                    y2 = (float) (y + len * Math.sin(Math.toRadians(e.rotation + 90)));
+            rv.set(1, 1).setAngle(e.rotation).setLength(len2);
+            f.at(x2 + rv.x, y2 + rv.y);
+        }
+    });
     public Effect hitEffect = new Effect();
 
     @Override
@@ -61,9 +70,7 @@ public class ChouNiu extends FLegsUnit {
                 stopTimer = 0;
             }
 
-            if (abs(vel.angle() - rotation) < 5) {
-                movingEffect.at(x, y, vel.angle(), this);
-            }
+            movingEffect.at(x, y, rotation);
 
             Units.nearbyEnemies(team, x, y, hitSize * 1.1f, u -> {
                 boolean dead = u.dead;
