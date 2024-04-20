@@ -11,6 +11,7 @@ import arc.graphics.g2d.Fill;
 import mindustry.entities.Effect;
 import mindustry.entities.Fires;
 import mindustry.entities.Units;
+import mindustry.gen.Healthc;
 import mindustry.graphics.Pal;
 
 import static arc.math.Angles.randLenVectors;
@@ -22,8 +23,8 @@ public class ChouNiu extends FLegsUnit {
     public boolean hit = false;
     public Effect movingEffect = new Effect(120, e -> {
         Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
-        randLenVectors(e.id, 3, hitSize * 3, e.rotation, 50,
-                (x, y) -> Fill.circle(e.x + x, e.y + y, 1 * (1 - e.fin()))
+        randLenVectors(e.id, 3, hitSize * 3, e.rotation, 25,
+                (x, y) -> Fill.circle(e.x + x, e.y + y, (1 - e.fin()))
         );
     });
 
@@ -40,8 +41,9 @@ public class ChouNiu extends FLegsUnit {
     public void update() {
         super.update();
 
-        if (controller instanceof ChouAI ca && ca.hitTarget != null && !hit && within(ca.hitTarget, hitSize * 1.1f)) {
-            hit = true;
+        if (controller instanceof ChouAI ca) {
+            hit = ca.hitTarget != null && !hit && within(ca.hitTarget, hitSize * 1.1f) &&
+                    (ca.hitTarget instanceof Healthc h && !h.dead());
         }
 
         if (moving()) {
@@ -51,7 +53,7 @@ public class ChouNiu extends FLegsUnit {
                 stopTimer = 0;
             }
 
-            movingEffect.at(x, y, 90 + rotation);
+            movingEffect.at(x, y, vel.angle() % 180 == 0 ? -vel.angle() : vel.angle());
 
             Units.nearbyEnemies(team, x, y, hitSize * 1.1f, u -> {
                 boolean dead = u.dead;

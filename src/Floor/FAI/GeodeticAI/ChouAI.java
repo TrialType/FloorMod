@@ -1,11 +1,10 @@
 package Floor.FAI.GeodeticAI;
 
 import Floor.FEntities.FUnit.Geodetic.ChouNiu;
-import arc.math.Angles;
-import mindustry.ai.Pathfinder;
+import arc.math.geom.Vec2;
+import mindustry.Vars;
 import mindustry.entities.Units;
 import mindustry.entities.units.AIController;
-import mindustry.gen.Flyingc;
 import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
 import mindustry.world.Tile;
@@ -13,6 +12,10 @@ import mindustry.world.Tile;
 public class ChouAI extends AIController {
     public ChouNiu cn;
     public Teamc hitTarget = null;
+    public Vec2 vec = new Vec2();
+    public Tile last = null;
+    public int pathId = -1;
+    public boolean[] noFound = {false};
 
     @Override
     public void updateUnit() {
@@ -31,38 +34,41 @@ public class ChouAI extends AIController {
         }
 
         if (hitTarget != null) {
-            unit.rotation(Angles.angle(hitTarget.x() - unit.x, hitTarget.y() - unit.y));
-            pathfind(hitTarget.tileOn());
+            if (hitTarget.tileOn() != last) {
+                pathId = Vars.controlPath.nextTargetId();
+            }
+            last = hitTarget.tileOn();
+            if (last != null) {
+                pathFind(last);
+            }
         }
     }
 
     @Override
     public void init() {
         cn = (ChouNiu) unit;
+
+
     }
 
     public void updateTarget() {
-        hitTarget = Units.closestTarget(unit.team, unit.x, unit.y, unit.range(), Flyingc::isGrounded, b -> true);
+        hitTarget = Units.closestTarget(unit.team, unit.x, unit.y, unit.range(), u -> u.tileOn() != null, b -> true);
     }
 
-    public void pathfind(Tile tile) {
-        Tile targetTile = unit.tileOn();
-        if (tile == null || targetTile == null) {
-            return;
+    public void pathFind(Tile tile) {
+
+        boolean move = true;
+        Vec2 ecc = new Vec2(tile.worldx(), tile.worldy());
+        vec.set(tile.worldx(), tile.worldy());
+
+        if (unit.isGrounded()) {
+            move = Vars.controlPath.getPathPosition(unit, pathId, ecc, vec, noFound);
         }
 
-        int costType = unit.pathType();
+        float engageRange = unit.range() - 10f;
 
-        if (tile == targetTile || costType == Pathfinder.costNaval && !tile.floor().isLiquid) {
-            return;
-        }
-
-        if (!cn.hit) {
-            unit.movePref(vec.trns(unit.angleTo(tile.worldx(), tile.worldy()), unit.speed()));
-        } else {
-            if (unit.vel.len() < 12f) {
-                cn.hit = false;
-            }
+        if (move) {
+            moveTo(vec, unit.within(ecc, engageRange) ? engageRange : 0, 100f, false, null, ecc.epsilonEquals(vec, 4.1f));
         }
     }
 }
