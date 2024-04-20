@@ -7,6 +7,7 @@ import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.FreeBulletType;
+import Floor.FEntities.FBulletType.OnePlaceBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.ChouNiu;
@@ -34,6 +35,7 @@ import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
@@ -1326,6 +1328,34 @@ public class FUnits {
 
             legCount = 4;
             legLength = 4;
+            mechLandShake = stepShake = 0;
+
+            weapons.add(new Weapon() {{
+                reload = 60;
+                mirror = false;
+                x = y = 0;
+                bullet = new OnePlaceBulletType() {{
+                    lifetime = 120;
+                    speed = 9;
+
+                    homingPower = 1;
+                    homingRange = 1000;
+                    homingDelay = 0;
+
+                    Effect ef = new Effect(12, e -> {
+                        float range = (float) e.data;
+                        Draw.color(Color.white);
+                        Draw.z(Layer.buildBeam);
+                        Fill.circle(e.x, e.y, range);
+                    });
+                    addPlace(0, 0, 100, ef);
+                    addPlace(90, 41.5f, 15, ef);
+                    addPlace(40, 92.6f, 15, ef);
+                    addPlace(0, 101, 15, ef);
+                    addPlace(-90, 44.5f, 15, ef);
+                    addPlace(-40, 92.6f, 15, ef);
+                }};
+            }});
 
             abilities.add(new LevelSign());
         }};

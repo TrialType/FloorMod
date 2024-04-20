@@ -22,7 +22,7 @@ public class YinHu extends FLegsUnit {
         super.update();
 
         Units.nearbyEnemies(team, x, y, hitSize, u -> {
-            if (abs(this.angleTo(u) - rotation) <= 5 && sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y)) < hitSize / 1.9) {
+            if (abs(this.angleTo(u) - rotation) <= 15 && sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y)) < hitSize / 1.8) {
                 Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
                 u.kill();
             }
