@@ -63,13 +63,11 @@ public class ChouAI extends AIController {
                 move = Vars.controlPath.getPathPosition(unit, pathId, ecc, vec, noFound);
             }
 
-            float engageRange = unit.range() - 10f;
-
             if (move) {
-                moveTo(vec, unit.within(ecc, engageRange) ? engageRange : 0, 100f, false, null, ecc.epsilonEquals(vec, 4.1f));
+                moveTo(vec, 0, 100f, false, null, ecc.epsilonEquals(vec, 4.1f));
             }
         } else {
-            if (!unit.within(tile, 6)) {
+            if (!unit.within(tile, 30) || !unit.moving()) {
                 cn.hit = false;
             }
         }

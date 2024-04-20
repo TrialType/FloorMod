@@ -59,12 +59,11 @@ public class ChouNiu extends FLegsUnit {
         super.update();
 
         if (controller instanceof ChouAI ca) {
-            hit = ca.hitTarget != null && !hit && within(ca.hitTarget, hitSize * 1.1f) &&
-                    (ca.hitTarget instanceof Healthc h && !h.dead());
+            hit = ca.hitTarget != null && !hit && within(ca.hitTarget, hitSize * 0.45f) &&
+                    (ca.hitTarget instanceof Healthc h && !h.dead() && h.health() > 0);
         }
 
         if (moving()) {
-
             if (stopTimer > 0) {
                 boost = Math.max(1, stopTimer / 60);
                 stopTimer = 0;
