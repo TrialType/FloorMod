@@ -1,7 +1,5 @@
 package Floor.FContent;
 
-import arc.Core;
-import mindustry.Vars;
 import mindustry.type.SectorPreset;
 
 import static Floor.FContent.FPlanets.ENGSWEIS;
@@ -15,6 +13,8 @@ public class FPlanetGenerators {
         }};
 
         longestDown = new SectorPreset("long-down", ENGSWEIS, 64) {{
+            alwaysUnlocked = true;
+
             difficulty = 6;
         }};
     }

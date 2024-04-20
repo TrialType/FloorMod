@@ -10,7 +10,7 @@ import mindustry.type.StatusEffect;
 
 public class FStatusEffects {
     public final static Seq<StatusEffect> burnings = new Seq<>();
-    public static StatusEffect StrongStop, boostSpeed, HardHit,
+    public static StatusEffect StrongStop, boostSpeed, HardHit, onePercent,
             suppressI, suppressII, suppressIII, suppressIV,
             slowII, fastII,
             High_tension, High_tensionII, High_tensionIII, High_tensionIV, High_tensionV,
@@ -21,6 +21,14 @@ public class FStatusEffects {
     public static WithMoreStatus pWet, pTarred, pFreezing, pMelting, pMuddy;
 
     public static void load() {
+        onePercent = new StatusEffect("one-percent") {{
+            show = false;
+
+            speedMultiplier = 0.01f;
+            reloadMultiplier = 0.01f;
+            dragMultiplier = 0.01f;
+        }};
+
         pureA = new StatusEffect("pure-a") {{
             show = false;
             permanent = true;

@@ -1,12 +1,15 @@
 package Floor.FContent;
 
 import Floor.FAI.*;
+import Floor.FAI.GeodeticAI.ChouAI;
 import Floor.FEntities.FAbility.EMPAbility;
+import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
+import Floor.FEntities.FUnit.Geodetic.ChouNiu;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
 import Floor.FEntities.FBulletType.PercentBulletType;
@@ -54,6 +57,9 @@ public class FUnits {
 
     //special
     public static UnitType bulletInterception, rejuvenate;
+
+    //Geodetic
+    public static UnitType chou;
 
     public static void load() {
         rejuvenate = new UnitType("rejuvenate") {{
@@ -1284,6 +1290,26 @@ public class FUnits {
                     colors = new Color[]{Pal.techBlue, Pal.techBlue, Pal.techBlue};
                 }};
             }});
+        }};
+
+        chou = new UnitType("chou") {{
+            constructor = ChouNiu::new;
+            controller = u -> new ChouAI();
+
+            physics = false;
+
+            drag = 0.03f;
+            accel = 1;
+            health = 500000;
+            hitSize = 45;
+            speed = 8;
+            armor = 200;
+            rotateSpeed = 12;
+
+            legCount = 4;
+            legLength = 4;
+
+            abilities.add(new LevelSign());
         }};
 
         BossList.list.add(velocity);

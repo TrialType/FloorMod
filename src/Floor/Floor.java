@@ -20,6 +20,6 @@ public class Floor extends Mod {
         FPlanets.load();
         PFloors.load();
         FPlanetGenerators.load();
-        TechChange.load();
+        Techs.load();
     }
 }

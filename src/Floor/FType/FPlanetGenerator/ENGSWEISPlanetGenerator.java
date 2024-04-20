@@ -18,10 +18,10 @@ public class ENGSWEISPlanetGenerator extends SerpuloPlanetGenerator {
         PlanetGrid.Ptile tile = sector.tile;
 
         boolean any = false;
-        float poles = Math.abs(tile.v.y);
+        float poles = Math.abs(tile.v.z);
         float noise = Noise.snoise3(tile.v.x, tile.v.y, tile.v.z, 0.001f, 0.58f);
 
-        if (noise + poles / 7.1 > 0.12 && poles > 0.23) {
+        if (noise + poles / 7.1 > 0.12 && poles > 0.1 && tile.v.z > 0) {
             any = true;
         }
 
@@ -29,7 +29,7 @@ public class ENGSWEISPlanetGenerator extends SerpuloPlanetGenerator {
             for (PlanetGrid.Ptile other : tile.tiles) {
                 Sector sec = sector.planet.getSector(other);
 
-                if (sec.id == sector.planet.startSector || sec.generateEnemyBase && poles < 0.85 || sector.preset != null) {
+                if (sec.id == sector.planet.startSector || (sec.generateEnemyBase && poles < 0.85) || sector.preset != null) {
                     return;
                 }
             }
@@ -40,10 +40,10 @@ public class ENGSWEISPlanetGenerator extends SerpuloPlanetGenerator {
 
     @Override
     public void generate() {
-        super.generate();
-        if (sector.preset.difficulty <= 5) {
-            sector.preset.difficulty += 5;
+        if(sector.threat <= 0.7){
+            sector.threat = 0.8f;
         }
+        super.generate();
     }
 
     @Override

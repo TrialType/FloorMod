@@ -2,21 +2,14 @@ package Floor.FContent;
 
 import Floor.FType.FPlanetGenerator.ENGSWEISPlanetGenerator;
 import arc.graphics.Color;
-import arc.struct.Seq;
-import mindustry.content.Items;
 import mindustry.content.Planets;
-import mindustry.content.TechTree;
-import mindustry.game.Objectives;
 import mindustry.game.Team;
 import mindustry.graphics.Pal;
 import mindustry.graphics.g3d.HexMesh;
 import mindustry.graphics.g3d.HexSkyMesh;
 import mindustry.graphics.g3d.MultiMesh;
-import mindustry.maps.planet.SerpuloPlanetGenerator;
-import mindustry.type.ItemStack;
 import mindustry.type.Planet;
 
-import static mindustry.content.TechTree.node;
 
 public class FPlanets {
     public static Planet ENGSWEIS;
@@ -39,6 +32,9 @@ public class FPlanets {
             allowWaveSimulation = true;
             allowSectorInvasion = true;
             enemyCoreSpawnReplace = true;
+
+            tidalLock = true;
+            rotateTime = orbitTime;
 
             prebuildBase = false;
             ruleSetter = r -> {

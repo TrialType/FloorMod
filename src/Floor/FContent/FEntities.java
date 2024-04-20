@@ -3,6 +3,7 @@ package Floor.FContent;
 import Floor.FEntities.FBullet.AroundBullet;
 import Floor.FEntities.FEffectState.WaterEffectState;
 import Floor.FEntities.FUnit.F.*;
+import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FBullet.removeSpwanBullet;
 import mindustry.gen.EntityMapping;
@@ -29,5 +30,6 @@ public class FEntities {
         EntityMapping.idMap[117] = WUGENANSMechUnit::create;
         EntityMapping.idMap[118] = CaveUnit::create;
         EntityMapping.idMap[119] = TimeUpGradeUnit::create;
+        EntityMapping.idMap[120] = ChouNiu::create;
     }
 }

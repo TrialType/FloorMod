@@ -14,7 +14,7 @@ import static mindustry.content.Blocks.*;
 import static mindustry.content.SectorPresets.*;
 import static mindustry.content.TechTree.node;
 
-public class TechChange {
+public class Techs {
     public static TechTree.TechNode tf;
     public static TechTree.TechNode head;
 
