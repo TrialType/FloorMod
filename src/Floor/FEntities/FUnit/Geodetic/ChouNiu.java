@@ -8,25 +8,33 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.math.Rand;
+import arc.math.geom.Vec2;
 import mindustry.entities.Effect;
 import mindustry.entities.Fires;
 import mindustry.entities.Units;
 import mindustry.gen.Healthc;
+import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 
-import static arc.math.Angles.randLenVectors;
 import static arc.util.Time.delta;
+import static java.lang.Math.abs;
 
 public class ChouNiu extends FLegsUnit {
     public float stopTimer = 0;
     public float boost = 1;
     public boolean hit = false;
+    public final static Vec2 ev = new Vec2();
+    public final static Rand rand = new Rand();
     public Effect movingEffect = new Effect(120, e -> {
         Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
-        randLenVectors(e.id, 3, hitSize * 3, e.rotation, 25,
-                (x, y) -> Fill.circle(e.x + x, e.y + y, (1 - e.fin()))
-        );
+        Unit cn = (Unit) e.data;
+        ev.rotate(e.rotation).setLength(cn.hitSize);
+        rand.setSeed(e.id);
+        Fill.circle(cn.x + ev.x, cn.y + ev.y, (1 - e.fin()));
     });
+
+    public Effect hitEffect = new Effect();
 
     @Override
     public int classId() {
@@ -53,11 +61,14 @@ public class ChouNiu extends FLegsUnit {
                 stopTimer = 0;
             }
 
-            movingEffect.at(x, y, vel.angle() % 180 == 0 ? -vel.angle() : vel.angle());
+            if (abs(vel.angle() - rotation) < 5) {
+                movingEffect.at(x, y, vel.angle(), this);
+            }
 
             Units.nearbyEnemies(team, x, y, hitSize * 1.1f, u -> {
                 boolean dead = u.dead;
                 u.damage(20 * boost * delta * damageMultiplier);
+                hitEffect.at(u);
                 u.apply(FStatusEffects.onePercent, 600);
                 u.apply(FStatusEffects.burningV, 600);
                 if (!dead && u.dead) {
@@ -68,6 +79,7 @@ public class ChouNiu extends FLegsUnit {
             Units.nearbyBuildings(x, y, hitSize * 1.1f, b -> {
                 if (b.team != team) {
                     b.damage(20 * boost * delta * damageMultiplier);
+                    hitEffect.at(b);
                     b.applySlowdown(0.01f, 600);
                     Fires.create(b.tile);
                 }

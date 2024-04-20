@@ -47,8 +47,6 @@ public class ChouAI extends AIController {
     @Override
     public void init() {
         cn = (ChouNiu) unit;
-
-
     }
 
     public void updateTarget() {
@@ -56,19 +54,24 @@ public class ChouAI extends AIController {
     }
 
     public void pathFind(Tile tile) {
+        if (!cn.hit) {
+            boolean move = true;
+            Vec2 ecc = new Vec2(tile.worldx(), tile.worldy());
+            vec.set(tile.worldx(), tile.worldy());
 
-        boolean move = true;
-        Vec2 ecc = new Vec2(tile.worldx(), tile.worldy());
-        vec.set(tile.worldx(), tile.worldy());
+            if (unit.isGrounded()) {
+                move = Vars.controlPath.getPathPosition(unit, pathId, ecc, vec, noFound);
+            }
 
-        if (unit.isGrounded()) {
-            move = Vars.controlPath.getPathPosition(unit, pathId, ecc, vec, noFound);
-        }
+            float engageRange = unit.range() - 10f;
 
-        float engageRange = unit.range() - 10f;
-
-        if (move) {
-            moveTo(vec, unit.within(ecc, engageRange) ? engageRange : 0, 100f, false, null, ecc.epsilonEquals(vec, 4.1f));
+            if (move) {
+                moveTo(vec, unit.within(ecc, engageRange) ? engageRange : 0, 100f, false, null, ecc.epsilonEquals(vec, 4.1f));
+            }
+        } else {
+            if (!unit.within(tile, 6)) {
+                cn.hit = false;
+            }
         }
     }
 }
