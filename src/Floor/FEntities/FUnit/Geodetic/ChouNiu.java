@@ -8,15 +8,20 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.math.Rand;
 import arc.math.geom.Vec2;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.entities.Effect;
 import mindustry.entities.Fires;
 import mindustry.entities.Units;
 import mindustry.gen.Healthc;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 
 import static arc.util.Time.delta;
+import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 public class ChouNiu extends FLegsUnit {
@@ -56,11 +61,25 @@ public class ChouNiu extends FLegsUnit {
     }
 
     @Override
+    public void read(Reads read) {
+        super.read(read);
+        stopTimer = read.f();
+        lastTimer = read.f();
+    }
+
+    @Override
+    public void write(Writes write) {
+        super.write(write);
+        write.f(stopTimer);
+        write.f(lastTimer);
+    }
+
+    @Override
     public void update() {
         super.update();
 
         if (controller instanceof ChouAI ca) {
-            if (!this.hit && ca.hitTarget instanceof Healthc h && !(h.dead() || h.health() <= 0) && within(ca.hitTarget, 6f)) {
+            if (!this.hit && ca.hitTarget instanceof Healthc h && !(h.dead() || h.health() <= 0) && within(ca.hitTarget, 5f)) {
                 this.hit = true;
             }
         }
@@ -72,11 +91,13 @@ public class ChouNiu extends FLegsUnit {
                 stopTimer = 0;
             }
 
-            movingEffect.at(x, y, rotation);
+            if (abs(rotation - vel.angle()) < 5f) {
+                movingEffect.at(x, y, rotation);
+            }
 
             Units.nearbyEnemies(team, x, y, hitSize * 1.1f, u -> {
                 boolean dead = u.dead;
-                u.damage(20 * boost * delta * damageMultiplier);
+                u.damage((float) Math.pow(20 * delta * damageMultiplier, boost) / boost);
                 hitEffect.at(u);
                 u.apply(FStatusEffects.onePercent, 600);
                 u.apply(FStatusEffects.burningV, 600);
@@ -87,7 +108,7 @@ public class ChouNiu extends FLegsUnit {
 
             Units.nearbyBuildings(x, y, hitSize * 1.1f, b -> {
                 if (b.team != team) {
-                    b.damage(20 * boost * delta * damageMultiplier);
+                    b.damage((float) Math.pow(20 * delta * damageMultiplier, boost) / boost);
                     hitEffect.at(b);
                     b.applySlowdown(0.01f, 600);
                     Fires.create(b.tile);
@@ -98,6 +119,16 @@ public class ChouNiu extends FLegsUnit {
             boost = 1;
             stopTimer += delta;
         }
+    }
+
+    @Override
+    public void draw() {
+        super.draw();
+
+        Draw.z(Layer.shields);
+        Draw.color(Color.red);
+        Lines.stroke(1.5f);
+        Lines.arc(x, y, range(), 360f, 0);
     }
 
     public float range() {

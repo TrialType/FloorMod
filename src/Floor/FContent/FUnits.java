@@ -1304,7 +1304,7 @@ public class FUnits {
             hitSize = 45;
             speed = 8;
             armor = 200;
-            rotateSpeed = 12;
+            rotateSpeed = 36;
 
             legCount = 4;
             legLength = 4;
