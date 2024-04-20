@@ -31,5 +31,6 @@ public class FEntities {
         EntityMapping.idMap[118] = CaveUnit::create;
         EntityMapping.idMap[119] = TimeUpGradeUnit::create;
         EntityMapping.idMap[120] = ChouNiu::create;
+        EntityMapping.idMap[121] = YinHu::create;
     }
 }

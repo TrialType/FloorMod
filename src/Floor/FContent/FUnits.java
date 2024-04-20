@@ -10,6 +10,7 @@ import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.SqrtDamageBullet;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.ChouNiu;
+import Floor.FEntities.FUnit.Geodetic.YinHu;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
 import Floor.FEntities.FBulletType.PercentBulletType;
@@ -59,7 +60,7 @@ public class FUnits {
     public static UnitType bulletInterception, rejuvenate;
 
     //Geodetic
-    public static UnitType chou;
+    public static UnitType chou, yin;
 
     public static void load() {
         rejuvenate = new UnitType("rejuvenate") {{
@@ -1293,12 +1294,29 @@ public class FUnits {
         }};
 
         chou = new UnitType("chou") {{
-            constructor = ChouNiu::new;
+            constructor = ChouNiu::create;
             controller = u -> new ChouAI();
 
             physics = false;
 
             drag = 0.03f;
+            accel = 1;
+            health = 500000;
+            hitSize = 45;
+            speed = 8;
+            armor = 200;
+            rotateSpeed = 36;
+
+            legCount = 4;
+            legLength = 4;
+
+            abilities.add(new LevelSign());
+        }};
+
+        yin = new UnitType("yin") {{
+            constructor = YinHu::create;
+
+            drag = 0.5f;
             accel = 1;
             health = 500000;
             hitSize = 45;
