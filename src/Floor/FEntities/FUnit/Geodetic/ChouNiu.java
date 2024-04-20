@@ -21,6 +21,7 @@ import static java.lang.Math.sqrt;
 
 public class ChouNiu extends FLegsUnit {
     public float stopTimer = 0;
+    public float lastTimer = -1;
     public float boost = 1;
     public boolean hit = false;
     public static final Vec2 rv = new Vec2();
@@ -59,13 +60,15 @@ public class ChouNiu extends FLegsUnit {
         super.update();
 
         if (controller instanceof ChouAI ca) {
-            hit = ca.hitTarget != null && !hit && within(ca.hitTarget, hitSize * 0.45f) &&
-                    (ca.hitTarget instanceof Healthc h && !h.dead() && h.health() > 0);
+            if (!this.hit && ca.hitTarget instanceof Healthc h && !(h.dead() || h.health() <= 0) && within(ca.hitTarget, 6f)) {
+                this.hit = true;
+            }
         }
 
         if (moving()) {
             if (stopTimer > 0) {
                 boost = Math.max(1, stopTimer / 60);
+                lastTimer = stopTimer;
                 stopTimer = 0;
             }
 
@@ -90,14 +93,14 @@ public class ChouNiu extends FLegsUnit {
                     Fires.create(b.tile);
                 }
             });
-
         } else if (!(controller instanceof ChouAI ca && ca.hitTarget != null)) {
+            lastTimer = -1;
             boost = 1;
             stopTimer += delta;
         }
     }
 
     public float range() {
-        return this.type.maxRange * Math.max(1, stopTimer / 60);
+        return this.type.maxRange * Math.max(1, Math.max(lastTimer, stopTimer) / 60);
     }
 }

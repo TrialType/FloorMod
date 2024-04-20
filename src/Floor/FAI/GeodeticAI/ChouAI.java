@@ -5,7 +5,6 @@ import arc.math.geom.Vec2;
 import mindustry.Vars;
 import mindustry.entities.Units;
 import mindustry.entities.units.AIController;
-import mindustry.gen.Healthc;
 import mindustry.gen.Teamc;
 import mindustry.world.Tile;
 
@@ -28,10 +27,7 @@ public class ChouAI extends AIController {
 
     @Override
     public void updateMovement() {
-        if (hitTarget == null || (hitTarget instanceof Healthc h && (h.dead() || h.health() <= 0))) {
-            hitTarget = null;
-            updateTarget();
-        }
+        updateTarget();
 
         if (hitTarget != null) {
             if (hitTarget.tileOn() != last) {
@@ -50,7 +46,8 @@ public class ChouAI extends AIController {
     }
 
     public void updateTarget() {
-        hitTarget = Units.closestTarget(unit.team, unit.x, unit.y, unit.range(), u -> u.tileOn() != null, b -> true);
+        hitTarget = Units.closestTarget(unit.team, unit.x, unit.y, unit.range(),
+                u -> u.tileOn() != null && !u.tileOn().floor().isDeep(), b -> true);
     }
 
     public void pathFind(Tile tile) {
@@ -64,10 +61,12 @@ public class ChouAI extends AIController {
             }
 
             if (move) {
+                unit.lookAt(tile);
+
                 moveTo(vec, 0, 100f, false, null, ecc.epsilonEquals(vec, 4.1f));
             }
         } else {
-            if (!unit.within(tile, 30) || !unit.moving()) {
+            if (!unit.within(hitTarget, 20) || !unit.moving()) {
                 cn.hit = false;
             }
         }
