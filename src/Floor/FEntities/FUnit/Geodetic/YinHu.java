@@ -1,12 +1,12 @@
 package Floor.FEntities.FUnit.Geodetic;
 
+import Floor.FAI.GeodeticAI.YinAI;
 import Floor.FContent.FEvents;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import arc.Events;
 import mindustry.entities.Units;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 public class YinHu extends FLegsUnit {
     @Override
@@ -34,5 +34,17 @@ public class YinHu extends FLegsUnit {
                 b.kill();
             }
         });
+    }
+
+    @Override
+    public float speed() {
+        float s = super.speed();
+        if (controller instanceof YinAI ya) {
+            if (ya.eatTarget != null) {
+                float len = (float) sqrt((x - ya.eatTarget.x()) * (x - ya.eatTarget.x()) + (y - ya.eatTarget.y()) * (y - ya.eatTarget.y()));
+                s = s + 7.5f * (1 - (len / range()));
+            }
+        }
+        return s;
     }
 }

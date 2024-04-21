@@ -1301,6 +1301,7 @@ public class FUnits {
             controller = u -> new ChouAI();
 
             physics = false;
+            allowLegStep = false;
 
             drag = 0.03f;
             accel = 1;
@@ -1324,13 +1325,14 @@ public class FUnits {
             accel = 1;
             health = 500000;
             hitSize = 45;
-            speed = 8;
+            speed = 1.5f;
             armor = 200;
             rotateSpeed = 36;
 
             legCount = 4;
             legLength = 4;
             mechLandShake = stepShake = 0;
+            allowLegStep = false;
 
             weapons.add(new Weapon() {{
                 reload = 60;
