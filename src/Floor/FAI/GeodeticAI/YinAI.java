@@ -9,15 +9,21 @@ import mindustry.world.Tile;
 
 public class YinAI extends AIController {
     public Teamc eatTarget;
+    public Teamc lastTarget = null;
     public Vec2 vec = new Vec2();
     public int pathId = -1;
     public boolean[] noFound = {false};
+
     @Override
     public void updateMovement() {
         updateTarget();
+        if (lastTarget != eatTarget) {
+            pathId = Vars.controlPath.nextTargetId();
+        }
+        lastTarget = eatTarget;
         if (eatTarget != null) {
             Tile tile = eatTarget.tileOn();
-            if(tile != null){
+            if (tile != null) {
                 boolean move = true;
                 Vec2 ecc = new Vec2(tile.worldx(), tile.worldy());
                 vec.set(tile.worldx(), tile.worldy());

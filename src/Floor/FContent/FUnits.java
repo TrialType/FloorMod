@@ -2,20 +2,19 @@ package Floor.FContent;
 
 import Floor.FAI.*;
 import Floor.FAI.GeodeticAI.ChouAI;
+import Floor.FAI.GeodeticAI.MaoAI;
 import Floor.FAI.GeodeticAI.YinAI;
 import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
-import Floor.FEntities.FBulletType.FreeBulletType;
-import Floor.FEntities.FBulletType.OnePlaceBulletType;
-import Floor.FEntities.FBulletType.SqrtDamageBullet;
+import Floor.FEntities.FBulletType.*;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.ChouNiu;
+import Floor.FEntities.FUnit.Geodetic.MaoTu;
 import Floor.FEntities.FUnit.Geodetic.YinHu;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
-import Floor.FEntities.FBulletType.PercentBulletType;
 import Floor.FTools.BossList;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -63,7 +62,7 @@ public class FUnits {
     public static UnitType bulletInterception, rejuvenate;
 
     //Geodetic
-    public static UnitType chou, yin;
+    public static UnitType chou, yin, mao;
 
     public static void load() {
         rejuvenate = new UnitType("rejuvenate") {{
@@ -1308,7 +1307,7 @@ public class FUnits {
             health = 500000;
             hitSize = 45;
             speed = 8;
-            armor = 200;
+            armor = 280;
             rotateSpeed = 36;
 
             legCount = 4;
@@ -1323,10 +1322,10 @@ public class FUnits {
 
             drag = 0.5f;
             accel = 1;
-            health = 500000;
+            health = 250000;
             hitSize = 45;
             speed = 1.5f;
-            armor = 200;
+            armor = 50;
             rotateSpeed = 36;
 
             legCount = 4;
@@ -1358,6 +1357,60 @@ public class FUnits {
                     addPlace(0, 101, 15, ef);
                     addPlace(-90, 44.5f, 15, ef);
                     addPlace(-40, 92.6f, 15, ef);
+                }};
+            }});
+
+            abilities.add(new LevelSign());
+        }};
+
+        mao = new UnitType("mao") {{
+            constructor = MaoTu::create;
+            controller = u -> new MaoAI();
+
+            drag = 0.5f;
+            accel = 1;
+            health = 150000;
+            hitSize = 25;
+            speed = 6f;
+            armor = 25;
+            rotateSpeed = 36;
+
+            legCount = 4;
+            legLength = 1;
+            mechLandShake = stepShake = 0;
+            allowLegStep = true;
+
+            weapons.add(new Weapon() {{
+                x = y = 0;
+                alwaysShooting = true;
+                reload = 45;
+                inaccuracy = 360;
+
+                bullet = new SummonBulletType() {{
+                    absorbable = hittable = reflectable = false;
+                    width = height = 60;
+
+                    lifetime = 360;
+                    speed = 8;
+
+                    homingPower = 1;
+                    homingRange = 1000;
+
+                    everySummonDelay = 0;
+                    summon = new BasicBulletType() {{
+                        width = height = 80;
+
+                        speed = 6;
+                        lifetime = 45;
+                        damage = 100;
+                        pierceBuilding = pierce = true;
+                        absorbable = hittable = reflectable = false;
+
+                        lightning = 2;
+                        lightningDamage = 100;
+                        lightningAngle = 75;
+                        lightningLength = 12;
+                    }};
                 }};
             }});
 

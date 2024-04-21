@@ -30,7 +30,7 @@ public class YinHu extends FLegsUnit {
 
         Units.nearbyBuildings(x, y, hitSize, b -> {
             if (b.team != team && abs(this.angleTo(b) - rotation) <= 5 &&
-                    sqrt((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y)) < hitSize / 1.9) {
+                    sqrt((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y)) < hitSize / 1.8) {
                 b.kill();
             }
         });
@@ -42,7 +42,7 @@ public class YinHu extends FLegsUnit {
         if (controller instanceof YinAI ya) {
             if (ya.eatTarget != null) {
                 float len = (float) sqrt((x - ya.eatTarget.x()) * (x - ya.eatTarget.x()) + (y - ya.eatTarget.y()) * (y - ya.eatTarget.y()));
-                s = s + 7.5f * (1 - (len / range()));
+                s = s + 3.5f * (1 - (len / range()));
             }
         }
         return s;
