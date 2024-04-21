@@ -51,7 +51,6 @@ public class OnePlaceBulletType extends BasicBulletType {
             float dx2 = (float) (Math.cos(Math.toRadians(rotation + 90)) * xx),
                     dy2 = (float) (Math.sin(Math.toRadians(rotation + 90)) * xx);
             float cx = x + dx + dx2, cy = y + dy + dy2;
-
             float len = damageRange.get(i);
             rangeEffect.get(i).at(cx, cy, 0, len);
             Units.nearbyEnemies(team, cx, cy, len * (1 + rangePower), u -> {

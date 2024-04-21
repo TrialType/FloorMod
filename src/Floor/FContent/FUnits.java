@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import Floor.FAI.*;
 import Floor.FAI.GeodeticAI.ChouAI;
+import Floor.FAI.GeodeticAI.YinAI;
 import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
@@ -1317,6 +1318,7 @@ public class FUnits {
 
         yin = new UnitType("yin") {{
             constructor = YinHu::create;
+            controller = u -> new YinAI();
 
             drag = 0.5f;
             accel = 1;
