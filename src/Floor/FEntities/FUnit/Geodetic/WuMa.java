@@ -3,15 +3,17 @@ package Floor.FEntities.FUnit.Geodetic;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import arc.Core;
 import arc.math.Rand;
-import arc.struct.Seq;
+import arc.scene.ui.Button;
+import arc.scene.ui.layout.Cell;
+import arc.struct.ObjectMap;
 import arc.util.Time;
+import mindustry.Vars;
 import mindustry.ui.dialogs.BaseDialog;
 
 public class WuMa extends FLegsUnit {
     public static float w, h;
     public static final Rand ra = new Rand();
-    public Seq<Float> cloneTimers = new Seq<>();
-    public Seq<BaseDialog> hideDialogs = new Seq<>();
+    public ObjectMap<BaseDialog, Float> dialogs = new ObjectMap<>();
     public float hideTimer = 0;
 
     public static WuMa create() {
@@ -32,18 +34,23 @@ public class WuMa extends FLegsUnit {
 
         hideTimer += Time.delta;
 
-        for (int i = 0; i < cloneTimers.size; i++) {
-            float timer = cloneTimers.get(i);
+        for (int i = 0; i < dialogs.size; i++) {
+            float timer = dialogs.values().toSeq().get(i);
+            BaseDialog dialog = dialogs.keys().toSeq().get(i);
             if (timer - Time.delta <= 0) {
-                cloneTimers.items[i] = 3f;
-                BaseDialog bd = new BaseDialog("");
-                bd.cont.button(Core.bundle.get("@three"), bd::hide).
-                        setBounds(ra.range(w), ra.range(h), 40, 10);
-                hideDialogs.add(bd);
-                cloneTimers.add(3f);
-                bd.show();
+                dialogs.put(dialog, 60f);
+                BaseDialog cover = new BaseDialog("");
+                cover.setLayoutEnabled(false);
+                cover.cont.setLayoutEnabled(false);
+                dialogs.put(cover, 60f);
+
+                cover.cont.button(Core.bundle.get("@one"), () -> {
+                    dialogs.remove(cover);
+                    cover.hide();
+                }).setBounds(ra.range(w), ra.range(h), 40, 10);
+                cover.show();
             } else {
-                cloneTimers.items[i] = timer - Time.delta;
+                dialogs.put(dialog, timer - Time.delta);
             }
         }
     }
@@ -51,15 +58,19 @@ public class WuMa extends FLegsUnit {
     @Override
     public void draw() {
         super.draw();
-        if (hideTimer > 180) {
-//            if (team != Vars.player.team()) {
-            BaseDialog hide = new BaseDialog("你好");
-            cloneTimers.add(3f);
-            hideDialogs.add(hide);
-            hide.cont.button(Core.bundle.get("@three"), hide::hide).
-                    setBounds(ra.range(w), ra.range(h), 40, 10);
-            hide.show();
-//            }
+        if (hideTimer > 60) {
+            if (team == Vars.player.team()) {
+                BaseDialog cover = new BaseDialog("");
+                cover.setLayoutEnabled(false);
+                cover.cont.setLayoutEnabled(false);
+                dialogs.put(cover, 60f);
+
+                cover.cont.button(Core.bundle.get("@one"), () -> {
+                    dialogs.remove(cover);
+                    cover.hide();
+                }).setBounds(ra.range(w), ra.range(h), 40, 10);
+                cover.show();
+            }
             hideTimer = 0;
         }
     }
