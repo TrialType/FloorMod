@@ -3,15 +3,12 @@ package Floor.FEntities.FUnit.Geodetic;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import arc.Core;
 import arc.math.Rand;
-import arc.scene.ui.Button;
-import arc.scene.ui.layout.Cell;
 import arc.struct.ObjectMap;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.ui.dialogs.BaseDialog;
 
 public class WuMa extends FLegsUnit {
-    public static float w, h;
     public static final Rand ra = new Rand();
     public ObjectMap<BaseDialog, Float> dialogs = new ObjectMap<>();
     public float hideTimer = 0;
@@ -27,9 +24,6 @@ public class WuMa extends FLegsUnit {
 
     @Override
     public void update() {
-        w = Core.scene.getWidth();
-        h = Core.scene.getHeight();
-
         super.update();
 
         hideTimer += Time.delta;
@@ -39,20 +33,52 @@ public class WuMa extends FLegsUnit {
             BaseDialog dialog = dialogs.keys().toSeq().get(i);
             if (timer - Time.delta <= 0) {
                 dialogs.put(dialog, 60f);
-                BaseDialog cover = new BaseDialog("");
-                cover.setLayoutEnabled(false);
-                cover.cont.setLayoutEnabled(false);
-                dialogs.put(cover, 60f);
-
-                cover.cont.button(Core.bundle.get("@one"), () -> {
-                    dialogs.remove(cover);
-                    cover.hide();
-                }).setBounds(ra.range(w), ra.range(h), 40, 10);
-                cover.show();
+                createCover();
             } else {
                 dialogs.put(dialog, timer - Time.delta);
             }
         }
+    }
+
+    public void createCover() {
+        BaseDialog cover = new BaseDialog("");
+        dialogs.put(cover, 60f);
+        int located = ra.nextInt(10) + 1;
+        boolean left = located % 2 == 0;
+        for (int j = 1; j <= 5; j++) {
+            cover.cont.row();
+            if (j == located / 2) {
+                if (left) {
+                    cover.cont.table(t -> {
+                        t.button(Core.bundle.get("@one"), () -> {
+                            dialogs.remove(cover);
+                            cover.hide();
+                        }).left().growX();
+                        t.button(Core.bundle.get("妈妈省的"), () -> {
+                            dialogs.remove(cover);
+                            cover.hide();
+                        }).right().growX();
+                    }).growX().growY();
+                } else {
+                    cover.cont.table(t -> {
+                        t.button(Core.bundle.get("@one"), () -> {
+                            dialogs.remove(cover);
+                            cover.hide();
+                        }).right().growX();
+                        t.button(Core.bundle.get("妈妈省的"), () -> {
+                            dialogs.remove(cover);
+                            cover.hide();
+                        }).left().growX();
+                    }).growX().growY();
+                }
+            } else {
+                cover.cont.table(t -> t.button("妈妈省的", () -> {
+                }).right().growX()).growX().growY();
+                cover.cont.table(t -> t.button("妈妈省的", () -> {
+                }).left().growX()).growX().growY();
+            }
+        }
+        cover.show();
     }
 
     @Override
@@ -60,16 +86,7 @@ public class WuMa extends FLegsUnit {
         super.draw();
         if (hideTimer > 60) {
             if (team == Vars.player.team()) {
-                BaseDialog cover = new BaseDialog("");
-                cover.setLayoutEnabled(false);
-                cover.cont.setLayoutEnabled(false);
-                dialogs.put(cover, 60f);
-
-                cover.cont.button(Core.bundle.get("@one"), () -> {
-                    dialogs.remove(cover);
-                    cover.hide();
-                }).setBounds(ra.range(w), ra.range(h), 40, 10);
-                cover.show();
+                createCover();
             }
             hideTimer = 0;
         }
