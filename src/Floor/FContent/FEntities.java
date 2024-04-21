@@ -33,5 +33,6 @@ public class FEntities {
         EntityMapping.idMap[122] = ChouNiu::create;
         EntityMapping.idMap[123] = YinHu::create;
         EntityMapping.idMap[124] = MaoTu::create;
+        EntityMapping.idMap[127] = WuMa::create;
     }
 }

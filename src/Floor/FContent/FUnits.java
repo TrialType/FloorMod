@@ -12,6 +12,7 @@ import Floor.FEntities.FBulletType.*;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.ChouNiu;
 import Floor.FEntities.FUnit.Geodetic.MaoTu;
+import Floor.FEntities.FUnit.Geodetic.WuMa;
 import Floor.FEntities.FUnit.Geodetic.YinHu;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
@@ -62,7 +63,7 @@ public class FUnits {
     public static UnitType bulletInterception, rejuvenate;
 
     //Geodetic
-    public static UnitType chou, yin, mao;
+    public static UnitType chou, yin, mao, wu;
 
     public static void load() {
         rejuvenate = new UnitType("rejuvenate") {{
@@ -1413,6 +1414,25 @@ public class FUnits {
                     }};
                 }};
             }});
+
+            abilities.add(new LevelSign());
+        }};
+
+        wu = new UnitType("wu") {{
+            constructor = WuMa::create;
+
+            drag = 0.5f;
+            accel = 1;
+            health = 150000;
+            hitSize = 45;
+            speed = 6f;
+            armor = 25;
+            rotateSpeed = 36;
+
+            legCount = 4;
+            legLength = 1;
+            mechLandShake = stepShake = 0;
+            allowLegStep = true;
 
             abilities.add(new LevelSign());
         }};
