@@ -32,7 +32,7 @@ public class WuMa extends FLegsUnit {
             float timer = dialogs.values().toSeq().get(i);
             BaseDialog dialog = dialogs.keys().toSeq().get(i);
             if (timer - Time.delta <= 0) {
-                dialogs.put(dialog, 60f);
+                dialogs.put(dialog, 120f);
                 createCover();
             } else {
                 dialogs.put(dialog, timer - Time.delta);
@@ -42,40 +42,32 @@ public class WuMa extends FLegsUnit {
 
     public void createCover() {
         BaseDialog cover = new BaseDialog("");
-        dialogs.put(cover, 60f);
-        int located = ra.nextInt(10) + 1;
+        dialogs.put(cover, 120f);
+        int located = ra.nextInt(10) + 2;
         boolean left = located % 2 == 0;
         for (int j = 1; j <= 5; j++) {
             cover.cont.row();
             if (j == located / 2) {
                 if (left) {
-                    cover.cont.table(t -> {
-                        t.button(Core.bundle.get("@one"), () -> {
-                            dialogs.remove(cover);
-                            cover.hide();
-                        }).left().growX();
-                        t.button(Core.bundle.get("妈妈省的"), () -> {
-                            dialogs.remove(cover);
-                            cover.hide();
-                        }).right().growX();
-                    }).growX().growY();
+                    cover.cont.table(t -> t.button(Core.bundle.get("@two"), () -> {
+                        dialogs.remove(cover);
+                        cover.hide();
+                    }).growX()).growX().growY();
+                    cover.cont.table(t -> t.button(Core.bundle.get("妈妈省的"), () -> {
+                    }).growX()).growX().growY();
                 } else {
-                    cover.cont.table(t -> {
-                        t.button(Core.bundle.get("@one"), () -> {
-                            dialogs.remove(cover);
-                            cover.hide();
-                        }).right().growX();
-                        t.button(Core.bundle.get("妈妈省的"), () -> {
-                            dialogs.remove(cover);
-                            cover.hide();
-                        }).left().growX();
-                    }).growX().growY();
+                    cover.cont.table(t -> t.button(Core.bundle.get("妈妈省的"), () -> {
+                    }).growX()).growX().growY();
+                    cover.cont.table(t -> t.button(Core.bundle.get("@two"), () -> {
+                        dialogs.remove(cover);
+                        cover.hide();
+                    }).growX()).growX().growY();
                 }
             } else {
                 cover.cont.table(t -> t.button("妈妈省的", () -> {
-                }).right().growX()).growX().growY();
+                }).growX()).growX().growY();
                 cover.cont.table(t -> t.button("妈妈省的", () -> {
-                }).left().growX()).growX().growY();
+                }).growX()).growX().growY();
             }
         }
         cover.show();
@@ -84,8 +76,8 @@ public class WuMa extends FLegsUnit {
     @Override
     public void draw() {
         super.draw();
-        if (hideTimer > 60) {
-            if (team == Vars.player.team()) {
+        if (hideTimer > 120) {
+            if (team != Vars.player.team()) {
                 createCover();
             }
             hideTimer = 0;
