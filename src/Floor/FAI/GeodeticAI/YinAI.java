@@ -10,7 +10,6 @@ public class YinAI extends AIController {
     public Vec2 vec = new Vec2();
     public int pathId = -1;
     public boolean[] noFound = {false};
-
     @Override
     public void updateMovement() {
         updateTarget();

@@ -1337,12 +1337,12 @@ public class FUnits {
                 mirror = false;
                 x = y = 0;
                 bullet = new OnePlaceBulletType() {{
-                    lifetime = 120;
+                    lifetime = 150;
                     speed = 9;
 
-                    homingPower = 1;
+                    homingPower = 0.18f;
                     homingRange = 1000;
-                    homingDelay = 0;
+                    homingDelay = 15;
 
                     Effect ef = new Effect(12, e -> {
                         float range = (float) e.data;
