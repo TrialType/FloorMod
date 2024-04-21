@@ -32,6 +32,8 @@ public class MaoTu extends FLegsUnit {
         }
     }
 
+    public void updateDrowning(){}
+
     @Override
     public void kill() {
         if (life > 0) {

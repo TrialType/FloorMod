@@ -1396,7 +1396,7 @@ public class FUnits {
                     homingPower = 1;
                     homingRange = 1000;
 
-                    everySummonDelay = 0;
+                    everySummonDelay = 12;
                     summon = new BasicBulletType() {{
                         width = height = 80;
 
