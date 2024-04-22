@@ -1425,7 +1425,7 @@ public class FUnits {
             accel = 1;
             health = 150000;
             hitSize = 45;
-            speed = 6f;
+            speed = 1f;
             armor = 25;
             rotateSpeed = 36;
 

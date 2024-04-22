@@ -4,6 +4,7 @@ import Floor.FAI.GeodeticAI.YinAI;
 import Floor.FContent.FEvents;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import arc.Events;
+import arc.util.Time;
 import mindustry.entities.Units;
 
 import static java.lang.Math.*;
@@ -23,15 +24,27 @@ public class YinHu extends FLegsUnit {
 
         Units.nearbyEnemies(team, x, y, hitSize, u -> {
             if (abs(this.angleTo(u) - rotation) <= 15 && sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y)) < hitSize / 1.8) {
-                Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
-                u.kill();
+                if (u.maxHealth > maxHealth) {
+                    boolean dead = u.dead;
+                    u.damage(maxHealth / 60 / Time.delta);
+                    if (!dead && u.dead) {
+                        Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
+                    }
+                } else {
+                    Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
+                    u.kill();
+                }
             }
         });
 
         Units.nearbyBuildings(x, y, hitSize, b -> {
             if (b.team != team && abs(this.angleTo(b) - rotation) <= 5 &&
                     sqrt((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y)) < hitSize / 1.8) {
-                b.kill();
+                if (b.maxHealth > maxHealth) {
+                    b.damage(maxHealth / 60 / Time.delta);
+                } else {
+                    b.kill();
+                }
             }
         });
     }
