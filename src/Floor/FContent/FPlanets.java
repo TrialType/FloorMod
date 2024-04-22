@@ -12,7 +12,7 @@ import mindustry.type.Planet;
 
 
 public class FPlanets {
-    public static Planet ENGSWEIS;
+    public static Planet ENGSWEIS, Adventure;
 
     public static void load() {
         Planets.sun.children.clear();
@@ -59,5 +59,16 @@ public class FPlanets {
         Planets.sun.children.add(Planets.erekir);
         Planets.sun.children.add(Planets.serpulo);
         Planets.erekir.orbitRadius = (ENGSWEIS.orbitRadius + Planets.serpulo.orbitRadius) / 2;
+
+        Adventure = new Planet("adventure", Planets.sun, 1, 3) {{
+            generator = new ENGSWEISPlanetGenerator();
+            meshLoader = () -> new HexMesh(this, 6);
+            cloudMeshLoader = () -> new MultiMesh(
+                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, new Color().set(Pal.spore).mul(0.9f).a(0.75f), 2, 0.45f, 0.9f, 0.38f),
+                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Pal.spore, 0.55f).a(0.75f), 2, 0.45f, 1f, 0.41f)
+            );
+
+            alwaysUnlocked = false;
+        }};
     }
 }

@@ -24,7 +24,9 @@ public class MoreResearchDialog extends ResearchDialog {
 
             {
                 Seq<Planet> planets = new Seq<>();
-                //first, find a planet associated with the current tech tree
+                if (lastNode.planet != null) {
+                    planets.add(lastNode.planet);
+                }
                 content.planets().each(p -> {
                     if (p.techTree == lastNode) {
                         planets.add(p);
