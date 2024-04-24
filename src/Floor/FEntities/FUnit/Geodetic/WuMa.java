@@ -58,7 +58,8 @@ public class WuMa extends FLegsUnit {
                 Unit u = type.create(team);
                 WuMa wm = (WuMa) u;
                 wm.isShadow = true;
-                u.set((float) (x + 2 * Math.cos(Math.toRadians(60 * i))), (float) (y + 2 * Math.sin(Math.toRadians(60 * i))));
+                u.set((float) (x + hitSize * Math.cos(Math.toRadians(60 * i))),
+                        (float) (y + hitSize * Math.sin(Math.toRadians(60 * i))));
                 u.rotation(60 * i);
                 u.add();
             }
