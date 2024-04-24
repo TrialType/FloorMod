@@ -5,6 +5,7 @@ import Floor.FContent.FEvents;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
@@ -18,6 +19,7 @@ import mindustry.world.modules.ItemModule;
 import mindustry.world.modules.PowerModule;
 
 public class XuGou extends FLegsUnit {
+    public float summonTimer = 0;
     public ItemSeq items = new ItemSeq();
     public float power = 0;
 
@@ -32,7 +34,8 @@ public class XuGou extends FLegsUnit {
 
     @Override
     public void update() {
-        if (hitTime == 1 && !this.dead && health > 0) {
+        summonTimer += Time.delta;
+        if (hitTime == 1 && !this.dead && health > 0 && summonTimer >= 600) {
             for (int i = 1; i <= 2; i++) {
                 Unit u = type.create(team);
                 u.maxHealth = this.health;
@@ -42,6 +45,7 @@ public class XuGou extends FLegsUnit {
                 u.rotation(180 * i);
                 u.add();
             }
+            summonTimer = 0;
         }
 
         super.update();
@@ -92,23 +96,24 @@ public class XuGou extends FLegsUnit {
         }
 
         float value = power + 3 * items.total;
-        if (value > 1000) {
+        float sum = maxHealth / 100;
+        if (value > sum) {
             this.maxHealth *= 2;
             heal();
-            Units.nearbyEnemies(team, x, y, 200, u -> {
+            Units.nearbyEnemies(this.team, x, y, 200, u -> {
                 Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
                 u.kill();
             });
             Units.nearbyBuildings(x, y, 200, b -> {
-                if (b.team != team) {
+                if (b.team != this.team) {
                     b.kill();
                 }
             });
 
-            if (power >= 1000) {
-                power -= 1000;
+            if (power >= sum) {
+                power -= sum;
             } else {
-                int need = (int) (1000 - power);
+                int need = (int) (sum - power);
                 Seq<ItemStack> its = new Seq<>();
                 for (ItemStack is : items.toSeq()) {
                     int num = is.amount;
@@ -127,6 +132,10 @@ public class XuGou extends FLegsUnit {
                 power = 0;
             }
         }
+    }
+
+    @Override
+    public void updateDrowning() {
     }
 
     @Override
