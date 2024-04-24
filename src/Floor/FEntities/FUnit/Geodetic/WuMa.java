@@ -53,7 +53,7 @@ public class WuMa extends FLegsUnit {
             }
         }
 
-        if (!isShadow && summonTimer >= 3600 && health / maxHealth <= 0.2f) {
+        if (!isShadow && summonTimer >= 3600 && health / maxHealth <= 0.2f && !dead && health > 0) {
             for (int i = 1; i <= 8; i++) {
                 Unit u = type.create(team);
                 WuMa wm = (WuMa) u;

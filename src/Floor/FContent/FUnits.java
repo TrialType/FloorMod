@@ -1,19 +1,14 @@
 package Floor.FContent;
 
 import Floor.FAI.*;
-import Floor.FAI.GeodeticAI.ChouAI;
-import Floor.FAI.GeodeticAI.MaoAI;
-import Floor.FAI.GeodeticAI.YinAI;
+import Floor.FAI.GeodeticAI.*;
 import Floor.FEntities.FAbility.EMPAbility;
 import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.*;
 import Floor.FEntities.FUnit.F.*;
-import Floor.FEntities.FUnit.Geodetic.ChouNiu;
-import Floor.FEntities.FUnit.Geodetic.MaoTu;
-import Floor.FEntities.FUnit.Geodetic.WuMa;
-import Floor.FEntities.FUnit.Geodetic.YinHu;
+import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
 import Floor.FTools.BossList;
@@ -63,7 +58,7 @@ public class FUnits {
     public static UnitType bulletInterception, rejuvenate;
 
     //Geodetic
-    public static UnitType chou, yin, mao, wu;
+    public static UnitType chou, yin, mao, wu, xu;
 
     public static void load() {
         rejuvenate = new UnitType("rejuvenate") {{
@@ -1420,6 +1415,7 @@ public class FUnits {
 
         wu = new UnitType("wu") {{
             constructor = WuMa::create;
+            controller = u -> new WuAI();
 
             range = maxRange = 4000;
             drag = 0.5f;
@@ -1434,6 +1430,27 @@ public class FUnits {
             legLength = 1;
             mechLandShake = stepShake = 0;
             allowLegStep = true;
+
+            abilities.add(new LevelSign());
+        }};
+
+        xu = new UnitType("xu") {{
+            constructor = XuGou::create;
+            controller = u -> new XuAI();
+
+            range = maxRange = 4000;
+            drag = 0.5f;
+            accel = 1;
+            health = 100000;
+            hitSize =  12;
+            speed = 2f;
+            armor = 12;
+            rotateSpeed = 36;
+
+            legCount = 4;
+            legLength = 1;
+            mechLandShake = stepShake = 0;
+            allowLegStep = false;
 
             abilities.add(new LevelSign());
         }};
