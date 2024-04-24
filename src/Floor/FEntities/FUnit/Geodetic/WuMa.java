@@ -9,18 +9,26 @@ import arc.math.Angles;
 import arc.math.Rand;
 import arc.struct.ObjectMap;
 import arc.util.Time;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.entities.Units;
 import mindustry.gen.Teamc;
+import mindustry.gen.Unit;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 public class WuMa extends FLegsUnit {
+    public boolean isShadow = false;
+    public float shadowTimer = 0;
+
     public static final Rand ra = new Rand();
+    public int dialogsNumber = -1;
     public ObjectMap<BaseDialog, Float> dialogs = new ObjectMap<>();
     public float hideTimer = 0;
+    public float summonTimer = 3600;
 
     public static WuMa create() {
         return new WuMa();
@@ -33,7 +41,38 @@ public class WuMa extends FLegsUnit {
 
     @Override
     public void update() {
-        if (speed() > super.speed() * 3) {
+        hideTimer += Time.delta;
+        summonTimer += Time.delta;
+
+        if (isShadow) {
+            shadowTimer += Time.delta;
+            if (shadowTimer >= 3600) {
+                shadowTimer = 0;
+                kill();
+                return;
+            }
+        }
+
+        if (!isShadow && summonTimer >= 3600 && health / maxHealth <= 0.2f) {
+            for (int i = 1; i <= 8; i++) {
+                Unit u = type.create(team);
+                WuMa wm = (WuMa) u;
+                wm.isShadow = true;
+                u.set((float) (x + 2 * Math.cos(Math.toRadians(60 * i))), (float) (y + 2 * Math.sin(Math.toRadians(60 * i))));
+                u.rotation(60 * i);
+                u.add();
+            }
+            summonTimer = 0;
+        }
+
+        if (dialogsNumber > 0) {
+            for (int i = 0; i < dialogsNumber; i++) {
+                createCover();
+            }
+            dialogsNumber = -1;
+        }
+
+        if (speed() > super.speed() * 6) {
             Units.nearbyEnemies(team, x, y, hitSize, u -> {
                 if (abs(this.angleTo(u) - rotation) <= 15 && sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y)) < hitSize / 1.8) {
                     Events.fire(new FEvents.UnitDestroyOtherEvent(this, u));
@@ -48,9 +87,8 @@ public class WuMa extends FLegsUnit {
                 }
             });
         }
-        super.update();
 
-        hideTimer += Time.delta;
+        super.update();
 
         for (int i = 0; i < dialogs.size; i++) {
             float timer = dialogs.values().toSeq().get(i);
@@ -101,7 +139,7 @@ public class WuMa extends FLegsUnit {
     public void draw() {
         super.draw();
         if (hideTimer > 120) {
-            if (team != Vars.player.team()) {
+            if (!Vars.state.isEditor() && team != Vars.player.team()) {
                 createCover();
             }
             hideTimer = 0;
@@ -112,12 +150,33 @@ public class WuMa extends FLegsUnit {
     public float speed() {
         float s = super.speed();
         Teamc t;
-        if (controller instanceof WuAI wa && (t = wa.hitTarget) != null) {
+        if (controller instanceof WuAI wa && (t = wa.hitTarget) != null && t instanceof Unit u) {
             float angle = Angles.angle(x, y, t.x(), t.y());
-            if (Math.abs(angle - rotation) <= 15) {
+            if (Math.abs(angle - u.rotation) <= 15) {
                 s = s * 8;
             }
         }
         return s;
+    }
+
+    @Override
+    public void write(Writes write) {
+        super.write(write);
+        write.i(dialogs.size);
+        write.f(hideTimer);
+        write.f(summonTimer);
+        write.bool(isShadow);
+        write.f(shadowTimer);
+    }
+
+    @Override
+    public void read(Reads read) {
+        super.read(read);
+
+        dialogsNumber = read.i();
+        hideTimer = read.f();
+        summonTimer = read.f();
+        isShadow = read.bool();
+        shadowTimer = read.f();
     }
 }

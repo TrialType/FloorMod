@@ -233,7 +233,7 @@ public class ElectricFence extends Block {
                     } else {
                         close = ro2 + ro3 < 181;
                     }
-                    if (close && air && !(u.physref.body.layer == 4)) {
+                    if (close && air && (u.physref == null || !(u.physref.body.layer == 4))) {
                         return true;
                     } else return close && !air && u.isGrounded();
                 }

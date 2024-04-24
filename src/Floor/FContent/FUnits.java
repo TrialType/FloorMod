@@ -1421,6 +1421,7 @@ public class FUnits {
         wu = new UnitType("wu") {{
             constructor = WuMa::create;
 
+            range = maxRange = 4000;
             drag = 0.5f;
             accel = 1;
             health = 150000;
