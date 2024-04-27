@@ -1442,7 +1442,7 @@ public class FUnits {
             drag = 0.5f;
             accel = 1;
             health = 100000;
-            hitSize =  12;
+            hitSize = 12;
             speed = 2f;
             armor = 12;
             rotateSpeed = 36;

@@ -41,7 +41,7 @@ public class UnitUpGrade {
             uug.setShieldLevel(10);
             uug.sfa(10);
             uug.setSpeedLevel(10);
-        } else if (get) {
+        } else if (get && number > 0) {
             for (int i = 0; i < number; i++) {
                 int index = getIndex(uug);
                 getPower(uug, index, index);
