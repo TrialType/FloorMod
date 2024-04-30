@@ -6,11 +6,14 @@ import mindustry.game.Objectives;
 import mindustry.type.ItemStack;
 
 import static Floor.FContent.FBlocks.*;
+import static Floor.FContent.FItems.*;
+import static Floor.FContent.FItems.laserProject5;
 import static Floor.FContent.FPlanetGenerators.fullWater;
 import static Floor.FContent.FPlanetGenerators.longestDown;
 import static Floor.FContent.FPlanets.ENGSWEIS;
 import static Floor.FContent.FUnits.*;
 import static mindustry.content.Blocks.*;
+import static mindustry.content.Items.*;
 import static mindustry.content.SectorPresets.*;
 import static mindustry.content.TechTree.node;
 
@@ -91,12 +94,12 @@ public class Techs {
         //Sectors
         head.each(tn -> {
             if (tn.content == impact0078) {
-                TechTree.TechNode tt = node(longestDown, Seq.with(new Objectives.SectorComplete(impact0078)), () -> {
+                tf = node(longestDown, Seq.with(new Objectives.SectorComplete(impact0078)), () -> {
                     node(fullWater, Seq.with(new Objectives.SectorComplete(longestDown)), () -> {
                     });
                 });
-                tt.parent = tn;
-                tn.children.add(tt);
+                tf.parent = tn;
+                tn.children.add(tf);
             }
         });
         //units
@@ -107,6 +110,159 @@ public class Techs {
                 tf.parent = t;
                 t.children.add(tf);
             }
+        });
+        //items
+        tf = node(blueprint1, () -> {
+            node(blueprint2, ItemStack.with(), () -> {
+                node(blueprint3, ItemStack.with(), () -> {
+                    node(blueprint4, ItemStack.with(), () -> {
+                        node(blueprint5, ItemStack.with(), () -> {
+                        });
+                    });
+                });
+            });
+
+            node(sizeProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(sizeProject2, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(sizeProject3, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(sizeProject4, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(sizeProject5, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                                node(sizeProject6, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                                    node(sizeProject7, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                                        node(sizeProject8, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                                            node(sizeProject9, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                                                node(sizeProject10, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(healthProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(healthProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(healthProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(healthProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(healthProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(speedProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(speedProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(speedProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(speedProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(speedProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(copperProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(copperProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(copperProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(copperProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(copperProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(laserProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(laserProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(laserProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(laserProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(laserProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(reloadProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(reloadProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(reloadProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(reloadProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(reloadProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(shieldProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(shieldProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(shieldProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(shieldProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(shieldProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(splashProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(splashProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(splashProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(splashProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(splashProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(pricesProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(pricesProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(pricesProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(pricesProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(pricesProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(slowProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(slowProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(slowProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(slowProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(slowProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(knockProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(knockProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(knockProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(knockProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(knockProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+
+            node(percentProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(percentProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(percentProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(percentProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(percentProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
         });
     }
 }

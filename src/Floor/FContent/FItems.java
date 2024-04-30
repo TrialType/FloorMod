@@ -4,6 +4,20 @@ import mindustry.type.Item;
 
 public class FItems {
     public static Item damagePower, reloadPower, healthPower, speedPower, shieldPower, againPower;
+    public static Item
+            blueprint1, blueprint2, blueprint3, blueprint4, blueprint5,
+            sizeProject1, sizeProject2, sizeProject3, sizeProject4, sizeProject5, sizeProject6, sizeProject7, sizeProject8, sizeProject9, sizeProject10,
+            speedProject1, speedProject2, speedProject3, speedProject4, speedProject5,
+            healthProject1, healthProject2, healthProject3, healthProject4, healthProject5,
+            copperProject1, copperProject2, copperProject3, copperProject4, copperProject5,
+            laserProject1, laserProject2, laserProject3, laserProject4, laserProject5,
+            reloadProject1, reloadProject2, reloadProject3, reloadProject4, reloadProject5,
+            shieldProject1, shieldProject2, shieldProject3, shieldProject4, shieldProject5,
+            splashProject1, splashProject2, splashProject3, splashProject4, splashProject5,
+            pricesProject1, pricesProject2, pricesProject3, pricesProject4, pricesProject5,
+            slowProject1, slowProject2, slowProject3, slowProject4, slowProject5,
+            knockProject1, knockProject2, knockProject3, knockProject4, knockProject5,
+            percentProject1, percentProject2, percentProject3, percentProject4, percentProject5;
 
     public static void load() {
         damagePower = new Item("damage_power") {{
@@ -29,6 +43,283 @@ public class FItems {
         againPower = new Item("again_power") {{
             buildable = false;
             alwaysUnlocked = true;
+        }};
+
+        blueprint1 = new Item("blue-print1") {{
+            buildable = false;
+        }};
+        blueprint2 = new Item("blue-print2") {{
+            buildable = false;
+        }};
+        blueprint3 = new Item("blue-print3") {{
+            buildable = false;
+        }};
+        blueprint4 = new Item("blue-print4") {{
+            buildable = false;
+        }};
+        blueprint5 = new Item("blue-print5") {{
+            buildable = false;
+        }};
+
+        sizeProject1 = new Item("size-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject2 = new Item("size-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject3 = new Item("size-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject4 = new Item("size-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject5 = new Item("size-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject6 = new Item("size-project6") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject7 = new Item("size-project7") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject8 = new Item("size-project8") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject9 = new Item("size-project9") {{
+            hidden = true;
+            buildable = false;
+        }};
+        sizeProject10 = new Item("size-project10") {{
+            hidden = true;
+            buildable = false;
+        }};
+        speedProject1 = new Item("speed-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        speedProject2 = new Item("speed-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        speedProject3 = new Item("speed-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        speedProject4 = new Item("speed-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        speedProject5 = new Item("speed-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        healthProject1 = new Item("health-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        healthProject2 = new Item("health-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        healthProject3 = new Item("health-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        healthProject4 = new Item("health-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        healthProject5 = new Item("health-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        copperProject1 = new Item("copper-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        copperProject2 = new Item("copper-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        copperProject3 = new Item("copper-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        copperProject4 = new Item("copper-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        copperProject5 = new Item("copper-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        laserProject1 = new Item("laser-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        laserProject2 = new Item("laser-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        laserProject3 = new Item("laser-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        laserProject4 = new Item("laser-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        laserProject5 = new Item("laser-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        reloadProject1 = new Item("reload-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        reloadProject2 = new Item("reload-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        reloadProject3 = new Item("reload-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        reloadProject4 = new Item("reload-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        reloadProject5 = new Item("reload-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        shieldProject1 = new Item("shield-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        shieldProject2 = new Item("shield-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        shieldProject3 = new Item("shield-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        shieldProject4 = new Item("shield-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        shieldProject5 = new Item("shield-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        splashProject1 = new Item("splash-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        splashProject2 = new Item("splash-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        splashProject3 = new Item("splash-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        splashProject4 = new Item("splash-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        splashProject5 = new Item("splash-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        pricesProject1 = new Item("prices-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        pricesProject2 = new Item("prices-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        pricesProject3 = new Item("prices-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        pricesProject4 = new Item("prices-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        pricesProject5 = new Item("prices-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        slowProject1 = new Item("slow-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        slowProject2 = new Item("slow-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        slowProject3 = new Item("slow-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        slowProject4 = new Item("slow-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        slowProject5 = new Item("slow-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        knockProject1 = new Item("knock-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        knockProject2 = new Item("knock-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        knockProject3 = new Item("knock-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        knockProject4 = new Item("knock-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        knockProject5 = new Item("knock-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        percentProject1 = new Item("percent-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        percentProject2 = new Item("percent-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        percentProject3 = new Item("percent-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        percentProject4 = new Item("percent-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        percentProject5 = new Item("percent-project5") {{
+            hidden = true;
+            buildable = false;
         }};
     }
 }

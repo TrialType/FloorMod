@@ -5,6 +5,7 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -13,6 +14,7 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.struct.IntSeq;
 import arc.struct.Seq;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -29,11 +31,13 @@ import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
+import mindustry.mod.ContentParser;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
 import mindustry.type.UnitType;
 import mindustry.ui.dialogs.DatabaseDialog;
+import mindustry.ui.dialogs.PlanetDialog;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
@@ -195,11 +199,11 @@ public class FBlocks {
         Reconstructor rt = (Reconstructor) Blocks.additiveReconstructor;
         rt.upgrades.add(new UnitType[]{FUnits.barb, FUnits.hammer});
         rt = (Reconstructor) Blocks.multiplicativeReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.hammer,FUnits.buying});
+        rt.upgrades.add(new UnitType[]{FUnits.hammer, FUnits.buying});
         rt = (Reconstructor) Blocks.exponentialReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.buying,FUnits.crazy});
+        rt.upgrades.add(new UnitType[]{FUnits.buying, FUnits.crazy});
         rt = (Reconstructor) Blocks.tetrativeReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.crazy,FUnits.transition});
+        rt.upgrades.add(new UnitType[]{FUnits.crazy, FUnits.transition});
 
         specialUnitFactory = new UnitFactory("special-unit-factory") {{
             requirements(Category.units, with(Items.lead, 1500, Items.silicon, 700, Items.titanium, 1400, Items.thorium, 400, Items.plastanium, 200));
@@ -1423,7 +1427,7 @@ public class FBlocks {
 //======================================================================================================================
         slowProject = new DownProject("slow_project") {{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
-            range = 16;
+            range = (Core.settings.getJson("floor-stronger-core", IntSeq.class, IntSeq::new)).get(0);
             downSpeed = 0.9f;
 
             consumePower(3.50f);
