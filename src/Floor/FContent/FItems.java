@@ -18,6 +18,9 @@ public class FItems {
             slowProject1, slowProject2, slowProject3, slowProject4, slowProject5,
             knockProject1, knockProject2, knockProject3, knockProject4, knockProject5,
             percentProject1, percentProject2, percentProject3, percentProject4, percentProject5;
+    public static Item[] allSize, allSpeed, allHealth, allCopper, allLaser, allReload,
+            allShield, allSplash, allPrices, allSlow, allKnock, allPercent;
+    public static Item[][] allProject;
 
     public static void load() {
         damagePower = new Item("damage_power") {{
@@ -321,5 +324,17 @@ public class FItems {
             hidden = true;
             buildable = false;
         }};
+
+        allSize = new Item[]{
+                sizeProject1, sizeProject2, sizeProject3, sizeProject4, sizeProject5,
+                sizeProject6, sizeProject7, sizeProject8, sizeProject9, sizeProject10
+        };
+        allHealth = new Item[]{healthProject1, healthProject2, healthProject3, healthProject4, healthProject5};
+        allSpeed = new Item[]{speedProject1, speedProject2, speedProject3, speedProject4, speedProject5};
+
+        allProject = new Item[][]{
+                allSize, allHealth, allSpeed, allCopper, allLaser, allReload,
+                allShield, allSplash, allPrices, allSlow, allKnock, allPercent
+        };
     }
 }
