@@ -331,6 +331,15 @@ public class FItems {
         };
         allHealth = new Item[]{healthProject1, healthProject2, healthProject3, healthProject4, healthProject5};
         allSpeed = new Item[]{speedProject1, speedProject2, speedProject3, speedProject4, speedProject5};
+        allCopper = new Item[]{copperProject1, copperProject2, copperProject3, copperProject4, copperProject5};
+        allLaser = new Item[]{laserProject1, laserProject2, laserProject3, laserProject4, laserProject5};
+        allReload = new Item[]{reloadProject1, reloadProject2, reloadProject3, reloadProject4, reloadProject5};
+        allShield = new Item[]{shieldProject1, shieldProject2, shieldProject3, shieldProject4, shieldProject5};
+        allSplash = new Item[]{splashProject1, splashProject2, splashProject3, splashProject4, splashProject5};
+        allPrices = new Item[]{pricesProject1, pricesProject2, pricesProject3, pricesProject4, pricesProject5};
+        allSlow = new Item[]{slowProject1, slowProject2, slowProject3, slowProject4, slowProject5};
+        allKnock = new Item[]{knockProject1, knockProject2, knockProject3, knockProject4, knockProject5};
+        allPercent = new Item[]{percentProject1, percentProject2, percentProject4, percentProject5};
 
         allProject = new Item[][]{
                 allSize, allHealth, allSpeed, allCopper, allLaser, allReload,
