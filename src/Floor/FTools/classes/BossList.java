@@ -1,4 +1,4 @@
-package Floor.FTools;
+package Floor.FTools.classes;
 
 import arc.struct.Seq;
 import mindustry.type.UnitType;

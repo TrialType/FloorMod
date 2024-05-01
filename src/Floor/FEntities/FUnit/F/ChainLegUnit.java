@@ -1,7 +1,7 @@
 package Floor.FEntities.FUnit.F;
 
-import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.UnitChainAble;
+import Floor.FTools.interfaces.FUnitUpGrade;
+import Floor.FTools.interfaces.ChainAble;
 import arc.Events;
 import arc.func.Boolf;
 import arc.graphics.g2d.Draw;
@@ -47,7 +47,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, UnitChainAble {
+public class ChainLegUnit extends ENGSWEISLegsUnit implements FUnitUpGrade, ChainAble {
     private int underUnitId;
     public Unit underUnit = null;
     public Healthc order = null;

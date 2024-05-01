@@ -1,8 +1,8 @@
 package Floor.FAI;
 
 import Floor.FEntities.FUnit.F.TileMiner;
-import Floor.FTools.FLine;
-import Floor.FTools.NeedPoseBridge;
+import Floor.FTools.classes.FLine;
+import Floor.FTools.interfaces.NeedPoseBridge;
 import arc.math.geom.Vec2;
 import arc.struct.IntSeq;
 import mindustry.entities.units.AIController;

@@ -1,9 +1,8 @@
-package Floor.FTools;
+package Floor.FTools.classes;
 
 import arc.struct.IntMap;
 
-public class CoreGradeLocated {
+public class ProjectsLocated {
     public static final IntMap<Integer> located = new IntMap<>();
-    private CoreGradeLocated() {
-    }
+    private ProjectsLocated() {}
 }

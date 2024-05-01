@@ -1,6 +1,6 @@
 package Floor.FEntities.FWeapon;
 
-import Floor.FTools.BossList;
+import Floor.FTools.classes.BossList;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;

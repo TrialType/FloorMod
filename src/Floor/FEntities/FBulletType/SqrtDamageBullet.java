@@ -1,18 +1,13 @@
 package Floor.FEntities.FBulletType;
 
-import Floor.FTools.FDamage;
-import arc.graphics.Color;
+import Floor.FTools.classes.FDamage;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
-import arc.math.Mathf;
 import arc.util.Time;
-import arc.util.Tmp;
 import mindustry.entities.bullet.ContinuousBulletType;
 import mindustry.gen.Bullet;
-import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
 
 import java.util.HashMap;
 import java.util.Map;

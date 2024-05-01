@@ -1,5 +1,6 @@
-package Floor.FTools;
+package Floor.FTools.classes;
 
+import Floor.FTools.interfaces.FUnitUpGrade;
 import mindustry.type.UnitType;
 
 import java.util.Random;

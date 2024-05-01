@@ -1,8 +1,8 @@
 package Floor.FType.UponFloor;
 
 import Floor.FContent.FStatusEffects;
-import Floor.FTools.Corrosion;
-import Floor.FTools.RangePure;
+import Floor.FTools.interfaces.Corrosion;
+import Floor.FTools.interfaces.RangePure;
 import arc.struct.IntMap;
 import arc.struct.IntSeq;
 import arc.struct.Seq;

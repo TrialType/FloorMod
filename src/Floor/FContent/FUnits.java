@@ -11,7 +11,7 @@ import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnitType.*;
-import Floor.FTools.BossList;
+import Floor.FTools.classes.BossList;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;

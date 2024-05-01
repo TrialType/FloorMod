@@ -1,7 +1,7 @@
 package Floor.FEntities.FAbility;
 
 import Floor.FEntities.FUnit.F.TileMiner;
-import Floor.FTools.StrongSpawner;
+import Floor.FTools.interfaces.StrongSpawner;
 import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;

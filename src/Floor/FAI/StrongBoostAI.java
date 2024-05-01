@@ -3,7 +3,7 @@ package Floor.FAI;
 import Floor.FContent.FStatusEffects;
 import Floor.FEntities.FUnit.F.ENGSWEISUnitEntity;
 import Floor.FEntities.FUnitType.ENGSWEISUnitType;
-import Floor.FTools.BossList;
+import Floor.FTools.classes.BossList;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;

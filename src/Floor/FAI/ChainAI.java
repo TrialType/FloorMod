@@ -1,8 +1,8 @@
 package Floor.FAI;
 
 import Floor.FEntities.FUnitType.ChainUnitType;
-import Floor.FTools.LayAble;
-import Floor.FTools.UnitChainAble;
+import Floor.FTools.interfaces.LayAble;
+import Floor.FTools.interfaces.ChainAble;
 import arc.func.Cons;
 import arc.math.Mathf;
 import arc.struct.Seq;
@@ -24,7 +24,7 @@ public class ChainAI extends GroundAI {
     private Healthc order = null;
 
     public void FindUnderUnit() {
-        if (unit instanceof UnitChainAble uca) {
+        if (unit instanceof ChainAble uca) {
             Cons<Unit> cons = unit -> {
                 if (underUnit != null) return;
                 if (unit instanceof LayAble l && unit.team == this.unit.team && !unit.spawnedByCore && unit.speed() < this.unit.speed() * 3) {
@@ -48,7 +48,7 @@ public class ChainAI extends GroundAI {
 
     @Override
     public void updateUnit() {
-        if (unit instanceof UnitChainAble uca) {
+        if (unit instanceof ChainAble uca) {
             underUnit = uca.UnderUnit();
             upon = uca.upon();
             timer += 1;
@@ -69,7 +69,7 @@ public class ChainAI extends GroundAI {
         if (timer >= 1500 && underUnit == null) FindUnderUnit();
         Building core = unit.closestEnemyCore();
         if (underUnit != null) {
-            if (unit instanceof UnitChainAble uca) {
+            if (unit instanceof ChainAble uca) {
                 if (underUnit.dead) {
                     if (underUnit instanceof LayAble la) la.getUit().remove(unit);
                     underUnit = null;

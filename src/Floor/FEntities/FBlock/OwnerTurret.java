@@ -1,6 +1,6 @@
 package Floor.FEntities.FBlock;
 
-import Floor.FTools.FBuildUpGrade;
+import Floor.FTools.interfaces.FBuildUpGrade;
 import arc.graphics.Color;
 import arc.graphics.g2d.Fill;
 import arc.math.Angles;
@@ -17,7 +17,6 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
-import mindustry.gen.Player;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.io.TypeIO;

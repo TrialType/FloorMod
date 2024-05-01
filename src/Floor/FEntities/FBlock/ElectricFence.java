@@ -1,7 +1,7 @@
 package Floor.FEntities.FBlock;
 
-import Floor.FTools.BossList;
-import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.classes.BossList;
+import Floor.FTools.interfaces.FUnitUpGrade;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -13,10 +13,7 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.Vars;
-import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
-import mindustry.core.GameState;
 import mindustry.core.Renderer;
 import mindustry.entities.Units;
 import mindustry.game.Team;
@@ -26,7 +23,6 @@ import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.logic.LogicDialog;
 import mindustry.type.StatusEffect;
 import mindustry.ui.Bar;
 import mindustry.world.Block;

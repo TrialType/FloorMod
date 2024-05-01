@@ -1,4 +1,4 @@
-package Floor.FTools;
+package Floor.FTools.interfaces;
 
 public interface FUnitUpGrade {
     int getLevel();

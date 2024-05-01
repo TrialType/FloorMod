@@ -1,4 +1,4 @@
-package Floor.FTools;
+package Floor.FTools.interfaces;
 
 import arc.math.geom.Vec2;
 

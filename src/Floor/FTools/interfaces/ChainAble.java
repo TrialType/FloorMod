@@ -1,9 +1,9 @@
-package Floor.FTools;
+package Floor.FTools.interfaces;
 
 import mindustry.gen.Healthc;
 import mindustry.gen.Unit;
 
-public interface UnitChainAble {
+public interface ChainAble {
     Healthc order();
 
     void order(Healthc order);

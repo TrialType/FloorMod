@@ -1,9 +1,9 @@
 package Floor.FEntities.FUnit.Override;
 
-import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.LayAble;
-import Floor.FTools.UnitChainAble;
-import Floor.FTools.UnitUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
+import Floor.FTools.interfaces.LayAble;
+import Floor.FTools.interfaces.ChainAble;
+import Floor.FTools.classes.UnitUpGrade;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Bits;
@@ -706,7 +706,7 @@ public class FUnitEntity extends UnitEntity implements FUnitUpGrade, LayAble {
 
         for (int i = 0; i < units.size; i++) {
             Unit u = units.get(i);
-            if (u instanceof UnitChainAble uca) {
+            if (u instanceof ChainAble uca) {
                 if (!u.within(x, y, u.speed() * 700) || u.isPlayer()) {
                     uca.UnderUnit(null);
                     uca.upon(false);

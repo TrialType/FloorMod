@@ -1,6 +1,6 @@
 package Floor.FEntities.FBulletType;
 
-import Floor.FTools.FDamage;
+import Floor.FTools.classes.FDamage;
 import arc.Events;
 import arc.util.Tmp;
 import mindustry.content.StatusEffects;

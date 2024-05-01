@@ -1,4 +1,4 @@
-package Floor.FTools;
+package Floor.FTools.classes;
 
 import Floor.FContent.FStatusEffects;
 import arc.Events;
@@ -9,7 +9,6 @@ import arc.math.geom.Rect;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.Nullable;
-import mindustry.content.StatusEffects;
 import mindustry.core.World;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;

@@ -1,4 +1,4 @@
-package Floor.FTools;
+package Floor.FTools.classes;
 
 import arc.math.Mathf;
 import arc.math.geom.QuadTree;

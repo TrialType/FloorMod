@@ -1,6 +1,6 @@
 package Floor.FEntities.FUnit.Override;
 
-import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Bits;

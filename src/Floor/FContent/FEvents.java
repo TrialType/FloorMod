@@ -1,9 +1,9 @@
 package Floor.FContent;
 
-import Floor.FTools.FBuildUpGrade;
-import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.UnitUpGrade;
-import Floor.FTools.UpGradeTime;
+import Floor.FTools.interfaces.FBuildUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
+import Floor.FTools.classes.UnitUpGrade;
+import Floor.FTools.interfaces.UpGradeTime;
 import Floor.FType.FDialog.MoreResearchDialog;
 import Floor.FType.UponFloor.CorrosionMist;
 import arc.Events;

@@ -1,6 +1,6 @@
 package Floor.FEntities.FBlock;
 
-import Floor.FTools.Corrosion;
+import Floor.FTools.interfaces.Corrosion;
 import mindustry.type.StatusEffect;
 import mindustry.world.blocks.environment.Floor;
 

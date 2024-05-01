@@ -1,4 +1,4 @@
-package Floor.FTools;
+package Floor.FTools.classes;
 
 import Floor.FEntities.FUnit.F.TileMiner;
 import arc.math.Mathf;

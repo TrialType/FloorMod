@@ -1,11 +1,10 @@
 package Floor.FEntities.FBulletType;
 
 import Floor.FContent.FStatusEffects;
-import Floor.FTools.FDamage;
+import Floor.FTools.classes.FDamage;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
-import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;

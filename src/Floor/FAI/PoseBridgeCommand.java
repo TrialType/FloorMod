@@ -1,8 +1,7 @@
 package Floor.FAI;
 
-import Floor.FTools.NeedPoseBridge;
+import Floor.FTools.interfaces.NeedPoseBridge;
 import mindustry.ai.types.CommandAI;
-import mindustry.content.Fx;
 
 public class PoseBridgeCommand extends CommandAI {
     @Override

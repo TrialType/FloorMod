@@ -1,7 +1,7 @@
 package Floor.FEntities.FUnit.Override;
 
-import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.UnitUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
+import Floor.FTools.classes.UnitUpGrade;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;

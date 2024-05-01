@@ -1,6 +1,6 @@
 package Floor.FEntities.FBlock;
 
-import Floor.FTools.RangePure;
+import Floor.FTools.interfaces.RangePure;
 import Floor.FType.UponFloor.CorrosionMist;
 import arc.Core;
 import arc.graphics.g2d.Draw;

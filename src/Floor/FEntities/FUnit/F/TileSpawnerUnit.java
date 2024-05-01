@@ -1,6 +1,6 @@
 package Floor.FEntities.FUnit.F;
 
-import Floor.FTools.StrongSpawner;
+import Floor.FTools.interfaces.StrongSpawner;
 import arc.math.Mathf;
 import arc.struct.Bits;
 import arc.struct.Seq;

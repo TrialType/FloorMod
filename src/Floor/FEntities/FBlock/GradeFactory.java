@@ -1,8 +1,8 @@
 package Floor.FEntities.FBlock;
 
 import Floor.FContent.FItems;
-import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.UnitUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
+import Floor.FTools.classes.UnitUpGrade;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
@@ -13,7 +13,6 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.core.GameState;
-import mindustry.entities.bullet.BulletType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -25,7 +24,6 @@ import mindustry.ui.Bar;
 import mindustry.ui.ItemDisplay;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import mindustry.world.blocks.logic.LogicBlock;
 import mindustry.world.blocks.payloads.Payload;
 import mindustry.world.blocks.payloads.UnitPayload;
 import mindustry.world.blocks.units.UnitBlock;

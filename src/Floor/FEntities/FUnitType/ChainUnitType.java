@@ -1,30 +1,21 @@
 package Floor.FEntities.FUnitType;
 
 import Floor.FAI.ChainAI;
-import Floor.FTools.UnitChainAble;
-import arc.Core;
+import Floor.FTools.interfaces.ChainAble;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
-import arc.scene.ui.layout.Table;
 import arc.util.Tmp;
 import mindustry.ai.UnitCommand;
-import mindustry.content.StatusEffects;
 import mindustry.entities.Leg;
 import mindustry.gen.Legsc;
-import mindustry.gen.Payloadc;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
-import mindustry.type.UnitType;
-import mindustry.world.blocks.environment.Floor;
 import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
-import mindustry.world.meta.StatValues;
 
 import static Floor.FContent.FCommands.*;
-import static mindustry.Vars.tilesize;
 
 
 public class ChainUnitType extends UpGradeUnitType {
@@ -47,7 +38,7 @@ public class ChainUnitType extends UpGradeUnitType {
 
     @Override
     public void drawEngines(Unit unit) {
-        if (unit instanceof UnitChainAble uca) {
+        if (unit instanceof ChainAble uca) {
             Unit u = uca.UnderUnit();
             if ((uca.upon() && unit.within(u.x, u.y, 4.5F)) || unit.elevation < 0.0001F) {
                 return;

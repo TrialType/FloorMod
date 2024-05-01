@@ -1,9 +1,9 @@
 package Floor.FEntities.FUnit.Override;
 
-import Floor.FTools.FUnitUpGrade;
-import Floor.FTools.LayAble;
-import Floor.FTools.UnitChainAble;
-import Floor.FTools.UnitUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
+import Floor.FTools.interfaces.LayAble;
+import Floor.FTools.interfaces.ChainAble;
+import Floor.FTools.classes.UnitUpGrade;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Bits;
@@ -495,18 +495,18 @@ public class FElevationMoveUnit extends ElevationMoveUnit implements FUnitUpGrad
 
         for (Unit u : units) {
             if (!u.within(x, y, u.speed() * 40)) {
-                if (u instanceof UnitChainAble uca) {
+                if (u instanceof ChainAble uca) {
                     uca.UnderUnit(null);
                     uca.upon(false);
                 }
                 units.remove(u);
                 continue;
             }
-            if ((u.dead || u.health() <= 0) || (u instanceof UnitChainAble uca && uca.UnderUnit() != this)) {
+            if ((u.dead || u.health() <= 0) || (u instanceof ChainAble uca && uca.UnderUnit() != this)) {
                 units.remove(u);
                 continue;
             }
-            if (u instanceof UnitChainAble uca && uca.UnderUnit() == null) uca.UnderUnit(this);
+            if (u instanceof ChainAble uca && uca.UnderUnit() == null) uca.UnderUnit(this);
         }
     }
 

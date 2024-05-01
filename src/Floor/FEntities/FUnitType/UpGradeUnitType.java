@@ -1,6 +1,6 @@
 package Floor.FEntities.FUnitType;
 
-import Floor.FTools.FUnitUpGrade;
+import Floor.FTools.interfaces.FUnitUpGrade;
 import arc.Core;
 import arc.graphics.Color;
 import arc.scene.ui.layout.Table;

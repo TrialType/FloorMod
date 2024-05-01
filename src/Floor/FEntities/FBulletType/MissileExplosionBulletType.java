@@ -1,17 +1,11 @@
 package Floor.FEntities.FBulletType;
 
-import Floor.FTools.FDamage;
 import arc.math.Mathf;
 import arc.util.Nullable;
 import arc.util.Time;
 import mindustry.ai.types.MissileAI;
-import mindustry.content.Fx;
-import mindustry.content.StatusEffects;
-import mindustry.entities.Damage;
-import mindustry.entities.Fires;
 import mindustry.entities.Mover;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.world.blocks.ControlBlock;

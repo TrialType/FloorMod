@@ -176,17 +176,6 @@ public class Techs {
                 });
             });
 
-            node(laserProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
-                node(laserProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
-                    node(laserProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
-                        node(laserProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
-                            node(laserProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
-                            });
-                        });
-                    });
-                });
-            });
-
             node(reloadProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(reloadProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(reloadProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -225,17 +214,6 @@ public class Techs {
                     node(pricesProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
                         node(pricesProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
                             node(pricesProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
-                            });
-                        });
-                    });
-                });
-            });
-
-            node(slowProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
-                node(slowProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
-                    node(slowProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
-                        node(slowProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
-                            node(slowProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
                             });
                         });
                     });

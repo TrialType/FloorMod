@@ -2,8 +2,7 @@ package Floor.FEntities.FUnit.F;
 
 
 import Floor.FAI.PoseBridgeCommand;
-import Floor.FContent.FBlocks;
-import Floor.FTools.FLine;
+import Floor.FTools.classes.FLine;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;

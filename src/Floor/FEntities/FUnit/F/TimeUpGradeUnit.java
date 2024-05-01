@@ -1,7 +1,7 @@
 package Floor.FEntities.FUnit.F;
 
 import Floor.FEntities.FUnit.Override.FUnitEntity;
-import Floor.FTools.UpGradeTime;
+import Floor.FTools.interfaces.UpGradeTime;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Seq;
