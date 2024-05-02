@@ -17,7 +17,6 @@ import static mindustry.Vars.ui;
 
 public class GradeBulletDialog extends BaseDialog {
     public final Seq<String> types = new Seq<>(new String[]{"bullet", "laser", "liquid"});
-    public static BulletType bullet;
 
     //rollback
     public String lastType = "";
@@ -26,6 +25,10 @@ public class GradeBulletDialog extends BaseDialog {
     //update
     public String type = "";
     public HashMap<String, Object> change = new HashMap<>();
+
+
+    public static BulletType bullet;
+    private String area = "";
 
     public GradeBulletDialog(String title, DialogStyle style) {
         super(title, style);
@@ -85,35 +88,37 @@ public class GradeBulletDialog extends BaseDialog {
 
         switch (type) {
             case "bullet" -> table.table(t -> {
+                area = "bulletWide";
                 t.table(base -> {
-                    base.add(Core.bundle.get("dialog.bullet.bulletWide") + ":");
-                    base.label(() -> change.computeIfAbsent("bulletWide", s -> 12) + "");
-                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet.bulletWide"), "", 10, change.get("bulletWide") + "", true, str -> {
+                    base.add(Core.bundle.get("dialog.bullet." + area) + ":");
+                    base.label(() -> change.computeIfAbsent(area, s -> 12) + "");
+                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + area), "", 10, change.get(area) + "", true, str -> {
                         if (Strings.canParsePositiveInt(str)) {
                             int amount = Strings.parseInt(str);
                             if (amount > 0 && amount <= 45) {
-                                change.put("bulletWide", amount);
+                                change.put(area, amount);
                                 return;
                             }
                         }
                         ui.showInfo(Core.bundle.format("configure.invalid", 45));
                     })).size(20);
-                });
+                }).pad(5);
 
+                area = "bulletHeight";
                 t.table(base -> {
-                    base.add(Core.bundle.get("dialog.bullet.bulletHeight") + ":");
-                    base.label(() -> change.computeIfAbsent("bulletHeight", s -> 12) + "");
-                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet.bulletHeight"), "", 10, change.get("bulletWide") + "", true, str -> {
+                    base.add(Core.bundle.get("dialog.bullet." + area) + ":");
+                    base.label(() -> change.computeIfAbsent(area, s -> 12) + "");
+                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + area), "", 10, change.get(area) + "", true, str -> {
                         if (Strings.canParsePositiveInt(str)) {
                             int amount = Strings.parseInt(str);
                             if (amount > 0 && amount <= 45) {
-                                change.put("bulletHeight", amount);
+                                change.put(area, amount);
                                 return;
                             }
                         }
                         ui.showInfo(Core.bundle.format("configure.invalid", 45));
                     })).size(20);
-                });
+                }).pad(5);
             }).pad(2).left().fillX();
             case "laser" -> table.table(t -> {
 
