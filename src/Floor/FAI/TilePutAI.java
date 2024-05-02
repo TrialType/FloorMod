@@ -1,7 +1,7 @@
 package Floor.FAI;
 
 import Floor.FEntities.FUnit.F.TileMiner;
-import Floor.FTools.classes.FLine;
+import Floor.FTools.classes.FLocated;
 import Floor.FTools.interfaces.NeedPoseBridge;
 import arc.math.geom.Vec2;
 import arc.struct.IntSeq;
@@ -36,12 +36,12 @@ public class TilePutAI extends AIController implements NeedPoseBridge {
                 if (tile != null && tile.overlay().itemDrop == null && index >= 0 && tile.block() instanceof AirBlock) {
                     tile.setOverlay(items[index]);
                     tile.overlay().drawBase(tile);
-                    IntSeq is = FLine.ores[items[index].itemDrop.id][tile.x / FLine.quadrantSize][tile.y / FLine.quadrantSize];
+                    IntSeq is = FLocated.ores[items[index].itemDrop.id][tile.x / FLocated.quadrantSize][tile.y / FLocated.quadrantSize];
                     if (is == null) {
-                        is = FLine.ores[items[index].itemDrop.id][tile.x / FLine.quadrantSize][tile.y / FLine.quadrantSize] = new IntSeq(false, 16);
+                        is = FLocated.ores[items[index].itemDrop.id][tile.x / FLocated.quadrantSize][tile.y / FLocated.quadrantSize] = new IntSeq(false, 16);
                     }
                     is.add(tile.pos());
-                    FLine.allOres.increment(items[index].itemDrop, 1);
+                    FLocated.allOres.increment(items[index].itemDrop, 1);
                     items[index] = null;
                 }
             }

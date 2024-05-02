@@ -16,7 +16,7 @@ public class FItems {
             pricesProject1, pricesProject2, pricesProject3, pricesProject4, pricesProject5,
             knockProject1, knockProject2, knockProject3, knockProject4, knockProject5,
             percentProject1, percentProject2, percentProject3, percentProject4, percentProject5;
-    public static Item[] allSize, allSpeed, allHealth, allCopper, allReload,
+    public static Item[] allSize, allSpeed, allHealth, allDamage, allReload,
             allShield, allSplash, allPrices, allKnock, allPercent;
     public static Item[][] allBullet, allAbility, allBase, allWeapon;
 
@@ -289,7 +289,7 @@ public class FItems {
         };
         allHealth = new Item[]{healthProject1, healthProject2, healthProject3, healthProject4, healthProject5};
         allSpeed = new Item[]{speedProject1, speedProject2, speedProject3, speedProject4, speedProject5};
-        allCopper = new Item[]{bulletProject1, bulletProject2, bulletProject3, bulletProject4, bulletProject5};
+        allDamage = new Item[]{bulletProject1, bulletProject2, bulletProject3, bulletProject4, bulletProject5};
         allReload = new Item[]{reloadProject1, reloadProject2, reloadProject3, reloadProject4, reloadProject5};
         allShield = new Item[]{shieldProject1, shieldProject2, shieldProject3, shieldProject4, shieldProject5};
         allSplash = new Item[]{splashProject1, splashProject2, splashProject3, splashProject4, splashProject5};
@@ -297,7 +297,7 @@ public class FItems {
         allKnock = new Item[]{knockProject1, knockProject2, knockProject3, knockProject4, knockProject5};
         allPercent = new Item[]{percentProject1, percentProject2, percentProject4, percentProject5};
 
-        allBullet = new Item[][]{allCopper, allSplash, allPrices, allKnock, allPercent};
+        allBullet = new Item[][]{allDamage, allSplash, allPrices, allKnock, allPercent};
         allWeapon = new Item[][]{allReload};
         allAbility = new Item[][]{allShield};
         allBase = new Item[][]{allSize, allHealth, allSpeed};

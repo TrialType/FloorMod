@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static mindustry.Vars.*;
 
-public class FLine {
+public class FLocated {
     public static final Map<Tile, TileMiner> tm = new HashMap<>();
     public static IntSeq[][][] ores;
     public static ObjectIntMap<Item> allOres;
@@ -24,7 +24,7 @@ public class FLine {
     public static int quadWidth, quadHeight;
     private static int index = -1;
 
-    private FLine() {
+    private FLocated() {
     }
 
     public static boolean couldMine(TileMiner unit, Tile tile) {
@@ -90,8 +90,8 @@ public class FLine {
         get();
         Item item = tile.drop();
         if (ores[item.id] != null) {
-            int qx = (tile.x / FLine.quadrantSize);
-            int qy = (tile.y / FLine.quadrantSize);
+            int qx = (tile.x / FLocated.quadrantSize);
+            int qy = (tile.y / FLocated.quadrantSize);
             ores[item.id][qx][qy].removeValue(tile.pos());
             allOres.increment(item, -1);
         }

@@ -1,16 +1,14 @@
 package Floor;
 
 import Floor.FContent.*;
-import Floor.FType.FDialog.GradeBulletDialog;
-import arc.Core;
-import arc.struct.IntSeq;
+import Floor.FType.FDialog.BulletDialog;
 import arc.util.Time;
 import mindustry.mod.Mod;
 
 public class Floor extends Mod {
     public Floor() {
         Time.run(60, () -> {
-            new GradeBulletDialog("").show();
+            new BulletDialog(null, "").show();
         });
     }
 

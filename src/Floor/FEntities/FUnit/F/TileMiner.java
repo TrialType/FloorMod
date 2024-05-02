@@ -2,7 +2,7 @@ package Floor.FEntities.FUnit.F;
 
 
 import Floor.FAI.PoseBridgeCommand;
-import Floor.FTools.classes.FLine;
+import Floor.FTools.classes.FLocated;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;
@@ -158,8 +158,8 @@ public class TileMiner extends UnitEntityLegacyMono {
                     } else if (tiles[1] == null) {
                         tiles[1] = mineTile.overlay();
                     }
-                    FLine.removeOre(mineTile);
-                    FLine.tm.remove(mineTile);
+                    FLocated.removeOre(mineTile);
+                    FLocated.tm.remove(mineTile);
                     mineTile.setOverlay(Blocks.air);
                     mineTile.overlay().drawBase(mineTile);
                     this.mineTile = null;
@@ -574,7 +574,7 @@ public class TileMiner extends UnitEntityLegacyMono {
             tiles[i] = content.block(read.i()).asFloor();
         }
         sid = read.i();
-        FLine.tm.put(mineTile, this);
+        FLocated.tm.put(mineTile, this);
         mineTimer = read.f();
         if(controller instanceof CommandAI && !(controller instanceof PoseBridgeCommand)){
             controller = new PoseBridgeCommand();

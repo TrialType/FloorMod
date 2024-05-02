@@ -1,7 +1,7 @@
 package Floor.FAI;
 
 import Floor.FEntities.FUnit.F.TileMiner;
-import Floor.FTools.classes.FLine;
+import Floor.FTools.classes.FLocated;
 import Floor.FTools.interfaces.NeedPoseBridge;
 import arc.math.geom.Vec2;
 import mindustry.content.Blocks;
@@ -36,7 +36,7 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
             if (!unit.canMine()) return;
             if (unit.mineTile != null && !unit.mineTile.within(unit, unit.hitSize * 4)) {
                 unit.elevation = 1;
-                FLine.tm.remove(unit.mineTile);
+                FLocated.tm.remove(unit.mineTile);
                 unit.mineTile(null);
                 targetItem = null;
                 ore = null;
@@ -53,18 +53,18 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
                         if (timer.get(timerTarget2, 60 * 4) || targetItem == null) {
                             CoreBlock.CoreBuild core = unit.closestEnemyCore();
                             if(core != null){
-                                targetItem = unit.type.mineItems.min(i -> FLine.hasOre(i) && unit.canMine(i) && FLine.allOres.get(i) > 0,
+                                targetItem = unit.type.mineItems.min(i -> FLocated.hasOre(i) && unit.canMine(i) && FLocated.allOres.get(i) > 0,
                                         i -> core.items.get(i));
                             }
                         }
                         if (targetItem != null) {
-                            ore = FLine.findOre(sm, targetItem);
+                            ore = FLocated.findOre(sm, targetItem);
                         }
                         if (ore != null) {
                             moveTo(ore, unit.hitSize * 4, 20f);
                             if (ore.block() == Blocks.air && unit.within(ore, unit.hitSize * 5)) {
                                 unit.mineTile = ore;
-                                FLine.tm.put(ore, sm);
+                                FLocated.tm.put(ore, sm);
                             }
                             if (ore.block() != Blocks.air) {
                                 mining = false;
@@ -103,7 +103,7 @@ public class TileMinerAI extends AIController implements NeedPoseBridge {
                             moveTo(ore, unit.hitSize * 3, 20f);
                             if (ore.block() == Blocks.air && unit.within(ore, unit.hitSize * 4)) {
                                 unit.mineTile = ore;
-                                FLine.tm.put(ore, sm);
+                                FLocated.tm.put(ore, sm);
                             }
                             if (ore.block() != Blocks.air) {
                                 mining = false;

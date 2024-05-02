@@ -69,7 +69,6 @@ public class PhysicsWorldChanger extends PhysicsProcess.PhysicsWorld {
                     float ms = body.mass + other.mass;
                     float m1 = other.mass / ms, m2 = body.mass / ms;
 
-                    //first body is always local due to guard check above
                     body.x += vec.x * m1 / scl;
                     body.y += vec.y * m1 / scl;
 
