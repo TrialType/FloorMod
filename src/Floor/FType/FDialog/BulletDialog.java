@@ -82,8 +82,8 @@ public class BulletDialog extends BaseDialog {
 
     public void Front(Table table) {
         table.table(t -> {
-            t.add(Core.bundle.get("dialog.bullet-type") + ":").size(40).pad(10);
-            t.label(() -> Core.bundle.format("dialog." + newType)).size(40).pad(10);
+            t.add(Core.bundle.get("dialog.bullet-type") + ":").size(40).width(100).pad(10);
+            t.label(() -> Core.bundle.format("dialog." + newType)).size(40).width(100).pad(10);
             t.button(b -> {
                 b.image(Icon.down).size(5);
 
@@ -93,6 +93,10 @@ public class BulletDialog extends BaseDialog {
                         tb.button(Core.bundle.get("dialog." + name), () -> {
                             newType = name;
                             typeNew = typeLast = Core.settings.getJson("floor-bulletDialog-" + newType, HashMap.class, HashMap::new);
+                            if (typeNew == null) {
+                                typeNew = typeLast = new HashMap<>();
+                                Core.settings.putJson("floor-bulletDialog-" + newType, HashMap.class, typeNew);
+                            }
                             hide.run();
                             updateHeavy();
                             rebuildType();
@@ -102,7 +106,7 @@ public class BulletDialog extends BaseDialog {
                 }));
             }, Styles.logici, () -> {
             }).size(40);
-        }).pad(2).left().growX().row();
+        }).pad(2).left().growX().width(400).row();
 
         table.table(t -> typeOn = t).pad(2).left().fillX();
         rebuildType();
@@ -168,7 +172,7 @@ public class BulletDialog extends BaseDialog {
                         return;
                     }
                 }
-                ui.showInfo(Core.bundle.format("configure.invalid", 45));
+                ui.showInfo(Core.bundle.format("configure.invalid", max));
             })).size(55);
         }).pad(10).fillX();
     }
