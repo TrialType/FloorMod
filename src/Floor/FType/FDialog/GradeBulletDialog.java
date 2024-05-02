@@ -1,122 +1,166 @@
 package Floor.FType.FDialog;
 
-import Floor.FContent.FItems;
 import arc.Core;
 import arc.math.Interp;
 import arc.scene.actions.Actions;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Strings;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Icon;
-import mindustry.type.Item;
+import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
-public class GradeBulletDialog extends BaseDialog {
-    public static BulletType bullet;
-    public int nameUsing = 0;
+import java.util.HashMap;
 
-    public final Seq<String> typeNames = new Seq<>(new String[]{"copper", "laser", "liquid"});
-    public final static int bulletProjectNumber = 5;
-    //copperLev 0,splashLev 2,pricesLev 3,knockLev 5,percentLev 6
-    public Seq<Integer> use = new Seq<>(new Integer[bulletProjectNumber]);
-    public Seq<Integer> change = new Seq<>(new Integer[bulletProjectNumber]);
+import static mindustry.Vars.ui;
+
+public class GradeBulletDialog extends BaseDialog {
+    public final Seq<String> types = new Seq<>(new String[]{"bullet", "laser", "liquid"});
+    public static BulletType bullet;
+
+    //rollback
+    public String lastType = "";
+    public HashMap<String, Object> use = new HashMap<>();
+
+    //update
+    public String type = "";
+    public HashMap<String, Object> change = new HashMap<>();
 
     public GradeBulletDialog(String title, DialogStyle style) {
         super(title, style);
         shown(this::loadBase);
 
         buttons.button("@back", Icon.left, () -> {
+            loadOut(use, type);
             hide();
-            loadOut(use);
         }).size(210f, 64f);
         buttons.button("@apply", Icon.flipY, () -> {
+            loadOut(change, lastType);
             hide();
-            loadOut(change);
-            use = change;
         }).size(210f, 64f);
     }
 
     public GradeBulletDialog(String title) {
         super(title);
+        shown(this::loadBase);
+
+        buttons.button("@back", Icon.left, () -> {
+            loadOut(use, type);
+            hide();
+        }).size(210f, 64f);
+        buttons.button("@apply", Icon.right, () -> {
+            loadOut(change, lastType);
+            hide();
+        }).size(210f, 64f);
     }
 
     public void loadBase() {
         loadIn();
-        Seq<Integer> max = new Seq<>(new Integer[bulletProjectNumber]);
-        for (int j = 0; j < bulletProjectNumber; j++) {
-            Item[] items = FItems.allBullet[j];
-            for (int i = items.length - 1; i >= 0; i--) {
-                if (items[i].unlocked()) {
-                    max.items[j] = i + 1;
+
+        cont.pane(this::BulletBase);
+    }
+
+    public void BulletBase(Table table) {
+        table.table(t -> {
+            t.add(Core.bundle.get("dialog.bullet-type") + ":");
+            t.label(() -> Core.bundle.format("dialog." + type));
+            t.button(Icon.down, () -> {
+                Table select = new Table();
+                select.pack();
+                select.setTransform(true);
+                select.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+                        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+
+                for (String name : types) {
+                    select.button(Core.bundle.get("dialog." + name), () -> {
+                        type = name;
+                        use = change = Core.settings.getJson("floor-bulletDialog-" + type, HashMap.class, HashMap::new);
+                        select.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
+                    });
+                    select.row();
                 }
-            }
-        }
+            });
+        }).pad(2).left().fillX().row();
 
-        for (int i = 0; i < bulletProjectNumber; i++) {
-            if (max.get(i) < use.get(i)) {
-                use.items[i] = change.items[i] = max.get(i);
-            }
-        }
+        switch (type) {
+            case "bullet" -> table.table(t -> {
+                t.table(base -> {
+                    base.add(Core.bundle.get("dialog.bullet.bulletWide") + ":");
+                    base.label(() -> change.computeIfAbsent("bulletWide", s -> 12) + "");
+                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet.bulletWide"), "", 10, change.get("bulletWide") + "", true, str -> {
+                        if (Strings.canParsePositiveInt(str)) {
+                            int amount = Strings.parseInt(str);
+                            if (amount > 0 && amount <= 45) {
+                                change.put("bulletWide", amount);
+                                return;
+                            }
+                        }
+                        ui.showInfo(Core.bundle.format("configure.invalid", 45));
+                    })).size(20);
+                });
 
-        cont.pane(table -> {
-            table.table(t -> {
-                t.add(Core.bundle.get("dialog.bullet-type"));
-                t.label(() -> Core.bundle.format("dialog." + typeNames.get(nameUsing)));
-                t.button(Icon.down, () -> {
-                    Table select = new Table();
-                    select.pack();
-                    select.setTransform(true);
-                    select.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                            Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
-
-                    for (String name : typeNames) {
-                        select.button(Core.bundle.get("dialog." + name), () -> {
-                            nameUsing = typeNames.indexOf(name);
-                            select.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
-                        });
-                        select.row();
-                    }
+                t.table(base -> {
+                    base.add(Core.bundle.get("dialog.bullet.bulletHeight") + ":");
+                    base.label(() -> change.computeIfAbsent("bulletHeight", s -> 12) + "");
+                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet.bulletHeight"), "", 10, change.get("bulletWide") + "", true, str -> {
+                        if (Strings.canParsePositiveInt(str)) {
+                            int amount = Strings.parseInt(str);
+                            if (amount > 0 && amount <= 45) {
+                                change.put("bulletHeight", amount);
+                                return;
+                            }
+                        }
+                        ui.showInfo(Core.bundle.format("configure.invalid", 45));
+                    })).size(20);
                 });
             }).pad(2).left().fillX();
+            case "laser" -> table.table(t -> {
 
-            if (nameUsing == 0) {
-                table.table(t -> {
-                    t.add(Core.bundle.get("dialog.bullet-type"));
-                    t.label(() -> Core.bundle.format("dialog." + typeNames.get(nameUsing)));
-                    t.button(Icon.down, () -> {
-                        Table select = new Table();
-                        select.pack();
-                        select.setTransform(true);
-                        select.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                                Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+            }).pad(2).left().fillX();
+            case "liquid" -> table.table(t -> {
 
-                        for (String name : typeNames) {
-                            select.button(Core.bundle.get("dialog." + name), () -> {
-                                nameUsing = typeNames.indexOf(name);
-                                select.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
-                            });
-                            select.row();
-                        }
-                    });
-                }).pad(2).left().fillX();
-            } else if (nameUsing == 1) {
-
-            }
-        });
+            }).pad(2).left().fillX();
+        }
     }
 
     public void loadIn() {
-        Integer[] values = Core.settings.getJson("floor-bulletDialog",
-                Integer[].class, () -> new Integer[use.size]);
-        nameUsing = Core.settings.getInt("floor-bulletName");
-        if (values != null) {
-            use = new Seq<>(values);
-            change = new Seq<>(values);
+        type = lastType = Core.settings.getString("floor-bulletName");
+        if (type == null || type.isEmpty()) {
+            type = lastType = "bullet";
+            Core.settings.put("floor-bulletName", "bullet");
+        }
+        switch (type) {
+            case "bullet" -> {
+                use = change = Core.settings.getJson("floor-bulletDialog-bullet", HashMap.class, HashMap::new);
+                if (use == null) {
+                    use = change = new HashMap<>();
+                    Core.settings.putJson("floor-bulletDialog-bullet", HashMap.class, use);
+                }
+            }
+            case "laser" -> {
+                use = change = Core.settings.getJson("floor-bulletDialog-laser", HashMap.class, HashMap::new);
+                if (use == null) {
+                    use = change = new HashMap<>();
+                    Core.settings.putJson("floor-bulletDialog-laser", HashMap.class, use);
+                }
+            }
+            case "liquid" -> {
+                use = change = Core.settings.getJson("floor-bulletDialog-liquid", HashMap.class, HashMap::new);
+                if (use == null) {
+                    use = change = new HashMap<>();
+                    Core.settings.putJson("floor-bulletDialog-liquid", HashMap.class, use);
+                }
+            }
         }
     }
 
-    public void loadOut(Seq<Integer> save) {
-        Core.settings.putJson("floor-bulletDialog", Integer[].class, save.items);
-        Core.settings.put("floor-bulletName", nameUsing);
+    public void loadOut(HashMap<String, Object> maps, String type) {
+        Core.settings.put("floor-bulletName", type);
+        switch (type) {
+            case "bullet" -> Core.settings.putJson("floor-bulletDialog-bullet", HashMap.class, maps);
+            case "laser" -> Core.settings.putJson("floor-bulletDialog-laser", HashMap.class, maps);
+            case "liquid" -> Core.settings.putJson("floor-bulletDialog-liquid", HashMap.class, maps);
+        }
     }
 }

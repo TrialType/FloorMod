@@ -1,18 +1,22 @@
 package Floor;
 
 import Floor.FContent.*;
+import Floor.FType.FDialog.GradeBulletDialog;
 import arc.Core;
 import arc.struct.IntSeq;
+import arc.util.Time;
 import mindustry.mod.Mod;
 
 public class Floor extends Mod {
     public Floor() {
+        Time.run(60, () -> {
+            new GradeBulletDialog("").show();
+        });
     }
 
     @Override
     public void loadContent() {
-
-        Core.settings.putJson("floor-stronger-core", new IntSeq(new int[]{32}));
+        FSettings.load();
         FLiquids.load();
         FItems.load();
         FCommands.load();

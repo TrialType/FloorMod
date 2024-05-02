@@ -9,7 +9,7 @@ public class FItems {
             sizeProject1, sizeProject2, sizeProject3, sizeProject4, sizeProject5, sizeProject6, sizeProject7, sizeProject8, sizeProject9, sizeProject10,
             speedProject1, speedProject2, speedProject3, speedProject4, speedProject5,
             healthProject1, healthProject2, healthProject3, healthProject4, healthProject5,
-            copperProject1, copperProject2, copperProject3, copperProject4, copperProject5,
+            bulletProject1, bulletProject2, bulletProject3, bulletProject4, bulletProject5,
             reloadProject1, reloadProject2, reloadProject3, reloadProject4, reloadProject5,
             shieldProject1, shieldProject2, shieldProject3, shieldProject4, shieldProject5,
             splashProject1, splashProject2, splashProject3, splashProject4, splashProject5,
@@ -142,23 +142,23 @@ public class FItems {
             hidden = true;
             buildable = false;
         }};
-        copperProject1 = new Item("copper-project1") {{
+        bulletProject1 = new Item("copper-project1") {{
             hidden = true;
             buildable = false;
         }};
-        copperProject2 = new Item("copper-project2") {{
+        bulletProject2 = new Item("copper-project2") {{
             hidden = true;
             buildable = false;
         }};
-        copperProject3 = new Item("copper-project3") {{
+        bulletProject3 = new Item("copper-project3") {{
             hidden = true;
             buildable = false;
         }};
-        copperProject4 = new Item("copper-project4") {{
+        bulletProject4 = new Item("copper-project4") {{
             hidden = true;
             buildable = false;
         }};
-        copperProject5 = new Item("copper-project5") {{
+        bulletProject5 = new Item("copper-project5") {{
             hidden = true;
             buildable = false;
         }};
@@ -289,7 +289,7 @@ public class FItems {
         };
         allHealth = new Item[]{healthProject1, healthProject2, healthProject3, healthProject4, healthProject5};
         allSpeed = new Item[]{speedProject1, speedProject2, speedProject3, speedProject4, speedProject5};
-        allCopper = new Item[]{copperProject1, copperProject2, copperProject3, copperProject4, copperProject5};
+        allCopper = new Item[]{bulletProject1, bulletProject2, bulletProject3, bulletProject4, bulletProject5};
         allReload = new Item[]{reloadProject1, reloadProject2, reloadProject3, reloadProject4, reloadProject5};
         allShield = new Item[]{shieldProject1, shieldProject2, shieldProject3, shieldProject4, shieldProject5};
         allSplash = new Item[]{splashProject1, splashProject2, splashProject3, splashProject4, splashProject5};

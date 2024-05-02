@@ -7,7 +7,6 @@ import mindustry.type.ItemStack;
 
 import static Floor.FContent.FBlocks.*;
 import static Floor.FContent.FItems.*;
-import static Floor.FContent.FItems.laserProject5;
 import static Floor.FContent.FPlanetGenerators.fullWater;
 import static Floor.FContent.FPlanetGenerators.longestDown;
 import static Floor.FContent.FPlanets.ENGSWEIS;
@@ -165,11 +164,11 @@ public class Techs {
                 });
             });
 
-            node(copperProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
-                node(copperProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
-                    node(copperProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
-                        node(copperProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
-                            node(copperProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+            node(bulletProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(bulletProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(bulletProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(bulletProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(bulletProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
                             });
                         });
                     });
