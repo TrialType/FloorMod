@@ -28,7 +28,6 @@ public class GradeBulletDialog extends BaseDialog {
 
 
     public static BulletType bullet;
-    private String area = "";
 
     public GradeBulletDialog(String title, DialogStyle style) {
         super(title, style);
@@ -70,11 +69,6 @@ public class GradeBulletDialog extends BaseDialog {
             t.label(() -> Core.bundle.format("dialog." + type));
             t.button(Icon.down, () -> {
                 Table select = new Table();
-                select.pack();
-                select.setTransform(true);
-                select.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
-
                 for (String name : types) {
                     select.button(Core.bundle.get("dialog." + name), () -> {
                         type = name;
@@ -83,43 +77,48 @@ public class GradeBulletDialog extends BaseDialog {
                     });
                     select.row();
                 }
+                select.pack();
+                select.setTransform(true);
+                select.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+                        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
             });
         }).pad(2).left().fillX().row();
 
         switch (type) {
             case "bullet" -> table.table(t -> {
-                area = "bulletWide";
+                String place1 = "bulletWide";
                 t.table(base -> {
-                    base.add(Core.bundle.get("dialog.bullet." + area) + ":");
-                    base.label(() -> change.computeIfAbsent(area, s -> 12) + "");
-                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + area), "", 10, change.get(area) + "", true, str -> {
+                    base.add(Core.bundle.get("dialog.bullet." + place1) + ":");
+                    base.label(() -> change.computeIfAbsent(place1, s -> 12) + "");
+                    base.button(Icon.pencil, Styles.flati, 20, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + place1), "", 10, change.get(place1) + "", true, str -> {
                         if (Strings.canParsePositiveInt(str)) {
                             int amount = Strings.parseInt(str);
                             if (amount > 0 && amount <= 45) {
-                                change.put(area, amount);
+                                change.put(place1, amount);
                                 return;
                             }
                         }
                         ui.showInfo(Core.bundle.format("configure.invalid", 45));
                     })).size(20);
-                }).pad(5);
+                }).pad(5).fillX();
 
-                area = "bulletHeight";
+                String place2 = "bulletHeight";
                 t.table(base -> {
-                    base.add(Core.bundle.get("dialog.bullet." + area) + ":");
-                    base.label(() -> change.computeIfAbsent(area, s -> 12) + "");
-                    base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + area), "", 10, change.get(area) + "", true, str -> {
+                    base.add(Core.bundle.get("dialog.bullet." + place2) + ":");
+                    base.label(() -> change.computeIfAbsent(place2, s -> 12) + "");
+                    base.button(Icon.pencil, Styles.flati, 20, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + place2), "", 10, change.get(place2) + "", true, str -> {
                         if (Strings.canParsePositiveInt(str)) {
                             int amount = Strings.parseInt(str);
                             if (amount > 0 && amount <= 45) {
-                                change.put(area, amount);
+                                change.put(place2, amount);
                                 return;
                             }
                         }
                         ui.showInfo(Core.bundle.format("configure.invalid", 45));
                     })).size(20);
-                }).pad(5);
+                }).pad(5).fillX();
             }).pad(2).left().fillX();
+
             case "laser" -> table.table(t -> {
 
             }).pad(2).left().fillX();
