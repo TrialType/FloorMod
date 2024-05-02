@@ -3,6 +3,7 @@ package Floor.FType.FDialog;
 import Floor.FEntities.FBulletType.PercentBulletType;
 import arc.Core;
 import arc.func.Cons2;
+import arc.graphics.Color;
 import arc.scene.actions.Actions;
 import arc.scene.ui.Button;
 import arc.scene.ui.layout.Table;
@@ -105,6 +106,7 @@ public class BulletDialog extends BaseDialog {
 
         table.table(t -> typeOn = t).pad(2).left().fillX();
         rebuildType();
+        table.row();
         table.table(t -> baseOn = t).pad(2).left().fillX();
         rebuildBase();
     }
@@ -138,7 +140,7 @@ public class BulletDialog extends BaseDialog {
 
     public void createLevDialog(String name, Table t, float def) {
         t.table(type -> {
-            type.add(Core.bundle.get("dialog.bullet." + name) + ":").pad(3);
+            type.add(Core.bundle.get("dialog.bullet." + name) + ":").pad(3).color(Color.red);
             type.label(() -> typeNew.computeIfAbsent(name, s -> def) + "");
             type.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + name), "", 15, typeNew.get(name) + "", true, str -> {
                 if (Strings.canParsePositiveFloat(str)) {
