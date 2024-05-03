@@ -5,10 +5,15 @@ import arc.Events;
 import arc.func.Cons;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.math.geom.Rect;
-import arc.math.geom.Vec2;
+import arc.math.geom.*;
+import arc.struct.FloatSeq;
+import arc.struct.IntFloatMap;
+import arc.struct.IntSet;
 import arc.struct.Seq;
 import arc.util.Nullable;
+import arc.util.Tmp;
+import arc.util.pooling.Pool;
+import arc.util.pooling.Pools;
 import mindustry.core.World;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
@@ -26,12 +31,10 @@ import static mindustry.Vars.world;
 
 public class FDamage extends Damage {
     private static final EventType.UnitDamageEvent bulletDamageEvent = new EventType.UnitDamageEvent();
-    private static final Vec2 vec = new Vec2();
     private static final Rect rect = new Rect();
-
+    private static final Vec2 vec = new Vec2();
     private FDamage() {
     }
-
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source) {
         Cons<Unit> cons = unit -> {
             if (unit.team == team || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))) {

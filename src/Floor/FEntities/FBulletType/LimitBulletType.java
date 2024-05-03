@@ -1,6 +1,7 @@
 package Floor.FEntities.FBulletType;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -18,22 +19,20 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
-import mindustry.gen.Building;
-import mindustry.gen.Bullet;
-import mindustry.gen.Sounds;
-import mindustry.gen.Unit;
+import mindustry.game.EventType;
+import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.graphics.Trail;
-import mindustry.world.blocks.distribution.MassDriver;
 
 import static arc.graphics.g2d.Draw.color;
-import static mindustry.Vars.content;
-import static mindustry.Vars.headless;
 
-public class AllBulletTypes extends BulletType {
-    public String type = "base";
+public class LimitBulletType extends BulletType {
+    public String type = "bullet";
+    public boolean haveEmp = false;
+    public boolean havePercent = false;
+
+    public float percent = 0;
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public Color mixColorFrom = new Color(1f, 1f, 1f, 0f), mixColorTo = new Color(1f, 1f, 1f, 0f);
     public float width = 5f, height = 7f;
@@ -44,8 +43,6 @@ public class AllBulletTypes extends BulletType {
     public @Nullable String backSprite;
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
-    //artillery
-    public float trailMult = 1f, trailSize = 4f;
     //emp
     public float radius = 100f;
     public float timeIncrease = 2.5f, timeDuration = 60f * 10f;
@@ -53,8 +50,6 @@ public class AllBulletTypes extends BulletType {
     public Effect hitPowerEffect = Fx.hitEmpSpark, chainEffect = Fx.chainEmp, applyEffect = Fx.heal;
     public boolean hitUnits = true;
     public float unitDamageScl = 0.7f;
-    //flak
-    public float explodeRange = 30f, explodeDelay = 5f, flakDelay = 0f, flakInterval = 6f;
     //continuous
     public float length = 220f;
     public float shake = 0f;
@@ -82,12 +77,6 @@ public class AllBulletTypes extends BulletType {
     public float fadeTime = 16f;
     public float strokeFrom = 2f, strokeTo = 0.5f, pointyScaling = 0.75f;
     public float backLength = 7f, frontLength = 35f;
-    //fire
-    public Color colorFrom = Pal.lightFlame, colorMid = Pal.darkFlame, colorTo = Color.gray;
-    public float velMin = 0.6f, velMax = 2.6f;
-    public float fireTrailChance = 0.04f;
-    public Effect trailEffect2 = Fx.ballfire;
-    public float fireEffectChance = 0.1f, fireEffectChance2 = 0.1f;
     //laser
     public Effect laserEffect = Fx.lancerLaserShootSmoke;
     public float lengthFalloff = 0.5f;
@@ -101,88 +90,16 @@ public class AllBulletTypes extends BulletType {
     private static float cdist = 0f;
     private static Unit result;
     public float trailSpacing = 10f;
-    //pointL
-    public TextureRegion laser, laserEnd;
-
-    public Color color = Color.white;
-
-    public Effect beamEffect = Fx.colorTrail;
-    public float beamEffectInterval = 3f, beamEffectSize = 3.5f;
     //rail
     static float furthest = 0;
     static boolean any = false;
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
     public Effect endEffect = Fx.none;
     public float pointEffectSpace = 20f;
-    //
 
-    public void bomb() {
-        type = "bomb";
-        collidesTiles = false;
-        collides = false;
-        shrinkY = 0.7f;
-        drag = 0.05f;
-        keepVelocity = false;
-        collidesAir = false;
-        hitSound = Sounds.explosion;
-        sprite = "shell";
-    }
-
-    public void artillery() {
-        type = "artillery";
-        collidesTiles = false;
-        collides = false;
-        collidesAir = false;
-        scaleLife = true;
-        hitShake = 1f;
-        hitSound = Sounds.explosion;
-        hitEffect = Fx.flakExplosion;
-        shootEffect = Fx.shootBig;
-        trailEffect = Fx.artilleryTrail;
-
-        shrinkX = 0.15f;
-        shrinkY = 0.63f;
-        shrinkInterp = Interp.slope;
-        sprite = "shell";
-    }
-
-    public void emp() {
-        type = "emp";
-    }
-
-    public void flak() {
-        type = "flak";
-        hitEffect = Fx.flakExplosionBig;
-        collidesGround = false;
-    }
-
-    public void laserB() {
-        type = "laserB";
-        smokeEffect = Fx.hitLaser;
-        hitEffect = Fx.hitLaser;
-        despawnEffect = Fx.hitLaser;
-        lightColor = Pal.heal;
-        lightOpacity = 0.6f;
-    }
-
-    public void missile() {
-        type = "missile";
-        backColor = Pal.missileYellowBack;
-        frontColor = Pal.missileYellow;
-        homingPower = 0.08f;
-        shrinkY = 0f;
-        hitSound = Sounds.explosion;
-        trailChance = 0.2f;
-    }
-
-    public void continuous() {
-        type = "continuous";
-        removeAfterPierce = false;
-        despawnEffect = Fx.none;
-        shootEffect = Fx.none;
-        impact = true;
-        keepVelocity = false;
-        collides = false;
+    //______________________________________________________________________________________________________________________
+    public void bullet() {
+        type = "bullet";
     }
 
     public void continuousF() {
@@ -212,29 +129,6 @@ public class AllBulletTypes extends BulletType {
         lightColor = Color.orange;
     }
 
-    public void explosion() {
-        type = "explosion";
-        hittable = false;
-        lifetime = 1f;
-        speed = 0f;
-        rangeOverride = 20f;
-        shootEffect = Fx.massiveExplosion;
-        instantDisappear = true;
-        scaledSplashDamage = true;
-        killShooter = true;
-        collides = false;
-        keepVelocity = false;
-    }
-
-    public void fire() {
-        type = "fire";
-        collidesTiles = false;
-        collides = false;
-        drag = 0.03f;
-        hitEffect = despawnEffect = Fx.none;
-        trailEffect = Fx.fireballsmoke;
-    }
-
     public void laser() {
         type = "laser";
         hitEffect = Fx.hitLaserBlast;
@@ -255,30 +149,12 @@ public class AllBulletTypes extends BulletType {
         keepVelocity = false;
     }
 
-    public void mass() {
-        type = "mass";
-        collidesTiles = false;
-        despawnEffect = Fx.smeltsmoke;
-        hitEffect = Fx.hitBulletBig;
-    }
-
     public void point() {
         type = "point";
         scaleLife = true;
         collides = false;
         keepVelocity = false;
         backMove = false;
-    }
-
-    public void pointL() {
-        removeAfterPierce = false;
-        despawnEffect = Fx.none;
-        impact = true;
-        keepVelocity = false;
-        collides = false;
-        optimalLifeFract = 0.5f;
-        shootEffect = smokeEffect = Fx.none;
-        drawSize = 1000f;
     }
 
     public void rail() {
@@ -289,158 +165,35 @@ public class AllBulletTypes extends BulletType {
         keepVelocity = false;
     }
 
+    //______________________________________________________________________________________________________________________
     @Override
     public void update(Bullet b) {
-        switch (type) {
-            case "artillery": {
-                super.update(b);
-                if (b.timer(0, (3 + b.fslope() * 2f) * trailMult)) {
-                    trailEffect.at(b.x, b.y, b.fslope() * trailSize, backColor);
-                }
-                break;
+        if (type.equals("continuousF") || type.equals("continuousL")) {
+            if (!continuous) return;
+            if (b.timer(1, damageInterval)) {
+                applyDamage(b);
             }
-            case "flak": {
-                super.update(b);
-                if (b.time >= flakDelay && b.fdata >= 0 && b.timer(2, flakInterval)) {
-                    Units.nearbyEnemies(b.team, Tmp.r1.setSize(explodeRange * 2f).setCenter(b.x, b.y), unit -> {
-                        if (b.fdata < 0f || !unit.checkTarget(collidesAir, collidesGround) || !unit.targetable(b.team))
-                            return;
-
-                        if (unit.within(b, explodeRange + unit.hitSize / 2f)) {
-                            b.fdata = -1f;
-                            Time.run(explodeDelay, () -> {
-                                if (b.fdata < 0) {
-                                    b.time = b.lifetime;
-                                }
-                            });
-                        }
-                    });
-                }
-                break;
+            if (shake > 0) {
+                Effect.shake(shake, shake, b);
             }
-            case "continuous": {
-                if (!continuous) return;
-                if (b.timer(1, damageInterval)) {
-                    applyDamage(b);
-                }
-                if (shake > 0) {
-                    Effect.shake(shake, shake, b);
-                }
-                updateBulletInterval(b);
-                break;
-            }
-            case "fire": {
-                super.update(b);
-                if (Mathf.chanceDelta(fireTrailChance)) {
-                    Fires.create(b.tileOn());
-                }
-                if (Mathf.chanceDelta(fireEffectChance)) {
-                    trailEffect.at(b.x, b.y);
-                }
-                if (Mathf.chanceDelta(fireEffectChance2)) {
-                    trailEffect2.at(b.x, b.y);
-                }
-                break;
-            }
-            case "mass": {
-                if (!(b.data() instanceof MassDriver.DriverBulletData data)) {
-                    hit(b);
-                    return;
-                }
-                float hitDst = 7f;
-                if (data.to.dead()) {
-                    return;
-                }
-                float baseDst = data.from.dst(data.to);
-                float dst1 = b.dst(data.from);
-                float dst2 = b.dst(data.to);
-                boolean intersect = false;
-                if (dst1 > baseDst) {
-                    float angleTo = b.angleTo(data.to);
-                    float baseAngle = data.to.angleTo(data.from);
-                    if (Angles.near(angleTo, baseAngle, 2f)) {
-                        intersect = true;
-                        b.set(data.to.x + Angles.trnsx(baseAngle, hitDst), data.to.y + Angles.trnsy(baseAngle, hitDst));
-                    }
-                }
-                if (Math.abs(dst1 + dst2 - baseDst) < 4f && dst2 <= hitDst) {
-                    intersect = true;
-                }
-                if (intersect) {
-                    data.to.handlePayload(b, data);
-                }
-                break;
-            }
-            case "pointL": {
-                updateTrail(b);
-                updateTrailEffects(b);
-                updateBulletInterval(b);
-                if (b.timer.get(0, damageInterval)) {
-                    Damage.collidePoint(b, b.team, hitEffect, b.aimX, b.aimY);
-                }
-                if (b.timer.get(1, beamEffectInterval)) {
-                    beamEffect.at(b.aimX, b.aimY, beamEffectSize * b.fslope(), hitColor);
-                }
-                if (shake > 0) {
-                    Effect.shake(shake, shake, b);
-                }
-                break;
-            }
-            default: {
-                super.update(b);
-            }
+            updateBulletInterval(b);
+        } else {
+            super.update(b);
         }
     }
-
     @Override
     public void load() {
-        switch (type) {
-            case "base", "bomb": {
-                super.load();
-                backRegion = Core.atlas.find(backSprite == null ? (sprite + "-back") : backSprite);
-                frontRegion = Core.atlas.find(sprite);
-                break;
-            }
-            case "pointL": {
-                super.load();
-                laser = Core.atlas.find(sprite);
-                laserEnd = Core.atlas.find(sprite + "-end");
-            }
-            default: {
-                super.load();
-            }
+        if (type.equals("bullet")) {
+            super.load();
+            backRegion = Core.atlas.find(backSprite == null ? (sprite + "-back") : backSprite);
+            frontRegion = Core.atlas.find(sprite);
+        } else {
+            super.load();
         }
     }
-
     @Override
     public void draw(Bullet b) {
         switch (type) {
-            case "base", "bomb": {
-                super.draw(b);
-                float shrink = shrinkInterp.apply(b.fout());
-                float height = this.height * ((1f - shrinkY) + shrinkY * shrink);
-                float width = this.width * ((1f - shrinkX) + shrinkX * shrink);
-                float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f) + rotationOffset;
-                Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
-                Draw.mixcol(mix, mix.a);
-                if (backRegion.found()) {
-                    Draw.color(backColor);
-                    Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
-                }
-                Draw.color(frontColor);
-                Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
-                break;
-            }
-            case "laserB": {
-                super.draw(b);
-                Draw.color(backColor);
-                Lines.stroke(width);
-                Lines.lineAngleCenter(b.x, b.y, b.rotation(), height);
-                Draw.color(frontColor);
-                Lines.lineAngleCenter(b.x, b.y, b.rotation(), height / 2f);
-                Draw.reset();
-                break;
-            }
             case "continuousF": {
                 float mult = b.fin(lengthInterp);
                 float realLength = Damage.findLength(b, length * mult, laserAbsorb, pierceCap);
@@ -491,12 +244,6 @@ public class AllBulletTypes extends BulletType {
                 Draw.reset();
                 break;
             }
-            case "fire": {
-                Draw.color(colorFrom, colorMid, colorTo, b.fin());
-                Fill.circle(b.x, b.y, radius * b.fout());
-                Draw.reset();
-                break;
-            }
             case "laser": {
                 float realLength = b.fdata;
                 float f = Mathf.curve(b.fin(), 0f, 0.2f);
@@ -524,19 +271,21 @@ public class AllBulletTypes extends BulletType {
             case "lightning": {
                 break;
             }
-            case "mass": {
-                float w = 11f, h = 13f;
-                Draw.color(Pal.bulletYellowBack);
-                Draw.rect("shell-back", b.x, b.y, w, h, b.rotation() + 90);
-                Draw.color(Pal.bulletYellow);
-                Draw.rect("shell", b.x, b.y, w, h, b.rotation() + 90);
-                Draw.reset();
-            }
-            case "pointL": {
+            case "bullet": {
                 super.draw(b);
-                Draw.color(color);
-                Drawf.laser(laser, laserEnd, b.x, b.y, b.aimX, b.aimY, b.fslope() * (1f - oscMag + Mathf.absin(Time.time, oscScl, oscMag)));
-                Draw.reset();
+                float shrink = shrinkInterp.apply(b.fout());
+                float height = this.height * ((1f - shrinkY) + shrinkY * shrink);
+                float width = this.width * ((1f - shrinkX) + shrinkX * shrink);
+                float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f) + rotationOffset;
+                Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
+                Draw.mixcol(mix, mix.a);
+                if (backRegion.found()) {
+                    Draw.color(backColor);
+                    Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+                }
+                Draw.color(frontColor);
+                Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
+                break;
             }
             default: {
                 super.draw(b);
@@ -544,7 +293,6 @@ public class AllBulletTypes extends BulletType {
         }
         Draw.reset();
     }
-
     @Override
     public void drawLight(Bullet b) {
         switch (type) {
@@ -555,105 +303,117 @@ public class AllBulletTypes extends BulletType {
             }
         }
     }
+    public void hitEntity(Bullet b, Hitboxc entity, float health) {
+        boolean wasDead = entity instanceof Unit u && u.dead;
 
+        if (entity instanceof Healthc h) {
+            if (pierceArmor) {
+                h.damagePierce(b.damage);
+            } else {
+                h.damage(b.damage);
+            }
+            if (havePercent) {
+                h.damage(h.maxHealth() * percent);
+            }
+        }
+
+        if (entity instanceof Unit unit) {
+            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
+            if (impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+            unit.impulse(Tmp.v3);
+            unit.apply(status, statusDuration);
+
+            Events.fire(new EventType.UnitDamageEvent().set(unit, b));
+        }
+
+        if (!wasDead && entity instanceof Unit unit && unit.dead) {
+            Events.fire(new EventType.UnitBulletDestroyEvent(unit, b));
+        }
+
+        handlePierce(b, health, entity.x(), entity.y());
+    }
     @Override
     public void hit(Bullet b, float x, float y) {
-        switch (type) {
-            case "emp": {
-                super.hit(b, x, y);
-                if (!b.absorbed) {
-                    Vars.indexer.allBuildings(x, y, radius, other -> {
-                        if (other.team == b.team) {
-                            if (other.block.hasPower && other.block.canOverdrive && other.timeScale() < timeIncrease) {
-                                other.applyBoost(timeIncrease, timeDuration);
-                                chainEffect.at(x, y, 0, hitColor, other);
-                                applyEffect.at(other, other.block.size * 7f);
-                            }
+        if (haveEmp) {
+            super.hit(b, x, y);
+            if (!b.absorbed) {
+                Vars.indexer.allBuildings(x, y, radius, other -> {
+                    if (other.team == b.team) {
+                        if (other.block.hasPower && other.block.canOverdrive && other.timeScale() < timeIncrease) {
+                            other.applyBoost(timeIncrease, timeDuration);
+                            chainEffect.at(x, y, 0, hitColor, other);
+                            applyEffect.at(other, other.block.size * 7f);
+                        }
 
-                            if (other.block.hasPower && other.damaged()) {
-                                other.heal(healPercent / 100f * other.maxHealth() + healAmount);
-                                Fx.healBlockFull.at(other.x, other.y, other.block.size, hitColor, other.block);
-                                applyEffect.at(other, other.block.size * 7f);
-                            }
-                        } else if (other.power != null) {
+                        if (other.block.hasPower && other.damaged()) {
+                            other.heal(healPercent / 100f * other.maxHealth() + healAmount);
+                            Fx.healBlockFull.at(other.x, other.y, other.block.size, hitColor, other.block);
+                            applyEffect.at(other, other.block.size * 7f);
+                        }
+                    } else if (other.power != null) {
+                        var absorber = Damage.findAbsorber(b.team, x, y, other.x, other.y);
+                        if (absorber != null) {
+                            other = absorber;
+                        }
+
+                        if (other.power != null && other.power.graph.getLastPowerProduced() > 0f) {
+                            other.applySlowdown(powerSclDecrease, timeDuration);
+                            other.damage(damage * powerDamageScl);
+                            hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
+                            chainEffect.at(x, y, 0, hitColor, other);
+                        }
+                    }
+                });
+
+                if (hitUnits) {
+                    Units.nearbyEnemies(b.team, x, y, radius, other -> {
+                        if (other.team != b.team && other.hittable()) {
                             var absorber = Damage.findAbsorber(b.team, x, y, other.x, other.y);
                             if (absorber != null) {
-                                other = absorber;
+                                return;
                             }
 
-                            if (other.power != null && other.power.graph.getLastPowerProduced() > 0f) {
-                                other.applySlowdown(powerSclDecrease, timeDuration);
-                                other.damage(damage * powerDamageScl);
-                                hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
-                                chainEffect.at(x, y, 0, hitColor, other);
-                            }
+                            hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
+                            chainEffect.at(x, y, 0, hitColor, other);
+                            other.damage(damage * unitDamageScl);
+                            other.apply(status, statusDuration);
                         }
                     });
-
-                    if (hitUnits) {
-                        Units.nearbyEnemies(b.team, x, y, radius, other -> {
-                            if (other.team != b.team && other.hittable()) {
-                                var absorber = Damage.findAbsorber(b.team, x, y, other.x, other.y);
-                                if (absorber != null) {
-                                    return;
-                                }
-
-                                hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
-                                chainEffect.at(x, y, 0, hitColor, other);
-                                other.damage(damage * unitDamageScl);
-                                other.apply(status, statusDuration);
-                            }
-                        });
-                    }
                 }
-                break;
             }
-            case "mass": {
-                super.hit(b, x, y);
-                despawned(b);
-            }
-            default: {
-                super.hit(b, x, y);
-            }
+        } else {
+            super.hit(b, x, y);
         }
     }
-
     @Override
     public float continuousDamage() {
-        if (!continuous) return -1f;
-        switch (type) {
-            case "continuous", "pointL": {
-                return damage / damageInterval * 60f;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public float estimateDPS() {
-        if (!continuous) return super.estimateDPS();
         return switch (type) {
-            case "continuous", " pointL" -> damage * 100f / damageInterval * 3f;
-            case "laser" -> super.estimateDPS() * 3f;
-            case "lightning" -> super.estimateDPS() * Math.max(lightningLength / 10f, 1);
-            default -> 0;
+            case "continuousF", "continuousL" -> damage / damageInterval * 60f;
+            default -> super.continuousDamage();
         };
     }
-
+    @Override
+    public float estimateDPS() {
+        return switch (type) {
+            case "continuousF", "continuousL" -> damage * 100f / damageInterval * 3f;
+            case "laser" -> super.estimateDPS() * 3f;
+            case "lightning" -> super.estimateDPS() * Math.max(lightningLength / 10f, 1);
+            default -> super.estimateDPS();
+        };
+    }
     @Override
     protected float calculateRange() {
         return switch (type) {
-            case "continuous", "laser" -> Math.max(length, maxRange);
+            case "continuousF", "continuousL", "laser" -> Math.max(length, maxRange);
             case "lightning" -> (lightningLength + lightningLengthRand / 2f) * 6f;
             case "rail" -> length;
-            default -> 0;
+            default -> super.calculateRange();
         };
     }
-
     @Override
     public void init() {
         switch (type) {
-            case "continuous", "laser": {
+            case "continuousF", "continuousL", "laser": {
                 super.init();
                 drawSize = Math.max(drawSize, length * 2f);
                 break;
@@ -663,20 +423,14 @@ public class AllBulletTypes extends BulletType {
             }
         }
     }
-
     @Override
     public void init(Bullet b) {
         switch (type) {
-            case "continuous": {
+            case "continuousF", "continuousL": {
                 super.init(b);
                 if (!continuous) {
                     applyDamage(b);
                 }
-                break;
-            }
-            case "fire": {
-                super.init(b);
-                b.vel.setLength(Mathf.random(velMin, velMax));
                 break;
             }
             case "laser": {
@@ -768,104 +522,22 @@ public class AllBulletTypes extends BulletType {
             }
         }
     }
-
-    @Override
-    public void despawned(Bullet b) {
-        switch (type) {
-            case "mass": {
-                super.despawned(b);
-
-                if (!(b.data() instanceof MassDriver.DriverBulletData data)) return;
-
-                for (int i = 0; i < data.items.length; i++) {
-                    int amountDropped = Mathf.random(0, data.items[i]);
-                    if (amountDropped > 0) {
-                        float angle = b.rotation() + Mathf.range(100f);
-                        Fx.dropItem.at(b.x, b.y, angle, Color.white, content.item(i));
-                    }
-                }
-            }
-            default: {
-                super.despawned(b);
-            }
-        }
-    }
-
-    @Override
-    public void updateTrailEffects(Bullet b) {
-        if (type.equals("pointL")) {
-            if (trailChance > 0) {
-                if (Mathf.chanceDelta(trailChance)) {
-                    trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : (trailParam * b.fslope()), trailColor);
-                }
-            }
-
-            if (trailInterval > 0f) {
-                if (b.timer(0, trailInterval)) {
-                    trailEffect.at(b.aimX, b.aimY, trailRotation ? b.angleTo(b.aimX, b.aimY) : (trailParam * b.fslope()), trailColor);
-                }
-            }
-        } else {
-            super.updateTrailEffects(b);
-        }
-    }
-
-    @Override
-    public void updateTrail(Bullet b) {
-        if (type.equals("pointL")) {
-            if (!headless && trailLength > 0) {
-                if (b.trail == null) {
-                    b.trail = new Trail(trailLength);
-                }
-                b.trail.length = trailLength;
-                b.trail.update(b.aimX, b.aimY, b.fslope() * (1f - (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
-            }
-        } else {
-            super.updateTrailEffects(b);
-        }
-    }
-
-    public void updateBulletInterval(Bullet b) {
-        if (type.equals("pointL")) {
-            if (intervalBullet != null && b.time >= intervalDelay && b.timer.get(2, bulletInterval)) {
-                float ang = b.rotation();
-                for (int i = 0; i < intervalBullets; i++) {
-                    intervalBullet.create(b, b.aimX, b.aimY, ang + Mathf.range(intervalRandomSpread) + intervalAngle + ((i - (intervalBullets - 1f) / 2f) * intervalSpread));
-                }
-            }
-        } else {
-            super.updateBulletInterval(b);
-        }
-    }
-
     public void applyDamage(Bullet b) {
-        switch (type) {
-            case "continuous": {
-                if (!continuous) {
-                    Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceCap);
-                }
+        if (type.equals("continuousF") || type.equals("continuousL")) {
+            if (!continuous) {
+                Damage.collideLine(b, b.team, hitEffect, b.x, b.y, b.rotation(), currentLength(b), largeHit, laserAbsorb, pierceCap);
             }
         }
     }
-
     public float currentLength(Bullet b) {
-        switch (type) {
-            case "continuous": {
-                if (!continuous) {
-                    return length;
-                }
-            }
-            case "continuousF": {
-                return length * b.fin(lengthInterp);
-            }
-            case "continuousL": {
-                float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
-                return length * fout;
-            }
+        if (type.equals("continuousF")) {
+            return length * b.fin(lengthInterp);
+        } else if (type.equals("continuousL")) {
+            float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
+            return length * fout;
         }
-        return 0;
+        return -1;
     }
-
     @Override
     public void handlePierce(Bullet b, float initialHealth, float x, float y) {
         if (type.equals("rail")) {
@@ -888,7 +560,6 @@ public class AllBulletTypes extends BulletType {
             super.handlePierce(b, initialHealth, x, y);
         }
     }
-
     @Override
     public boolean testCollision(Bullet bullet, Building tile) {
         if (type.equals("rail")) {
@@ -896,13 +567,22 @@ public class AllBulletTypes extends BulletType {
         }
         return super.testCollision(bullet, tile);
     }
-
     @Override
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct) {
         if (type.equals("rail")) {
             handlePierce(b, initialHealth, x, y);
         } else {
             super.hitTile(b, build, x, y, initialHealth, direct);
+        }
+        if (!build.dead) {
+            if (havePercent && build.team != b.team) {
+                build.damage(build.maxHealth * percent);
+            }
+            if (build.dead) {
+                Events.fire(new EventType.BuildingBulletDestroyEvent(build, b));
+            } else {
+                Events.fire(new EventType.BuildDamageEvent().set(build, b));
+            }
         }
     }
 }

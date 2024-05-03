@@ -1,6 +1,6 @@
 package Floor.FType.FDialog;
 
-import Floor.FEntities.FBulletType.PercentBulletType;
+import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
 import arc.func.Cons2;
 import arc.graphics.Color;
@@ -12,22 +12,22 @@ import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
 import mindustry.content.Liquids;
-import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.LaserBulletType;
-import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.gen.Icon;
 import mindustry.type.Liquid;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import static mindustry.Vars.ui;
 
 public class BulletDialog extends BaseDialog {
     public BaseDialog parent;
-    public final Seq<String> types = new Seq<>(new String[]{"bullet", "laser", "liquid"});
-
+    public final Seq<String> types = new Seq<>(new String[]{
+            "bullet", "laser", "lightning", "continuousF", "continuousL", "point", "rail"
+    });
     //rollback
     public String lastType = "";
     public HashMap<String, Object> typeLast = new HashMap<>();
@@ -39,7 +39,7 @@ public class BulletDialog extends BaseDialog {
     public HashMap<String, Object> baseNew = new HashMap<>();
 
     //global
-    public BulletType bullet;
+    public LimitBulletType bullet;
     public float heavy = 0.5f;
     public Table typeOn;
     public Table baseOn;
@@ -177,33 +177,6 @@ public class BulletDialog extends BaseDialog {
         }).pad(10).fillX();
     }
 
-    public BulletType Bullet() {
-        switch (newType) {
-            case "bullet" -> {
-                bullet = new PercentBulletType();
-                PercentBulletType pbt = (PercentBulletType) bullet;
-                for (String val : typeNew.keySet()) {
-                    switch (val) {
-                        case "bulletWide" -> pbt.width = (float) typeNew.get(val);
-                        case "bulletHeight" -> pbt.height = (float) typeNew.get(val);
-                    }
-                }
-            }
-            case "laser" -> {
-                bullet = new LaserBulletType();
-
-            }
-            case "liquid" -> {
-                bullet = new LiquidBulletType();
-
-            }
-            default -> {
-                return new BulletType(0, 0);
-            }
-        }
-        return bullet;
-    }
-
     public void createSelectDialog(Button b, Cons2<Table, Runnable> table) {
         Table ta = new Table() {
             @Override
@@ -235,14 +208,37 @@ public class BulletDialog extends BaseDialog {
         ta.pack();
     }
 
-    public void loadFromBullet(BulletType bu) {
-        if (bu instanceof PercentBulletType pbt) {
-            newType = lastType = "bullet";
-        } else if (bu instanceof LaserBulletType lbt) {
-            newType = lastType = "laser";
-        } else if (bu instanceof LiquidBulletType lbt) {
-            newType = lastType = "liquid";
+    public LimitBulletType loadInToBullet() {
+        bullet = new LimitBulletType();
+        try {
+            Method method = LimitBulletType.class.getMethod(newType);
+            method.invoke(bullet);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
+        switch (newType) {
+            case "bullet" -> {
+            }
+            case "laser" -> {
+                bullet.laser();
+            }
+            case "liquid" -> {
+            }
+        }
+        return bullet;
+    }
+
+    public void loadFromBullet(LimitBulletType bu) {
+        newType = lastType = bu.type;
+
+        baseNew.put("damage", bu.damage);
+        baseLast.put("damage", bu.damage);
+
+        baseNew.put("speed", bu.speed);
+        baseLast.put("speed", bu.speed);
+
+        baseNew.put("lifetime", bu.lifetime);
+        baseLast.put("lifetime", bu.lifetime);
     }
 
     public void updateHeavy() {
