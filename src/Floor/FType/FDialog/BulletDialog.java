@@ -5,6 +5,8 @@ import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
 import arc.graphics.Color;
+import arc.math.Interp;
+import arc.scene.Element;
 import arc.scene.actions.Actions;
 import arc.scene.ui.Button;
 import arc.scene.ui.layout.Table;
@@ -244,6 +246,7 @@ public class BulletDialog extends BaseDialog {
         t.table(table -> {
             table.background(Tex.scroll);
             table.label(() -> Core.bundle.get("dialog.bullet." + type)).left();
+            table.row();
             table.label(() -> Core.bundle.get("@heavyUse") + ":  " + ProjectsLocated.getHeavy(type, findVal(type))).left().pad(5);
             table.label(() -> Core.bundle.get("@maxLevel") + ":  " + ProjectsLocated.maxLevel.get(type)).left().pad(5);
         });
@@ -311,7 +314,28 @@ public class BulletDialog extends BaseDialog {
             }
         };
         ta.margin(4);
+
+        Element hitter = new Element();
+
+        Runnable hide = () -> {
+            Core.app.post(hitter::remove);
+            ta.actions(Actions.fadeOut(0.3f, Interp.fade), Actions.remove());
+        };
+
+        hitter.fillParent = true;
+        hitter.tapped(hide);
+
+        Core.scene.add(hitter);
+
         ta.update(() -> {
+            if(b.parent == null || !b.isDescendantOf(Core.scene.root)){
+                Core.app.post(() -> {
+                    hitter.remove();
+                    ta.remove();
+                });
+                return;
+            }
+
             b.localToStageCoordinates(Tmp.v1.set(b.getWidth() / 2f, b.getHeight() / 2f));
             ta.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
             if (ta.getWidth() > Core.scene.getWidth()) ta.setWidth(Core.graphics.getWidth());
@@ -323,7 +347,7 @@ public class BulletDialog extends BaseDialog {
 
         Core.scene.add(ta);
 
-        ta.top().pane(select -> table.get(select, () -> ta.actions(Actions.remove()))).pad(0f).top().scrollX(false);
+        ta.top().pane(select -> table.get(select, hide)).pad(0f).top().scrollX(false);
         ta.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
 
         ta.pack();

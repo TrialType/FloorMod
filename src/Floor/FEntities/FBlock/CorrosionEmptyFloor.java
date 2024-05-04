@@ -15,7 +15,6 @@ public class CorrosionEmptyFloor extends CorrosionFloor{
 
     @Override
     public void drawBase(Tile tile){
-        //draws only edges, never itself
         drawEdges(tile);
 
         Floor floor = tile.overlay();
