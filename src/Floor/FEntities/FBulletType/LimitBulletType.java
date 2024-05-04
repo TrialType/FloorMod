@@ -35,6 +35,12 @@ public class LimitBulletType extends BulletType {
     public boolean havePercent = false;
 
 
+
+    static float furthest = 0;
+    static boolean any = false;
+
+
+
     public float percent = 0;
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public Color mixColorFrom = new Color(1f, 1f, 1f, 0f), mixColorTo = new Color(1f, 1f, 1f, 0f);
@@ -47,7 +53,7 @@ public class LimitBulletType extends BulletType {
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
     //emp
-    public float radius = 100f;
+    public float radius = 0;
     public float timeIncrease = 2.5f, timeDuration = 60f * 10f;
     public float powerDamageScl = 2f, powerSclDecrease = 0.2f;
     public Effect hitPowerEffect = Fx.hitEmpSpark, chainEffect = Fx.chainEmp, applyEffect = Fx.heal;
@@ -81,7 +87,7 @@ public class LimitBulletType extends BulletType {
     public float strokeFrom = 2f, strokeTo = 0.5f, pointyScaling = 0.75f;
     public float backLength = 7f, frontLength = 35f;
     //laser
-    public float laserLength = 220;
+    public float laserLength = 0;
     public Effect laserEffect = Fx.lancerLaserShootSmoke;
     public float lengthFalloff = 0.5f;
     public float sideLength = 29f, sideWidth = 0.7f;
@@ -93,8 +99,6 @@ public class LimitBulletType extends BulletType {
     public float trailSpacing = 10f;
     //rail
     public float railLength = 0;
-    static float furthest = 0;
-    static boolean any = false;
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
     public Effect endEffect = Fx.none;
     public float pointEffectSpace = 20f;
@@ -104,6 +108,10 @@ public class LimitBulletType extends BulletType {
     public Color bulletLightningColor = Pal.lancerLaser;
 
     //______________________________________________________________________________________________________________________
+    public LimitBulletType() {
+        setZero();
+    }
+
     @Override
     public void update(Bullet b) {
         if (type.equals("continuousF") || type.equals("continuousL")) {
@@ -325,7 +333,27 @@ public class LimitBulletType extends BulletType {
                 }
             }
         } else {
-            super.hit(b, x, y);
+            hitEffect.at(x, y, b.rotation(), hitColor);
+            hitSound.at(x, y, hitSoundPitch, hitSoundVolume);
+
+            Effect.shake(hitShake, hitShake, b);
+
+            if (fragOnHit) {
+                createFrags(b, x, y);
+            }
+            createPuddles(b, x, y);
+            createIncend(b, x, y);
+            createUnits(b, x, y);
+
+            if (suppressionRange > 0) {
+                Damage.applySuppression(b.team, b.x, b.y, suppressionRange, suppressionDuration, 0f, suppressionEffectChance, new Vec2(b.x, b.y));
+            }
+
+            createSplashDamage(b, x, y);
+
+            for (int i = 0; i < lightning; i++) {
+                Lightning.create(b, lightningColor, lightningDamage, b.x, b.y, b.rotation() + Mathf.range(lightningCone / 2) + lightningAngle, lightningLength + Mathf.random(lightningLengthRand));
+            }
         }
     }
 
@@ -564,6 +592,24 @@ public class LimitBulletType extends BulletType {
             }
         } catch (RuntimeException | IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void setZero() {
+        Field[] fields = LimitBulletType.class.getFields();
+        for (Field field : fields) {
+            try {
+                Object value = field.get(this);
+                if (value instanceof Float) {
+                    field.set(this, 0f);
+                } else if (value instanceof Integer) {
+                    field.set(this, 0);
+                } else if (value instanceof Boolean) {
+                    field.set(this, false);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

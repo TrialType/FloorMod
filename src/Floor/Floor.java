@@ -2,12 +2,14 @@ package Floor;
 
 import Floor.FContent.*;
 import Floor.FType.FDialog.BulletDialog;
+import Floor.FType.FDialog.ProjectsLocated;
 import arc.util.Time;
 import mindustry.mod.Mod;
 
 public class Floor extends Mod {
     public Floor() {
         Time.run(60, () -> {
+            new ProjectsLocated("");
             new BulletDialog(null, "").show();
         });
     }

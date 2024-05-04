@@ -13,6 +13,7 @@ import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -27,7 +28,9 @@ public class BulletDialog extends BaseDialog {
     public String newType = "bullet";
     //global
     public LimitBulletType bullet = new LimitBulletType();
-    public LimitBulletType NBullet;
+    public LimitBulletType FBullet;
+    public float bulletHeavy = 0;
+    public float fromHeavy = 0;
     public float heavy = 0.5f;
     public Table typeOn;
     public Table baseOn;
@@ -40,42 +43,77 @@ public class BulletDialog extends BaseDialog {
         if (parent instanceof WeaponDialog wd) {
             this.parentW = wd;
             (wd.bullet == null ? new LimitBulletType() : wd.bullet).copyTo(this.bullet);
+            updateHeavy();
+            this.fromHeavy = parentW.heavy;
+            this.bulletHeavy = parentW.bulletHeavy - this.heavy;
             newType = bullet.type;
         } else if (parent instanceof BulletDialog bd) {
             this.parentB = bd;
-            (bd.NBullet == null ? new LimitBulletType() : bd.NBullet).copyTo(this.bullet);
+            (bd.FBullet == null ? new LimitBulletType() : bd.FBullet).copyTo(this.bullet);
+            updateHeavy();
+            this.fromHeavy = parentB.fromHeavy + parentB.heavy;
+            this.bulletHeavy = parentB.bulletHeavy - this.heavy;
             newType = bullet.type;
         }
 
-        buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
-        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
-            //loadOut(typeNew, baseNew, newType);
+        buttons.button("@back", Icon.left, () -> {
+            hide();
             if (parentB != null) {
-                if (parentB.NBullet == null) {
-                    parentB.NBullet = new LimitBulletType();
+                parentB.bulletHeavy = this.heavy + this.bulletHeavy;
+            } else if (parentW != null) {
+                parentW.bulletHeavy = this.heavy + this.bulletHeavy;
+            }
+        }).size(210f, 64f);
+        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
+            if (ProjectsLocated.getHeavy("percent", findVal("percent")) > 0) {
+                bullet.havePercent = true;
+            }
+            if (ProjectsLocated.getHeavy("emp", findVal("emp")) > 0) {
+                bullet.haveEmp = true;
+            }
+            if (newType.equals("lightning")) {
+                if (bullet.havePercent) {
+                    bullet.lightningType = new LimitBulletType() {{
+                        havePercent = true;
+                        percent = bullet.percent;
+                        lightningDamage = bullet.lightningDamage;
+                    }};
                 }
-                bullet.copyTo(parentB.NBullet);
+            }
+            if (parentB != null) {
+                if (parentB.FBullet == null) {
+                    parentB.FBullet = new LimitBulletType();
+                }
+                bullet.copyTo(parentB.FBullet);
+                parentB.bulletHeavy = this.heavy + this.bulletHeavy;
             } else if (parentW != null) {
                 if (parentW.bullet == null) {
                     parentW.bullet = new LimitBulletType();
                 }
                 bullet.copyTo(parentW.bullet);
+                parentW.bulletHeavy = this.heavy + this.bulletHeavy;
             }
             hide();
+        }).size(210f, 64f);
+        buttons.button("@toZero", Icon.defense, () -> {
+            bullet.setZero();
+            rebuildType();
+            rebuildBase();
+            updateHeavy();
         }).size(210f, 64f);
     }
 
     public void loadBase() {
-        updateHeavy();
         cont.pane(this::Front);
     }
 
     public void Front(Table table) {
         table.table(t -> {
-            t.add(Core.bundle.get("dialog.bullet-type") + ":").size(40).width(100).pad(10);
-            t.label(() -> Core.bundle.format("dialog." + newType)).size(40).width(100).pad(10);
+            t.background(Tex.scroll);
+            t.add(Core.bundle.get("dialog.bullet-type") + " : ").size(25).left().width(100);
+            t.label(() -> Core.bundle.format("dialog." + newType)).size(25).left().width(100).pad(1);
             t.button(b -> {
-                b.image(Icon.down).size(5);
+                b.image(Icon.down).size(25);
 
                 b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
                     tb.top();
@@ -93,21 +131,23 @@ public class BulletDialog extends BaseDialog {
                     }
                 }));
             }, Styles.logici, () -> {
-            }).size(40);
-        }).pad(2).left().growX().width(400).row();
+            }).size(25).left().pad(5);
+            t.row();
+            t.label(() -> Core.bundle.get("@heavyUse") + ": " +
+                    (heavy + fromHeavy + bulletHeavy) + " / " +
+                    ProjectsLocated.freeSize).size(25).left().width(100).pad(5);
+        }).pad(2).growX().row();
 
-        table.table(t -> typeOn = t).pad(2).left().fillX();
-
+        table.table(t -> typeOn = t).pad(2).left().growX();
         rebuildType();
-
         table.row();
-        table.table(t -> baseOn = t).pad(2).left().fillX();
-
+        table.table(t -> baseOn = t).pad(2).left().growX();
         rebuildBase();
     }
 
     public void rebuildType() {
         typeOn.clear();
+        typeOn.background(Tex.buttonDown);
         switch (newType) {
             case "bullet" -> {
                 createLevDialog("bulletSpeed", "pass", typeOn, bullet.speed,
@@ -127,52 +167,87 @@ public class BulletDialog extends BaseDialog {
             case "lightning" -> {
                 createLevDialog("bulletLightningLength", "pass", typeOn, bullet.bulletLightningLength,
                         f -> bullet.bulletLightningLength = (int) (f + 0), f -> bullet.bulletLightningLength = (int) (f + 0));
-                createLevDialog("bulletLightningLengthRand", "pass", baseOn, bullet.bulletLightningLengthRand,
+                createLevDialog("bulletLightningLengthRand", "pass", typeOn, bullet.bulletLightningLengthRand,
                         f -> bullet.bulletLightningLengthRand = (int) (f + 0), f -> bullet.bulletLightningLengthRand = (int) (f + 0));
             }
             case "continuousF" -> {
-                createLevDialog("laserCLength", "pass", typeOn, bullet.laserCLength,
+                createLevDialog("flareLength", "pass", typeOn, bullet.laserCLength,
                         f -> bullet.laserCLength = f, f -> bullet.laserCLength = f);
+                createNumberDialog("flareWidth", typeOn, bullet.flareWidth, 0, 30,
+                        f -> bullet.flareWidth = f);
             }
             case "continuousL" -> {
-                createLevDialog("flareLength", "pass", typeOn, bullet.flareLength,
+                createLevDialog("laserCLength", "pass", typeOn, bullet.flareLength,
                         f -> bullet.flareLength = f, f -> bullet.flareLength = f);
+                createNumberDialog("fadeTime", typeOn, bullet.fadeTime, 12, 36,
+                        f -> bullet.fadeTime = f);
             }
             case "point" -> {
                 createLevDialog("bulletSpeed", "pass", typeOn, bullet.speed,
                         f -> bullet.speed = f, f -> bullet.speed = f);
+                createNumberDialog("trailSpacing", typeOn, 10, 10, 180,
+                        f -> bullet.trailSpacing = f);
             }
             case "rail" -> {
                 createLevDialog("railLength", "pass", typeOn, bullet.railLength,
                         f -> bullet.railLength = f, f -> bullet.railLength = f);
+                createNumberDialog("pointEffectSpace", typeOn, 10, 10, 180,
+                        f -> bullet.pointEffectSpace = f);
             }
         }
     }
 
     public void rebuildBase() {
         baseOn.clear();
-        baseOn.label(() -> Core.bundle.get("dialog.bullet.damage"));
-        baseOn.row();
-        createLevDialog("damage", "damage", baseOn, bullet.damage, f -> bullet.damage = f, f -> bullet.damage = f);
-        createLevDialog("lifetime", findTyp("lifetime"), baseOn, bullet.lifetime, f -> bullet.lifetime = f, f -> bullet.lifetime = f);
-        baseOn.label(() -> Core.bundle.get("dialog.bullet.frag"));
-        baseOn.row();
-        createNumberDialog("fragAngle", baseOn, bullet.fragAngle, -12, 12,
-                f -> bullet.fragAngle = f);
-        createLevDialog("frags", "frags", baseOn, bullet.fragBullets,
-                f -> bullet.fragBullets = (int) (f + 0), f -> bullet.fragBullets = (int) (f + 0));
-        baseOn.row();
-        baseOn.label(() -> Core.bundle.get("dialog.bullet.lightning"));
-        baseOn.row();
-        createNumberDialog("lightningAngle", baseOn, bullet.lightningAngle, 0, 360,
-                f -> bullet.lightningAngle = f);
-        createNumberDialog("lightningAngleRand", baseOn, bullet.lightningAngleRand, 0, 360,
-                f -> bullet.lightningAngle = f);
-        baseOn.row();
-        createLevDialog("lightningLength", "lightning", baseOn, bullet.lightningLength,
-                f -> bullet.lightningLength = (int) (f + 0), f -> bullet.lightningLength = (int) (f + 0));
-        createLevDialog("lightningLengthRand", "lightning", baseOn, bullet.lightningLengthRand,
-                f -> bullet.lightningLengthRand = (int) (f + 0), f -> bullet.lightningLengthRand = (int) (f + 0));
+        createTypeLine(baseOn, "damage");
+
+        baseOn.table(s -> {
+            s.background(Tex.buttonDown);
+            createLevDialog("damage", "damage", s, bullet.damage,
+                    f -> bullet.damage = f, f -> bullet.damage = f);
+            createLevDialog("lifetime", findTyp("lifetime"), s, bullet.lifetime,
+                    f -> bullet.lifetime = f, f -> bullet.lifetime = f);
+        }).growX();
+
+        createTypeLine(baseOn, "frags");
+
+        baseOn.table(s -> {
+            s.background(Tex.buttonDown);
+            createNumberDialog("fragAngle", s, bullet.fragAngle, -12, 12,
+                    f -> bullet.fragAngle = f);
+            createLevDialog("frags", "frags", s, bullet.fragBullets,
+                    f -> bullet.fragBullets = (int) (f + 0), f -> bullet.fragBullets = (int) (f + 0));
+        }).growX();
+
+        createTypeLine(baseOn, "lightning");
+
+        baseOn.table(s -> {
+            s.background(Tex.buttonDown);
+            createNumberDialog("lightningAngle", s, bullet.lightningAngle, 0, 360,
+                    f -> bullet.lightningAngle = f);
+            createNumberDialog("lightningAngleRand", s, bullet.lightningAngleRand, 0, 360,
+                    f -> bullet.lightningAngle = f);
+            createLevDialog("lightningLength", "lightning", s, bullet.lightningLength,
+                    f -> bullet.lightningLength = (int) (f + 0), f -> bullet.lightningLength = (int) (f + 0));
+            s.row();
+            createLevDialog("lightningLengthRand", "lightning", s, bullet.lightningLengthRand,
+                    f -> bullet.lightningLengthRand = (int) (f + 0), f -> bullet.lightningLengthRand = (int) (f + 0));
+            createLevDialog("lightningDamage", "lightning", s, bullet.lightningDamage,
+                    f -> bullet.lightningDamage = f + 0, f -> bullet.lightningDamage = f + 0);
+            createLevDialog("lightnings", "lightning", s, bullet.lightning,
+                    f -> bullet.lightning = (int) (f + 0), f -> bullet.lightning = (int) (f + 0));
+        }).growX();
+    }
+
+    public void createTypeLine(Table t, String type) {
+        t.row();
+        t.table(table -> {
+            table.background(Tex.scroll);
+            table.label(() -> Core.bundle.get("dialog.bullet." + type)).left();
+            table.label(() -> Core.bundle.get("@heavyUse") + ":  " + ProjectsLocated.getHeavy(type, findVal(type))).left().pad(5);
+            table.label(() -> Core.bundle.get("@maxLevel") + ":  " + ProjectsLocated.maxLevel.get(type)).left().pad(5);
+        });
+        t.row();
     }
 
     public void createLevDialog(String name, String line, Table t, float value, Cons<Float> changer, Cons<Float> rollback) {
@@ -185,21 +260,21 @@ public class BulletDialog extends BaseDialog {
                     changer.get(amount);
                     float now = this.heavy;
                     updateHeavy();
-                    if (ProjectsLocated.couldUse(line, findVal(line)) && heavy <= ProjectsLocated.freeSize) {
+                    if (ProjectsLocated.couldUse(line, findVal(line)) && heavy + bulletHeavy + fromHeavy <= ProjectsLocated.freeSize) {
                         rebuildBase();
                         rebuildType();
                     } else {
                         if (!ProjectsLocated.couldUse(line, findVal(line))) {
-                            ui.showInfo(Core.bundle.format("@levelOutOfBounds"));
-                        } else if (!(heavy <= ProjectsLocated.freeSize)) {
-                            ui.showInfo(Core.bundle.format("@tooHeavy"));
+                            ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
+                        } else if (!(heavy + bulletHeavy + fromHeavy <= ProjectsLocated.freeSize)) {
+                            ui.showInfo(Core.bundle.get("@tooHeavy"));
                         }
                         this.heavy = now;
                         rollback.get(value);
                     }
                     return;
                 }
-                ui.showInfo(Core.bundle.format("@inputError"));
+                ui.showInfo(Core.bundle.get("@inputError"));
             })).size(55);
         }).pad(10).fillX();
     }
