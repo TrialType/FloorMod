@@ -35,6 +35,7 @@ public class ProjectsLocated extends BaseDialog {
         heavies.put("percent", i -> i * 1.2f);
         heavies.put("number", i -> i * 1.8f);
         heavies.put("frags", i -> i * 1.8f);
+        heavies.put("none", i -> Integer.MAX_VALUE);
 
         levels.put("damage", f -> f <= 0 ? 0 : f <= 12 ? 1 : f <= 24 ? 2 : f <= 48 ? 3 : f <= 96 ? 4 : f <= 192 ? 5 : 6);
         levels.put("pass", f -> f <= 0 ? 0 : f <= 15 ? 1 : f <= 35 ? 2 : f <= 60 ? 3 : f <= 90 ? 4 : f <= 120 ? 5 : 6);
@@ -44,12 +45,17 @@ public class ProjectsLocated extends BaseDialog {
         levels.put("percent", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.3 ? 3 : f <= 0.45 ? 4 : f <= 0.65 ? 5 : 6);
         levels.put("number", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
         levels.put("frags", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
+        levels.put("none", f -> 6);
 
         updateMaxLevel();
         updateHeavy();
     }
 
     public static float getHeavy(String type, float val) {
+        //only for test
+        if (heavies.get(type) == null) {
+            return 0;
+        }
         return heavies.get(type).get(levels.get(type).get(val));
     }
 
@@ -61,11 +67,12 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     public static void updateHeavy() {
-        maxSize = 0;
+        //test
+        maxSize = 1000;
         for (int i = allSize.length; i > 0; i--) {
             if (allSize[i - 1].unlocked()) {
-                maxSize = 4 + (i == 1 ? 2 : i == 2 ? 5 : i == 3 ? 8 : i == 4 ? 12 : i == 5 ? 16 : i == 6 ? 20 : i == 7 ? 25 :
-                        i == 8 ? 30 : i == 9 ? 35 : 40);
+                maxSize = 2 + (i == 1 ? 1 : i == 2 ? 2 : i == 3 ? 3 : i == 4 ? 4 : i == 5 ? 5 : i == 6 ? 6 : i == 7 ? 7 :
+                        i == 8 ? 8 : i == 9 ? 9 : 10);
                 break;
             }
         }

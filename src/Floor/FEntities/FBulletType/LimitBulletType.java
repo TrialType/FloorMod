@@ -25,12 +25,15 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 
+import java.lang.reflect.Field;
+
 import static arc.graphics.g2d.Draw.color;
 
 public class LimitBulletType extends BulletType {
     public String type = "bullet";
     public boolean haveEmp = false;
     public boolean havePercent = false;
+
 
     public float percent = 0;
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
@@ -51,7 +54,6 @@ public class LimitBulletType extends BulletType {
     public boolean hitUnits = true;
     public float unitDamageScl = 0.7f;
     //continuous
-    public float length = 220f;
     public float shake = 0f;
     public float damageInterval = 5f;
     public boolean largeHit = false;
@@ -74,96 +76,32 @@ public class LimitBulletType extends BulletType {
     };
     public Color[] colors = {Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white.cpy()};
     //continuousL
+    public float laserCLength = 0;
     public float fadeTime = 16f;
     public float strokeFrom = 2f, strokeTo = 0.5f, pointyScaling = 0.75f;
     public float backLength = 7f, frontLength = 35f;
     //laser
+    public float laserLength = 220;
     public Effect laserEffect = Fx.lancerLaserShootSmoke;
     public float lengthFalloff = 0.5f;
     public float sideLength = 29f, sideWidth = 0.7f;
     public float sideAngle = 90f;
     public float lightningSpacing = -1, lightningDelay = 0.1f, lightningAngleRand;
-    //lightning
-    public Color lightningColor = Pal.lancerLaser;
-    public int lightningLength = 25, lightningLengthRand = 0;
     //point
     private static float cdist = 0f;
     private static Unit result;
     public float trailSpacing = 10f;
     //rail
+    public float railLength = 0;
     static float furthest = 0;
     static boolean any = false;
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
     public Effect endEffect = Fx.none;
     public float pointEffectSpace = 20f;
-
-    //______________________________________________________________________________________________________________________
-    public void bullet() {
-        type = "bullet";
-    }
-
-    public void continuousF() {
-        type = "continuousF";
-        optimalLifeFract = 0.5f;
-        hitEffect = Fx.hitFlameBeam;
-        hitSize = 4;
-        drawSize = 420f;
-        hitColor = colors[1].cpy().a(1f);
-        lightColor = hitColor;
-        laserAbsorb = false;
-        ammoMultiplier = 1f;
-        pierceArmor = true;
-    }
-
-    public void continuousL() {
-        type = "continuousL";
-        shake = 1f;
-        largeHit = true;
-        hitEffect = Fx.hitBeam;
-        hitSize = 4;
-        drawSize = 420f;
-        hitColor = colors[2];
-        incendAmount = 1;
-        incendSpread = 5;
-        incendChance = 0.4f;
-        lightColor = Color.orange;
-    }
-
-    public void laser() {
-        type = "laser";
-        hitEffect = Fx.hitLaserBlast;
-        hitColor = colors[2];
-        despawnEffect = Fx.none;
-        shootEffect = Fx.hitLancer;
-        smokeEffect = Fx.none;
-        hitSize = 4;
-        impact = true;
-        keepVelocity = false;
-        collides = false;
-    }
-
-    public void lightning() {
-        type = "lightning";
-        despawnEffect = Fx.none;
-        hitEffect = Fx.hitLancer;
-        keepVelocity = false;
-    }
-
-    public void point() {
-        type = "point";
-        scaleLife = true;
-        collides = false;
-        keepVelocity = false;
-        backMove = false;
-    }
-
-    public void rail() {
-        type = "rail";
-        hitEffect = Fx.none;
-        despawnEffect = Fx.none;
-        collides = false;
-        keepVelocity = false;
-    }
+    //lightning
+    public int bulletLightningLength = 0;
+    public int bulletLightningLengthRand = 0;
+    public Color bulletLightningColor = Pal.lancerLaser;
 
     //______________________________________________________________________________________________________________________
     @Override
@@ -181,6 +119,7 @@ public class LimitBulletType extends BulletType {
             super.update(b);
         }
     }
+
     @Override
     public void load() {
         if (type.equals("bullet")) {
@@ -191,12 +130,13 @@ public class LimitBulletType extends BulletType {
             super.load();
         }
     }
+
     @Override
     public void draw(Bullet b) {
         switch (type) {
             case "continuousF": {
                 float mult = b.fin(lengthInterp);
-                float realLength = Damage.findLength(b, length * mult, laserAbsorb, pierceCap);
+                float realLength = Damage.findLength(b, flareLength * mult, laserAbsorb, pierceCap);
                 float sin = Mathf.sin(Time.time, oscScl, oscMag);
                 for (int i = 0; i < colors.length; i++) {
                     Draw.color(colors[i].write(Tmp.c1).mul(0.9f).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
@@ -225,7 +165,7 @@ public class LimitBulletType extends BulletType {
             }
             case "continuousL": {
                 float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
-                float realLength = Damage.findLength(b, length * fout, laserAbsorb, pierceCap);
+                float realLength = Damage.findLength(b, laserCLength * fout, laserAbsorb, pierceCap);
                 float rot = b.rotation();
                 for (int i = 0; i < colors.length; i++) {
                     Draw.color(Tmp.c1.set(colors[i]).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
@@ -293,6 +233,7 @@ public class LimitBulletType extends BulletType {
         }
         Draw.reset();
     }
+
     @Override
     public void drawLight(Bullet b) {
         switch (type) {
@@ -303,6 +244,7 @@ public class LimitBulletType extends BulletType {
             }
         }
     }
+
     public void hitEntity(Bullet b, Hitboxc entity, float health) {
         boolean wasDead = entity instanceof Unit u && u.dead;
 
@@ -332,6 +274,7 @@ public class LimitBulletType extends BulletType {
 
         handlePierce(b, health, entity.x(), entity.y());
     }
+
     @Override
     public void hit(Bullet b, float x, float y) {
         if (haveEmp) {
@@ -385,6 +328,7 @@ public class LimitBulletType extends BulletType {
             super.hit(b, x, y);
         }
     }
+
     @Override
     public float continuousDamage() {
         return switch (type) {
@@ -392,30 +336,45 @@ public class LimitBulletType extends BulletType {
             default -> super.continuousDamage();
         };
     }
+
     @Override
     public float estimateDPS() {
         return switch (type) {
             case "continuousF", "continuousL" -> damage * 100f / damageInterval * 3f;
             case "laser" -> super.estimateDPS() * 3f;
-            case "lightning" -> super.estimateDPS() * Math.max(lightningLength / 10f, 1);
+            case "lightning" -> super.estimateDPS() * Math.max(bulletLightningLength / 10f, 1);
             default -> super.estimateDPS();
         };
     }
+
     @Override
-    protected float calculateRange() {
+    public float calculateRange() {
         return switch (type) {
-            case "continuousF", "continuousL", "laser" -> Math.max(length, maxRange);
-            case "lightning" -> (lightningLength + lightningLengthRand / 2f) * 6f;
-            case "rail" -> length;
+            case "continuousF" -> Math.max(flareLength, maxRange);
+            case "continuousL" -> Math.max(laserCLength, maxRange);
+            case "laser" -> Math.max(laserLength, maxRange);
+            case "lightning" -> (bulletLightningLength + bulletLightningLengthRand / 2f) * 6f;
+            case "rail" -> railLength;
             default -> super.calculateRange();
         };
     }
+
     @Override
     public void init() {
         switch (type) {
-            case "continuousF", "continuousL", "laser": {
+            case "laser": {
                 super.init();
-                drawSize = Math.max(drawSize, length * 2f);
+                drawSize = Math.max(drawSize, laserLength * 2f);
+                break;
+            }
+            case "continuousF": {
+                super.init();
+                drawSize = Math.max(drawSize, flareLength * 2f);
+                break;
+            }
+            case "continuousL": {
+                super.init();
+                drawSize = Math.max(drawSize, laserCLength * 2f);
                 break;
             }
             default: {
@@ -423,6 +382,7 @@ public class LimitBulletType extends BulletType {
             }
         }
     }
+
     @Override
     public void init(Bullet b) {
         switch (type) {
@@ -434,7 +394,7 @@ public class LimitBulletType extends BulletType {
                 break;
             }
             case "laser": {
-                float resultLength = Damage.collideLaser(b, length, largeHit, laserAbsorb, pierceCap), rot = b.rotation();
+                float resultLength = Damage.collideLaser(b, laserLength, largeHit, laserAbsorb, pierceCap), rot = b.rotation();
                 laserEffect.at(b.x, b.y, rot, resultLength * 0.75f);
                 if (lightningSpacing > 0) {
                     int idx = 0;
@@ -458,7 +418,8 @@ public class LimitBulletType extends BulletType {
             }
             case "lightning": {
                 super.init(b);
-                Lightning.create(b, lightningColor, damage, b.x, b.y, b.rotation(), lightningLength + Mathf.random(lightningLengthRand));
+                Lightning.create(b, bulletLightningColor, damage, b.x, b.y, b.rotation(),
+                        bulletLightningLength + Mathf.random(bulletLightningLengthRand));
                 break;
             }
             case "point": {
@@ -498,10 +459,10 @@ public class LimitBulletType extends BulletType {
             }
             case "rail": {
                 super.init(b);
-                b.fdata = length;
-                furthest = length;
+                b.fdata = railLength;
+                furthest = railLength;
                 any = false;
-                Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), length, false, false);
+                Damage.collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), railLength, false, false);
                 float resultLen = furthest;
                 Vec2 nor = Tmp.v1.trns(b.rotation(), 1f).nor();
                 if (pointEffect != Fx.none) {
@@ -522,6 +483,7 @@ public class LimitBulletType extends BulletType {
             }
         }
     }
+
     public void applyDamage(Bullet b) {
         if (type.equals("continuousF") || type.equals("continuousL")) {
             if (!continuous) {
@@ -529,15 +491,17 @@ public class LimitBulletType extends BulletType {
             }
         }
     }
+
     public float currentLength(Bullet b) {
         if (type.equals("continuousF")) {
-            return length * b.fin(lengthInterp);
+            return flareLength * b.fin(lengthInterp);
         } else if (type.equals("continuousL")) {
             float fout = Mathf.clamp(b.time > b.lifetime - fadeTime ? 1f - (b.time - (lifetime - fadeTime)) / fadeTime : 1f);
-            return length * fout;
+            return laserCLength * fout;
         }
         return -1;
     }
+
     @Override
     public void handlePierce(Bullet b, float initialHealth, float x, float y) {
         if (type.equals("rail")) {
@@ -560,6 +524,7 @@ public class LimitBulletType extends BulletType {
             super.handlePierce(b, initialHealth, x, y);
         }
     }
+
     @Override
     public boolean testCollision(Bullet bullet, Building tile) {
         if (type.equals("rail")) {
@@ -567,6 +532,7 @@ public class LimitBulletType extends BulletType {
         }
         return super.testCollision(bullet, tile);
     }
+
     @Override
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct) {
         if (type.equals("rail")) {
@@ -584,5 +550,28 @@ public class LimitBulletType extends BulletType {
                 Events.fire(new EventType.BuildDamageEvent().set(build, b));
             }
         }
+    }
+
+    public void copyTo(LimitBulletType other) {
+        try {
+            Field[] fields = LimitBulletType.class.getFields();
+            for (Field field : fields) {
+                field.set(other, field.get(this));
+            }
+            fields = BulletType.class.getFields();
+            for (Field field : fields) {
+                field.set(other, field.get(this));
+            }
+        } catch (RuntimeException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void write(int id) {
+
+    }
+
+    public LimitBulletType read(int id) {
+        return this;
     }
 }
