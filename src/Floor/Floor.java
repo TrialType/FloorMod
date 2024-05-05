@@ -1,16 +1,22 @@
 package Floor;
 
 import Floor.FContent.*;
-import Floor.FType.FDialog.EffectDialog;
+import Floor.FType.FDialog.BulletDialog;
+import arc.Events;
 import arc.util.Time;
-import mindustry.entities.Effect;
+import mindustry.game.EventType;
 import mindustry.mod.Mod;
 
 public class Floor extends Mod {
     public Floor() {
         Time.run(60, () -> {
-            Effect test = new Effect();
-            new EffectDialog("", 1).show();
+            BulletDialog bd = new BulletDialog(null, "");
+            bd.show();
+            Events.on(EventType.UnitCreateEvent.class, e -> {
+                if (e.unit != null) {
+                    bd.bullet.create(e.unit, e.unit.x, e.unit.y, 0);
+                }
+            });
         });
     }
 

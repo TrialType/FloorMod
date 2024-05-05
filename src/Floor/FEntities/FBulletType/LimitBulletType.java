@@ -1,5 +1,6 @@
 package Floor.FEntities.FBulletType;
 
+import Floor.FEntities.FEffect.IOMulti;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -19,6 +20,7 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -35,10 +37,15 @@ public class LimitBulletType extends BulletType {
     public boolean havePercent = false;
 
 
-
     static float furthest = 0;
     static boolean any = false;
 
+
+    public IOMulti hitEffect = new IOMulti();
+    public IOMulti despawnEffect = new IOMulti();
+    public IOMulti shootEffect = new IOMulti();
+    public IOMulti chargeEffect = new IOMulti();
+    public IOMulti smokeEffect = new IOMulti();
 
 
     public float percent = 0;

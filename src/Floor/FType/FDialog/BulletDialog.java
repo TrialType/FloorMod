@@ -1,6 +1,8 @@
 package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
+import Floor.FEntities.FEffect.IOEffect;
+import Floor.FEntities.FEffect.IOMulti;
 import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
@@ -14,6 +16,8 @@ import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
+import mindustry.entities.Effect;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -36,6 +40,7 @@ public class BulletDialog extends BaseDialog {
     public float heavy = 0.5f;
     public Table typeOn;
     public Table baseOn;
+    public Table effectOn;
 
     public BulletDialog(BaseDialog parent, String title) {
         super(title);
@@ -239,6 +244,61 @@ public class BulletDialog extends BaseDialog {
             createLevDialog("lightnings", "lightning", s, bullet.lightning,
                     f -> bullet.lightning = (int) (f + 0), f -> bullet.lightning = (int) (f + 0));
         }).growX();
+
+        baseOn.row();
+        baseOn.label(() -> Core.bundle.get("dialog.bullet.effects") + ": ");
+        baseOn.row();
+
+        baseOn.table(this::rebuildEffect).grow();
+    }
+
+    public void rebuildEffect(Table on) {
+        on.clear();
+        on.label(() -> Core.bundle.get("dialog.bullet.shootEffect") + "->");
+        on.button(Icon.pencil, () -> {
+            BaseDialog bd = new BaseDialog("");
+            bd.cont.pane(li -> {
+                li.table(ta -> {
+                    effectOn = ta;
+                    rebuildEffectList(bullet.shootEffect);
+                }).grow();
+                li.row();
+                li.button(Icon.add, () -> {
+                    IOEffect effect = new IOEffect();
+                    IOEffect[] effects = new IOEffect[bullet.shootEffect.effects.length + 1];
+                    System.arraycopy(bullet.shootEffect.effects, 0, effects, 0, bullet.shootEffect.effects.length);
+                    effects[effects.length - 1] = effect;
+                    bullet.shootEffect.effects = effects;
+                    rebuildEffectList(bullet.shootEffect);
+                }).growX();
+            }).growX().growY();
+            bd.row();
+            bd.buttons.button(Icon.left, bd::hide);
+            bd.show();
+        });
+        on.row();
+    }
+
+    public void rebuildEffectList(IOMulti list) {
+        effectOn.clear();
+        for (int i = 0; i < list.effects.length; i++) {
+            int finalI = i;
+            effectOn.table(t -> {
+                t.label(() -> finalI + "");
+                t.button(Icon.pencil, () -> createEffectDialog(list.effects[finalI], () -> rebuildEffectList(list)));
+                t.button(Icon.trash, () -> {
+                    IOEffect[] effects = new IOEffect[list.effects.length - 1];
+                    for (int j = 0; j < list.effects.length; j++) {
+                        if (j != finalI) {
+                            effects[j] = list.effects[j];
+                        }
+                    }
+                    list.effects = effects;
+                    rebuildEffectList(list);
+                });
+            }).growX();
+            effectOn.row();
+        }
     }
 
     public void createTypeLine(Table t, String type) {
@@ -251,6 +311,12 @@ public class BulletDialog extends BaseDialog {
             table.label(() -> Core.bundle.get("@maxLevel") + ":  " + ProjectsLocated.maxLevel.get(type)).left().pad(5);
         });
         t.row();
+    }
+
+    public void createEffectDialog(IOEffect body, Runnable hide) {
+        EffectDialog ed = new EffectDialog("");
+        ed.hidden(hide);
+        ed.setEffect(body).show();
     }
 
     public void createLevDialog(String name, String line, Table t, float value, Cons<Float> changer, Cons<Float> rollback) {
@@ -328,7 +394,7 @@ public class BulletDialog extends BaseDialog {
         Core.scene.add(hitter);
 
         ta.update(() -> {
-            if(b.parent == null || !b.isDescendantOf(Core.scene.root)){
+            if (b.parent == null || !b.isDescendantOf(Core.scene.root)) {
                 Core.app.post(() -> {
                     hitter.remove();
                     ta.remove();

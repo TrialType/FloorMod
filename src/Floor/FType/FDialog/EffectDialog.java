@@ -1,5 +1,6 @@
 package Floor.FType.FDialog;
 
+import Floor.FEntities.FEffect.IOEffect;
 import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
@@ -27,7 +28,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import static mindustry.Vars.ui;
 
 public class EffectDialog extends BaseDialog {
-    public Effect effect;
+    public IOEffect effect = new IOEffect();
     public Seq<effectAction> renderers = new Seq<>();
     public Seq<EAction> all = new Seq<>();
     public Table base;
@@ -38,17 +39,19 @@ public class EffectDialog extends BaseDialog {
     public String cls = "";
     public float[] acs = new float[10];
 
-    public EffectDialog(String title, int version) {
+    public EffectDialog(String title) {
         super(title);
-
     }
 
-    /*super(title);
+    public EffectDialog setEffect(IOEffect effect) {
         this.effect = effect;
+        for (String v : effect.values) {
+            all.add(EAction.in(v));
+        }
 
         buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
         buttons.button(Core.bundle.get("@apply"), Icon.chat, () -> {
-            loadOut();
+            effect.values = loadOut();
             this.effect.renderer = e -> {
                 for (effectAction ea : renderers) {
                     ea.get(e);
@@ -62,8 +65,11 @@ public class EffectDialog extends BaseDialog {
             t.row();
             t.table(table -> action = table).growX();
         }).grow();
-        shown(this::rebuild);*/
-    public void rebuild() {
+        shown(this::reb);
+        return this;
+    }
+
+    public void reb() {
         rebuildBase();
         rebuildAction();
     }
@@ -325,7 +331,7 @@ public class EffectDialog extends BaseDialog {
             t.row();
             t.table(ta -> ta.button(Core.bundle.get("dialog.effect.inputForColor"), () -> ui.showTextInput("", "", 150, cls, true, str -> {
                         for (String c : str.split(",")) {
-                            if (c.length() < 6 || c.length() > 8 || !c.matches("([a,f][0,9]){6,8}")) {
+                            if (c.length() != 6 && c.length() != 8) {
                                 ui.showInfo(Core.bundle.format("@inputError"));
                                 return;
                             }
@@ -341,9 +347,9 @@ public class EffectDialog extends BaseDialog {
         }).width(100).pad(5);
         bd.buttons.button(Core.bundle.get("@apply"), () -> {
             if (index < 0) {
-                all.add(new EAction(typeNow, acs, cls.split(",")));
+                all.add(new EAction(typeNow, acs, cls.isEmpty() ? new String[0] : cls.split(",")));
             } else {
-                all.set(index, new EAction(typeNow, acs, cls.split(",")));
+                all.set(index, new EAction(typeNow, acs, cls.isEmpty() ? new String[0] : cls.split(",")));
             }
             rebuildList();
             bd.remove();
@@ -416,9 +422,11 @@ public class EffectDialog extends BaseDialog {
         ta.pack();
     }
 
-    public void loadOut() {
+    public String[] loadOut() {
         renderers.clear();
-        for (EAction a : all) {
+        String[] allValues = new String[all.size];
+        for (int i = 0; i < all.size; i++) {
+            EAction a = all.get(i);
             switch (a.type) {
                 case "circle": {
                     renderers.add(e -> {
@@ -464,10 +472,12 @@ public class EffectDialog extends BaseDialog {
                     break;
                 }
             }
+            allValues[i] = a.out();
         }
+        return allValues;
     }
 
-    public void setColor(String[] colors, float fin) {
+    public static void setColor(String[] colors, float fin) {
         if (colors.length == 0) {
             Draw.color(Color.white);
             return;
@@ -504,6 +514,43 @@ public class EffectDialog extends BaseDialog {
             this.type = type;
             this.values = values;
             this.colors = colors;
+        }
+
+        protected EAction() {
+        }
+
+        public String out() {
+            return type + "\n" + values() + "\n" + colors() + "\n";
+        }
+
+        public String values() {
+            StringBuilder s = new StringBuilder();
+            for (float f : values) {
+                s.append(",").append(f);
+            }
+            return s.toString();
+        }
+
+        public String colors() {
+            StringBuilder s = new StringBuilder();
+            for (String c : colors) {
+                s.append(",").append(c);
+            }
+            return s.toString();
+        }
+
+        public static EAction in(String s) {
+            EAction e = new EAction();
+            e.type = s.split("\n")[0];
+            String[] vs = s.split("\n")[1].split(",");
+            e.values = new float[vs.length];
+            for (int i = 0; i < vs.length; i++) {
+                if (Strings.canParseFloat(vs[i])) {
+                    e.values[i] = Strings.parseFloat(vs[i]);
+                }
+            }
+            e.colors = s.split("\n")[2].split(",");
+            return e;
         }
     }
 }
