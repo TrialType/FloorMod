@@ -1,16 +1,16 @@
 package Floor;
 
 import Floor.FContent.*;
-import Floor.FType.FDialog.BulletDialog;
-import Floor.FType.FDialog.ProjectsLocated;
+import Floor.FType.FDialog.EffectDialog;
 import arc.util.Time;
+import mindustry.entities.Effect;
 import mindustry.mod.Mod;
 
 public class Floor extends Mod {
     public Floor() {
         Time.run(60, () -> {
-            new ProjectsLocated("");
-            new BulletDialog(null, "").show();
+            Effect test = new Effect();
+            new EffectDialog(test, "").show();
         });
     }
 
