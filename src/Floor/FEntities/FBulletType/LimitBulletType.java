@@ -20,7 +20,6 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -55,7 +54,7 @@ public class LimitBulletType extends BulletType {
     public float shrinkX = 0f, shrinkY = 0.5f;
     public Interp shrinkInterp = Interp.linear;
     public float spin = 0, rotationOffset = 0f;
-    public String sprite;
+    public String sprite = "bullet";
     public @Nullable String backSprite;
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
@@ -175,7 +174,6 @@ public class LimitBulletType extends BulletType {
                 }
                 Tmp.v1.trns(b.rotation(), realLength * 1.1f);
                 Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
-                Draw.reset();
                 break;
             }
             case "continuousL": {
@@ -196,7 +194,6 @@ public class LimitBulletType extends BulletType {
                 }
                 Tmp.v1.trns(b.rotation(), realLength * 1.1f);
                 Drawf.light(b.x, b.y, b.x + Tmp.v1.x, b.y + Tmp.v1.y, lightStroke, lightColor, 0.7f);
-                Draw.reset();
                 break;
             }
             case "laser": {
@@ -462,9 +459,7 @@ public class LimitBulletType extends BulletType {
                 float px = b.x + b.lifetime * b.vel.x,
                         py = b.y + b.lifetime * b.vel.y,
                         rot = b.rotation();
-                Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> {
-                    trailEffect.at(x, y, rot);
-                });
+                Geometry.iterateLine(0f, b.x, b.y, px, py, trailSpacing, (x, y) -> trailEffect.at(x, y, rot));
                 b.time = b.lifetime;
                 b.set(px, py);
                 cdist = 0f;
@@ -618,10 +613,32 @@ public class LimitBulletType extends BulletType {
                 throw new RuntimeException(e);
             }
         }
+        hitSize = 4;
+        drawSize = 40f;
+        rangeOverride = -1f;
+        createChance = 1;
+        trailSpacing = 10;
+        pointEffectSpace = 20;
+    }
+
+    public void despawned(Bullet b) {
+        if (despawnHit) {
+            hit(b);
+        } else {
+            createUnits(b, b.x, b.y);
+        }
+
+        if (!fragOnHit) {
+            createFrags(b, b.x, b.y);
+        }
+
+        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
+        despawnSound.at(b);
+
+        Effect.shake(despawnShake, despawnShake, b);
     }
 
     public void write(int id) {
-
     }
 
     public LimitBulletType read(int id) {

@@ -7,6 +7,7 @@ import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.*;
+import Floor.FEntities.FEffect.IOMulti;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
@@ -1183,6 +1184,25 @@ public class FUnits {
             health = 1200;
             upDamage = 13;
             speed = 1.2f;
+
+            weapons.add(new Weapon() {{
+                reload = 12;
+                bullet = new LimitBulletType() {{
+                    type = "bullet";
+                    bulletLightningLength = 100;
+                    trailEffect = Fx.none;
+                    maxRange = 1200;
+                    laserLength = 400;
+                    width = height = 12;
+                    lifetime = 120;
+                    speed = 2;
+                    damage = 1000;
+                    backLength = 7f;
+                    frontLength = 35f;
+                    pierce = true;
+                    pierceCap = -1;
+                }};
+            }});
         }};
         cave = new UnitType("cave") {{
             constructor = CaveUnit::create;

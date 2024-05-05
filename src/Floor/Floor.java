@@ -9,15 +9,15 @@ import mindustry.mod.Mod;
 
 public class Floor extends Mod {
     public Floor() {
-        Time.run(60, () -> {
-            BulletDialog bd = new BulletDialog(null, "");
-            bd.show();
-            Events.on(EventType.UnitCreateEvent.class, e -> {
-                if (e.unit != null) {
-                    bd.bullet.create(e.unit, e.unit.x, e.unit.y, 0);
-                }
-            });
-        });
+//        Time.run(60, () -> {
+//            BulletDialog bd = new BulletDialog(null, "");
+//            bd.show();
+//            Events.on(EventType.UnitCreateEvent.class, e -> {
+//                if (e.unit != null) {
+//                    bd.bullet.create(e.unit, e.unit.x, e.unit.y, 0);
+//                }
+//            });
+//        });
     }
 
     @Override

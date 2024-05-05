@@ -16,8 +16,6 @@ import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
-import mindustry.entities.Effect;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -104,9 +102,9 @@ public class BulletDialog extends BaseDialog {
         }).size(210f, 64f);
         buttons.button("@toZero", Icon.defense, () -> {
             bullet.setZero();
+            updateHeavy();
             rebuildType();
             rebuildBase();
-            updateHeavy();
         }).size(210f, 64f);
     }
 
@@ -254,29 +252,38 @@ public class BulletDialog extends BaseDialog {
 
     public void rebuildEffect(Table on) {
         on.clear();
-        on.label(() -> Core.bundle.get("dialog.bullet.shootEffect") + "->");
-        on.button(Icon.pencil, () -> {
+        on.table(l -> createEffectLine(l, "shootEffect", bullet.shootEffect)).growX();
+        on.table(l -> createEffectLine(l, "despawnEffect", bullet.despawnEffect)).growX();
+        on.row();
+        on.table(l -> createEffectLine(l, "hitEffect", bullet.hitEffect)).growX();
+        on.table(l -> createEffectLine(l, "chargeEffect", bullet.chargeEffect)).growX();
+        on.row();
+        on.table(l -> createEffectLine(l, "smokeEffect", bullet.smokeEffect)).growX();
+    }
+
+    public void createEffectLine(Table t, String name, IOMulti list) {
+        t.label(() -> Core.bundle.get("dialog.bullet." + name) + "->");
+        t.button(Icon.pencil, () -> {
             BaseDialog bd = new BaseDialog("");
             bd.cont.pane(li -> {
                 li.table(ta -> {
                     effectOn = ta;
-                    rebuildEffectList(bullet.shootEffect);
+                    rebuildEffectList(list);
                 }).grow();
                 li.row();
                 li.button(Icon.add, () -> {
                     IOEffect effect = new IOEffect();
-                    IOEffect[] effects = new IOEffect[bullet.shootEffect.effects.length + 1];
-                    System.arraycopy(bullet.shootEffect.effects, 0, effects, 0, bullet.shootEffect.effects.length);
+                    IOEffect[] effects = new IOEffect[list.effects.length + 1];
+                    System.arraycopy(list.effects, 0, effects, 0, list.effects.length);
                     effects[effects.length - 1] = effect;
-                    bullet.shootEffect.effects = effects;
-                    rebuildEffectList(bullet.shootEffect);
-                }).growX();
+                    list.effects = effects;
+                    rebuildEffectList(list);
+                });
             }).growX().growY();
             bd.row();
             bd.buttons.button(Icon.left, bd::hide);
             bd.show();
         });
-        on.row();
     }
 
     public void rebuildEffectList(IOMulti list) {
@@ -284,8 +291,8 @@ public class BulletDialog extends BaseDialog {
         for (int i = 0; i < list.effects.length; i++) {
             int finalI = i;
             effectOn.table(t -> {
-                t.label(() -> finalI + "");
-                t.button(Icon.pencil, () -> createEffectDialog(list.effects[finalI], () -> rebuildEffectList(list)));
+                t.label(() -> finalI + "").growX();
+                t.button(Icon.pencil, () -> createEffectDialog(list.effects[finalI], () -> rebuildEffectList(list))).growX();
                 t.button(Icon.trash, () -> {
                     IOEffect[] effects = new IOEffect[list.effects.length - 1];
                     for (int j = 0; j < list.effects.length; j++) {
@@ -295,7 +302,7 @@ public class BulletDialog extends BaseDialog {
                     }
                     list.effects = effects;
                     rebuildEffectList(list);
-                });
+                }).growX();
             }).growX();
             effectOn.row();
         }

@@ -520,36 +520,49 @@ public class EffectDialog extends BaseDialog {
         }
 
         public String out() {
-            return type + "\n" + values() + "\n" + colors() + "\n";
+            return type + "&&" + values() + "&&" + colors();
         }
 
         public String values() {
             StringBuilder s = new StringBuilder();
-            for (float f : values) {
-                s.append(",").append(f);
+            for (int i = 0; i < values.length; i++) {
+                if (i == 0) {
+                    s.append(values[i]);
+                } else {
+                    s.append(",").append(values[i]);
+                }
             }
             return s.toString();
         }
 
         public String colors() {
             StringBuilder s = new StringBuilder();
-            for (String c : colors) {
-                s.append(",").append(c);
+            for (int i = 0; i < colors.length; i++) {
+                if (i == 0) {
+                    s.append(colors[i]);
+                } else {
+                    s.append(",").append(colors[i]);
+                }
             }
             return s.toString();
         }
 
         public static EAction in(String s) {
             EAction e = new EAction();
-            e.type = s.split("\n")[0];
-            String[] vs = s.split("\n")[1].split(",");
+            String[] ss = s.split("&&");
+            e.type = ss[0];
+            String[] vs = ss[1].split(",");
             e.values = new float[vs.length];
             for (int i = 0; i < vs.length; i++) {
                 if (Strings.canParseFloat(vs[i])) {
                     e.values[i] = Strings.parseFloat(vs[i]);
                 }
             }
-            e.colors = s.split("\n")[2].split(",");
+            if (ss.length == 3) {
+                e.colors = ss[2].split(",");
+            } else {
+                e.colors = new String[0];
+            }
             return e;
         }
     }
