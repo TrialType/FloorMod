@@ -10,7 +10,7 @@ public class Floor extends Mod {
     public Floor() {
         Time.run(60, () -> {
             Effect test = new Effect();
-            new EffectDialog(test, "").show();
+            new EffectDialog("", 1).show();
         });
     }
 

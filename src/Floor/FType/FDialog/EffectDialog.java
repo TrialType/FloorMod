@@ -37,12 +37,17 @@ public class EffectDialog extends BaseDialog {
     public String typeNow = "circle";
     public String cls = "";
     public float[] acs = new float[10];
-    public EffectDialog(Effect effect, String title) {
+
+    public EffectDialog(String title, int version) {
         super(title);
+
+    }
+
+    /*super(title);
         this.effect = effect;
 
         buttons.button("@back", Icon.left, this::hide).size(210f, 64f);
-        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
+        buttons.button(Core.bundle.get("@apply"), Icon.chat, () -> {
             loadOut();
             this.effect.renderer = e -> {
                 for (effectAction ea : renderers) {
@@ -57,9 +62,7 @@ public class EffectDialog extends BaseDialog {
             t.row();
             t.table(table -> action = table).growX();
         }).grow();
-        shown(this::rebuild);
-    }
-
+        shown(this::rebuild);*/
     public void rebuild() {
         rebuildBase();
         rebuildAction();
