@@ -20,6 +20,7 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.EmpBulletType;
 import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -49,6 +50,7 @@ public class LimitBulletType extends BulletType {
     public float percent = 0;
 
     //emp
+    public float empDamage;
     public float radius = 0;
 
     public float timeIncrease = 2.5f, timeDuration = 60f * 10f;
@@ -324,7 +326,7 @@ public class LimitBulletType extends BulletType {
 
                         if (other.power != null && other.power.graph.getLastPowerProduced() > 0f) {
                             other.applySlowdown(powerSclDecrease, timeDuration);
-                            other.damage(damage * powerDamageScl);
+                            other.damage(empDamage * powerDamageScl);
                             hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
                             chainEffect.at(x, y, 0, hitColor, other);
                         }
@@ -341,7 +343,7 @@ public class LimitBulletType extends BulletType {
 
                             hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
                             chainEffect.at(x, y, 0, hitColor, other);
-                            other.damage(damage * unitDamageScl);
+                            other.damage(empDamage * unitDamageScl);
                             other.apply(status, statusDuration);
                         }
                     });

@@ -32,21 +32,30 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     static {
+        //just for effect
+        heavies.put("none", i -> 0);
+
+        levels.put("none", f -> 0);
+
+        //bullet
         heavies.put("bulletBase", i -> i * 1f);
         heavies.put("splash", i -> i * 1.5f);
         heavies.put("lightning", i -> i * 1.2f);
         heavies.put("percent", i -> i * 1.2f);
-        heavies.put("number", i -> i * 1.8f);
         heavies.put("frags", i -> i * 1.8f);
-        heavies.put("none", i -> 0);
+        heavies.put("emp", i -> i);
 
         levels.put("bulletBase", f -> f <= 0 ? 0 : f <= 36 ? 1 : f <= 72 ? 2 : f <= 144 ? 3 : f <= 288 ? 4 : f <= 576 ? 5 : 6);
         levels.put("splash", f -> f <= 0 ? 0 : f <= 3 ? 1 : f <= 4.2 ? 2 : f <= 7 ? 3 : f <= 12 ? 4 : f <= 19 ? 5 : 6);
         levels.put("lightning", f -> f <= 0 ? 0 : f <= 2 ? 1 : f <= 4 ? 2 : f <= 8 ? 3 : f <= 12 ? 4 : f <= 20 ? 5 : 6);
         levels.put("percent", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.3 ? 3 : f <= 0.45 ? 4 : f <= 0.65 ? 5 : 6);
-        levels.put("number", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
         levels.put("frags", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
-        levels.put("none", f -> 0);
+        levels.put("emp", f -> f <= 0 ? 0 : f <= 60 ? 1 : f <= 90 ? 2 : f <= 130 ? 3 : f <= 180 ? 4 : f <= 260 ? 5 : 6);
+
+        //weapon
+        heavies.put("number", i -> i * 1.8f);
+
+        levels.put("number", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
 
         updateMaxLevel();
         updateHeavy();

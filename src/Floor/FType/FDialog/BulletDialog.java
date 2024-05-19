@@ -466,20 +466,20 @@ public class BulletDialog extends BaseDialog {
                 default -> bullet.damage * 1.2f + bullet.railLength / 8;
             };
             case "splash" -> switch (newType) {
-                case "point", "bullet", "laser" -> bullet.splashDamage * bullet.splashDamageRadius;
+                case "point", "bullet", "laser" -> bullet.splashDamage * bullet.splashDamageRadius / 4;
                 case "continuousF", "continuousL" ->
-                        bullet.lifetime * bullet.splashDamage * bullet.splashDamageRadius * 1.2f * (40 / bullet.damageInterval);
-                case "lightning", "rail" -> bullet.splashDamage * bullet.splashDamageRadius * 1.2f;
+                        bullet.lifetime * bullet.splashDamage * bullet.splashDamageRadius * 1.2f * (40 / bullet.damageInterval) / 4;
+                case "lightning", "rail" -> bullet.splashDamage * bullet.splashDamageRadius * 1.2f / 4;
                 default -> 100000;
             };
             case "lightning" -> switch (newType) {
                 case "point", "bullet", "laser" ->
-                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand;
+                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand / 4;
                 case "continuousF", "continuousL" ->
                         bullet.lightning * bullet.lightningDamage * bullet.lightningLength *
-                                bullet.lightningLengthRand * 1.2f * bullet.lifetime * (40 / bullet.damageInterval);
+                                bullet.lightningLengthRand * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) / 4;
                 case "lightning", "rail" ->
-                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand * 1.2f;
+                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand * 1.2f / 4;
                 default -> 100000;
             };
             case "percent" -> switch (newType) {
@@ -501,6 +501,16 @@ public class BulletDialog extends BaseDialog {
                 case "continuousF", "continuousL" ->
                         bullet.knockback * 1.2f * bullet.lifetime * (40 / bullet.damageInterval);
                 case "lightning", "rail" -> bullet.knockback * 1.2f;
+                default -> 100000;
+            };
+            case "emp" -> switch (newType) {
+                case "point", "bullet", "laser" ->
+                        bullet.empDamage * bullet.radius * bullet.powerSclDecrease * bullet.width * bullet.height / 4;
+                case "continuousF", "continuousL" ->
+                        bullet.empDamage * bullet.radius * bullet.powerSclDecrease * bullet.width *
+                                bullet.height * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) / 4;
+                case "lightning", "rail" ->
+                        bullet.empDamage * bullet.radius * bullet.powerSclDecrease * bullet.width * bullet.height * 1.2f / 4;
                 default -> 100000;
             };
             case "none" -> 0;
