@@ -18,11 +18,11 @@ public class FItems {
             lightningProject1, lightningProject2, lightningProject3, lightningProject4, lightningProject5,
             empProject1, empProject2, empProject3, empProject4, empProject5,
             fragProject1, fragProject2, fragProject3, fragProject4, fragProject5,
-            continuousProject1, continuousProject2, continuousProject3, continuousProject4, continuousProject5,
-            targetIntervalProject1, targetIntervalProject2, targetIntervalProject3, targetIntervalProject4, targetIntervalProject5;
+            targetIntervalProject1, targetIntervalProject2, targetIntervalProject3, targetIntervalProject4, targetIntervalProject5,
+            bulletNumberProject1, bulletNumberProject2, bulletNumberProject3, bulletNumberProject4, bulletNumberProject5;
     public static Item[] allSize, allSpeed, allHealth, allBulletBase, allReload,
-            allShield, allSplash, allKnock, allPercent, allContinuous, allTargetInterval,
-            allLightning, allEmp, allFrag;
+            allShield, allSplash, allKnock, allPercent, allTargetInterval,
+            allLightning, allEmp, allFrag, allBulletNumber;
     public static Item[][] allBullet, allAbility, allBase, allWeapon;
 
     public static void load() {
@@ -327,26 +327,6 @@ public class FItems {
             hidden = true;
             buildable = false;
         }};
-        continuousProject1 = new Item("continuous-project1") {{
-            hidden = true;
-            buildable = false;
-        }};
-        continuousProject2 = new Item("continuous-project2") {{
-            hidden = true;
-            buildable = false;
-        }};
-        continuousProject3 = new Item("continuous-project3") {{
-            hidden = true;
-            buildable = false;
-        }};
-        continuousProject4 = new Item("continuous-project4") {{
-            hidden = true;
-            buildable = false;
-        }};
-        continuousProject5 = new Item("continuous-project5") {{
-            hidden = true;
-            buildable = false;
-        }};
         targetIntervalProject1 = new Item("targetInterval-project1") {{
             hidden = true;
             buildable = false;
@@ -364,6 +344,26 @@ public class FItems {
             buildable = false;
         }};
         targetIntervalProject5 = new Item("targetInterval-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        bulletNumberProject1 = new Item("bulletNumber-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        bulletNumberProject2 = new Item("bulletNumber-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        bulletNumberProject3 = new Item("bulletNumber-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        bulletNumberProject4 = new Item("bulletNumber-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        bulletNumberProject5 = new Item("bulletNumber-project5") {{
             hidden = true;
             buildable = false;
         }};
@@ -412,15 +412,15 @@ public class FItems {
         allReload = new Item[]{
                 reloadProject1, reloadProject2, reloadProject3, reloadProject4, reloadProject5
         };
-        allContinuous = new Item[]{
-                continuousProject1, continuousProject2, continuousProject3, continuousProject4, continuousProject5
-        };
         allTargetInterval = new Item[]{
                 targetIntervalProject1, targetIntervalProject2, targetIntervalProject3, targetIntervalProject4, targetIntervalProject5
         };
+        allBulletNumber = new Item[]{
+                bulletNumberProject1, bulletNumberProject2, bulletNumberProject3, bulletNumberProject4, bulletNumberProject5
+        };
 
         allBullet = new Item[][]{allBulletBase, allSplash, allKnock, allPercent, allLightning, allEmp, allFrag};
-        allWeapon = new Item[][]{allReload, allContinuous, allTargetInterval};
+        allWeapon = new Item[][]{allReload, allTargetInterval, allBulletNumber};
         allAbility = new Item[][]{allShield};
         allBase = new Item[][]{allSize, allHealth, allSpeed};
     }

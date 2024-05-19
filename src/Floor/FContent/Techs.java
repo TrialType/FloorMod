@@ -120,7 +120,6 @@ public class Techs {
                     });
                 });
             });
-
             node(sizeProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(sizeProject2, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                     node(sizeProject3, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
@@ -141,7 +140,6 @@ public class Techs {
                     });
                 });
             });
-
             node(healthProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(healthProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(healthProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -152,7 +150,6 @@ public class Techs {
                     });
                 });
             });
-
             node(speedProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(speedProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(speedProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -163,7 +160,6 @@ public class Techs {
                     });
                 });
             });
-
             node(bulletProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(bulletProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(bulletProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -174,7 +170,6 @@ public class Techs {
                     });
                 });
             });
-
             node(reloadProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(reloadProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(reloadProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -185,7 +180,6 @@ public class Techs {
                     });
                 });
             });
-
             node(shieldProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(shieldProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(shieldProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -196,7 +190,6 @@ public class Techs {
                     });
                 });
             });
-
             node(splashProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(splashProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(splashProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -207,18 +200,6 @@ public class Techs {
                     });
                 });
             });
-
-            node(pricesProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
-                node(pricesProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
-                    node(pricesProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
-                        node(pricesProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
-                            node(pricesProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
-                            });
-                        });
-                    });
-                });
-            });
-
             node(knockProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(knockProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(knockProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -229,7 +210,6 @@ public class Techs {
                     });
                 });
             });
-
             node(percentProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
                 node(percentProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
                     node(percentProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
@@ -240,6 +220,58 @@ public class Techs {
                     });
                 });
             });
+            node(lightningProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(lightningProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(lightningProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(lightningProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(lightningProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(empProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(empProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(empProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(empProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(empProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(fragProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(fragProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(fragProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(fragProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(fragProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(targetIntervalProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(targetIntervalProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(targetIntervalProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(targetIntervalProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(targetIntervalProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(bulletNumberProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(bulletNumberProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(bulletNumberProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(bulletNumberProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(bulletNumberProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
         });
+        tf.parent = head;
+        head.children.add(tf);
     }
 }
