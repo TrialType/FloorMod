@@ -520,12 +520,12 @@ public class BulletDialog extends BaseDialog {
 
     public void updateHeavy() {
         heavy = 0.5f;
-        heavy += ProjectsLocated.getHeavy("damage", findVal("damage"));
-        heavy += ProjectsLocated.getHeavy("pass", findVal("pass"));
-        heavy += ProjectsLocated.getHeavy("prices", findVal("prices"));
+        heavy += ProjectsLocated.getHeavy("bulletBase", findVal("bulletBase"));
+        heavy += ProjectsLocated.getHeavy("emp", findVal("emp"));
         heavy += ProjectsLocated.getHeavy("splash", findVal("splash"));
         heavy += ProjectsLocated.getHeavy("lightning", findVal("lightning"));
         heavy += ProjectsLocated.getHeavy("percent", findVal("percent"));
         heavy += ProjectsLocated.getHeavy("frags", findVal("frags"));
+        heavy += ProjectsLocated.getHeavy("knock", findVal("knock"));
     }
 }

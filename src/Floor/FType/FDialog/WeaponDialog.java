@@ -3,6 +3,7 @@ package Floor.FType.FDialog;
 import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
 import arc.scene.ui.layout.Table;
+import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Icon;
 import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
@@ -22,16 +23,22 @@ public class WeaponDialog extends BaseDialog {
         super(title);
 
         this.pack = pack;
-        weapon = new Weapon();
+        weapon = pack.weapon == null ? new Weapon() : pack.weapon;
+        updateHeavy();
         bulletDialog = new BulletDialog(this, "");
         bulletDialog.hidden(() -> ProjectsLocated.freeSize += this.heavy);
         bullet = new LimitBulletType();
-        buttons.button("@back", Icon.left, () -> {
-
-        });
+        buttons.button("@back", Icon.left, this::hide);
         buttons.button("@apply", Icon.right, () -> {
             pack.weapon = this.weapon;
+            pack.heavy = this.heavy + this.bulletHeavy;
             hide();
+        });
+        buttons.button("@setZero", () -> {
+            weapon.reload = Float.MAX_VALUE;
+            weapon.shoot.shots = 0;
+            weapon.targetSwitchInterval = weapon.targetInterval = Float.MAX_VALUE;
+            rebuild();
         });
         shown(this::rebuild);
     }
@@ -58,5 +65,8 @@ public class WeaponDialog extends BaseDialog {
 
     public void updateHeavy() {
         heavy = 0.5f;
+        heavy += ProjectsLocated.getHeavy("number", weapon.shoot.shots);
+        heavy += ProjectsLocated.getHeavy("reload", weapon.reload);
+        heavy += ProjectsLocated.getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
     }
 }
