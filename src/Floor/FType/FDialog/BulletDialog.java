@@ -24,6 +24,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import static mindustry.Vars.ui;
 
 public class BulletDialog extends BaseDialog {
+    public int boost = 1;
     public WeaponDialog parentW;
     public BulletDialog parentB;
     public final Seq<String> types = new Seq<>(new String[]{
@@ -52,21 +53,23 @@ public class BulletDialog extends BaseDialog {
             this.fromHeavy = parentW.heavy;
             this.bulletHeavy = parentW.bulletHeavy - this.heavy;
             newType = bullet.type;
+            boost = wd.weapon.shoot.shots;
         } else if (parent instanceof BulletDialog bd) {
             this.parentB = bd;
             (bd.FBullet == null ? new LimitBulletType() : bd.FBullet).copyTo(this.bullet);
             updateHeavy();
-            this.fromHeavy = parentB.fromHeavy + parentB.heavy;
+            this.fromHeavy = parentB.fromHeavy + parentB.heavy * parentB.boost;
             this.bulletHeavy = parentB.bulletHeavy - this.heavy;
             newType = bullet.type;
+            boost = bd.bullet.fragBullets * bd.boost;
         }
 
         buttons.button("@back", Icon.left, () -> {
             hide();
             if (parentB != null) {
-                parentB.bulletHeavy = this.heavy + this.bulletHeavy;
+                parentB.bulletHeavy = this.heavy * boost + this.bulletHeavy;
             } else if (parentW != null) {
-                parentW.bulletHeavy = this.heavy + this.bulletHeavy;
+                parentW.bulletHeavy = this.heavy * boost + this.bulletHeavy;
             }
         }).size(210f, 64f);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -90,13 +93,13 @@ public class BulletDialog extends BaseDialog {
                     parentB.FBullet = new LimitBulletType();
                 }
                 bullet.copyTo(parentB.FBullet);
-                parentB.bulletHeavy = this.heavy + this.bulletHeavy;
+                parentB.bulletHeavy = this.heavy * boost + this.bulletHeavy;
             } else if (parentW != null) {
                 if (parentW.bullet == null) {
                     parentW.bullet = new LimitBulletType();
                 }
                 bullet.copyTo(parentW.bullet);
-                parentW.bulletHeavy = this.heavy + this.bulletHeavy;
+                parentW.bulletHeavy = this.heavy * boost + this.bulletHeavy;
             }
             hide();
         }).size(210f, 64f);
@@ -155,8 +158,13 @@ public class BulletDialog extends BaseDialog {
         typeOn.background(Tex.buttonDown);
         switch (newType) {
             case "bullet" -> {
-                createLevDialog("bulletSpeed", "pass", typeOn, bullet.speed,
-                        f -> bullet.speed = f, f -> bullet.speed = f);
+                createLevDialog("range", "bulletBase", typeOn, bullet.range,
+                        f -> bullet.range = f, f -> bullet.range = f);
+                createNumberDialog("lifetime", typeOn, bullet.lifetime, 0, Float.MAX_VALUE,
+                        f -> {
+                            bullet.lifetime = f;
+                            bullet.speed = bullet.range / (f == 0 ? 0.0001f : f);
+                        });
                 createNumberDialog("bulletWide", typeOn, bullet.width, 0, 45,
                         f -> bullet.width = f);
                 createNumberDialog("bulletHeight", typeOn, bullet.height, 0, 45,
@@ -164,37 +172,41 @@ public class BulletDialog extends BaseDialog {
                 typeOn.row();
             }
             case "laser" -> {
-                createLevDialog("laserLength", "pass", typeOn, bullet.laserCLength,
+                createLevDialog("laserLength", "bulletBase", typeOn, bullet.laserCLength,
                         f -> bullet.laserCLength = f, f -> bullet.laserCLength = f);
                 createNumberDialog("laserWidth", typeOn, bullet.width, 0.01f, 45,
                         f -> bullet.width = f);
             }
             case "lightning" -> {
-                createLevDialog("bulletLightningLength", "pass", typeOn, bullet.bulletLightningLength,
+                createLevDialog("bulletLightningLength", "bulletBase", typeOn, bullet.bulletLightningLength,
                         f -> bullet.bulletLightningLength = (int) (f + 0), f -> bullet.bulletLightningLength = (int) (f + 0));
-                createLevDialog("bulletLightningLengthRand", "pass", typeOn, bullet.bulletLightningLengthRand,
+                createLevDialog("bulletLightningLengthRand", "bulletBase", typeOn, bullet.bulletLightningLengthRand,
                         f -> bullet.bulletLightningLengthRand = (int) (f + 0), f -> bullet.bulletLightningLengthRand = (int) (f + 0));
             }
             case "continuousF" -> {
-                createLevDialog("flareLength", "pass", typeOn, bullet.laserCLength,
+                createLevDialog("flareLength", "bulletBase", typeOn, bullet.laserCLength,
                         f -> bullet.laserCLength = f, f -> bullet.laserCLength = f);
+                createLevDialog("lifetime", "bulletBase", typeOn, bullet.lifetime,
+                        f -> bullet.lifetime = f, f -> bullet.lifetime = f);
                 createNumberDialog("flareWidth", typeOn, bullet.flareWidth, 0, 30,
                         f -> bullet.flareWidth = f);
             }
             case "continuousL" -> {
-                createLevDialog("laserCLength", "pass", typeOn, bullet.flareLength,
+                createLevDialog("laserCLength", "bulletBase", typeOn, bullet.flareLength,
                         f -> bullet.flareLength = f, f -> bullet.flareLength = f);
+                createLevDialog("lifetime", "bulletBase", typeOn, bullet.lifetime,
+                        f -> bullet.lifetime = f, f -> bullet.lifetime = f);
                 createNumberDialog("fadeTime", typeOn, bullet.fadeTime, 12, 36,
                         f -> bullet.fadeTime = f);
             }
             case "point" -> {
-                createLevDialog("bulletSpeed", "pass", typeOn, bullet.speed,
-                        f -> bullet.speed = f, f -> bullet.speed = f);
+                createLevDialog("range", "bulletBase", typeOn, bullet.range,
+                        f -> bullet.range = f, f -> bullet.range = f);
                 createNumberDialog("trailSpacing", typeOn, 10, 10, 180,
                         f -> bullet.trailSpacing = f);
             }
             case "rail" -> {
-                createLevDialog("railLength", "pass", typeOn, bullet.railLength,
+                createLevDialog("railLength", "bulletBase", typeOn, bullet.railLength,
                         f -> bullet.railLength = f, f -> bullet.railLength = f);
                 createNumberDialog("pointEffectSpace", typeOn, 10, 10, 180,
                         f -> bullet.pointEffectSpace = f);
@@ -204,14 +216,12 @@ public class BulletDialog extends BaseDialog {
 
     public void rebuildBase() {
         baseOn.clear();
-        createTypeLine(baseOn, "damage");
+        createTypeLine(baseOn, "bulletBase");
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
-            createLevDialog("damage", "damage", s, bullet.damage,
+            createLevDialog("damage", "bulletBase", s, bullet.damage,
                     f -> bullet.damage = f, f -> bullet.damage = f);
-            createLevDialog("lifetime", findTyp("lifetime"), s, bullet.lifetime,
-                    f -> bullet.lifetime = f, f -> bullet.lifetime = f);
         }).growX();
 
         createTypeLine(baseOn, "frags");
@@ -222,6 +232,15 @@ public class BulletDialog extends BaseDialog {
                     f -> bullet.fragAngle = f);
             createLevDialog("frags", "frags", s, bullet.fragBullets,
                     f -> bullet.fragBullets = (int) (f + 0), f -> bullet.fragBullets = (int) (f + 0));
+            s.row();
+            s.label(() -> Core.bundle.get("writeFrag") + "->").width(150);
+            s.button(Icon.pencilSmall, () -> {
+                ProjectsLocated.freeSize -= this.heavy * boost;
+                BulletDialog bd = new BulletDialog(this, "");
+                bd.hidden(() -> ProjectsLocated.freeSize += this.heavy * boost);
+                bd.show();
+            }).pad(15).width(24);
+            s.row();
         }).growX();
 
         createTypeLine(baseOn, "lightning");
@@ -242,6 +261,11 @@ public class BulletDialog extends BaseDialog {
             createLevDialog("lightnings", "lightning", s, bullet.lightning,
                     f -> bullet.lightning = (int) (f + 0), f -> bullet.lightning = (int) (f + 0));
         }).growX();
+
+        createTypeLine(baseOn, "percent");
+
+        baseOn.table(p -> createLevDialog("percent", "percent", p, bullet.percent,
+                f -> bullet.percent = f, f -> bullet.percent = f));
 
         baseOn.row();
         baseOn.label(() -> Core.bundle.get("dialog.bullet.effects") + ": ");
@@ -336,7 +360,8 @@ public class BulletDialog extends BaseDialog {
                     changer.get(amount);
                     float now = this.heavy;
                     updateHeavy();
-                    if (ProjectsLocated.couldUse(line, findVal(line)) && heavy + bulletHeavy + fromHeavy <= ProjectsLocated.freeSize) {
+                    if (ProjectsLocated.couldUse(line, findVal(line)) && boost * heavy +
+                            bullet.fragBullets * bulletHeavy + fromHeavy <= ProjectsLocated.freeSize) {
                         rebuildBase();
                         rebuildType();
                     } else {
@@ -427,52 +452,60 @@ public class BulletDialog extends BaseDialog {
     }
 
     public float findVal(String name) {
-        switch (name) {
-            case "damage": {
-                if (newType.equals("point")) {
-                    return bullet.damage / 1.4f;
-                }
-                return bullet.damage;
-            }
-            case "pass": {
-                return bullet.calculateRange();
-            }
-            case "prices": {
-                if (newType.equals("point")) {
-                    return 0;
-                }
-                return bullet.pierceCap;
-            }
-            case "splash": {
-                return bullet.splashDamage * bullet.splashDamageRadius * (bullet.splashDamagePierce ? 1.5f : 1f) / 4;
-            }
-            case "lightning": {
-                switch (newType) {
-                    case "bullet", "laser", "continuousF", "continuousL", "point", "rail" -> {
-                        return bullet.lightningLength * bullet.lightningLengthRand * bullet.lightningDamage * bullet.lightning / 8;
-                    }
-                    case "lightning" -> {
-                        return bullet.lightningLength * bullet.lightningLengthRand * bullet.lightningDamage * bullet.lightning / 16;
-                    }
-                }
-            }
-            case "percent": {
-                return bullet.percent;
-            }
-            case "frags": {
-                return bullet.fragBullets;
-            }
-        }
-        return Float.MAX_VALUE;
-    }
-
-    public String findTyp(String name) {
-        if (newType.equals("continuousF") || name.equals("continuousL")) {
-            if (name.equals("lifetime")) {
-                return "damage";
-            }
-        }
-        return "none";
+        return switch (name) {
+            case "bulletBase" -> switch (newType) {
+                case "point" -> bullet.damage / 1.4f + bullet.range / 8;
+                case "bullet" -> bullet.damage + bullet.range / 8 + bullet.pierceCap;
+                case "laser" -> bullet.damage + bullet.laserLength / 8 + bullet.pierceCap;
+                case "continuousF" ->
+                        bullet.damage * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) + bullet.flareLength / 8;
+                case "continuousL" ->
+                        bullet.damage * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) + bullet.laserCLength / 8;
+                case "lightning" ->
+                        bullet.damage * 1.2f + (bullet.bulletLightningLength + bullet.bulletLightningLengthRand / 1.2f) / 8;
+                default -> bullet.damage * 1.2f + bullet.railLength / 8;
+            };
+            case "splash" -> switch (newType) {
+                case "point", "bullet", "laser" -> bullet.splashDamage * bullet.splashDamageRadius;
+                case "continuousF", "continuousL" ->
+                        bullet.lifetime * bullet.splashDamage * bullet.splashDamageRadius * 1.2f * (40 / bullet.damageInterval);
+                case "lightning", "rail" -> bullet.splashDamage * bullet.splashDamageRadius * 1.2f;
+                default -> 100000;
+            };
+            case "lightning" -> switch (newType) {
+                case "point", "bullet", "laser" ->
+                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand;
+                case "continuousF", "continuousL" ->
+                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength *
+                                bullet.lightningLengthRand * 1.2f * bullet.lifetime * (40 / bullet.damageInterval);
+                case "lightning", "rail" ->
+                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand * 1.2f;
+                default -> 100000;
+            };
+            case "percent" -> switch (newType) {
+                case "point", "bullet", "laser" -> bullet.percent;
+                case "continuousF", "continuousL" ->
+                        bullet.percent * 1.2f * bullet.lifetime * (40 / bullet.damageInterval);
+                case "lightning", "rail" -> bullet.percent * 1.2f;
+                default -> 100000;
+            };
+            case "frags" -> switch (newType) {
+                case "point", "bullet", "laser" -> bullet.fragBullets;
+                case "continuousF", "continuousL" ->
+                        bullet.fragBullets * 1.2f * bullet.lifetime * (40 / bullet.damageInterval);
+                case "lightning", "rail" -> bullet.fragBullets * 1.2f;
+                default -> 100000;
+            };
+            case "knock" -> switch (newType) {
+                case "point", "bullet", "laser" -> bullet.knockback;
+                case "continuousF", "continuousL" ->
+                        bullet.knockback * 1.2f * bullet.lifetime * (40 / bullet.damageInterval);
+                case "lightning", "rail" -> bullet.knockback * 1.2f;
+                default -> 100000;
+            };
+            case "none" -> 0;
+            default -> 100000;
+        };
     }
 
     public void updateHeavy() {

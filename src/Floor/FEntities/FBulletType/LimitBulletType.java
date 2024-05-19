@@ -46,8 +46,18 @@ public class LimitBulletType extends BulletType {
     public IOMulti chargeEffect = new IOMulti();
     public IOMulti smokeEffect = new IOMulti();
 
-
     public float percent = 0;
+
+    //emp
+    public float radius = 0;
+
+    public float timeIncrease = 2.5f, timeDuration = 60f * 10f;
+    public float powerDamageScl = 2f, powerSclDecrease = 0.2f;
+    public float unitDamageScl = 0.7f;
+
+    public Effect hitPowerEffect = Fx.hitEmpSpark, chainEffect = Fx.chainEmp, applyEffect = Fx.heal;
+    public boolean hitUnits = true;
+
     public Color backColor = Pal.bulletYellowBack, frontColor = Pal.bulletYellow;
     public Color mixColorFrom = new Color(1f, 1f, 1f, 0f), mixColorTo = new Color(1f, 1f, 1f, 0f);
     public float width = 5f, height = 7f;
@@ -58,25 +68,20 @@ public class LimitBulletType extends BulletType {
     public @Nullable String backSprite;
     public TextureRegion backRegion;
     public TextureRegion frontRegion;
-    //emp
-    public float radius = 0;
-    public float timeIncrease = 2.5f, timeDuration = 60f * 10f;
-    public float powerDamageScl = 2f, powerSclDecrease = 0.2f;
-    public Effect hitPowerEffect = Fx.hitEmpSpark, chainEffect = Fx.chainEmp, applyEffect = Fx.heal;
-    public boolean hitUnits = true;
-    public float unitDamageScl = 0.7f;
     //continuous
-    public float shake = 0f;
     public float damageInterval = 5f;
-    public boolean largeHit = false;
     public boolean continuous = true;
+    public float shake = 0f;
+    public boolean largeHit = false;
     //continuousF
+    public float flareLength = 40f;
+
     public float lightStroke = 40f;
     public float oscScl = 1.2f, oscMag = 0.02f;
     public int divisions = 25;
     public boolean drawFlare = true;
     public Color flareColor = Color.valueOf("e189f5");
-    public float flareWidth = 3f, flareInnerScl = 0.5f, flareLength = 40f, flareInnerLenScl = 0.5f, flareLayer = Layer.bullet - 0.0001f, flareRotSpeed = 1.2f;
+    public float flareWidth = 3f, flareInnerScl = 0.5f, flareInnerLenScl = 0.5f, flareLayer = Layer.bullet - 0.0001f, flareRotSpeed = 1.2f;
     public boolean rotateFlare = false;
     public Interp lengthInterp = Interp.slope;
     public float[] lengthWidthPans = {
@@ -89,11 +94,13 @@ public class LimitBulletType extends BulletType {
     public Color[] colors = {Color.valueOf("eb7abe").a(0.55f), Color.valueOf("e189f5").a(0.7f), Color.valueOf("907ef7").a(0.8f), Color.valueOf("91a4ff"), Color.white.cpy()};
     //continuousL
     public float laserCLength = 0;
+
     public float fadeTime = 16f;
     public float strokeFrom = 2f, strokeTo = 0.5f, pointyScaling = 0.75f;
     public float backLength = 7f, frontLength = 35f;
     //laser
     public float laserLength = 0;
+
     public Effect laserEffect = Fx.lancerLaserShootSmoke;
     public float lengthFalloff = 0.5f;
     public float sideLength = 29f, sideWidth = 0.7f;
@@ -105,12 +112,16 @@ public class LimitBulletType extends BulletType {
     public float trailSpacing = 10f;
     //rail
     public float railLength = 0;
+
+
     public Effect pierceEffect = Fx.hitBulletSmall, pointEffect = Fx.none, lineEffect = Fx.none;
     public Effect endEffect = Fx.none;
     public float pointEffectSpace = 20f;
     //lightning
     public int bulletLightningLength = 0;
     public int bulletLightningLengthRand = 0;
+
+
     public Color bulletLightningColor = Pal.lancerLaser;
 
     //______________________________________________________________________________________________________________________
@@ -598,27 +609,13 @@ public class LimitBulletType extends BulletType {
     }
 
     public void setZero() {
-        Field[] fields = LimitBulletType.class.getFields();
-        for (Field field : fields) {
-            try {
-                Object value = field.get(this);
-                if (value instanceof Float) {
-                    field.set(this, 0f);
-                } else if (value instanceof Integer) {
-                    field.set(this, 0);
-                } else if (value instanceof Boolean) {
-                    field.set(this, false);
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        hitSize = 4;
-        drawSize = 40f;
-        rangeOverride = -1f;
-        createChance = 1;
-        trailSpacing = 10;
-        pointEffectSpace = 20;
+        damage = 0;
+        speed = 0;
+        fragBullets = 0;
+        lightning = 0;
+        lightningLength = lightningLengthRand = bulletLightningLengthRand = bulletLightningLength = 0;
+        lifetime = flareLength = laserLength = laserCLength = range = maxRange = radius = railLength = 0;
+        splashDamage = splashDamageRadius = percent = 0;
     }
 
     public void despawned(Bullet b) {

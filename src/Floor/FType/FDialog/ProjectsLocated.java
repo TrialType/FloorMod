@@ -1,7 +1,10 @@
 package Floor.FType.FDialog;
 
+import arc.func.Cons;
 import arc.struct.Seq;
 import mindustry.entities.abilities.Ability;
+import mindustry.game.EventType;
+import mindustry.gen.Unit;
 import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -10,6 +13,8 @@ import java.util.HashMap;
 import static Floor.FContent.FItems.*;
 
 public class ProjectsLocated extends BaseDialog {
+    public static Cons<Unit> upper = u -> {
+    };
     public static float maxSize = 0;
     public static float freeSize = 0;
     public static final HashMap<String, heavyGetter> heavies = new HashMap<>();
@@ -27,32 +32,27 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     static {
-        heavies.put("damage", i -> i * 1f);
-        heavies.put("pass", i -> i * 1f);
-        heavies.put("prices", i -> i * 1.5f);
+        heavies.put("bulletBase", i -> i * 1f);
         heavies.put("splash", i -> i * 1.5f);
         heavies.put("lightning", i -> i * 1.2f);
         heavies.put("percent", i -> i * 1.2f);
         heavies.put("number", i -> i * 1.8f);
         heavies.put("frags", i -> i * 1.8f);
-        heavies.put("none", i -> Integer.MAX_VALUE);
+        heavies.put("none", i -> 0);
 
-        levels.put("damage", f -> f <= 0 ? 0 : f <= 12 ? 1 : f <= 24 ? 2 : f <= 48 ? 3 : f <= 96 ? 4 : f <= 192 ? 5 : 6);
-        levels.put("pass", f -> f <= 0 ? 0 : f <= 15 ? 1 : f <= 35 ? 2 : f <= 60 ? 3 : f <= 90 ? 4 : f <= 120 ? 5 : 6);
-        levels.put("prices", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
-        levels.put("splash", f -> f <= 0 ? 0 : f <= 1.5 ? 1 : f <= 2.1 ? 2 : f <= 3.5 ? 3 : f <= 6 ? 4 : f <= 9.5 ? 5 : 6);
-        levels.put("lightning", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
+        levels.put("bulletBase", f -> f <= 0 ? 0 : f <= 36 ? 1 : f <= 72 ? 2 : f <= 144 ? 3 : f <= 288 ? 4 : f <= 576 ? 5 : 6);
+        levels.put("splash", f -> f <= 0 ? 0 : f <= 3 ? 1 : f <= 4.2 ? 2 : f <= 7 ? 3 : f <= 12 ? 4 : f <= 19 ? 5 : 6);
+        levels.put("lightning", f -> f <= 0 ? 0 : f <= 2 ? 1 : f <= 4 ? 2 : f <= 8 ? 3 : f <= 12 ? 4 : f <= 20 ? 5 : 6);
         levels.put("percent", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.3 ? 3 : f <= 0.45 ? 4 : f <= 0.65 ? 5 : 6);
         levels.put("number", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
         levels.put("frags", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 4 ? 3 : f <= 6 ? 4 : f <= 10 ? 5 : 6);
-        levels.put("none", f -> 6);
+        levels.put("none", f -> 0);
 
         updateMaxLevel();
         updateHeavy();
     }
 
     public static float getHeavy(String type, float val) {
-        //only for test
         if (heavies.get(type) == null) {
             return 0;
         }
@@ -68,7 +68,7 @@ public class ProjectsLocated extends BaseDialog {
 
     public static void updateHeavy() {
         //test
-        maxSize = 1000;
+        maxSize = 2;
         for (int i = allSize.length; i > 0; i--) {
             if (allSize[i - 1].unlocked()) {
                 maxSize = 2 + (i == 1 ? 1 : i == 2 ? 2 : i == 3 ? 3 : i == 4 ? 4 : i == 5 ? 5 : i == 6 ? 6 : i == 7 ? 7 :
@@ -86,10 +86,10 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     public static void updateMaxLevel() {
-        //damage
-        maxLevel.put("damage", 0);
-        for (int i = allDamage.length; i > 0; i--) {
-            if (allDamage[i - 1].unlocked()) {
+        //bulletBase
+        maxLevel.put("bulletBase", 0);
+        for (int i = allBulletBase.length; i > 0; i--) {
+            if (allBulletBase[i - 1].unlocked()) {
                 maxLevel.put("bulletBase", i);
                 break;
             }
@@ -100,15 +100,6 @@ public class ProjectsLocated extends BaseDialog {
         for (int i = allSplash.length; i > 0; i--) {
             if (allSplash[i - 1].unlocked()) {
                 maxLevel.put("splash", i);
-                break;
-            }
-        }
-
-        //prices
-        maxLevel.put("prices", 0);
-        for (int i = allPrices.length; i > 0; i--) {
-            if (allPrices[i - 1].unlocked()) {
-                maxLevel.put("prices", i);
                 break;
             }
         }

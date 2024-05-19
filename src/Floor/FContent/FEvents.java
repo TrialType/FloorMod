@@ -5,6 +5,7 @@ import Floor.FTools.interfaces.FUnitUpGrade;
 import Floor.FTools.classes.UnitUpGrade;
 import Floor.FTools.interfaces.UpGradeTime;
 import Floor.FType.FDialog.MoreResearchDialog;
+import Floor.FType.FDialog.ProjectsLocated;
 import Floor.FType.UponFloor.CorrosionMist;
 import arc.Events;
 import arc.util.Time;
@@ -40,6 +41,11 @@ public class FEvents {
             }
         });
 
+        Events.on(EventType.UnitCreateEvent.class, e -> {
+            if (e.unit.spawnedByCore() && !e.unit.team.isAI()) {
+                ProjectsLocated.upper.get(e.unit);
+            }
+        });
         Events.on(EventType.UnitCreateEvent.class, e -> {
             if (e.unit instanceof FUnitUpGrade uug) {
                 int n = r.nextInt(6);
