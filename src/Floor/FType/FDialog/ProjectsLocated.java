@@ -236,11 +236,22 @@ public class ProjectsLocated extends BaseDialog {
 
     public static class weaponPack {
         Weapon weapon;
+        WeaponDialog dialog;
         float heavy = 0;
+
+        public weaponPack() {
+            weapon = new Weapon();
+            dialog = new WeaponDialog("", this);
+        }
     }
 
     public static class abilityPack {
         Ability ability;
+        AbilityDialog dialog;
         float heavy = 0;
+
+        public abilityPack() {
+            dialog = new AbilityDialog("", this);
+        }
     }
 }

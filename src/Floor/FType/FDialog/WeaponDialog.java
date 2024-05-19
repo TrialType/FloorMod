@@ -9,6 +9,7 @@ import mindustry.ui.dialogs.BaseDialog;
 
 public class WeaponDialog extends BaseDialog {
     public Weapon weapon;
+    public ProjectsLocated.weaponPack pack;
     public BulletDialog bulletDialog;
     public LimitBulletType bullet;
     public float bulletHeavy = 0;
@@ -17,9 +18,10 @@ public class WeaponDialog extends BaseDialog {
     public Table baseOn;
     public Table typeOn;
 
-    public WeaponDialog(String title) {
+    public WeaponDialog(String title, ProjectsLocated.weaponPack pack) {
         super(title);
 
+        this.pack = pack;
         weapon = new Weapon();
         bulletDialog = new BulletDialog(this, "");
         bulletDialog.hidden(() -> ProjectsLocated.freeSize += this.heavy);
@@ -28,7 +30,8 @@ public class WeaponDialog extends BaseDialog {
 
         });
         buttons.button("@apply", Icon.right, () -> {
-
+            pack.weapon = this.weapon;
+            hide();
         });
         shown(this::rebuild);
     }
