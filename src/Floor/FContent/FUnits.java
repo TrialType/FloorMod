@@ -1186,21 +1186,22 @@ public class FUnits {
             speed = 1.2f;
 
             weapons.add(new Weapon() {{
-                reload = 12;
-                bullet = new LimitBulletType() {{
-                    type = "bullet";
-                    bulletLightningLength = 100;
-                    trailEffect = Fx.none;
+                reload = 180;
+                bullet = new EMPLarge() {{
+                    trailEffect = new MultiEffect(Fx.artilleryTrail, Fx.artilleryTrailSmoke);
+                    trailWidth = 4.5f;
+                    trailLength = 19;
+                    trailChance = -1f;
+                    shootEffect = Fx.shootBigColor;
+                    smokeEffect = Fx.shootSmokeSquareBig;
+
+                    width = height = 8;
+                    pierceBuilding = true;
+                    pierceCap = 0;
                     maxRange = 1200;
-                    laserLength = 400;
-                    width = height = 12;
                     lifetime = 120;
-                    speed = 2;
-                    damage = 1000;
-                    backLength = 7f;
-                    frontLength = 35f;
-                    pierce = true;
-                    pierceCap = -1;
+                    speed = 9;
+                    damage = 1;
                 }};
             }});
         }};
