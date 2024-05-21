@@ -7,7 +7,6 @@ import Floor.FEntities.FAbility.LevelSign;
 import Floor.FEntities.FAbility.StrongMinerAbility;
 import Floor.FEntities.FAbility.TimeLargeDamageAbility;
 import Floor.FEntities.FBulletType.*;
-import Floor.FEntities.FEffect.IOMulti;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
@@ -16,7 +15,9 @@ import Floor.FTools.classes.BossList;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.math.Interp;
+import arc.math.Mathf;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -32,6 +33,7 @@ import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -39,6 +41,9 @@ import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
+
+import static arc.graphics.g2d.Lines.lineAngle;
+import static arc.math.Angles.randLenVectors;
 
 public class FUnits {
     public static UnitType transfer, shuttlev_I, bulletInterception_a;
@@ -1188,19 +1193,29 @@ public class FUnits {
             weapons.add(new Weapon() {{
                 reload = 180;
                 bullet = new EMPLarge() {{
-                    trailEffect = new MultiEffect(Fx.artilleryTrail, Fx.artilleryTrailSmoke);
-                    trailWidth = 4.5f;
+                    trailEffect = new MultiEffect(new Effect(90, e -> {
+                        Draw.color(Color.valueOf("990000"));
+                        Lines.stroke(3 * (1 - e.fin()));
+                        Lines.ellipse(e.x, e.y, 36, 0.75f * e.fin(), 0.15f * e.fin(), e.rotation + 90);
+                        Drawf.light(e.x, e.y, e.fout() * 27, Color.valueOf("990000"), 0.7f);
+                    }), new Effect(15, e -> randLenVectors(e.id + 1, 12,
+                            27 * e.fin(), e.rotation, 60, (x, y) -> {
+                                Draw.color(Color.valueOf("990000"));
+                                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fin());
+                                Drawf.light(e.x + x, e.y + y, e.fout() * 4f, Color.valueOf("990000"), 0.7f);
+                            })));
+                    trailRotation = true;
+                    trailWidth = 1;
                     trailLength = 19;
-                    trailChance = -1f;
+                    trailChance = 0.4f;
+                    trailColor = Color.valueOf("990000");
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
 
-                    width = height = 8;
-                    pierceBuilding = true;
-                    pierceCap = 0;
-                    maxRange = 1200;
+                    width = height = 4;
+                    frontColor = backColor = Color.valueOf("990000aa");
                     lifetime = 120;
-                    speed = 9;
+                    speed = 13;
                     damage = 1;
                 }};
             }});

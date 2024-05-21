@@ -1,18 +1,13 @@
 package Floor.FEntities.FBulletType;
 
 import Floor.FEntities.FBullet.EMPBullet;
-import arc.Events;
 import arc.math.Mathf;
 import arc.util.Time;
-import arc.util.Tmp;
 import mindustry.ai.types.MissileAI;
-import mindustry.entities.Fires;
 import mindustry.entities.Mover;
 import mindustry.entities.bullet.BasicBulletType;
-import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.*;
-import mindustry.world.blocks.ConstructBlock;
 import mindustry.world.blocks.ControlBlock;
 
 import static mindustry.Vars.net;

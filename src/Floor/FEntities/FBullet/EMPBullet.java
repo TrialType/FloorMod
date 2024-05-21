@@ -1,32 +1,45 @@
 package Floor.FEntities.FBullet;
 
 import Floor.FContent.FStatusEffects;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
+import arc.math.Angles;
 import arc.math.Mathf;
-//import arc.math.Rand;
-//import arc.math.geom.Vec2;
-//import arc.struct.Seq;
+import arc.math.Rand;
+import arc.math.geom.Vec2;
+import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.pooling.Pools;
 import mindustry.Vars;
 import mindustry.content.Blocks;
+import mindustry.content.Fx;
 import mindustry.core.World;
 import mindustry.entities.Effect;
-import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.WaveEffect;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.StaticWall;
 
 import static mindustry.Vars.world;
 
 public class EMPBullet extends Bullet {
-    public Effect lightning = new Effect(5, e -> {
-        for (int i = 0; i < 16; i++) {
-            Lightning.create(team, Pal.techBlue, 0, e.x, e.y, Mathf.range(360f), 25);
+    public Effect lightning = new Effect(30, e -> {
+        if (e.data instanceof Seq<?> s) {
+            Seq<Vec2> points = new Seq<>();
+            int index = (int) (e.fin() * s.size);
+            for (int i = 0; i < index; i++) {
+                points.add((Vec2) s.get(i));
+            }
+            Fx.lightning.at(e.x, e.y, e.rotation, Color.valueOf("99111188"), points);
         }
     });
+    public float onAngle;
+    public float onLen;
+    public float onRotate;
     public float timer = 0;
     public Entityc on = null;
 
@@ -45,6 +58,11 @@ public class EMPBullet extends Bullet {
             this.collided.add(other.id());
             if (collided.size >= type.pierceCap + 1 || !type.pierce) {
                 on = other;
+                if (other instanceof Unit u) {
+                    this.onAngle = u.rotation - Angles.angle(x, y, u.x, u.y);
+                    this.onLen = (float) Math.sqrt((u.x - x) * (u.x - x) + (u.y - y) * (u.y - y));
+                    this.onRotate = u.rotation - this.rotation;
+                }
             }
             BulletType var10000 = this.type;
             float var10003;
@@ -135,11 +153,50 @@ public class EMPBullet extends Bullet {
             timer += Time.delta;
         }
         if (this.timer >= 180) {
-            lightning.at(this);
+            new MultiEffect(new WaveEffect() {{
+                lifetime = 16;
+                sizeFrom = 0;
+                sizeTo = 120;
+                strokeFrom = 0;
+                strokeTo = 9;
+                colorTo = colorFrom = Color.valueOf("bb1111");
+            }}, new Effect(40, e -> {
+                Draw.color(Color.valueOf("bb1111"));
+                Lines.stroke(9);
+                Lines.poly(e.x, e.y, 72, 120, 0);
+            }) {{
+                startDelay = 16;
+            }}, new WaveEffect() {{
+                startDelay = 56;
+                lifetime = 16;
+                sizeFrom = 120;
+                sizeTo = 120;
+                strokeFrom = 9;
+                strokeTo = 0;
+                colorTo = colorFrom = Color.valueOf("bb1111");
+            }}).at(this);
+
+            Rand random = new Rand();
+            for (int i = 0; i < 26; i++) {
+                Seq<Vec2> lines = new Seq<>();
+
+                float ro = random.range(360);
+                float finalRo = ro;
+                float lx = this.x, ly = this.y;
+                for (int j = 0; j < 12; j++) {
+                    lines.add(new Vec2(lx + Mathf.range(3f), ly + Mathf.range(3f)));
+                    ro += random.range(20f);
+                    lx += Angles.trnsx(ro, 12);
+                    ly += Angles.trnsy(ro, 12);
+                }
+
+                lightning.at(x, y, finalRo, lines);
+            }
+
             Units.nearbyEnemies(team, x, y, 100, u -> u.apply(FStatusEffects.StrongStop, 600));
             Units.nearbyBuildings(x, y, 100, b -> {
                 if (b.team != this.team && b.block.canOverdrive) {
-                    b.applySlowdown(0, 1);
+                    b.applySlowdown(0, 600);
                 }
             });
             remove();
@@ -159,27 +216,41 @@ public class EMPBullet extends Bullet {
                 }
             }
         }
-        if (on instanceof Building) {
-            this.vel.setZero();
-        } else if (on instanceof Unit u) {
-            this.vel.set(u.vel);
-        }
-        if (!Vars.net.client() || this.isLocal()) {
-            float px = this.x;
-            float py = this.y;
-            this.move(this.vel.x * Time.delta, this.vel.y * Time.delta);
-            if (Mathf.equal(px, this.x)) {
-                this.vel.x = 0.0F;
+        if (this.on == null) {
+            if (!Vars.net.client() || this.isLocal()) {
+                float px = this.x;
+                float py = this.y;
+                this.move(this.vel.x * Time.delta, this.vel.y * Time.delta);
+                if (Mathf.equal(px, this.x)) {
+                    this.vel.x = 0.0F;
+                }
+                if (Mathf.equal(py, this.y)) {
+                    this.vel.y = 0.0F;
+                }
+                this.vel.scl(Math.max(1.0F - this.drag * Time.delta, 0.0F));
             }
-            if (Mathf.equal(py, this.y)) {
-                this.vel.y = 0.0F;
+            if (this.mover != null) {
+                this.mover.move(this);
             }
-            this.vel.scl(Math.max(1.0F - this.drag * Time.delta, 0.0F));
+        } else {
+            if (on instanceof Building) {
+                this.vel.setZero();
+            } else if (on instanceof Unit u) {
+                this.vel.setZero();
+                Vec2 pla = new Vec2(1, 1);
+                pla.setAngle(u.rotation - onAngle);
+                pla.setLength(onLen);
+                this.rotation = u.rotation - onRotate;
+                this.x = u.x + pla.x;
+                this.y = u.y + pla.y;
+            }
         }
-        if (this.mover != null) {
-            this.mover.move(this);
+        if (on == null) {
+            this.type.update(this);
+        } else {
+            trail.length = 0;
+            trail.update(x, y, 0);
         }
-        this.type.update(this);
         if (this.type.collidesTiles && this.type.collides && this.type.collidesGround && on == null) {
             this.tileRaycast(World.toTile(this.lastX), World.toTile(this.lastY), this.tileX(), this.tileY());
         }
