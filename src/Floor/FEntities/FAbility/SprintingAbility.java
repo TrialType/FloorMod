@@ -101,10 +101,10 @@ public class SprintingAbility extends Ability {
                     for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
                         if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
                             float dx = Core.input.mouseX() - 350, dy = Core.input.mouseY() - 350;
-                            Vec2 v = new Vec2(dx, dy);
-                            v.setLength(unit.speed());
-                            unit.x += v.x;
-                            unit.y += v.y;
+                            float angle = Angles.angle(dx, dy);
+                            float len = (float) Math.sqrt(dx * dx + dy * dy);
+                            unit.x += (float) (len * Math.cos(Math.toRadians(angle)));
+                            unit.y += (float) (len * Math.sin(Math.toRadians(angle)));
                             moved = true;
                         } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                             powerTimer += Time.delta;
