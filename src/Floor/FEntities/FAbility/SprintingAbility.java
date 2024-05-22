@@ -54,11 +54,9 @@ public class SprintingAbility extends Ability {
 
     @Override
     public void update(Unit unit) {
-        if(Vars.mobile && mobileMover == null){
-            mobileMover = new Label(() -> "") {{
-                mobileMover.setBounds(20, 20, 10, 10);
-//        mobileMover.addListener(new DragListener());
-            }};
+        if(mobileMover == null){
+            mobileMover = new Label(() -> "");
+            mobileMover.setBounds(20, 20, 10, 10);
         }
         timer += Time.delta;
         if (timer >= reload) {
