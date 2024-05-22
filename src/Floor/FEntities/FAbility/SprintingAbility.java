@@ -51,6 +51,7 @@ public class SprintingAbility extends Ability {
     protected Table mobileMover;
     protected float powerTimer = 0;
     protected float timer = 0;
+    protected boolean moved = false, signed = false;
 
     @Override
     public void update(Unit unit) {
@@ -58,7 +59,7 @@ public class SprintingAbility extends Ability {
             mobileMover = new Table();
             signer = new Table();
             mobileMover.setBounds(200, 200, 300, 300);
-            signer.setBounds(1500, 800, 300, 300);
+            signer.setBounds(1500, 700, 300, 300);
             mobileMover.background(Tex.buttonDisabled);
             signer.background(Tex.buttonDisabled);
             mobileMover.update(() -> {
@@ -83,9 +84,9 @@ public class SprintingAbility extends Ability {
         timer += Time.delta;
         if (timer >= reload) {
             if (unit.isPlayer()) {
-                if (!have) {
-                    mobileMover.actions(Actions.fadeIn(60));
-                    signer.actions(Actions.fadeIn(60));
+                if (Vars.mobile && !have) {
+                    mobileMover.actions(Actions.fadeIn(15));
+                    signer.actions(Actions.fadeIn(15));
                     have = true;
                 }
 
@@ -95,17 +96,21 @@ public class SprintingAbility extends Ability {
                 if (!Vars.mobile && Core.input.keyDown(KeyCode.altLeft)) {
                     unit.rotation(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
                     powerTimer += Time.delta;
-                } else if (Vars.mobile) {
-                    for (int i = 0; i < Core.input.getTouches(); i++) {
-                        if (Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
+                } else if (Vars.mobile && onSign()) {
+                    signed = moved = false;
+                    for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
+                        if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
                             float dx = Core.input.mouseX() - 350, dy = Core.input.mouseY() - 350;
                             Vec2 v = new Vec2(dx, dy);
                             v.setLength(unit.speed());
-                            unit.move(v);
-                        } else if (Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1100 && Core.input.mouseY(i) >= 800) {
+                            unit.x += v.x;
+                            unit.y += v.y;
+                            moved = true;
+                        } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                             powerTimer += Time.delta;
-                            float dx = Core.input.mouseX() - 1650, dy = Core.input.mouseY() - 950;
+                            float dx = Core.input.mouseX() - 1650, dy = Core.input.mouseY() - 850;
                             unit.rotation(Angles.angle(dx, dy));
+                            signed = true;
                         }
                     }
                 } else if (powerTimer >= powerReload) {
@@ -146,10 +151,19 @@ public class SprintingAbility extends Ability {
                 }
             } else if (autoSprinting) {
                 have = false;
-                mobileMover.actions(Actions.fadeOut(60));
-                signer.actions(Actions.fadeOut(60));
+                mobileMover.actions(Actions.fadeOut(15));
+                signer.actions(Actions.fadeOut(15));
             }
         }
+    }
+
+    public boolean onSign() {
+        for (int i = 0; i < Core.input.getTouches(); i++) {
+            if (Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void percentDamage(Unit unit, Healthc u, float damage) {
