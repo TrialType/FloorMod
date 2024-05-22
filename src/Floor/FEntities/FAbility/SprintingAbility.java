@@ -3,7 +3,6 @@ package Floor.FEntities.FAbility;
 import Floor.FContent.FEvents;
 import arc.Core;
 import arc.Events;
-import arc.func.Cons;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -14,17 +13,16 @@ import arc.scene.actions.Actions;
 import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import mindustry.Vars;
-import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
-import mindustry.game.EventType;
 import mindustry.gen.Healthc;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
+import static mindustry.Vars.state;
 
 public class SprintingAbility extends Ability {
     public boolean autoSprinting = true;
@@ -48,9 +46,8 @@ public class SprintingAbility extends Ability {
         v1.trns(ro - 90, u.hitSize);
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
-    private Cons<EventType.SaveWriteEvent> event = e -> {
-    };
     protected boolean have = false;
+    protected Table signer;
     protected Table mobileMover;
     protected float powerTimer = 0;
     protected float timer = 0;
@@ -59,21 +56,36 @@ public class SprintingAbility extends Ability {
     public void update(Unit unit) {
         if (mobileMover == null) {
             mobileMover = new Table();
-            mobileMover.setBounds(100, 50, 200, 200);
-            mobileMover.clicked(() -> Fx.healWave.at(unit));
+            signer = new Table();
+            mobileMover.setBounds(200, 200, 200, 200);
+            signer.setBounds(1300, 600, 200, 200);
             mobileMover.background(Tex.buttonDisabled);
+            signer.background(Tex.buttonDisabled);
+            mobileMover.update(() -> {
+                if (!state.isGame() || unit.dead || unit.health <= 0) {
+                    have = false;
+                    mobileMover.remove();
+                    mobileMover.actions(Actions.fadeOut(1));
+                }
+            });
+            signer.update(() -> {
+                if (!state.isGame() || unit.dead || unit.health <= 0) {
+                    have = false;
+                    signer.remove();
+                    signer.actions(Actions.fadeOut(1));
+                }
+            });
+            Core.scene.add(mobileMover);
+            Core.scene.add(signer);
+            mobileMover.actions(Actions.fadeOut(0));
+            signer.actions(Actions.fadeOut(0));
         }
         timer += Time.delta;
         if (timer >= reload) {
             if (unit.isPlayer()) {
                 if (!have) {
-                    Core.scene.add(mobileMover);
                     mobileMover.actions(Actions.fadeIn(90));
-                    event = e -> {
-                        Core.app.post(mobileMover::remove);
-                        mobileMover.actions(Actions.fadeOut(1));
-                    };
-                    Events.on(EventType.SaveWriteEvent.class, event);
+                    signer.actions(Actions.fadeIn(90));
                     have = true;
                 }
 
@@ -83,12 +95,19 @@ public class SprintingAbility extends Ability {
                 if (!Vars.mobile && Core.input.keyDown(KeyCode.altLeft)) {
                     unit.rotation(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
                     powerTimer += Time.delta;
-                } else if (Vars.mobile &&
-                        Core.input.mouseX() <= 200 && Core.input.mouseX() >= 100 &&
-                        Core.input.mouseY() <= 250 && Core.input.mouseY() >= 50) {
-                    powerTimer += Time.delta;
-                    float dx = Core.input.mouseX() - 200, dy = Core.input.mouseY() - 150;
-                    unit.rotation(Angles.angle(dx, dy));
+                } else if (!Vars.mobile) {
+                    for (int i = 0; i < Core.input.getTouches(); i++) {
+                        if (Core.input.mouseX(i) <= 400 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 400 && Core.input.mouseY(i) >= 200) {
+                            powerTimer += Time.delta;
+                            float dx = Core.input.mouseX() - 300, dy = Core.input.mouseY() - 300;
+                            Vec2 v = new Vec2(dx, dy);
+                            v.setLength(unit.speed());
+                            unit.move(v);
+                        } else if (Core.input.mouseX(i) <= 1500 && Core.input.mouseX(i) >= 1300 && Core.input.mouseY(i) <= 800 && Core.input.mouseY(i) >= 600) {
+                            float dx = Core.input.mouseX() - 1400, dy = Core.input.mouseY() - 700;
+                            unit.rotation(Angles.angle(dx, dy));
+                        }
+                    }
                 } else if (powerTimer >= powerReload) {
                     powerTimer = 0;
                     timer = 0;
@@ -127,9 +146,8 @@ public class SprintingAbility extends Ability {
                 }
             } else if (autoSprinting) {
                 have = false;
-                Events.remove(EventType.SaveWriteEvent.class, event);
-                Core.app.post(mobileMover::remove);
                 mobileMover.actions(Actions.fadeOut(90));
+                signer.actions(Actions.fadeOut(90));
             }
         }
     }
