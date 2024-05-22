@@ -12,6 +12,7 @@ import arc.math.geom.Vec2;
 import arc.scene.Element;
 import arc.scene.event.DragListener;
 import arc.scene.event.EventListener;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
 import arc.util.Time;
 import mindustry.Vars;
@@ -20,6 +21,7 @@ import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.Healthc;
 import mindustry.gen.Unit;
+import mindustry.ui.Styles;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
@@ -46,15 +48,18 @@ public class SprintingAbility extends Ability {
         v1.trns(ro - 90, u.hitSize);
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
-    protected static Element mobileMover = new Label(() -> "") {{
-        mobileMover.setBounds(20, 20, 10, 10);
-//        mobileMover.addListener(new DragListener());
-    }};
+    protected static Label mobileMover;
     protected float powerTimer = 0;
     protected float timer = 0;
 
     @Override
     public void update(Unit unit) {
+        if(Vars.mobile && mobileMover == null){
+            mobileMover = new Label(() -> "") {{
+                mobileMover.setBounds(20, 20, 10, 10);
+//        mobileMover.addListener(new DragListener());
+            }};
+        }
         timer += Time.delta;
         if (timer >= reload) {
             if (unit.isPlayer()) {
