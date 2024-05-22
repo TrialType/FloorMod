@@ -1427,7 +1427,7 @@ public class FBlocks {
 //======================================================================================================================
         slowProject = new DownProject("slow_project") {{
             requirements(Category.effect, with(Items.lead, 100, Items.titanium, 75, Items.silicon, 75, Items.plastanium, 30));
-            range = (Core.settings.getJson("floor-stronger-core", IntSeq.class, IntSeq::new)).get(0);
+            range = 8;
             downSpeed = 0.9f;
 
             consumePower(3.50f);

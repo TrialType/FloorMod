@@ -2,14 +2,12 @@ package Floor.FContent;
 
 import Floor.FAI.*;
 import Floor.FAI.GeodeticAI.*;
-import Floor.FEntities.FAbility.EMPAbility;
-import Floor.FEntities.FAbility.LevelSign;
-import Floor.FEntities.FAbility.StrongMinerAbility;
-import Floor.FEntities.FAbility.TimeLargeDamageAbility;
+import Floor.FEntities.FAbility.*;
 import Floor.FEntities.FBulletType.*;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
+import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.*;
 import Floor.FTools.classes.BossList;
 import arc.graphics.Color;
@@ -66,7 +64,16 @@ public class FUnits {
     //Geodetic
     public static UnitType chou, yin, mao, wu, xu;
 
+    //Test
+    public static UnitType d;
+
     public static void load() {
+        d = new UnitType("d") {{
+            constructor = FUnitEntity::create;
+            abilities.add(new SprintingAbility());
+            flying = true;
+        }};
+
         rejuvenate = new UnitType("rejuvenate") {{
             constructor = LegsUnit::create;
             aiController = HealthOnlyAI::new;
