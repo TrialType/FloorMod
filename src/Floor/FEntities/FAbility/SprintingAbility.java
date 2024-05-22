@@ -9,11 +9,8 @@ import arc.graphics.g2d.Lines;
 import arc.input.KeyCode;
 import arc.math.Angles;
 import arc.math.geom.Vec2;
-import arc.scene.Element;
-import arc.scene.event.DragListener;
-import arc.scene.event.EventListener;
-import arc.scene.ui.ImageButton;
 import arc.scene.ui.Label;
+import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.entities.Effect;
@@ -21,7 +18,10 @@ import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.Healthc;
 import mindustry.gen.Unit;
-import mindustry.ui.Styles;
+import mindustry.ui.fragments.PlacementFragment;
+
+
+import java.lang.reflect.Field;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
@@ -54,9 +54,8 @@ public class SprintingAbility extends Ability {
 
     @Override
     public void update(Unit unit) {
-        if(mobileMover == null){
+        if (mobileMover == null) {
             mobileMover = new Label(() -> "");
-            mobileMover.setBounds(20, 20, 10, 10);
         }
         timer += Time.delta;
         if (timer >= reload) {
@@ -65,25 +64,22 @@ public class SprintingAbility extends Ability {
                 float y = unit.y;
                 float ro = unit.rotation;
                 if (!Vars.mobile && Core.input.keyDown(KeyCode.altLeft)) {
+                    unit.rotation(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
                     powerTimer += Time.delta;
                 } else if (Vars.mobile && Core.input.mouseX() <= 30 && Core.input.mouseX() >= 10 &&
                         Core.input.mouseY() <= 30 && Core.input.mouseY() >= 10) {
-                    Core.scene.add(mobileMover);
-                    powerTimer += Time.delta;
-                    float dx = Core.input.mouseX() - x, dy = Core.input.mouseY() - y;
-                    unit.lookAt(unit.x + dx, unit.y + dy);
+                    try {
+                        Field field = PlacementFragment.class.getDeclaredField("topTable");
+                        field.setAccessible(true);
+                        Table t = (Table) field.get(Vars.ui.hudfrag.blockfrag);
+                        t.add(mobileMover);
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
 
-//                    DragListener dl = null;
-//                    for (EventListener listener : mobileMover.getListeners()) {
-//                        if (listener instanceof DragListener d) {
-//                            dl = d;
-//                            break;
-//                        }
-//                    }
-//                    if (dl != null && dl.getTouchDownX() <= 30 && dl.getTouchDownX() >= 10 &&
-//                            dl.getTouchDownY() <= 30 && dl.getTouchDownY() >= 10) {
-//                        powerTimer += Time.delta;
-//                    }
+                    powerTimer += Time.delta;
+                    float dx = Core.input.mouseX() - 20 + x, dy = Core.input.mouseY() - 20 + y;
+                    unit.rotation(Angles.angle(dx, dy));
                 } else if (powerTimer >= powerReload) {
                     powerTimer = 0;
                     Units.nearbyEnemies(unit.team, x, y, maxLength, u -> {
@@ -120,7 +116,6 @@ public class SprintingAbility extends Ability {
                     maxPowerEffect.at(x, y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                 }
             } else if (autoSprinting) {
-                Core.app.post(mobileMover::remove);
             }
         }
     }
