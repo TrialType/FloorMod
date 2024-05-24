@@ -3,6 +3,7 @@ package Floor.FEntities.FAbility;
 import Floor.FContent.FEvents;
 import arc.Core;
 import arc.Events;
+import arc.KeyBinds;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -19,6 +20,8 @@ import mindustry.entities.abilities.Ability;
 import mindustry.gen.Healthc;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
+
+import javax.naming.Binding;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
@@ -93,26 +96,33 @@ public class SprintingAbility extends Ability {
                 float x = unit.x;
                 float y = unit.y;
                 float ro = unit.rotation;
-                if (!Vars.mobile && Core.input.keyDown(KeyCode.altLeft)) {
-                    unit.rotation(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
-                    powerTimer += Time.delta;
-                } else if (Vars.mobile && onSign()) {
-                    signed = moved = false;
-                    for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
-                        if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
-                            float dx = Core.input.mouseX() - 350, dy = Core.input.mouseY() - 350;
-                            float angle = Angles.angle(dx, dy);
-                            unit.x += (float) (unit.speed() * Math.cos(Math.toRadians(angle)));
-                            unit.y += (float) (unit.speed() * Math.sin(Math.toRadians(angle)));
-                            moved = true;
-                        } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
-                            powerTimer += Time.delta;
-                            float dx = Core.input.mouseX() - 1650, dy = Core.input.mouseY() - 850;
-                            unit.rotation(Angles.angle(dx, dy));
-                            signed = true;
+                boolean getting = Vars.mobile ? onSign() : Core.input.keyDown(KeyCode.altLeft);
+                if (getting) {
+                    if (!Vars.mobile) {
+                        unit.rotation(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
+                        powerTimer += Time.delta;
+                    } else {
+                        signed = moved = false;
+                        for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
+                            if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
+                                float dx = Core.input.mouseX() - 350, dy = Core.input.mouseY() - 350;
+                                float angle = Angles.angle(dx, dy);
+                                unit.x += (float) (unit.speed() * cos(toRadians(angle)));
+                                unit.y += (float) (unit.speed() * sin(toRadians(angle)));
+                                moved = true;
+                            } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
+                                powerTimer += Time.delta;
+                                float dx = Core.input.mouseX() - 1650, dy = Core.input.mouseY() - 850;
+                                unit.rotation(Angles.angle(dx, dy));
+                                signed = true;
+                            }
                         }
                     }
-                } else if (powerTimer >= powerReload) {
+                } else {
+                    powerTimer = max(0, powerTimer - Time.delta);
+                }
+
+                if (!getting && powerTimer >= powerReload) {
                     powerTimer = 0;
                     timer = 0;
                     Units.nearbyEnemies(unit.team, x, y, maxLength, u -> {
@@ -141,8 +151,6 @@ public class SprintingAbility extends Ability {
                     });
                     unit.x = (float) (x + cos(toRadians(unit.rotation)) * maxLength);
                     unit.y = (float) (y + sin(toRadians(unit.rotation)) * maxLength);
-                } else {
-                    powerTimer = Math.max(0, powerTimer - Time.delta);
                 }
 
                 if (powerTimer > 0) {
