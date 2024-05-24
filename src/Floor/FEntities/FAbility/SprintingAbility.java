@@ -49,13 +49,12 @@ public class SprintingAbility extends Ability {
 
     protected int stats = 0;
     protected Table select;
-    protected boolean have = false;
     protected Table signer;
     protected Table mobileMover;
     protected float powerTimer = 0;
     protected float timer = 0;
+    protected boolean have = false;
     protected boolean moved = false, signed = false;
-
     protected boolean hase = false;
 
     @Override
