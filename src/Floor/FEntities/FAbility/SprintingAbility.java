@@ -25,7 +25,6 @@ import static java.lang.Math.toRadians;
 import static mindustry.Vars.state;
 
 public class SprintingAbility extends Ability {
-    public boolean autoSprinting = true;
     public float damage = 1000;
     public float maxLength = 200;
     public float reload = 180;
@@ -87,7 +86,7 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeOut(0));
         }
 
-        if (!(Vars.mobile && stats == 2)) {
+        if (!(Vars.mobile && stats == 1)) {
             have = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
@@ -96,7 +95,6 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeIn(1));
             have = true;
         }
-
 
         if (!unit.isPlayer()) {
             have = false;
@@ -124,10 +122,9 @@ public class SprintingAbility extends Ability {
 
         timer += Time.delta;
         if (timer >= reload) {
-            if (unit.isPlayer() && !(Vars.mobile && stats == 0)) {
+            if (unit.isPlayer() && stats != 0) {
                 float x = unit.x;
                 float y = unit.y;
-                float ro = unit.rotation;
                 boolean getting = Vars.mobile ? onSign() : Core.input.keyDown(KeyCode.altLeft);
 
                 if (!(!getting && powerTimer >= powerReload) && powerTimer > 0) {
@@ -136,9 +133,13 @@ public class SprintingAbility extends Ability {
 
                 if (getting) {
                     if (!Vars.mobile) {
-                        unit.rotation(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
+                        Vec2 mover = new Vec2(unit.vel);
+                        mover.setLength(mover.len() * 1.2f);
+                        unit.vel.setZero();
+                        unit.move(mover);
+                        unit.lookAt(Angles.mouseAngle(x, y));
                         powerTimer += Time.delta;
-                    } else if (stats == 2) {
+                    } else if (stats == 1) {
                         signed = moved = false;
                         for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
                             if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
@@ -146,15 +147,20 @@ public class SprintingAbility extends Ability {
                                 float angle = Angles.angle(dx, dy);
                                 unit.x += (float) (unit.speed() * cos(toRadians(angle)));
                                 unit.y += (float) (unit.speed() * sin(toRadians(angle)));
+                                Core.camera.position.lerpDelta(unit, 1);
                                 moved = true;
                             } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                                 powerTimer += Time.delta;
                                 float dx = Core.input.mouseX(i) - 1650, dy = Core.input.mouseY(i) - 850;
-                                unit.rotation(Angles.angle(dx, dy));
+                                Vec2 mover = new Vec2(unit.vel);
+                                mover.setLength(mover.len() * 1.2f);
+                                unit.vel.setZero();
+                                unit.move(mover);
+                                unit.lookAt(Angles.angle(dx, dy));
                                 signed = true;
                             }
                         }
-                    } else if (stats == 1) {
+                    } else if (stats == 2) {
                         powerTimer += Time.delta;
                         unit.lookAt(Core.input.mouseWorld());
                     }
@@ -165,41 +171,18 @@ public class SprintingAbility extends Ability {
                 if (!getting && powerTimer >= powerReload) {
                     powerTimer = 0;
                     timer = 0;
-                    Units.nearbyEnemies(unit.team, x, y, maxLength, u -> {
-                        float angel2 = Angles.angle(x, y, u.x, u.y);
-                        float angle = Angles.angleDist(ro, angel2);
-                        float len = (float) sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y));
-
-                        if (angle <= 90) {
-                            if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= unit.hitSize) {
-                                damage(unit, u, damage);
-                            }
-                        }
-                    });
-                    Units.nearbyBuildings(x, y, maxLength, b -> {
-                        if (b.team != unit.team) {
-                            float angel2 = Angles.angle(x, y, b.x, b.y);
-                            float angle = Angles.angleDist(ro, angel2);
-                            float len = (float) sqrt((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y));
-
-                            if (angle <= 90) {
-                                if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= unit.hitSize) {
-                                    damage(unit, b, damage);
-                                }
-                            }
-                        }
-                    });
+                    applyDamage(x, y, damage, unit);
                     unit.x = (float) (x + cos(toRadians(unit.rotation)) * maxLength);
                     unit.y = (float) (y + sin(toRadians(unit.rotation)) * maxLength);
                 }
-            } else if (autoSprinting || (Vars.mobile && stats == 0)) {
-                timer += Time.delta;
-                if (timer >= reload) {
-                    float dx = unit.aimX - unit.x, dy = unit.aimY - unit.y;
-                    float angle = Angles.angle(dx, dy);
-                    unit.x = unit.x + (float) cos(toRadians(angle)) * maxLength;
-                    unit.y = unit.y + (float) sin(toRadians(angle)) * maxLength;
+            } else if (stats == 0) {
+                powerTimer += Time.delta;
+                if (powerTimer >= powerReload + 2 * Time.delta) {
+                    powerTimer = 0;
                     timer = 0;
+                    applyDamage(unit.x, unit.y, damage, unit);
+                    unit.x = unit.x + (float) cos(toRadians(unit.rotation)) * maxLength;
+                    unit.y = unit.y + (float) sin(toRadians(unit.rotation)) * maxLength;
                 } else {
                     maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                 }
@@ -233,17 +216,24 @@ public class SprintingAbility extends Ability {
         } else {
             select.clear();
         }
+        if (Vars.mobile) {
+            select.addListener(select.clicked(() -> {
+                stats = (stats + 1) % 3;
+                rebuild();
+            }));
+        } else {
+            select.addListener(select.clicked(() -> {
+                stats = (stats + 1) % 2;
+                rebuild();
+            }));
+        }
         if (stats == 0) {
             select.add(Core.bundle.get("ability.autoBoost"));
         } else if (stats == 1) {
-            select.add(Core.bundle.get("ability.targetBoost"));
-        } else if (stats == 2) {
             select.add(Core.bundle.get("ability.handBoost"));
+        } else if (stats == 2) {
+            select.add(Core.bundle.get("ability.targetBoost"));
         }
-        select.addListener(select.clicked(() -> {
-            stats = (stats + 1) % 3;
-            rebuild();
-        }));
     }
 
     protected void damage(Unit unit, Healthc u, float damage) {
@@ -252,6 +242,33 @@ public class SprintingAbility extends Ability {
         if (!dead && u.dead()) {
             Events.fire(new FEvents.UnitDestroyOtherEvent(unit, u));
         }
+    }
+
+    protected void applyDamage(float x, float y, float damage, Unit killer) {
+        Units.nearbyEnemies(killer.team, x, y, maxLength, u -> {
+            float angel2 = Angles.angle(x, y, u.x, u.y);
+            float angle = Angles.angleDist(killer.rotation, angel2);
+            float len = (float) sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y));
+
+            if (angle <= 90) {
+                if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= killer.hitSize) {
+                    damage(killer, u, damage);
+                }
+            }
+        });
+        Units.nearbyBuildings(x, y, maxLength, b -> {
+            if (b.team != killer.team) {
+                float angel2 = Angles.angle(x, y, b.x, b.y);
+                float angle = Angles.angleDist(killer.rotation, angel2);
+                float len = (float) sqrt((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y));
+
+                if (angle <= 90) {
+                    if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= killer.hitSize) {
+                        damage(killer, b, damage);
+                    }
+                }
+            }
+        });
     }
 
     public static class Place {
