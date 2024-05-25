@@ -72,6 +72,7 @@ public class FUnits {
             constructor = FUnitEntity::create;
             abilities.add(new SprintingAbility());
             flying = true;
+            speed = 2;
         }};
 
         rejuvenate = new UnitType("rejuvenate") {{

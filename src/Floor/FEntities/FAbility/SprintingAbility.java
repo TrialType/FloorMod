@@ -1,6 +1,7 @@
 package Floor.FEntities.FAbility;
 
 import Floor.FContent.FEvents;
+import Floor.FType.input.FMobileInput;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -46,14 +47,15 @@ public class SprintingAbility extends Ability {
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
 
+    protected boolean zoom = true;
     protected int stats = 0;
     protected Table select;
     protected Table signer;
     protected Table mobileMover;
     protected float powerTimer = 0;
     protected float timer = 0;
-    protected boolean have = false;
-    protected boolean moved = false, signed = false;
+    protected boolean haveSigner = false;
+    protected boolean haveMover = false;
     protected boolean hase = false;
 
     @Override
@@ -68,36 +70,45 @@ public class SprintingAbility extends Ability {
             signer.background(Tex.buttonDisabled);
             mobileMover.update(() -> {
                 if (!state.isGame()) {
-                    have = false;
+                    haveSigner = false;
+                    haveMover = false;
                     mobileMover.remove();
-                    mobileMover.actions(Actions.fadeOut(0));
+                    mobileMover.actions(Actions.fadeOut(1));
                 }
             });
             signer.update(() -> {
                 if (!state.isGame()) {
-                    have = false;
+                    haveSigner = false;
+                    haveMover = false;
                     signer.remove();
-                    signer.actions(Actions.fadeOut(0));
+                    signer.actions(Actions.fadeOut(1));
                 }
             });
             Core.scene.add(mobileMover);
             Core.scene.add(signer);
-            mobileMover.actions(Actions.fadeOut(0));
-            signer.actions(Actions.fadeOut(0));
+            mobileMover.actions(Actions.fadeOut(1));
+            signer.actions(Actions.fadeOut(1));
+        }
+
+        if (stats == 1 && !haveMover) {
+            mobileMover.actions(Actions.fadeIn(1));
+            haveMover = true;
+        } else if (stats != 1) {
+            mobileMover.actions(Actions.fadeOut(1));
+            haveMover = false;
         }
 
         if (!(Vars.mobile && stats == 1 && timer >= reload)) {
-            have = false;
-            mobileMover.actions(Actions.fadeOut(1));
+            haveSigner = false;
             signer.actions(Actions.fadeOut(1));
-        } else if (!have) {
-            mobileMover.actions(Actions.fadeIn(1));
+        } else if (!haveSigner) {
             signer.actions(Actions.fadeIn(1));
-            have = true;
+            haveSigner = true;
         }
 
         if (!unit.isPlayer() || unit.dead || unit.health <= 0) {
-            have = false;
+            haveSigner = false;
+            haveMover = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
             hase = false;
@@ -111,6 +122,20 @@ public class SprintingAbility extends Ability {
         if (!hase && unit.isPlayer()) {
             select.actions(Actions.fadeIn(1));
             hase = true;
+        }
+
+        if (stats == 1 && Vars.mobile) {
+            for (int i = 0; i < Core.input.getTouches(); i++) {
+                if (Core.input.isTouched(i) && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
+                        Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
+                    float dx = Core.input.mouseX(i) - 350, dy = Core.input.mouseY(i) - 350;
+                    float angle = Angles.angle(dx, dy);
+                    unit.x += (float) (unit.speed() * cos(toRadians(angle)));
+                    unit.y += (float) (unit.speed() * sin(toRadians(angle)));
+                    Core.camera.position.lerpDelta(unit, 0.1f);
+                    break;
+                }
+            }
         }
 
         timer += Time.delta;
@@ -133,19 +158,8 @@ public class SprintingAbility extends Ability {
                         unit.lookAt(Angles.mouseAngle(x, y));
                         powerTimer += Time.delta;
                     } else if (stats == 1) {
-                        signed = moved = false;
-                        for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
-                            if (!moved &&
-                                    Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
-                                    Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
-                                float dx = Core.input.mouseX(i) - 350, dy = Core.input.mouseY(i) - 350;
-                                float angle = Angles.angle(dx, dy);
-                                unit.x += (float) (unit.speed() * cos(toRadians(angle)));
-                                unit.y += (float) (unit.speed() * sin(toRadians(angle)));
-                                Core.camera.position.lerpDelta(unit, 0.03f);
-                                moved = true;
-                            } else if (!signed &&
-                                    Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
+                        for (int i = 0; i < Core.input.getTouches(); i++) {
+                            if (Core.input.isTouched(i) && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
                                     Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                                 powerTimer += Time.delta;
                                 float dx = Core.input.mouseX(i) - 1650, dy = Core.input.mouseY(i) - 850;
@@ -154,7 +168,7 @@ public class SprintingAbility extends Ability {
                                 unit.vel.setZero();
                                 unit.move(mover);
                                 unit.lookAt(Angles.angle(dx, dy));
-                                signed = true;
+                                break;
                             }
                         }
                     } else if (stats == 2) {
@@ -196,7 +210,7 @@ public class SprintingAbility extends Ability {
             return true;
         } else if (stats == 1) {
             for (int i = 0; i < Core.input.getTouches(); i++) {
-                if (Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
+                if (Core.input.isTouched(i) && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
                         Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                     return true;
                 }
@@ -213,7 +227,7 @@ public class SprintingAbility extends Ability {
                 if (!state.isGame()) {
                     hase = false;
                     select.remove();
-                    select.actions(Actions.fadeOut(0));
+                    select.actions(Actions.fadeOut(1));
                 }
             });
             Core.scene.add(select);
@@ -234,6 +248,19 @@ public class SprintingAbility extends Ability {
         if (stats == 0) {
             select.add(Core.bundle.get("ability.autoBoost"));
         } else if (stats == 1) {
+            if (zoom) {
+                select.background(Tex.alphaaaa);
+            } else {
+                select.background(Tex.windowEmpty);
+            }
+            select.button(Core.bundle.get("ability.zoom-" + zoom), () -> {
+                if (Vars.control.input instanceof FMobileInput fmi) {
+                    fmi.zoomModel = !zoom;
+                }
+                zoom = !zoom;
+                rebuild();
+            });
+            select.row();
             select.add(Core.bundle.get("ability.handBoost"));
         } else if (stats == 2) {
             select.add(Core.bundle.get("ability.targetBoost"));
