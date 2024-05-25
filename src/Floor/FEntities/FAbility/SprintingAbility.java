@@ -97,8 +97,8 @@ public class SprintingAbility extends Ability {
             mobileMover.setBounds(200, 200, 300, 300);
             signer.setBounds(1500, 700, 300, 300);
             screenChanger.setBounds(10, 500, 50, 100);
-            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(12)).width(50).height(50).row();
-            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(2)).width(50).height(50);
+            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(-1)).width(50).height(50).row();
+            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(1)).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
             signer.background(Tex.buttonDisabled);
             screenChanger.background(Tex.buttonDisabled);
