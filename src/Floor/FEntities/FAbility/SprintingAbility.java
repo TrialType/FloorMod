@@ -18,6 +18,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.Healthc;
+import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
 import mindustry.input.InputHandler;
@@ -48,12 +49,14 @@ public class SprintingAbility extends Ability {
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
 
+
     protected static InputHandler hm = new FMobileInput();
     protected static InputHandler def;
     protected int stats = 0;
     protected Table select;
     protected Table signer;
     protected Table mobileMover;
+    protected Table screenChanger;
     protected float powerTimer = 0;
     protected float timer = 0;
     protected boolean haveSigner = false;
@@ -90,10 +93,15 @@ public class SprintingAbility extends Ability {
             rebuild();
             mobileMover = new Table();
             signer = new Table();
+            screenChanger = new Table();
             mobileMover.setBounds(200, 200, 300, 300);
             signer.setBounds(1500, 700, 300, 300);
+            screenChanger.setBounds(10, 50, 50, 100);
+            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(1)).width(50).height(50).row();
+            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(1)).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
             signer.background(Tex.buttonDisabled);
+            screenChanger.background(Tex.buttonDisabled);
             mobileMover.update(() -> {
                 if (!state.isGame()) {
                     haveSigner = false;
@@ -110,17 +118,29 @@ public class SprintingAbility extends Ability {
                     signer.actions(Actions.fadeOut(1));
                 }
             });
+            screenChanger.update(() -> {
+                if (!state.isGame()) {
+                    haveSigner = false;
+                    haveMover = false;
+                    screenChanger.remove();
+                    screenChanger.actions(Actions.fadeOut(1));
+                }
+            });
             Core.scene.add(mobileMover);
             Core.scene.add(signer);
-            mobileMover.actions(Actions.fadeOut(1));
-            signer.actions(Actions.fadeOut(1));
+            Core.scene.add(screenChanger);
+            mobileMover.actions(Actions.fadeOut(0));
+            signer.actions(Actions.fadeOut(0));
+            screenChanger.actions(Actions.fadeOut(0));
         }
 
         if (stats == 1 && !haveMover) {
             mobileMover.actions(Actions.fadeIn(1));
+            screenChanger.actions(Actions.fadeIn(1));
             haveMover = true;
         } else if (stats != 1) {
             mobileMover.actions(Actions.fadeOut(1));
+            screenChanger.actions(Actions.fadeOut(1));
             haveMover = false;
         }
 
@@ -137,12 +157,13 @@ public class SprintingAbility extends Ability {
             haveMover = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
+            screenChanger.actions(Actions.fadeOut(1));
             hase = false;
             select.actions(Actions.fadeOut(1));
             mobileMover.remove();
             signer.remove();
             select.remove();
-            mobileMover = signer = select = null;
+            mobileMover = signer = select = screenChanger = null;
         }
 
         if (!hase && unit.isPlayer()) {
@@ -156,9 +177,10 @@ public class SprintingAbility extends Ability {
                         Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
                     float dx = Core.input.mouseX(i) - 350, dy = Core.input.mouseY(i) - 350;
                     float angle = Angles.angle(dx, dy);
+                    unit.lookAt(dx + unit.x, dy + unit.y);
                     unit.x += (float) (unit.speed() * cos(toRadians(angle)));
                     unit.y += (float) (unit.speed() * sin(toRadians(angle)));
-                    Core.camera.position.lerpDelta(unit, 0.1f);
+                    Core.camera.position.lerpDelta(unit, 0.3f);
                     break;
                 }
             }
@@ -243,6 +265,10 @@ public class SprintingAbility extends Ability {
             }
         }
         return false;
+    }
+
+    protected void rebuildScreen() {
+
     }
 
     protected void rebuild() {
