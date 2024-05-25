@@ -281,6 +281,7 @@ public class SprintingAbility extends Ability {
                 }
             });
             Core.scene.add(select);
+            select.actions(Actions.fadeOut(0));
         } else {
             select.clear();
         }
