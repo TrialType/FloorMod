@@ -86,7 +86,7 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeOut(0));
         }
 
-        if (!(Vars.mobile && stats == 1)) {
+        if (!(Vars.mobile && stats == 1 && timer >= reload)) {
             have = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
@@ -134,7 +134,7 @@ public class SprintingAbility extends Ability {
                 if (getting) {
                     if (!Vars.mobile) {
                         Vec2 mover = new Vec2(unit.vel);
-                        mover.setLength(mover.len() * 1.2f);
+                        mover.setLength(mover.len() * 1.4f);
                         unit.vel.setZero();
                         unit.move(mover);
                         unit.lookAt(Angles.mouseAngle(x, y));
@@ -142,18 +142,20 @@ public class SprintingAbility extends Ability {
                     } else if (stats == 1) {
                         signed = moved = false;
                         for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
-                            if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 && Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
+                            if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
+                                    Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
                                 float dx = Core.input.mouseX(i) - 350, dy = Core.input.mouseY(i) - 350;
                                 float angle = Angles.angle(dx, dy);
                                 unit.x += (float) (unit.speed() * cos(toRadians(angle)));
                                 unit.y += (float) (unit.speed() * sin(toRadians(angle)));
-                                Core.camera.position.lerpDelta(unit, 1);
+                                Core.camera.position.lerpDelta(unit, 0.03f);
                                 moved = true;
-                            } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
+                            } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
+                                    Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                                 powerTimer += Time.delta;
                                 float dx = Core.input.mouseX(i) - 1650, dy = Core.input.mouseY(i) - 850;
                                 Vec2 mover = new Vec2(unit.vel);
-                                mover.setLength(mover.len() * 1.2f);
+                                mover.setLength(mover.len() * 1.4f);
                                 unit.vel.setZero();
                                 unit.move(mover);
                                 unit.lookAt(Angles.angle(dx, dy));
@@ -162,9 +164,13 @@ public class SprintingAbility extends Ability {
                         }
                     } else if (stats == 2) {
                         powerTimer += Time.delta;
+                        Vec2 mover = new Vec2(unit.vel);
+                        mover.setLength(mover.len() * 1.4f);
+                        unit.vel.setZero();
+                        unit.move(mover);
                         unit.lookAt(Core.input.mouseWorld());
                     }
-                } else {
+                } else if (powerTimer < powerReload) {
                     powerTimer = max(0, powerTimer - Time.delta);
                 }
 
@@ -191,10 +197,11 @@ public class SprintingAbility extends Ability {
     }
 
     public boolean onSign() {
+        if (stats == 2 && Core.input.getTouches() > 0) {
+            return true;
+        }
         for (int i = 0; i < Core.input.getTouches(); i++) {
             if (stats == 1 && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
-                return true;
-            } else if (stats == 2 && Core.input.getTouches() > 0) {
                 return true;
             }
         }
@@ -204,7 +211,7 @@ public class SprintingAbility extends Ability {
     protected void rebuild() {
         if (select == null) {
             select = new Table();
-            select.setBounds(800, 50, 50, 15);
+            select.setBounds(1000, 50, 50, 15);
             select.update(() -> {
                 if (!state.isGame()) {
                     hase = false;
