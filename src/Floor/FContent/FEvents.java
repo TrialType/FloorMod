@@ -7,7 +7,6 @@ import Floor.FTools.interfaces.UpGradeTime;
 import Floor.FType.FDialog.MoreResearchDialog;
 import Floor.FType.FDialog.ProjectsLocated;
 import Floor.FType.UponFloor.CorrosionMist;
-import Floor.FType.input.FMobileInput;
 import arc.Events;
 import arc.util.Time;
 import mindustry.Vars;
@@ -26,12 +25,7 @@ public class FEvents {
     private static final Random r = new Random();
 
     public static void load() {
-        Events.on(EventType.ClientLoadEvent.class, e -> Time.runTask(10f, () -> {
-            Vars.ui.research = new MoreResearchDialog();
-            if(Vars.mobile){
-                Vars.control.input = new FMobileInput();
-            }
-        }));
+        Events.on(EventType.ClientLoadEvent.class, e -> Time.runTask(10f, () -> Vars.ui.research = new MoreResearchDialog()));
 
         Events.on(EventType.WorldLoadEndEvent.class, e -> CorrosionMist.init());
 

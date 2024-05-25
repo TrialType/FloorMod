@@ -20,6 +20,7 @@ import mindustry.entities.abilities.Ability;
 import mindustry.gen.Healthc;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
+import mindustry.input.InputHandler;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
@@ -47,7 +48,8 @@ public class SprintingAbility extends Ability {
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
 
-    protected boolean zoom = true;
+    protected static InputHandler hm = new FMobileInput();
+    protected static InputHandler def;
     protected int stats = 0;
     protected Table select;
     protected Table signer;
@@ -60,6 +62,30 @@ public class SprintingAbility extends Ability {
 
     @Override
     public void update(Unit unit) {
+        if (def == null) {
+            def = Vars.control.input;
+        }
+
+        if (Vars.mobile && !unit.isPlayer() && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
+            boolean has = false;
+            for (int i = 0; i < Vars.player.unit().abilities.length; i++) {
+                Ability a = Vars.player.unit().abilities[i];
+                if (a instanceof SprintingAbility) {
+                    has = true;
+                    break;
+                }
+            }
+            if (!has) {
+                if (Vars.control.input instanceof FMobileInput) {
+                    Vars.control.input = def;
+                }
+            }
+        }
+
+        if (unit.isPlayer() && Vars.mobile) {
+            Vars.control.input = stats == 1 ? hm : def;
+        }
+
         if (mobileMover == null) {
             rebuild();
             mobileMover = new Table();
@@ -248,18 +274,6 @@ public class SprintingAbility extends Ability {
         if (stats == 0) {
             select.add(Core.bundle.get("ability.autoBoost"));
         } else if (stats == 1) {
-            if (zoom) {
-                select.background(Tex.alphaaaa);
-            } else {
-                select.background(Tex.windowEmpty);
-            }
-            select.button(Core.bundle.get("ability.zoom-" + zoom), () -> {
-                if (Vars.control.input instanceof FMobileInput fmi) {
-                    fmi.zoomModel = !zoom;
-                }
-                zoom = !zoom;
-                rebuild();
-            });
             select.row();
             select.add(Core.bundle.get("ability.handBoost"));
         } else if (stats == 2) {
