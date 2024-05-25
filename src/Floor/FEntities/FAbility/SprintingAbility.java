@@ -96,9 +96,9 @@ public class SprintingAbility extends Ability {
             screenChanger = new Table();
             mobileMover.setBounds(200, 200, 300, 300);
             signer.setBounds(1500, 700, 300, 300);
-            screenChanger.setBounds(10, 50, 50, 100);
-            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(1.2f)).width(50).height(50).row();
-            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(0.8f)).width(50).height(50);
+            screenChanger.setBounds(10, 500, 50, 100);
+            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(12)).width(50).height(50).row();
+            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(2)).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
             signer.background(Tex.buttonDisabled);
             screenChanger.background(Tex.buttonDisabled);
@@ -177,7 +177,9 @@ public class SprintingAbility extends Ability {
                         Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
                     float dx = Core.input.mouseX(i) - 350, dy = Core.input.mouseY(i) - 350;
                     float angle = Angles.angle(dx, dy);
-                    unit.lookAt(dx + unit.x, dy + unit.y);
+                    if (!onSign()) {
+                        unit.lookAt(dx + unit.x, dy + unit.y);
+                    }
                     unit.x += (float) (unit.speed() * cos(toRadians(angle)));
                     unit.y += (float) (unit.speed() * sin(toRadians(angle)));
                     Core.camera.position.lerpDelta(unit, 0.3f);
@@ -265,10 +267,6 @@ public class SprintingAbility extends Ability {
             }
         }
         return false;
-    }
-
-    protected void rebuildScreen() {
-
     }
 
     protected void rebuild() {
