@@ -1,103 +1,87 @@
 package Floor.FType.input;
 
 import arc.Core;
+import arc.Events;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
+import arc.input.KeyCode;
+import arc.math.Interp;
 import arc.math.Mathf;
-import arc.math.geom.QuadTree;
-import arc.math.geom.Rect;
-import arc.math.geom.Vec2;
+import arc.math.geom.*;
+import arc.scene.Group;
+import arc.scene.ui.ImageButton;
+import arc.scene.ui.layout.Scl;
+import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
+import arc.util.Align;
+import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.core.World;
+import mindustry.entities.EntityCollisions;
+import mindustry.entities.Predict;
 import mindustry.entities.Units;
 import mindustry.entities.units.BuildPlan;
+import mindustry.game.EventType;
+import mindustry.game.Schematic;
 import mindustry.game.Team;
-import mindustry.gen.Building;
-import mindustry.gen.Call;
-import mindustry.gen.Unit;
+import mindustry.gen.*;
+import mindustry.graphics.Drawf;
+import mindustry.graphics.Pal;
 import mindustry.input.Binding;
 import mindustry.input.InputHandler;
-import mindustry.input.MobileInput;
+import mindustry.input.PlaceMode;
+import mindustry.type.UnitType;
+import mindustry.ui.Styles;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.ControlBlock;
 
-import java.lang.reflect.Field;
 
+import static arc.Core.input;
 import static arc.Core.scene;
 import static mindustry.Vars.*;
 import static mindustry.Vars.tilesize;
 import static mindustry.input.PlaceMode.*;
 
-public class FMobileInput extends MobileInput {
+public class FMobileInput extends InputHandler {
+    private static final float maxPanSpeed = 1.3f;
+    public final float edgePan = Scl.scl(60f);
+    public Vec2 vector = new Vec2(), movement = new Vec2(), targetPos = new Vec2();
+    public float lastZoom = -1;
+    public int lineStartX, lineStartY, lastLineX, lastLineY;
+    public float lineScale;
+    public float crosshairScale;
+    public Teamc lastTarget;
+    public float shiftDeltaX, shiftDeltaY;
+    public Seq<BuildPlan> removals = new Seq<>();
+    public boolean selecting;
+    public boolean lineMode, schematicMode, rebuildMode;
+    public PlaceMode mode = none;
+    public @Nullable Block lastBlock;
+    public @Nullable BuildPlan lastPlaced;
+    public boolean down = false;
+    public boolean manualShooting = false;
+    public @Nullable Teamc target;
+    public @Nullable Position payloadTarget;
+    public @Nullable Unit unitTapped;
+    public @Nullable Building buildingTapped;
+
+    {
+        Events.on(EventType.UnitDestroyEvent.class, e -> {
+            if(e.unit != null && e.unit.isPlayer() && e.unit.getPlayer().isLocal() && e.unit.type.weapons.contains(w -> w.bullet.killShooter)){
+                manualShooting = false;
+            }
+        });
+    }
     public boolean zoomModel = true;
     Rect r1 = new Rect(), r2 = new Rect();
 
     @Override
     public void update() {
-        if (logicCutscene && !renderer.isCutscene()) {
-            Core.camera.position.lerpDelta(logicCamPan, logicCamSpeed);
-        } else {
-            logicCutsceneZoom = -1f;
-        }
-
-        commandBuildings.removeAll(b -> !b.isValid());
-
-        if (!commandMode) {
-            commandRect = false;
-        }
-
-        Field field;
-        QuadTree<BuildPlan> playerPlanTree;
-        try {
-            field = InputHandler.class.getDeclaredField("playerPlanTree");
-            field.setAccessible(true);
-            playerPlanTree = (QuadTree<BuildPlan>) field.get(control.input);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        playerPlanTree.clear();
-        player.unit().plans.each(playerPlanTree::insert);
-
-        player.typing = ui.chatfrag.shown();
-
-        if (player.dead()) {
-            droppingItem = false;
-        }
-
-        if (player.isBuilder()) {
-            player.unit().updateBuilding(isBuilding);
-        }
-
-        if (player.shooting && !wasShooting && player.unit().hasWeapons() && state.rules.unitAmmo && !player.team().rules().infiniteAmmo && player.unit().ammo <= 0) {
-            player.unit().type.weapons.first().noAmmoSound.at(player.unit());
-        }
-
-        //you don't want selected blocks while locked, looks weird
-        if (locked()) {
-            block = null;
-
-        }
-
-        wasShooting = player.shooting;
-
-        //only reset the controlled type and control a unit after the timer runs out
-        //essentially, this means the client waits for ~1 second after controlling something before trying to control something else automatically
-        if (!player.dead() && (recentRespawnTimer -= Time.delta / 70f) <= 0f && player.justSwitchFrom != player.unit()) {
-            controlledType = player.unit().type;
-        }
-
-        if (controlledType != null && player.dead() && controlledType.playerControllable) {
-            Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
-
-            if (unit != null) {
-                //only trying controlling once a second to prevent packet spam
-                if (!net.client() || controlInterval.get(0, 70f)) {
-                    recentRespawnTimer = 1f;
-                    Call.unitControl(player, unit);
-                }
-            }
-        }
+        super.update();
 
         boolean locked = locked();
 
@@ -214,6 +198,96 @@ public class FMobileInput extends MobileInput {
         }
     }
 
+    boolean tileTapped(@Nullable Building build){
+        if(build == null){
+            inv.hide();
+            config.hideConfig();
+            commandBuildings.clear();
+            return false;
+        }
+        boolean consumed = false, showedInventory = false;
+
+        if(build.block.commandable && commandMode){
+            consumed = true;
+        }else if(build.block.configurable && build.interactable(player.team())){
+            consumed = true;
+            if((!config.isShown() && build.shouldShowConfigure(player))
+                    || (config.isShown() && config.getSelected().onConfigureBuildTapped(build))){
+                Sounds.click.at(build);
+                config.showConfig(build);
+            }
+        }else if(!config.hasConfigMouse()){
+            if(config.isShown() && config.getSelected().onConfigureBuildTapped(build)){
+                consumed = true;
+                config.hideConfig();
+            }
+
+            if(config.isShown()){
+                consumed = true;
+            }
+        }
+
+        if(!consumed && build.interactable(player.team())){
+            build.tapped();
+        }
+
+        if(build.interactable(player.team()) && build.block.consumesTap){
+            consumed = true;
+        }else if(build.interactable(player.team()) && build.block.synthetic() && (!consumed || build.block.allowConfigInventory)){
+            if(build.block.hasItems && build.items.total() > 0){
+                inv.showFor(build);
+                consumed = true;
+                showedInventory = true;
+            }
+        }
+
+        if(!showedInventory){
+            inv.hide();
+        }
+
+        return consumed;
+    }
+
+    boolean canMine(Tile tile){
+        return !Core.scene.hasMouse()
+                && player.unit().validMine(tile)
+                && player.unit().acceptsItem(player.unit().getMineResult(tile))
+                && !((!Core.settings.getBool("doubletapmine") && tile.floor().playerUnmineable) && tile.overlay().itemDrop == null);
+    }
+
+    boolean tryBeginMine(Tile tile){
+        if(canMine(tile)){
+            player.unit().mineTile = tile;
+            return true;
+        }
+        return false;
+    }
+
+    boolean checkConfigTap(){
+        return config.isShown() && config.getSelected().onConfigureTapped(input.mouseWorldX(), input.mouseWorldY());
+    }
+
+    boolean tryStopMine(){
+        if(player.unit().mining()){
+            player.unit().mineTile = null;
+            return true;
+        }
+        return false;
+    }
+
+    Tile tileAt(float x, float y){
+        return world.tile(tileX(x), tileY(y));
+    }
+    boolean tryTapPlayer(float x, float y){
+        if(canTapPlayer(x, y)){
+            droppingItem = true;
+            return true;
+        }
+        return false;
+    }
+    boolean canTapPlayer(float x, float y){
+        return player.within(x, y, 17) && player.unit().stack.amount > 0;
+    }
     boolean showCancel() {
         return (player.unit().isBuilding() || block != null || mode == breaking || !selectPlans.isEmpty()) && !hasSchem();
     }
@@ -334,5 +408,717 @@ public class FMobileInput extends MobileInput {
 
     boolean isAreaBreaking() {
         return mode == breaking && lineMode && Mathf.dst(lineStartX * tilesize, lineStartY * tilesize, Core.input.mouseWorld().x, Core.input.mouseWorld().y) >= 2 * tilesize;
+    }
+
+    @Override
+    public void buildPlacementUI(Table table){
+        table.image().color(Pal.gray).height(4f).colspan(4).growX();
+        table.row();
+        table.left().margin(0f).defaults().size(48f);
+
+        table.button(Icon.hammer, Styles.clearNoneTogglei, () -> {
+            mode = mode == breaking ? block == null ? none : placing : breaking;
+            lastBlock = block;
+        }).update(l -> l.setChecked(mode == breaking)).name("breakmode");
+
+        //diagonal swap button
+        table.button(Icon.diagonal, Styles.clearNoneTogglei, () -> {
+            Core.settings.put("swapdiagonal", !Core.settings.getBool("swapdiagonal"));
+        }).update(l -> l.setChecked(Core.settings.getBool("swapdiagonal")));
+
+        //rotate button
+        table.button(Icon.right, Styles.clearNoneTogglei, () -> {
+            if(block != null && block.rotate){
+                rotation = Mathf.mod(rotation + 1, 4);
+            }else{
+                schematicMode = !schematicMode;
+                if(schematicMode){
+                    block = null;
+                    mode = none;
+                }else{
+                    rebuildMode = false;
+                }
+            }
+        }).update(i -> {
+            boolean arrow = block != null && block.rotate;
+
+            i.getImage().setRotationOrigin(!arrow ? 0 : rotation * 90, Align.center);
+            i.getStyle().imageUp = arrow ? Icon.right : Icon.copy;
+            i.setChecked(!arrow && schematicMode);
+        });
+
+        //confirm button
+        table.button(Icon.ok, Styles.clearNoneTogglei, () -> {
+            if(schematicMode){
+                rebuildMode = !rebuildMode;
+            }else{
+                for(BuildPlan plan : selectPlans){
+                    Tile tile = plan.tile();
+
+                    //actually place/break all selected blocks
+                    if(tile != null){
+                        if(!plan.breaking){
+                            if(validPlace(plan.x, plan.y, plan.block, plan.rotation)){
+                                BuildPlan other = getPlan(plan.x, plan.y, plan.block.size, null);
+                                BuildPlan copy = plan.copy();
+
+                                if(other == null){
+                                    player.unit().addBuild(copy);
+                                }else if(!other.breaking && other.x == plan.x && other.y == plan.y && other.block.size == plan.block.size){
+                                    player.unit().plans().remove(other);
+                                    player.unit().addBuild(copy);
+                                }
+                            }
+
+                            rotation = plan.rotation;
+                        }else{
+                            tryBreakBlock(tile.x, tile.y);
+                        }
+                    }
+                }
+
+                //move all current plans to removal array so they fade out
+                removals.addAll(selectPlans.select(r -> !r.breaking));
+                selectPlans.clear();
+                selecting = false;
+            }
+        }).visible(() -> !selectPlans.isEmpty() || schematicMode || rebuildMode).update(i -> {
+            i.getStyle().imageUp = schematicMode || rebuildMode ? Icon.wrench : Icon.ok;
+            i.setChecked(rebuildMode);
+
+        }).name("confirmplace");
+    }
+    @Override
+    public void buildUI(Group group){
+
+        group.fill(t -> {
+            t.visible(this::showCancel);
+            t.bottom().left();
+            t.button("@cancel", Icon.cancel, () -> {
+                player.unit().clearBuilding();
+                selectPlans.clear();
+                mode = none;
+                block = null;
+            }).width(155f).height(50f).margin(12f);
+        });
+
+        group.fill(t -> {
+            t.visible(() -> !showCancel() && block == null && !hasSchem());
+            t.bottom().left();
+            t.button("@command", Icon.units, Styles.squareTogglet, () -> {
+                commandMode = !commandMode;
+            }).width(155f).height(50f).margin(12f).checked(b -> commandMode).row();
+
+            //for better looking insets
+            t.rect((x, y, w, h) -> {
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneRight.draw(x, 0, w, y);
+                }
+            }).fillX().row();
+        });
+
+        group.fill(t -> {
+            t.visible(this::hasSchem);
+            t.bottom().left();
+            t.table(Tex.pane, b -> {
+                b.defaults().size(50f);
+
+                ImageButton.ImageButtonStyle style = Styles.clearNonei;
+
+                b.button(Icon.save, style, this::showSchematicSave).disabled(f -> lastSchematic == null || lastSchematic.file != null);
+                b.button(Icon.cancel, style, () -> {
+                    selectPlans.clear();
+                    lastSchematic = null;
+                });
+                b.row();
+                b.button(Icon.flipX, style, () -> flipPlans(selectPlans, true));
+                b.button(Icon.flipY, style, () -> flipPlans(selectPlans, false));
+                b.row();
+                b.button(Icon.rotate, style, () -> rotatePlans(selectPlans, 1)).update(i -> {
+                    var img = i.getCells().first().get();
+
+                    img.setScale(-1f, 1f);
+                    //why the heck doesn't setOrigin work for scaling
+                    img.setTranslation(img.getWidth(), 0f);
+                });
+
+            }).margin(4f);
+        });
+    }
+
+    @Override
+    public void drawBottom(){
+        Lines.stroke(1f);
+
+        //draw plans about to be removed
+        for(BuildPlan plan : removals){
+            Tile tile = plan.tile();
+
+            if(tile == null) continue;
+
+            plan.animScale = Mathf.lerpDelta(plan.animScale, 0f, 0.2f);
+
+            if(plan.breaking){
+                drawSelected(plan.x, plan.y, tile.block(), Pal.remove);
+            }else{
+                plan.block.drawPlan(plan, allPlans(), true);
+            }
+        }
+
+        Draw.mixcol();
+        Draw.color(Pal.accent);
+
+        //Draw lines
+        if(lineMode){
+            int tileX = tileX(Core.input.mouseX());
+            int tileY = tileY(Core.input.mouseY());
+
+            if(mode == placing && block != null){
+                //draw placing
+                for(int i = 0; i < linePlans.size; i++){
+                    BuildPlan plan = linePlans.get(i);
+                    if(i == linePlans.size - 1 && plan.block.rotate && plan.block.drawArrow){
+                        drawArrow(block, plan.x, plan.y, plan.rotation);
+                    }
+                    plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation) && getPlan(plan.x, plan.y, plan.block.size, null) == null);
+                    drawSelected(plan.x, plan.y, plan.block, Pal.accent);
+                }
+                linePlans.each(this::drawOverPlan);
+            }else if(mode == breaking){
+                drawBreakSelection(lineStartX, lineStartY, tileX, tileY);
+            }
+        }
+
+        Draw.reset();
+    }
+
+    @Override
+    public void drawTop(){
+        if(mode == schematicSelect){
+            drawSelection(lineStartX, lineStartY, lastLineX, lastLineY, Vars.maxSchematicSize);
+        }else if(mode == rebuildSelect){
+            drawRebuildSelection(lineStartX, lineStartY, lastLineX, lastLineY);
+        }
+
+        drawCommanded();
+    }
+
+    @Override
+    public void drawOverSelect(){
+        //draw list of plans
+        for(BuildPlan plan : selectPlans){
+            Tile tile = plan.tile();
+
+            if(tile == null) continue;
+
+            if((!plan.breaking && validPlace(tile.x, tile.y, plan.block, plan.rotation))
+                    || (plan.breaking && validBreak(tile.x, tile.y))){
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
+            }else{
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 0.6f, 0.1f);
+            }
+
+            Tmp.c1.set(Draw.getMixColor());
+
+            if(!plan.breaking && plan == lastPlaced && plan.block != null){
+                Draw.mixcol();
+                if(plan.block.rotate && plan.block.drawArrow) drawArrow(plan.block, tile.x, tile.y, plan.rotation);
+            }
+
+            Draw.reset();
+            drawPlan(plan);
+            if(!plan.breaking){
+                drawOverPlan(plan);
+            }
+
+            //draw last placed plan
+            if(!plan.breaking && plan == lastPlaced && plan.block != null){
+                int rot = plan.block.planRotation(plan.rotation);
+                boolean valid = validPlace(tile.x, tile.y, plan.block, rot);
+                Draw.mixcol();
+                plan.block.drawPlace(tile.x, tile.y, rot, valid);
+
+                drawOverlapCheck(plan.block, tile.x, tile.y, valid);
+            }
+        }
+
+        //draw targeting crosshair
+        if(target != null && !state.isEditor() && !manualShooting){
+            if(target != lastTarget){
+                crosshairScale = 0f;
+                lastTarget = target;
+            }
+
+            crosshairScale = Mathf.lerpDelta(crosshairScale, 1f, 0.2f);
+
+            Drawf.target(target.getX(), target.getY(), 7f * Interp.swingIn.apply(crosshairScale), Pal.remove);
+        }
+
+        Draw.reset();
+    }
+
+    @Override
+    protected void drawPlan(BuildPlan plan){
+        if(plan.tile() == null) return;
+        bplan.animScale = plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.1f);
+
+        if(plan.breaking){
+            drawSelected(plan.x, plan.y, plan.tile().block(), Pal.remove);
+        }else{
+            plan.block.drawPlan(plan, allPlans(), validPlace(plan.x, plan.y, plan.block, plan.rotation));
+            drawSelected(plan.x, plan.y, plan.block, Pal.accent);
+        }
+    }
+    @Override
+    public boolean isRebuildSelecting(){
+        return rebuildMode;
+    }
+    @Override
+    protected int schemOriginX(){
+        Tmp.v1.setZero();
+        selectPlans.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return World.toTile(Tmp.v1.scl(1f / selectPlans.size).x);
+    }
+    @Override
+    protected int schemOriginY(){
+        Tmp.v1.setZero();
+        selectPlans.each(r -> Tmp.v1.add(r.drawx(), r.drawy()));
+        return World.toTile(Tmp.v1.scl(1f / selectPlans.size).y);
+    }
+    @Override
+    public boolean isPlacing(){
+        return super.isPlacing() && mode == placing;
+    }
+    @Override
+    public boolean isBreaking(){
+        return mode == breaking;
+    }
+    @Override
+    public void useSchematic(Schematic schem){
+        selectPlans.clear();
+        selectPlans.addAll(schematics.toPlans(schem, World.toTile(Core.camera.position.x), World.toTile(Core.camera.position.y)));
+        lastSchematic = schem;
+    }
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, KeyCode button){
+        if(state.isMenu() || locked()) return false;
+        down = true;
+        if(player.dead()) return false;
+        Tile cursor = tileAt(screenX, screenY);
+
+        float worldx = Core.input.mouseWorld(screenX, screenY).x, worldy = Core.input.mouseWorld(screenX, screenY).y;
+
+        //ignore off-screen taps
+        if(cursor == null || Core.scene.hasMouse(screenX, screenY)) return false;
+
+        //only begin selecting if the tapped block is a plan
+        selecting = hasPlan(cursor);
+
+        //call tap events
+        if(pointer == 0 && !selecting){
+            if(schematicMode && block == null){
+                mode = rebuildMode ? rebuildSelect : schematicSelect;
+
+                //engage schematic selection mode
+                int tileX = tileX(screenX);
+                int tileY = tileY(screenY);
+                lineStartX = tileX;
+                lineStartY = tileY;
+                lastLineX = tileX;
+                lastLineY = tileY;
+            }else if(!tryTapPlayer(worldx, worldy) && Core.settings.getBool("keyboard")){
+                //shoot on touch down when in keyboard mode
+                player.shooting = true;
+            }
+        }
+
+        return false;
+    }
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, KeyCode button){
+        lastZoom = renderer.getScale();
+
+        if(!Core.input.isTouched()){
+            down = false;
+        }
+
+        manualShooting = false;
+        selecting = false;
+
+        //place down a line if in line mode
+        if(lineMode){
+            int tileX = tileX(screenX);
+            int tileY = tileY(screenY);
+
+            if(mode == placing && isPlacing()){
+                flushSelectPlans(linePlans);
+                Events.fire(new EventType.LineConfirmEvent());
+            }else if(mode == breaking){
+                removeSelection(lineStartX, lineStartY, tileX, tileY, true);
+            }
+
+            lineMode = false;
+        }else if(mode == schematicSelect){
+            selectPlans.clear();
+            lastSchematic = schematics.create(lineStartX, lineStartY, lastLineX, lastLineY);
+            useSchematic(lastSchematic);
+            if(selectPlans.isEmpty()){
+                lastSchematic = null;
+            }
+            schematicMode = false;
+            mode = none;
+        }else if(mode == rebuildSelect){
+            rebuildArea(lineStartX, lineStartY, lastLineX, lastLineY);
+            mode = none;
+        }else{
+            Tile tile = tileAt(screenX, screenY);
+
+            tryDropItems(tile == null ? null : tile.build, Core.input.mouseWorld(screenX, screenY).x, Core.input.mouseWorld(screenX, screenY).y);
+        }
+
+        //select some units
+        selectUnitsRect();
+
+        return false;
+    }
+    @Override
+    public boolean longPress(float x, float y){
+        if(state.isMenu()|| player.dead() || locked()) return false;
+
+        //get tile on cursor
+        Tile cursor = tileAt(x, y);
+
+        if(Core.scene.hasMouse(x, y) || schematicMode) return false;
+
+        //handle long tap when player isn't building
+        if(mode == none){
+            Vec2 pos = Core.input.mouseWorld(x, y);
+
+            if(commandMode){
+
+                //long press begins rect selection.
+                commandRect = true;
+                commandRectX = input.mouseWorldX();
+                commandRectY = input.mouseWorldY();
+
+            }else{
+
+                if(player.unit() instanceof Payloadc pay){
+                    Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
+                    if(target != null){
+                        payloadTarget = target;
+                    }else{
+                        Building build = world.buildWorld(pos.x, pos.y);
+
+                        if(build != null && build.team == player.team() && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
+                            payloadTarget = build;
+                        }else if(pay.hasPayload()){
+                            //drop off at position
+                            payloadTarget = new Vec2(pos);
+                        }else{
+                            manualShooting = true;
+                            this.target = null;
+                        }
+                    }
+                }else{
+                    manualShooting = true;
+                    this.target = null;
+                }
+            }
+
+            if(!state.isPaused()) Fx.select.at(pos);
+        }else{
+
+            //ignore off-screen taps
+            if(cursor == null) return false;
+
+            //remove plan if it's there
+            //long pressing enables line mode otherwise
+            lineStartX = cursor.x;
+            lineStartY = cursor.y;
+            lastLineX = cursor.x;
+            lastLineY = cursor.y;
+            lineMode = true;
+
+            if(mode == breaking){
+                if(!state.isPaused()) Fx.tapBlock.at(cursor.worldx(), cursor.worldy(), 1f);
+            }else if(block != null){
+                updateLine(lineStartX, lineStartY, cursor.x, cursor.y);
+                if(!state.isPaused()) Fx.tapBlock.at(cursor.worldx() + block.offset, cursor.worldy() + block.offset, block.size);
+            }
+        }
+
+        return false;
+    }
+    @Override
+    public boolean tap(float x, float y, int count, KeyCode button){
+        if(state.isMenu() || lineMode || locked()) return false;
+        float worldx = Core.input.mouseWorld(x, y).x, worldy = Core.input.mouseWorld(x, y).y;
+        //get tile on cursor
+        Tile cursor = tileAt(x, y);
+        //ignore off-screen taps
+        if(cursor == null || Core.scene.hasMouse(x, y)) return false;
+
+        Call.tileTap(player, cursor);
+
+        Tile linked = cursor.build == null ? cursor : cursor.build.tile;
+
+        if(!player.dead()){
+            checkTargets(worldx, worldy);
+        }
+
+        //remove if plan present
+        if(hasPlan(cursor)){
+            removePlan(getPlan(cursor));
+        }else if(mode == placing && isPlacing() && validPlace(cursor.x, cursor.y, block, rotation) && !checkOverlapPlacement(cursor.x, cursor.y, block)){
+            //add to selection queue if it's a valid place position
+            selectPlans.add(lastPlaced = new BuildPlan(cursor.x, cursor.y, rotation, block, block.nextConfig()));
+            block.onNewPlan(lastPlaced);
+        }else if(mode == breaking && validBreak(linked.x,linked.y) && !hasPlan(linked)){
+            //add to selection queue if it's a valid BREAK position
+            selectPlans.add(new BuildPlan(linked.x, linked.y));
+        }else if((commandMode && selectedUnits.size > 0) || commandBuildings.size > 0){
+            //handle selecting units with command mode
+            commandTap(x, y);
+        }else if(commandMode){
+            tapCommandUnit();
+        }else{
+            //control units
+            if(count == 2){
+                //reset payload target
+                payloadTarget = null;
+
+                //control a unit/block detected on first tap of double-tap
+                if(unitTapped != null && state.rules.possessionAllowed && unitTapped.isAI() && unitTapped.team == player.team() && !unitTapped.dead && unitTapped.type.playerControllable){
+                    Call.unitControl(player, unitTapped);
+                    recentRespawnTimer = 1f;
+                }else if(buildingTapped != null && state.rules.possessionAllowed){
+                    Call.buildingControlSelect(player, buildingTapped);
+                    recentRespawnTimer = 1f;
+                }else if(!checkConfigTap() && !tryBeginMine(cursor)){
+                    tileTapped(linked.build);
+                }
+                return false;
+            }
+
+            unitTapped = selectedUnit();
+            buildingTapped = selectedControlBuild();
+
+            //prevent mining if placing/breaking blocks
+            if(!tryStopMine() && !canTapPlayer(worldx, worldy) && !checkConfigTap() && !tileTapped(linked.build) && mode == none && !Core.settings.getBool("doubletapmine")){
+                tryBeginMine(cursor);
+            }
+        }
+
+        return false;
+    }
+    @Override
+    public void updateState(){
+        super.updateState();
+
+        if(state.isMenu()){
+            selectPlans.clear();
+            removals.clear();
+            mode = none;
+            manualShooting = false;
+            payloadTarget = null;
+        }
+    }
+    protected void autoPan(){
+        float screenX = Core.input.mouseX(), screenY = Core.input.mouseY();
+
+        float panX = 0, panY = 0;
+
+        if(screenX <= edgePan){
+            panX = -(edgePan - screenX);
+        }
+
+        if(screenX >= Core.graphics.getWidth() - edgePan){
+            panX = (screenX - Core.graphics.getWidth()) + edgePan;
+        }
+
+        if(screenY <= edgePan){
+            panY = -(edgePan - screenY);
+        }
+
+        if(screenY >= Core.graphics.getHeight() - edgePan){
+            panY = (screenY - Core.graphics.getHeight()) + edgePan;
+        }
+
+        vector.set(panX, panY).scl((Core.camera.width) / Core.graphics.getWidth());
+        vector.limit(maxPanSpeed);
+
+        //pan view
+        Core.camera.position.x += vector.x;
+        Core.camera.position.y += vector.y;
+    }
+    @Override
+    public boolean pan(float x, float y, float deltaX, float deltaY){
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard") || locked() || commandRect) return false;
+
+        float scale = Core.camera.width / Core.graphics.getWidth();
+        deltaX *= scale;
+        deltaY *= scale;
+
+        //can't pan in line mode with one finger or while dropping items!
+        if((lineMode && !Core.input.isTouched(1)) || droppingItem || schematicMode){
+            return false;
+        }
+
+        //do not pan with manual shooting enabled
+        if(!down || manualShooting) return false;
+
+        if(selecting){ //pan all plans
+            shiftDeltaX += deltaX;
+            shiftDeltaY += deltaY;
+
+            int shiftedX = (int)(shiftDeltaX / tilesize);
+            int shiftedY = (int)(shiftDeltaY / tilesize);
+
+            if(Math.abs(shiftedX) > 0 || Math.abs(shiftedY) > 0){
+                for(var plan : selectPlans){
+                    if(plan.breaking) continue; //don't shift removal plans
+                    plan.x += shiftedX;
+                    plan.y += shiftedY;
+                }
+
+                shiftDeltaX %= tilesize;
+                shiftDeltaY %= tilesize;
+            }
+        }else{
+            //pan player
+            Core.camera.position.x -= deltaX;
+            Core.camera.position.y -= deltaY;
+        }
+
+        return false;
+    }
+    @Override
+    public boolean panStop(float x, float y, int pointer, KeyCode button){
+        shiftDeltaX = shiftDeltaY = 0f;
+        return false;
+    }
+    @Override
+    public boolean zoom(float initialDistance, float distance){
+        if(Core.settings.getBool("keyboard")) return false;
+        if(lastZoom < 0){
+            lastZoom = renderer.getScale();
+        }
+
+        renderer.setScale(distance / initialDistance * lastZoom);
+        return true;
+    }
+    protected void updateMovement(Unit unit){
+        Rect rect = Tmp.r3;
+
+        UnitType type = unit.type;
+        if(type == null) return;
+
+        boolean omni = unit.type.omniMovement;
+        boolean allowHealing = type.canHeal;
+        boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
+        boolean boosted = (unit instanceof Mechc && unit.isFlying());
+
+        //reset target if:
+        // - in the editor, or...
+        // - it's both an invalid standard target and an invalid heal target
+        if((Units.invalidateTarget(target, unit, type.range) && !validHealTarget) || state.isEditor()){
+            target = null;
+        }
+
+        targetPos.set(Core.camera.position);
+        float attractDst = 15f;
+
+        float speed = unit.speed();
+        float range = unit.hasWeapons() ? unit.range() : 0f;
+        float bulletSpeed = unit.hasWeapons() ? type.weapons.first().bullet.speed : 0f;
+        float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
+        boolean aimCursor = omni && player.shooting && type.hasWeapons() && !boosted && type.faceTarget;
+
+        if(aimCursor){
+            unit.lookAt(mouseAngle);
+        }else{
+            unit.lookAt(unit.prefRotation());
+        }
+
+        //validate payload, if it's a destroyed unit/building, remove it
+        if(payloadTarget instanceof Healthc h && !h.isValid()){
+            payloadTarget = null;
+        }
+
+        if(payloadTarget != null && unit instanceof Payloadc pay){
+            targetPos.set(payloadTarget);
+            attractDst = 0f;
+
+            if(unit.within(payloadTarget, 3f * Time.delta)){
+                if(payloadTarget instanceof Vec2 && pay.hasPayload()){
+                    //vec -> dropping something
+                    tryDropPayload();
+                }else if(payloadTarget instanceof Building build && build.team == unit.team){
+                    //building -> picking building up
+                    Call.requestBuildPayload(player, build);
+                }else if(payloadTarget instanceof Unit other && pay.canPickup(other)){
+                    //unit -> picking unit up
+                    Call.requestUnitPayload(player, other);
+                }
+
+                payloadTarget = null;
+            }
+        }else{
+            payloadTarget = null;
+        }
+
+        movement.set(targetPos).sub(player).limit(speed);
+        movement.setAngle(Mathf.slerp(movement.angle(), unit.vel.angle(), 0.05f));
+
+        if(player.within(targetPos, attractDst)){
+            movement.setZero();
+            unit.vel.approachDelta(Vec2.ZERO, unit.speed() * type.accel / 2f);
+        }
+
+        unit.hitbox(rect);
+        rect.grow(4f);
+
+        player.boosting = collisions.overlapsTile(rect, EntityCollisions::solid) || !unit.within(targetPos, 85f);
+
+        unit.movePref(movement);
+
+        //update shooting if not building + not mining
+        if(!player.unit().activelyBuilding() && player.unit().mineTile == null){
+
+            //autofire targeting
+            if(manualShooting){
+                player.shooting = !boosted;
+                unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
+            }else if(target == null){
+                player.shooting = false;
+                if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
+                    if(player.unit().type.canAttack){
+                        target = Units.closestTarget(unit.team, unit.x, unit.y, range, u -> u.checkTarget(type.targetAir, type.targetGround), u -> type.targetGround);
+                    }
+
+                    if(allowHealing && target == null){
+                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(player.team()));
+                        if(target != null && !unit.within(target, range)){
+                            target = null;
+                        }
+                    }
+                }
+
+                //when not shooting, aim at mouse cursor
+                //this may be a bad idea, aiming for a point far in front could work better, test it out
+                unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+            }else{
+                Vec2 intercept = Predict.intercept(unit, target, bulletSpeed);
+
+                player.mouseX = intercept.x;
+                player.mouseY = intercept.y;
+                player.shooting = !boosted;
+
+                unit.aim(player.mouseX, player.mouseY);
+            }
+        }
+
+        unit.controlWeapons(player.shooting && !boosted);
     }
 }
