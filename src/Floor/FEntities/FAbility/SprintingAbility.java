@@ -28,8 +28,8 @@ public class SprintingAbility extends Ability {
     public float damage = 1000;
     public float maxLength = 200;
     public float reload = 180;
-    public float powerReload = 120;
-    public Effect maxPowerEffect = new Effect(5, e -> {
+    public float powerReload = 60;
+    public Effect maxPowerEffect = new Effect(3, e -> {
         Place p = (Place) e.data;
         Unit u = p.unit;
         float f = p.fin;
@@ -96,15 +96,7 @@ public class SprintingAbility extends Ability {
             have = true;
         }
 
-        if (!unit.isPlayer()) {
-            have = false;
-            mobileMover.actions(Actions.fadeOut(1));
-            signer.actions(Actions.fadeOut(1));
-            hase = false;
-            select.actions(Actions.fadeOut(1));
-        }
-
-        if (unit.dead || unit.health <= 0) {
+        if (!unit.isPlayer() || unit.dead || unit.health <= 0) {
             have = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
@@ -113,6 +105,7 @@ public class SprintingAbility extends Ability {
             mobileMover.remove();
             signer.remove();
             select.remove();
+            mobileMover = signer = select = null;
         }
 
         if (!hase && unit.isPlayer()) {
@@ -142,7 +135,8 @@ public class SprintingAbility extends Ability {
                     } else if (stats == 1) {
                         signed = moved = false;
                         for (int i = 0; i < Core.input.getTouches() && !(signed && moved); i++) {
-                            if (!moved && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
+                            if (!moved &&
+                                    Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
                                     Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
                                 float dx = Core.input.mouseX(i) - 350, dy = Core.input.mouseY(i) - 350;
                                 float angle = Angles.angle(dx, dy);
@@ -150,7 +144,8 @@ public class SprintingAbility extends Ability {
                                 unit.y += (float) (unit.speed() * sin(toRadians(angle)));
                                 Core.camera.position.lerpDelta(unit, 0.03f);
                                 moved = true;
-                            } else if (!signed && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
+                            } else if (!signed &&
+                                    Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
                                     Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                                 powerTimer += Time.delta;
                                 float dx = Core.input.mouseX(i) - 1650, dy = Core.input.mouseY(i) - 850;
@@ -199,10 +194,12 @@ public class SprintingAbility extends Ability {
     public boolean onSign() {
         if (stats == 2 && Core.input.getTouches() > 0) {
             return true;
-        }
-        for (int i = 0; i < Core.input.getTouches(); i++) {
-            if (stats == 1 && Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 && Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
-                return true;
+        } else if (stats == 1) {
+            for (int i = 0; i < Core.input.getTouches(); i++) {
+                if (Core.input.mouseX(i) <= 1800 && Core.input.mouseX(i) >= 1500 &&
+                        Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
+                    return true;
+                }
             }
         }
         return false;
