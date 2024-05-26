@@ -49,7 +49,6 @@ public class SprintingAbility extends Ability {
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
 
-
     protected static InputHandler hm = new FMobileInput();
     protected static InputHandler def;
     protected int stats = 0;
