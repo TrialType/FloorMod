@@ -51,7 +51,7 @@ public class SprintingAbility extends Ability {
 
     protected static InputHandler hm = new FMobileInput();
     protected static InputHandler def;
-    protected int stats = 1;
+    protected int stats = 0;
     protected Table select;
     protected Table signer;
     protected Table mobileMover;
@@ -66,26 +66,6 @@ public class SprintingAbility extends Ability {
     public void update(Unit unit) {
         if (def == null) {
             def = Vars.control.input;
-        }
-
-        if (Vars.mobile && !unit.isPlayer() && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
-            boolean has = false;
-            for (int i = 0; i < Vars.player.unit().abilities.length; i++) {
-                Ability a = Vars.player.unit().abilities[i];
-                if (a instanceof SprintingAbility) {
-                    has = true;
-                    break;
-                }
-            }
-            if (!has) {
-                if (Vars.control.input instanceof FMobileInput) {
-                    Vars.control.input = def;
-                }
-            }
-        }
-
-        if (unit.isPlayer() && Vars.mobile) {
-            Vars.control.input = stats == 1 ? hm : def;
         }
 
         if (mobileMover == null) {
@@ -133,6 +113,31 @@ public class SprintingAbility extends Ability {
             screenChanger.actions(Actions.fadeOut(0));
         }
 
+        if (Vars.mobile && !unit.isPlayer() && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
+            boolean has = false;
+            for (int i = 0; i < Vars.player.unit().abilities.length; i++) {
+                Ability a = Vars.player.unit().abilities[i];
+                if (a instanceof SprintingAbility) {
+                    has = true;
+                    break;
+                }
+            }
+            if (!has) {
+                if (Vars.control.input instanceof FMobileInput) {
+                    Vars.control.input = def;
+                }
+            }
+        }
+
+        if (!unit.isPlayer()) {
+            stats = 0;
+        } else if (stats == 0) {
+            stats = 1;
+        }
+        if (unit.isPlayer() && Vars.mobile) {
+            Vars.control.input = stats == 1 ? hm : def;
+        }
+
         if (Vars.mobile && stats == 1 && !haveMover) {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
@@ -143,12 +148,17 @@ public class SprintingAbility extends Ability {
             haveMover = false;
         }
 
-        if (!(Vars.mobile && stats == 1 && timer >= reload)) {
-            haveSigner = false;
-            signer.actions(Actions.fadeOut(1));
-        } else if (!haveSigner) {
+        if (Vars.mobile && stats == 1 && timer >= reload && !haveSigner) {
             signer.actions(Actions.fadeIn(1));
             haveSigner = true;
+        } else if (haveSigner) {
+            haveSigner = false;
+            signer.actions(Actions.fadeOut(1));
+        }
+
+        if (Vars.mobile && !hase && unit.isPlayer()) {
+            select.actions(Actions.fadeIn(1));
+            hase = true;
         }
 
         if ((!unit.isPlayer() || unit.dead || unit.health <= 0) && haveMover) {
@@ -161,12 +171,7 @@ public class SprintingAbility extends Ability {
             select.actions(Actions.fadeOut(1));
         }
 
-        if (!hase && unit.isPlayer()) {
-            select.actions(Actions.fadeIn(1));
-            hase = true;
-        }
-
-        if (stats == 1 && Vars.mobile) {
+        if (stats == 1 && Vars.mobile && unit.isPlayer()) {
             for (int i = 0; i < Core.input.getTouches(); i++) {
                 if (Core.input.isTouched(i) && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
                         Core.input.mouseY(i) <= 500 && Core.input.mouseY(i) >= 200) {
@@ -282,18 +287,11 @@ public class SprintingAbility extends Ability {
         }
         if (Vars.mobile) {
             select.addListener(select.clicked(() -> {
-                stats = (stats + 1) % 3;
-                rebuild();
-            }));
-        } else {
-            select.addListener(select.clicked(() -> {
-                stats = (stats + 1) % 2;
+                stats = max(1, (stats + 1) % 3);
                 rebuild();
             }));
         }
-        if (stats == 0) {
-            select.add(Core.bundle.get("ability.autoBoost"));
-        } else if (stats == 1) {
+        if (stats == 1) {
             select.row();
             select.add(Core.bundle.get("ability.handBoost"));
         } else if (stats == 2) {
