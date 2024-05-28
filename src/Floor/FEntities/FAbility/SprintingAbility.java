@@ -133,7 +133,7 @@ public class SprintingAbility extends Ability {
             select.actions(Actions.fadeOut(0));
         }
 
-        if (!havePlayer()) {
+        if (noPlayer()) {
             if (Vars.control.input instanceof ButtonInput) {
                 Vars.control.input = def;
             }
@@ -169,7 +169,7 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeOut(1));
         }
 
-        if (!havePlayer() && haveMover) {
+        if (noPlayer() && haveMover) {
             haveSigner = false;
             haveMover = false;
             haveSelect = false;
@@ -266,15 +266,15 @@ public class SprintingAbility extends Ability {
         }
     }
 
-    protected boolean havePlayer() {
+    protected boolean noPlayer() {
         if (Vars.mobile && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
             for (Ability ability : Vars.player.unit().abilities) {
                 if (ability instanceof SprintingAbility) {
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     protected boolean onSign() {
