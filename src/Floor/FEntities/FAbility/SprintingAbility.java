@@ -25,6 +25,7 @@ import mindustry.input.InputHandler;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
+import static mindustry.Vars.renderer;
 import static mindustry.Vars.state;
 
 public class SprintingAbility extends Ability {
@@ -61,11 +62,18 @@ public class SprintingAbility extends Ability {
     protected static boolean haveSigner = false;
     protected static boolean haveMover = false;
     protected static boolean haveSelect = false;
+    protected static boolean changed = false;
 
     private static Unit play = null;
 
     @Override
     public void update(Unit unit) {
+        if (unit.isPlayer() && stats == 1 && !changed) {
+            renderer.setScale(0);
+        } else if (changed) {
+            changed = false;
+        }
+
         if (!unit.isPlayer()) {
             stats = 0;
         } else if (stats == 0) {
@@ -91,8 +99,14 @@ public class SprintingAbility extends Ability {
             signer.setBounds(1500, 700, 300, 300);
             screenChanger.setBounds(10, 500, 50, 100);
             select.setBounds(1000, 50, 50, 15);
-            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(-1)).width(50).height(50).row();
-            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(1)).width(50).height(50);
+            screenChanger.button(Icon.up, () -> {
+                Vars.renderer.scaleCamera(-1);
+                changed = true;
+            }).width(50).height(50).row();
+            screenChanger.button(Icon.down, () -> {
+                Vars.renderer.scaleCamera(1);
+                changed = true;
+            }).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
             signer.background(Tex.buttonDisabled);
             screenChanger.background(Tex.buttonDisabled);
@@ -180,6 +194,7 @@ public class SprintingAbility extends Ability {
         }
 
         if (stats == 1 && Vars.mobile) {
+            Core.camera.position.setZero();
             Core.camera.position.lerpDelta(unit, 0.03f);
         }
 
