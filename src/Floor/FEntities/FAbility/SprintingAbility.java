@@ -1,7 +1,7 @@
 package Floor.FEntities.FAbility;
 
 import Floor.FContent.FEvents;
-import Floor.FType.input.FMobileInput;
+import Floor.FType.input.ButtonInput;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -49,7 +49,7 @@ public class SprintingAbility extends Ability {
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
 
-    protected static InputHandler hm = new FMobileInput();
+    protected static InputHandler hm = new ButtonInput();
     protected static InputHandler def;
     protected int stats = 0;
     protected Table select;
@@ -113,7 +113,7 @@ public class SprintingAbility extends Ability {
             screenChanger.actions(Actions.fadeOut(0));
         }
 
-        if (Vars.mobile && !unit.isPlayer() && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
+        if (Vars.mobile && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
             boolean has = false;
             for (int i = 0; i < Vars.player.unit().abilities.length; i++) {
                 Ability a = Vars.player.unit().abilities[i];
@@ -123,7 +123,7 @@ public class SprintingAbility extends Ability {
                 }
             }
             if (!has) {
-                if (Vars.control.input instanceof FMobileInput) {
+                if (Vars.control.input instanceof ButtonInput) {
                     Vars.control.input = def;
                 }
             }
@@ -171,6 +171,10 @@ public class SprintingAbility extends Ability {
             select.actions(Actions.fadeOut(1));
         }
 
+        if (stats == 1 && Vars.mobile) {
+            Core.camera.position.lerpDelta(unit, 0.03f);
+        }
+
         if (stats == 1 && Vars.mobile && unit.isPlayer()) {
             for (int i = 0; i < Core.input.getTouches(); i++) {
                 if (Core.input.isTouched(i) && Core.input.mouseX(i) <= 500 && Core.input.mouseX(i) >= 200 &&
@@ -182,7 +186,6 @@ public class SprintingAbility extends Ability {
                     }
                     unit.x += (float) (unit.speed() * cos(toRadians(angle)));
                     unit.y += (float) (unit.speed() * sin(toRadians(angle)));
-                    Core.camera.position.lerpDelta(unit, 0.03f);
                     break;
                 }
             }
@@ -285,14 +288,11 @@ public class SprintingAbility extends Ability {
         } else {
             select.clear();
         }
-        if (Vars.mobile) {
-            select.addListener(select.clicked(() -> {
-                stats = max(1, (stats + 1) % 3);
-                rebuild();
-            }));
-        }
+        select.addListener(select.clicked(() -> {
+            stats = max(1, (stats + 1) % 3);
+            rebuild();
+        }));
         if (stats == 1) {
-            select.row();
             select.add(Core.bundle.get("ability.handBoost"));
         } else if (stats == 2) {
             select.add(Core.bundle.get("ability.targetBoost"));
