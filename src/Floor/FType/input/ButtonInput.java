@@ -6,7 +6,11 @@ import mindustry.input.InputHandler;
 public class ButtonInput extends InputHandler {
     @Override
     public void update() {
-        logicCutscene = false;
+    }
+
+    @Override
+    public boolean locked() {
+        return true;
     }
 
     @Override

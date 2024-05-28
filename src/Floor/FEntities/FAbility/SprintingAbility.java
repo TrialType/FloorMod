@@ -133,19 +133,9 @@ public class SprintingAbility extends Ability {
             select.actions(Actions.fadeOut(0));
         }
 
-        if (Vars.mobile && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
-            boolean has = false;
-            for (int i = 0; i < Vars.player.unit().abilities.length; i++) {
-                Ability a = Vars.player.unit().abilities[i];
-                if (a instanceof SprintingAbility) {
-                    has = true;
-                    break;
-                }
-            }
-            if (!has) {
-                if (Vars.control.input instanceof ButtonInput) {
-                    Vars.control.input = def;
-                }
+        if (!havePlayer()) {
+            if (Vars.control.input instanceof ButtonInput) {
+                Vars.control.input = def;
             }
         }
 
@@ -157,16 +147,26 @@ public class SprintingAbility extends Ability {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
             haveMover = true;
+        } else if (stats != 1) {
+            mobileMover.actions(Actions.fadeOut(1));
+            screenChanger.actions(Actions.fadeOut(1));
+            haveMover = false;
         }
 
         if (Vars.mobile && unit.isPlayer() && !haveSelect) {
             select.actions(Actions.fadeIn(1));
             haveSelect = true;
+        } else if (haveSelect) {
+            select.actions(Actions.fadeOut(1));
+            haveSelect = false;
         }
 
         if (Vars.mobile && stats == 1 && timer >= reload && !haveSigner) {
             signer.actions(Actions.fadeIn(1));
             haveSigner = true;
+        } else if (haveSigner) {
+            haveSigner = false;
+            signer.actions(Actions.fadeOut(1));
         }
 
         if (!havePlayer() && haveMover) {
@@ -267,7 +267,7 @@ public class SprintingAbility extends Ability {
     }
 
     protected boolean havePlayer() {
-        if (Vars.player.unit() != null && Vars.player.unit().abilities != null) {
+        if (Vars.mobile && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
             for (Ability ability : Vars.player.unit().abilities) {
                 if (ability instanceof SprintingAbility) {
                     return true;
