@@ -157,26 +157,16 @@ public class SprintingAbility extends Ability {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
             haveMover = true;
-        } else if (stats != 1) {
-            mobileMover.actions(Actions.fadeOut(1));
-            screenChanger.actions(Actions.fadeOut(1));
-            haveMover = false;
         }
 
         if (Vars.mobile && unit.isPlayer() && !haveSelect) {
             select.actions(Actions.fadeIn(1));
             haveSelect = true;
-        } else if (haveSelect) {
-            select.actions(Actions.fadeOut(1));
-            haveSelect = false;
         }
 
         if (Vars.mobile && stats == 1 && timer >= reload && !haveSigner) {
             signer.actions(Actions.fadeIn(1));
             haveSigner = true;
-        } else if (haveSigner) {
-            haveSigner = false;
-            signer.actions(Actions.fadeOut(1));
         }
 
         if (!havePlayer() && haveMover) {
@@ -276,7 +266,7 @@ public class SprintingAbility extends Ability {
         }
     }
 
-    public boolean havePlayer() {
+    protected boolean havePlayer() {
         if (Vars.player.unit() != null && Vars.player.unit().abilities != null) {
             for (Ability ability : Vars.player.unit().abilities) {
                 if (ability instanceof SprintingAbility) {
@@ -287,7 +277,7 @@ public class SprintingAbility extends Ability {
         return false;
     }
 
-    public boolean onSign() {
+    protected boolean onSign() {
         if (stats == 2 && Core.input.getTouches() > 0) {
             return true;
         } else if (stats == 1) {
