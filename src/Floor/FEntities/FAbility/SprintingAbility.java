@@ -206,7 +206,7 @@ public class SprintingAbility extends Ability {
                         mover.setLength(mover.len() * 1.8f);
                         unit.vel.setZero();
                         unit.move(mover);
-                        unit.lookAt(Angles.angle(Core.input.mouseWorldX(), Core.input.mouseWorldY()));
+                        unit.lookAt(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
                         powerTimer += Time.delta;
                     } else if (stats == 1) {
                         for (int i = 0; i < Core.input.getTouches(); i++) {

@@ -73,6 +73,7 @@ public class FUnits {
             abilities.add(new SprintingAbility());
             flying = true;
             speed = 2;
+            health = 114514;
         }};
 
         rejuvenate = new UnitType("rejuvenate") {{
