@@ -4,7 +4,6 @@ import Floor.FContent.FEvents;
 import Floor.FType.input.ButtonInput;
 import arc.Core;
 import arc.Events;
-import arc.func.Boolp;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -26,7 +25,6 @@ import mindustry.input.InputHandler;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
-import static mindustry.Vars.control;
 import static mindustry.Vars.state;
 
 public class SprintingAbility extends Ability {
@@ -51,40 +49,32 @@ public class SprintingAbility extends Ability {
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
 
-    protected static InputHandler hm = new ButtonInput();
-    protected static InputHandler def;
-    protected int stats = 0;
-    protected Table select;
-    protected Table signer;
-    protected Table mobileMover;
-    protected Table screenChanger;
     protected float powerTimer = 0;
     protected float timer = 0;
-    protected boolean haveSigner = false;
-    protected boolean haveMover = false;
+    protected int stats = 0;
+    protected static InputHandler hm = new ButtonInput();
+    protected static InputHandler def;
+    protected static Table select;
+    protected static Table signer;
+    protected static Table mobileMover;
+    protected static Table screenChanger;
+    protected static boolean haveSigner = false;
+    protected static boolean haveMover = false;
+    protected static boolean haveSelect = false;
 
-    public static Unit play = null;
-    public static int playStats = 0;
-    public static Boolp lock = () -> play != null && !play.dead && play.health > 0 && Vars.mobile && playStats == 1;
+    private static Unit play = null;
 
     @Override
     public void update(Unit unit) {
-        if (control.input.inputLocks.indexOf(lock) < 0) {
-            control.input.inputLocks.add(lock);
-        }
-
         if (!unit.isPlayer()) {
             stats = 0;
         } else if (stats == 0) {
             stats = 1;
         }
 
-        if (unit.isPlayer()) {
+        if (unit.isPlayer() && play != unit) {
+            rebuild();
             play = unit;
-            playStats = stats;
-        } else if (play == unit) {
-            play = null;
-            playStats = 0;
         }
 
         if (def == null) {
@@ -128,6 +118,7 @@ public class SprintingAbility extends Ability {
             });
             select.update(() -> {
                 if (!state.isGame()) {
+                    haveSelect = false;
                     select.remove();
                     select.actions(Actions.fadeOut(1));
                 }
@@ -165,13 +156,19 @@ public class SprintingAbility extends Ability {
         if (Vars.mobile && stats == 1 && !haveMover) {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
-            select.actions(Actions.fadeIn(1));
             haveMover = true;
         } else if (stats != 1) {
             mobileMover.actions(Actions.fadeOut(1));
             screenChanger.actions(Actions.fadeOut(1));
-            select.actions(Actions.fadeOut(1));
             haveMover = false;
+        }
+
+        if (Vars.mobile && unit.isPlayer() && !haveSelect) {
+            select.actions(Actions.fadeIn(1));
+            haveSelect = true;
+        } else if (haveSelect) {
+            select.actions(Actions.fadeOut(1));
+            haveSelect = false;
         }
 
         if (Vars.mobile && stats == 1 && timer >= reload && !haveSigner) {
@@ -182,9 +179,10 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeOut(1));
         }
 
-        if ((!unit.isPlayer() || unit.dead || unit.health <= 0) && haveMover) {
+        if (!havePlayer() && haveMover) {
             haveSigner = false;
             haveMover = false;
+            haveSelect = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
             screenChanger.actions(Actions.fadeOut(1));
@@ -276,6 +274,17 @@ public class SprintingAbility extends Ability {
                 }
             }
         }
+    }
+
+    public boolean havePlayer() {
+        if (Vars.player.unit() != null && Vars.player.unit().abilities != null) {
+            for (Ability ability : Vars.player.unit().abilities) {
+                if (ability instanceof SprintingAbility) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public boolean onSign() {
