@@ -1,7 +1,6 @@
 package Floor.FEntities.FAbility;
 
 import Floor.FContent.FEvents;
-import Floor.FType.input.ButtonInput;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -21,7 +20,6 @@ import mindustry.gen.Healthc;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
-import mindustry.input.InputHandler;
 import mindustry.input.MobileInput;
 
 import static java.lang.Math.*;
@@ -53,8 +51,6 @@ public class SprintingAbility extends Ability {
     protected float powerTimer = 0;
     protected float timer = 0;
     protected int stats = 0;
-    protected static InputHandler hm = new ButtonInput();
-    protected static InputHandler def;
     protected static Table select;
     protected static Table signer;
     protected static Table mobileMover;
@@ -78,10 +74,6 @@ public class SprintingAbility extends Ability {
             play = unit;
         }
 
-        if (def == null) {
-            def = Vars.control.input;
-        }
-
         if (mobileMover == null) {
             select = new Table();
             rebuild();
@@ -92,8 +84,16 @@ public class SprintingAbility extends Ability {
             signer.setBounds(1500, 700, 300, 300);
             screenChanger.setBounds(10, 500, 50, 100);
             select.setBounds(1000, 50, 50, 15);
-            screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(-1)).width(50).height(50).row();
-            screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(1)).width(50).height(50);
+            screenChanger.button(Icon.up, () -> {
+                MobileInput input = (MobileInput) control.input;
+                renderer.setScale(input.lastZoom);
+                Vars.renderer.scaleCamera(-1);
+            }).width(50).height(50).row();
+            screenChanger.button(Icon.down, () -> {
+                MobileInput input = (MobileInput) control.input;
+                renderer.setScale(input.lastZoom);
+                Vars.renderer.scaleCamera(1);
+            }).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
             signer.background(Tex.buttonDisabled);
             screenChanger.background(Tex.buttonDisabled);
@@ -134,19 +134,6 @@ public class SprintingAbility extends Ability {
             select.actions(Actions.fadeOut(0));
         }
 
-        if (noPlayer()) {
-            if (Vars.control.input instanceof ButtonInput) {
-                Vars.control.input = def;
-            }
-        }
-
-        if (unit.isPlayer() && Vars.mobile) {
-            MobileInput input = (MobileInput) (control.input);
-            input.selecting = true;
-            renderer.setScale(input.lastZoom);
-//            Vars.control.input = stats == 1 ? hm : def;
-        }
-
         if (Vars.mobile && stats == 1 && !haveMover) {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
@@ -184,7 +171,9 @@ public class SprintingAbility extends Ability {
         }
 
         if (stats == 1 && Vars.mobile) {
-            Core.camera.position.lerpDelta(unit, 0.03f);
+            MobileInput input = (MobileInput) (control.input);
+            input.selecting = true;
+            Core.camera.position.lerpDelta(unit, 0.1f);
         }
 
         if (stats == 1 && Vars.mobile && unit.isPlayer()) {
