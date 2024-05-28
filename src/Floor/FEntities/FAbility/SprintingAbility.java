@@ -62,7 +62,6 @@ public class SprintingAbility extends Ability {
     protected float timer = 0;
     protected boolean haveSigner = false;
     protected boolean haveMover = false;
-    protected boolean hase = false;
 
     @Override
     public void update(Unit unit) {
@@ -75,6 +74,16 @@ public class SprintingAbility extends Ability {
         }
 
         if (mobileMover == null) {
+            select = new Table();
+            select.setBounds(1000, 50, 50, 15);
+            select.update(() -> {
+                if (!state.isGame()) {
+                    select.remove();
+                    select.actions(Actions.fadeOut(1));
+                }
+            });
+            Core.scene.add(select);
+            select.actions(Actions.fadeOut(0));
             rebuild();
             mobileMover = new Table();
             signer = new Table();
@@ -147,10 +156,12 @@ public class SprintingAbility extends Ability {
         if (Vars.mobile && stats == 1 && !haveMover) {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
+            select.actions(Actions.fadeIn(1));
             haveMover = true;
         } else if (stats != 1) {
             mobileMover.actions(Actions.fadeOut(1));
             screenChanger.actions(Actions.fadeOut(1));
+            select.actions(Actions.fadeOut(1));
             haveMover = false;
         }
 
@@ -162,18 +173,12 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeOut(1));
         }
 
-        if (Vars.mobile && !hase && unit.isPlayer()) {
-            select.actions(Actions.fadeIn(1));
-            hase = true;
-        }
-
         if ((!unit.isPlayer() || unit.dead || unit.health <= 0) && haveMover) {
             haveSigner = false;
             haveMover = false;
             mobileMover.actions(Actions.fadeOut(1));
             signer.actions(Actions.fadeOut(1));
             screenChanger.actions(Actions.fadeOut(1));
-            hase = false;
             select.actions(Actions.fadeOut(1));
         }
 
@@ -279,21 +284,7 @@ public class SprintingAbility extends Ability {
     }
 
     protected void rebuild() {
-        if (select == null) {
-            select = new Table();
-            select.setBounds(1000, 50, 50, 15);
-            select.update(() -> {
-                if (!state.isGame()) {
-                    hase = false;
-                    select.remove();
-                    select.actions(Actions.fadeOut(1));
-                }
-            });
-            Core.scene.add(select);
-            select.actions(Actions.fadeOut(0));
-        } else {
-            select.clear();
-        }
+        select.clear();
         select.addListener(select.clicked(() -> {
             stats = max(1, (stats + 1) % 3);
             rebuild();
