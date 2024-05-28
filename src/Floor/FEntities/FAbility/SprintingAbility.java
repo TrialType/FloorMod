@@ -23,6 +23,7 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
 import mindustry.input.InputHandler;
+import mindustry.input.MobileInput;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
@@ -67,6 +68,10 @@ public class SprintingAbility extends Ability {
     public void update(Unit unit) {
         if (def == null) {
             def = Vars.control.input;
+        }
+
+        if (Vars.control.input instanceof MobileInput) {
+            Fx.healWave.at(Vars.player.unit());
         }
 
         if (mobileMover == null) {
@@ -125,7 +130,6 @@ public class SprintingAbility extends Ability {
             }
             if (!has) {
                 if (Vars.control.input instanceof ButtonInput) {
-                    Fx.healWave.at(Vars.player.unit());
                     Vars.control.input = def;
                 }
             }
