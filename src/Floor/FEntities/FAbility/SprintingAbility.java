@@ -14,6 +14,7 @@ import arc.scene.actions.Actions;
 import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
@@ -124,6 +125,7 @@ public class SprintingAbility extends Ability {
             }
             if (!has) {
                 if (Vars.control.input instanceof ButtonInput) {
+                    Fx.healWave.at(Vars.player.unit());
                     Vars.control.input = def;
                 }
             }
