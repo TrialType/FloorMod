@@ -140,7 +140,7 @@ public class SprintingAbility extends Ability {
             }
         }
 
-        if (unit.isPlayer() && !Vars.mobile) {
+        if (unit.isPlayer() && Vars.mobile) {
             MobileInput input = (MobileInput) (control.input);
             input.selecting = true;
             renderer.setScale(input.lastZoom);
