@@ -51,7 +51,7 @@ public class SprintingAbility extends Ability {
 
     protected static InputHandler hm = new FMobileInput();
     protected static InputHandler def;
-    protected int stats = 0;
+    protected int stats = 1;
     protected Table select;
     protected Table signer;
     protected Table mobileMover;
@@ -133,7 +133,7 @@ public class SprintingAbility extends Ability {
             screenChanger.actions(Actions.fadeOut(0));
         }
 
-        if (stats == 1 && !haveMover) {
+        if (Vars.mobile && stats == 1 && !haveMover) {
             mobileMover.actions(Actions.fadeIn(1));
             screenChanger.actions(Actions.fadeIn(1));
             haveMover = true;
@@ -151,7 +151,7 @@ public class SprintingAbility extends Ability {
             haveSigner = true;
         }
 
-        if (!unit.isPlayer() || unit.dead || unit.health <= 0) {
+        if ((!unit.isPlayer() || unit.dead || unit.health <= 0) && haveMover) {
             haveSigner = false;
             haveMover = false;
             mobileMover.actions(Actions.fadeOut(1));
@@ -159,10 +159,6 @@ public class SprintingAbility extends Ability {
             screenChanger.actions(Actions.fadeOut(1));
             hase = false;
             select.actions(Actions.fadeOut(1));
-            mobileMover.remove();
-            signer.remove();
-            select.remove();
-            mobileMover = signer = select = screenChanger = null;
         }
 
         if (!hase && unit.isPlayer()) {
@@ -181,7 +177,7 @@ public class SprintingAbility extends Ability {
                     }
                     unit.x += (float) (unit.speed() * cos(toRadians(angle)));
                     unit.y += (float) (unit.speed() * sin(toRadians(angle)));
-                    Core.camera.position.lerpDelta(unit, 0.3f);
+                    Core.camera.position.lerpDelta(unit, 0.03f);
                     break;
                 }
             }
@@ -201,7 +197,7 @@ public class SprintingAbility extends Ability {
                 if (getting) {
                     if (!Vars.mobile) {
                         Vec2 mover = new Vec2(unit.vel);
-                        mover.setLength(mover.len() * 1.4f);
+                        mover.setLength(mover.len() * 1.8f);
                         unit.vel.setZero();
                         unit.move(mover);
                         unit.lookAt(Angles.mouseAngle(x, y));
@@ -213,7 +209,7 @@ public class SprintingAbility extends Ability {
                                 powerTimer += Time.delta;
                                 float dx = Core.input.mouseX(i) - 1650, dy = Core.input.mouseY(i) - 850;
                                 Vec2 mover = new Vec2(unit.vel);
-                                mover.setLength(mover.len() * 1.4f);
+                                mover.setLength(mover.len() * 1.8f);
                                 unit.vel.setZero();
                                 unit.move(mover);
                                 unit.lookAt(Angles.angle(dx, dy));
