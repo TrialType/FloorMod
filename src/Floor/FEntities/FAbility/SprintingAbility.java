@@ -14,7 +14,6 @@ import arc.scene.actions.Actions;
 import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import mindustry.Vars;
-import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
@@ -23,7 +22,6 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
 import mindustry.input.InputHandler;
-import mindustry.input.MobileInput;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
@@ -69,21 +67,8 @@ public class SprintingAbility extends Ability {
             def = Vars.control.input;
         }
 
-        if (Vars.control.input instanceof MobileInput) {
-            Fx.healWave.at(Vars.player.unit());
-        }
-
         if (mobileMover == null) {
             select = new Table();
-            select.setBounds(1000, 50, 50, 15);
-            select.update(() -> {
-                if (!state.isGame()) {
-                    select.remove();
-                    select.actions(Actions.fadeOut(1));
-                }
-            });
-            Core.scene.add(select);
-            select.actions(Actions.fadeOut(0));
             rebuild();
             mobileMover = new Table();
             signer = new Table();
@@ -91,6 +76,7 @@ public class SprintingAbility extends Ability {
             mobileMover.setBounds(200, 200, 300, 300);
             signer.setBounds(1500, 700, 300, 300);
             screenChanger.setBounds(10, 500, 50, 100);
+            select.setBounds(1000, 50, 50, 15);
             screenChanger.button(Icon.up, () -> Vars.renderer.scaleCamera(-1)).width(50).height(50).row();
             screenChanger.button(Icon.down, () -> Vars.renderer.scaleCamera(1)).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
@@ -106,26 +92,30 @@ public class SprintingAbility extends Ability {
             });
             signer.update(() -> {
                 if (!state.isGame()) {
-                    haveSigner = false;
-                    haveMover = false;
                     signer.remove();
                     signer.actions(Actions.fadeOut(1));
                 }
             });
             screenChanger.update(() -> {
                 if (!state.isGame()) {
-                    haveSigner = false;
-                    haveMover = false;
                     screenChanger.remove();
                     screenChanger.actions(Actions.fadeOut(1));
+                }
+            });
+            select.update(() -> {
+                if (!state.isGame()) {
+                    select.remove();
+                    select.actions(Actions.fadeOut(1));
                 }
             });
             Core.scene.add(mobileMover);
             Core.scene.add(signer);
             Core.scene.add(screenChanger);
+            Core.scene.add(select);
             mobileMover.actions(Actions.fadeOut(0));
             signer.actions(Actions.fadeOut(0));
             screenChanger.actions(Actions.fadeOut(0));
+            select.actions(Actions.fadeOut(0));
         }
 
         if (Vars.mobile && Vars.player.unit() != null && Vars.player.unit().abilities != null) {
@@ -289,7 +279,7 @@ public class SprintingAbility extends Ability {
             stats = max(1, (stats + 1) % 3);
             rebuild();
         }));
-        if (stats == 1) {
+        if (stats == 1 || stats == 0) {
             select.add(Core.bundle.get("ability.handBoost"));
         } else if (stats == 2) {
             select.add(Core.bundle.get("ability.targetBoost"));
