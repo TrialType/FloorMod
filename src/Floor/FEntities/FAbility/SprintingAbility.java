@@ -4,6 +4,7 @@ import Floor.FContent.FEvents;
 import Floor.FType.input.ButtonInput;
 import arc.Core;
 import arc.Events;
+import arc.func.Boolp;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -25,6 +26,7 @@ import mindustry.input.InputHandler;
 
 import static java.lang.Math.*;
 import static java.lang.Math.toRadians;
+import static mindustry.Vars.control;
 import static mindustry.Vars.state;
 
 public class SprintingAbility extends Ability {
@@ -61,8 +63,30 @@ public class SprintingAbility extends Ability {
     protected boolean haveSigner = false;
     protected boolean haveMover = false;
 
+    public static Unit play = null;
+    public static int playStats = 0;
+    public static Boolp lock = () -> play != null && !play.dead && play.health > 0 && Vars.mobile && playStats == 1;
+
     @Override
     public void update(Unit unit) {
+        if (control.input.inputLocks.indexOf(lock) < 0) {
+            control.input.inputLocks.add(lock);
+        }
+
+        if (!unit.isPlayer()) {
+            stats = 0;
+        } else if (stats == 0) {
+            stats = 1;
+        }
+
+        if (unit.isPlayer()) {
+            play = unit;
+            playStats = stats;
+        } else if (play == unit) {
+            play = null;
+            playStats = 0;
+        }
+
         if (def == null) {
             def = Vars.control.input;
         }
@@ -134,11 +158,6 @@ public class SprintingAbility extends Ability {
             }
         }
 
-        if (!unit.isPlayer()) {
-            stats = 0;
-        } else if (stats == 0) {
-            stats = 1;
-        }
         if (unit.isPlayer() && Vars.mobile) {
             Vars.control.input = stats == 1 ? hm : def;
         }
