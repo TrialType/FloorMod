@@ -143,7 +143,7 @@ public class SprintingAbility extends Ability {
         if (unit.isPlayer() && !Vars.mobile) {
             MobileInput input = (MobileInput) (control.input);
             input.selecting = true;
-            renderer.scaleCamera(input.lastZoom);
+            renderer.setScale(input.lastZoom);
 //            Vars.control.input = stats == 1 ? hm : def;
         }
 
