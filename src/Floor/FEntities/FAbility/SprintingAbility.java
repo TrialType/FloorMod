@@ -66,7 +66,7 @@ public class SprintingAbility extends Ability {
             stats = 1;
         }
 
-        if (unit.isPlayer() && play != unit) {
+        if (Vars.mobile && unit.isPlayer() && play != unit) {
             rebuild();
             play = unit;
         }
@@ -191,9 +191,9 @@ public class SprintingAbility extends Ability {
 
         timer += Time.delta;
         if (timer >= reload) {
+            float x = unit.x;
+            float y = unit.y;
             if (unit.isPlayer() && stats != 0) {
-                float x = unit.x;
-                float y = unit.y;
                 boolean getting = Vars.mobile ? onSign() : Core.input.keyDown(KeyCode.altLeft);
 
                 if (!(!getting && powerTimer >= powerReload) && powerTimer > 0) {
@@ -206,7 +206,7 @@ public class SprintingAbility extends Ability {
                         mover.setLength(mover.len() * 1.8f);
                         unit.vel.setZero();
                         unit.move(mover);
-                        unit.lookAt(Angles.mouseAngle(x, y));
+                        unit.lookAt(Angles.angle(Core.input.mouseWorldX(), Core.input.mouseWorldY()));
                         powerTimer += Time.delta;
                     } else if (stats == 1) {
                         for (int i = 0; i < Core.input.getTouches(); i++) {
@@ -244,11 +244,10 @@ public class SprintingAbility extends Ability {
             } else if (stats == 0) {
                 powerTimer += Time.delta;
                 if (powerTimer >= powerReload + 2 * Time.delta) {
-                    Teamc target = Units.closestTarget(unit.team,unit.x,unit.y,maxLength);
-                    if(target != null && Angles.angleDist(Angles.angle(unit.x,unit.y,target.x(),target.y()),unit.rotation) <= 6){
+                    Teamc target = Units.closestTarget(unit.team,x,y,maxLength);
+                    if(target != null && Angles.angleDist(Angles.angle(x,y,target.x(),target.y()),unit.rotation) <= 6){
                         powerTimer = 0;
                         timer = 0;
-                        float x = unit.x,y = unit.y;
                         float angle = Angles.angle(x,y,target.x(),target.y());
                         applyDamage(x, y, damage, unit);
                         unit.x = x + (float) cos(toRadians(angle)) * maxLength;
