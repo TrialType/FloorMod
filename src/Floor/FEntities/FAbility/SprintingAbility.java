@@ -16,10 +16,7 @@ import mindustry.Vars;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
-import mindustry.gen.Healthc;
-import mindustry.gen.Icon;
-import mindustry.gen.Tex;
-import mindustry.gen.Unit;
+import mindustry.gen.*;
 import mindustry.input.MobileInput;
 
 import static java.lang.Math.*;
@@ -247,11 +244,18 @@ public class SprintingAbility extends Ability {
             } else if (stats == 0) {
                 powerTimer += Time.delta;
                 if (powerTimer >= powerReload + 2 * Time.delta) {
-                    powerTimer = 0;
-                    timer = 0;
-                    applyDamage(unit.x, unit.y, damage, unit);
-                    unit.x = unit.x + (float) cos(toRadians(unit.rotation)) * maxLength;
-                    unit.y = unit.y + (float) sin(toRadians(unit.rotation)) * maxLength;
+                    Teamc target = Units.closestTarget(unit.team,unit.x,unit.y,maxLength);
+                    if(target != null && Angles.angleDist(Angles.angle(unit.x,unit.y,target.x(),target.y()),unit.rotation) <= 6){
+                        powerTimer = 0;
+                        timer = 0;
+                        float x = unit.x,y = unit.y;
+                        float angle = Angles.angle(x,y,target.x(),target.y());
+                        applyDamage(x, y, damage, unit);
+                        unit.x = x + (float) cos(toRadians(angle)) * maxLength;
+                        unit.y = y + (float) sin(toRadians(angle)) * maxLength;
+                    } else {
+                        maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
+                    }
                 } else {
                     maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                 }
