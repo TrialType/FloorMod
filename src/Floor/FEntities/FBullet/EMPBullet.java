@@ -247,7 +247,7 @@ public class EMPBullet extends Bullet {
         }
         if (on == null) {
             this.type.update(this);
-        } else {
+        } else if (trail != null) {
             trail.length = 0;
             trail.update(x, y, 0);
         }

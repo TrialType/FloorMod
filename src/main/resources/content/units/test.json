@@ -1,0 +1,16 @@
+{
+  "name": "测试",
+  "type": "flying",
+  "speed": 3,
+  "armor": 3,
+  "flying": true,
+  "weapons": [
+    {
+      "reload": 15,
+      "bullet": {
+        "type": "EMPLarge",
+        "damage": 100
+      }
+    }
+  ]
+}

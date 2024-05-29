@@ -19,6 +19,9 @@ import mindustry.world.blocks.environment.OreBlock;
 import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.meta.Attribute;
 
+import static arc.Core.files;
+import static mindustry.Vars.tree;
+
 public class PFloors {
     public final static Seq<Block> WEFloors = new Seq<>();
     public static Floor pDeepwater, pWater, pTaintedWater, pDeepTaintedWater, pTar, pCryofluid, pSlag, pStone, pCraters, pCharr, pBasalt, pHotrock, pMagmarock,
@@ -46,7 +49,7 @@ public class PFloors {
             variants = 0;
             liquidDrop = FLiquids.fusionCopper;
             isLiquid = true;
-            cacheLayer = new CacheLayer.ShaderLayer(new Shaders.SurfaceShader("test"));
+            cacheLayer = CacheLayer.tar;
             attributes.set(Attribute.heat, 0.85f);
 
             emitLight = true;
