@@ -3,11 +3,14 @@ package Floor.FContent;
 import Floor.FEntities.FBlock.CorrosionEmptyFloor;
 import Floor.FEntities.FBlock.CorrosionFloor;
 import Floor.FEntities.FBlock.CorrosionSteamVent;
+import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.gl.Shader;
 import arc.struct.Seq;
 import mindustry.content.Items;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Shaders;
 import mindustry.world.Block;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.content.Liquids;
@@ -43,7 +46,7 @@ public class PFloors {
             variants = 0;
             liquidDrop = FLiquids.fusionCopper;
             isLiquid = true;
-            cacheLayer = CacheLayer.tar;
+            cacheLayer = new CacheLayer.ShaderLayer(new Shaders.SurfaceShader("test"));
             attributes.set(Attribute.heat, 0.85f);
 
             emitLight = true;

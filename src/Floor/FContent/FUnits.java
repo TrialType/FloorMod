@@ -10,12 +10,15 @@ import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.*;
 import Floor.FTools.classes.BossList;
+import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.Gl;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
+import mindustry.Vars;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -34,6 +37,7 @@ import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.graphics.Shaders;
 import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
@@ -42,6 +46,7 @@ import mindustry.type.weapons.RepairBeamWeapon;
 
 import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.math.Angles.randLenVectors;
+import static mindustry.Vars.renderer;
 
 public class FUnits {
     public static UnitType transfer, shuttlev_I, bulletInterception_a;
@@ -70,6 +75,23 @@ public class FUnits {
     public static void load() {
         d = new UnitType("d") {{
             constructor = FUnitEntity::create;
+
+            weapons.add(new Weapon() {{
+                reload = 60;
+                bullet = new BulletType() {{
+                    damage = 12;
+                    speed = 8;
+                    lifetime = 60;
+                    shootEffect = new Effect(60, e -> Draw.draw(1f, () -> {
+                        Draw.drawRange(Layer.floor, 11, () -> renderer.effectBuffer.begin(Color.clear), () -> {
+                            renderer.effectBuffer.end();
+                            renderer.effectBuffer.blit(Shaders.slag);
+                        });
+//                        renderer.effectBuffer.blit(Shaders.slag);
+                    }));
+                }};
+            }});
+
             abilities.add(new SprintingAbility());
             flying = true;
             speed = 2;

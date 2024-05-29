@@ -6,6 +6,7 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.SortedSpriteBatch;
 import arc.input.KeyCode;
 import arc.math.Angles;
 import arc.math.geom.Vec2;
@@ -17,6 +18,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.*;
+import mindustry.graphics.Shaders;
 import mindustry.input.MobileInput;
 
 import static java.lang.Math.*;
@@ -244,14 +246,18 @@ public class SprintingAbility extends Ability {
             } else if (stats == 0) {
                 powerTimer += Time.delta;
                 if (powerTimer >= powerReload + 2 * Time.delta) {
-                    Teamc target = Units.closestTarget(unit.team,x,y,maxLength);
-                    if(target != null && Angles.angleDist(Angles.angle(x,y,target.x(),target.y()),unit.rotation) <= 6){
-                        powerTimer = 0;
-                        timer = 0;
-                        float angle = Angles.angle(x,y,target.x(),target.y());
-                        applyDamage(x, y, damage, unit);
-                        unit.x = x + (float) cos(toRadians(angle)) * maxLength;
-                        unit.y = y + (float) sin(toRadians(angle)) * maxLength;
+                    Teamc target = Units.closestTarget(unit.team, x, y, maxLength * 2);
+                    if (target != null) {
+                        if (Angles.angleDist(Angles.angle(x, y, target.x(), target.y()), unit.rotation) <= 2) {
+                            powerTimer = 0;
+                            timer = 0;
+                            float angle = Angles.angle(x, y, target.x(), target.y());
+                            applyDamage(x, y, damage, unit);
+                            unit.x = x + (float) cos(toRadians(angle)) * maxLength;
+                            unit.y = y + (float) sin(toRadians(angle)) * maxLength;
+                        } else {
+                            unit.lookAt(target);
+                        }
                     } else {
                         maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                     }
