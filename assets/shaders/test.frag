@@ -20,13 +20,13 @@ vec4 blendOver(vec4 a, vec4 b) {
 
 void main(){
     vec2 c = v_texCoords.xy;
-    vec2 coords = c * u_resolution + u_campos;
+    vec2 coords = (c * u_resolution) + u_campos;
 
-    float len = distance(coords,vec2(100,100)) * 0.125;
+    float len = distance(coords,vec2(0.5,0.5));
 
-    if(len < 50){
+    if(len < 0.1){
         gl_FragColor = vec4(0,0,0,1);
-    }else {
-        gl_FragColor = vec4((100-len)/150,(100-len)/150,(100-len)/150,0.6);
+    }else if(len < 0.2){
+        gl_FragColor = vec4((0.4-len)/0.6,0,0,1);
     }
 }
