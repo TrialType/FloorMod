@@ -76,6 +76,7 @@ public class FUnits {
         d = new UnitType("d") {{
             constructor = FUnitEntity::create;
 
+            faceTarget = false;
             weapons.add(new Weapon() {{
                 reload = 60;
                 bullet = new BulletType() {{

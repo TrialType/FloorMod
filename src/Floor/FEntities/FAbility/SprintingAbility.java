@@ -6,7 +6,6 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.SortedSpriteBatch;
 import arc.input.KeyCode;
 import arc.math.Angles;
 import arc.math.geom.Vec2;
@@ -18,7 +17,6 @@ import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.*;
-import mindustry.graphics.Shaders;
 import mindustry.input.MobileInput;
 
 import static java.lang.Math.*;
@@ -50,6 +48,9 @@ public class SprintingAbility extends Ability {
     protected float powerTimer = 0;
     protected float timer = 0;
     protected int stats = 0;
+    protected boolean needPress = false;
+    protected static boolean screenScale = true;
+    protected static float lastZoom;
     protected static Table select;
     protected static Table signer;
     protected static Table mobileMover;
@@ -65,12 +66,15 @@ public class SprintingAbility extends Ability {
         if (!unit.isPlayer()) {
             stats = 0;
         } else if (stats == 0) {
+            MobileInput input = (MobileInput) control.input;
+            lastZoom = input.lastZoom;
             stats = 1;
         }
 
-        if (Vars.mobile && unit.isPlayer() && play != unit) {
-            rebuild();
-            play = unit;
+        if (stats == 1 && !screenScale) {
+            renderer.setScale(lastZoom);
+        } else if (screenScale) {
+            screenScale = false;
         }
 
         if (mobileMover == null) {
@@ -84,13 +88,11 @@ public class SprintingAbility extends Ability {
             screenChanger.setBounds(10, 500, 50, 100);
             select.setBounds(1000, 50, 50, 15);
             screenChanger.button(Icon.up, () -> {
-                MobileInput input = (MobileInput) control.input;
-                renderer.setScale(input.lastZoom);
+                screenScale = true;
                 Vars.renderer.scaleCamera(-1);
             }).width(50).height(50).row();
             screenChanger.button(Icon.down, () -> {
-                MobileInput input = (MobileInput) control.input;
-                renderer.setScale(input.lastZoom);
+                screenScale = true;
                 Vars.renderer.scaleCamera(1);
             }).width(50).height(50);
             mobileMover.background(Tex.buttonDisabled);
@@ -131,6 +133,11 @@ public class SprintingAbility extends Ability {
             signer.actions(Actions.fadeOut(0));
             screenChanger.actions(Actions.fadeOut(0));
             select.actions(Actions.fadeOut(0));
+        }
+
+        if (Vars.mobile && unit.isPlayer() && play != unit) {
+            rebuild();
+            play = unit;
         }
 
         if (Vars.mobile && stats == 1 && !haveMover) {
@@ -236,16 +243,19 @@ public class SprintingAbility extends Ability {
                     powerTimer = max(0, powerTimer - Time.delta);
                 }
 
-                if (!getting && powerTimer >= powerReload) {
+                if (!getting && powerTimer >= powerReload && !needPress) {
                     powerTimer = 0;
                     timer = 0;
                     applyDamage(x, y, damage, unit);
                     unit.x = (float) (x + cos(toRadians(unit.rotation)) * maxLength);
                     unit.y = (float) (y + sin(toRadians(unit.rotation)) * maxLength);
+                } else if (needPress && getting) {
+                    needPress = false;
                 }
             } else if (stats == 0) {
                 powerTimer += Time.delta;
                 if (powerTimer >= powerReload + 2 * Time.delta) {
+                    needPress = true;
                     Teamc target = Units.closestTarget(unit.team, x, y, maxLength * 2);
                     if (target != null) {
                         if (Angles.angleDist(Angles.angle(x, y, target.x(), target.y()), unit.rotation) <= 2) {
@@ -297,6 +307,10 @@ public class SprintingAbility extends Ability {
         select.clear();
         select.addListener(select.clicked(() -> {
             stats = max(1, (stats + 1) % 3);
+            if (stats == 1) {
+                MobileInput input = (MobileInput) control.input;
+                lastZoom = input.lastZoom;
+            }
             rebuild();
         }));
         if (stats == 1 || stats == 0) {
