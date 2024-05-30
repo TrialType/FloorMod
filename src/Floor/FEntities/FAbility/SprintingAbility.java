@@ -74,6 +74,8 @@ public class SprintingAbility extends Ability {
         if (stats == 1 && !screenScale) {
             renderer.setScale(lastZoom);
         } else if (screenScale) {
+            MobileInput input = (MobileInput) control.input;
+            lastZoom = input.lastZoom;
             screenScale = false;
         }
 
