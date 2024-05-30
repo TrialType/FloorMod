@@ -66,14 +66,16 @@ public class SprintingAbility extends Ability {
         if (!unit.isPlayer()) {
             stats = 0;
         } else if (stats == 0) {
-            MobileInput input = (MobileInput) control.input;
-            lastZoom = input.lastZoom;
+            if(mobile){
+                MobileInput input = (MobileInput) control.input;
+                lastZoom = input.lastZoom;
+            }
             stats = 1;
         }
 
-        if (stats == 1 && !screenScale) {
+        if (stats == 1 && !screenScale && mobile) {
             renderer.setScale(lastZoom);
-        } else if (screenScale) {
+        } else if (screenScale && mobile) {
             MobileInput input = (MobileInput) control.input;
             lastZoom = input.lastZoom;
             screenScale = false;
@@ -309,7 +311,7 @@ public class SprintingAbility extends Ability {
         select.clear();
         select.addListener(select.clicked(() -> {
             stats = max(1, (stats + 1) % 3);
-            if (stats == 1) {
+            if (stats == 1 && mobile) {
                 MobileInput input = (MobileInput) control.input;
                 lastZoom = input.lastZoom;
             }

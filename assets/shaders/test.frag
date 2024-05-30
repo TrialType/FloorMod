@@ -5,28 +5,28 @@
 #define S1 vec3(100.0, 60.0, 25.0) / 100.0
 #define NSCALE 200.0 / 2.0
 
-uniform sampler2D u_texture;
-uniform sampler2D u_noise;
-
 uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
 
 varying vec2 v_texCoords;
 
+vec4 blendOver(vec4 a, vec4 b) {
+    float newAlpha = mix(b.w, 1.0, a.w);
+    vec3 newColor = mix(b.w * b.xyz, a.xyz, a.w);
+    float divideFactor = (newAlpha > 0.001 ? (1.0 / newAlpha) : 1.0);
+    return vec4(divideFactor * newColor, newAlpha);
+}
+
 void main(){
     vec2 c = v_texCoords.xy;
-    vec2 coords = vec2(c.x * u_resolution.x + u_campos.x, c.y * u_resolution.y + u_campos.y);
+    vec2 coords = c * u_resolution + u_campos;
 
-    float btime = u_time / 5000.0;
-    float noise = (texture2D(u_noise, (coords) / NSCALE + vec2(btime) * vec2(-0.9, 0.8)).r + texture2D(u_noise, (coords) / NSCALE + vec2(btime * 1.1) * vec2(0.8, -1.0)).r) / 2.0;
-    vec4 color = texture2D(u_texture, c);
+    float len = distance(coords,vec2(100,100)) * 0.125;
 
-    if(noise > 0.6){
-        color.rgb = S2;
-    }else if (noise > 0.54){
-        color.rgb = S1;
+    if(len < 50){
+        gl_FragColor = vec4(0,0,0,1);
+    }else {
+        gl_FragColor = vec4((100-len)/150,(100-len)/150,(100-len)/150,0.6);
     }
-
-    gl_FragColor = color;
 }

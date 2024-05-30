@@ -16,6 +16,7 @@ import arc.graphics.Gl;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.graphics.gl.Shader;
 import arc.math.Interp;
 import arc.math.Mathf;
 import mindustry.Vars;
@@ -44,9 +45,11 @@ import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 
+import static arc.Core.files;
 import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.math.Angles.randLenVectors;
 import static mindustry.Vars.renderer;
+import static mindustry.Vars.tree;
 
 public class FUnits {
     public static UnitType transfer, shuttlev_I, bulletInterception_a;
@@ -79,16 +82,19 @@ public class FUnits {
             faceTarget = false;
             weapons.add(new Weapon() {{
                 reload = 60;
+                rotate = true;
+                rotateSpeed = 12;
                 bullet = new BulletType() {{
                     damage = 12;
                     speed = 8;
                     lifetime = 60;
                     shootEffect = new Effect(60, e -> Draw.draw(1f, () -> {
-                        Draw.drawRange(Layer.floor, 11, () -> renderer.effectBuffer.begin(Color.clear), () -> {
+                        Draw.drawRange(Layer.floor, 11, () -> renderer.effectBuffer.begin(), () -> {
                             renderer.effectBuffer.end();
-                            renderer.effectBuffer.blit(Shaders.slag);
+                            renderer.effectBuffer.blit(new Shader(
+                                    files.internal("shaders/screenspace.vert"),
+                                    tree.get("shaders/test.frag")));
                         });
-//                        renderer.effectBuffer.blit(Shaders.slag);
                     }));
                 }};
             }});
