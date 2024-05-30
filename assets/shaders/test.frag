@@ -19,7 +19,7 @@ void main(){
     vec2 c = v_texCoords.xy;
     vec2 coords = (c * u_resolution) + u_campos;
 
-    float len = distance(coords,vec2(0.025,0.025));
+    float len = distance(coords,vec2(10,10));
 
     if(len < 0.0125){
         gl_FragColor = vec4(0,0,0,1);

@@ -438,19 +438,19 @@ public class FStatusEffects {
             healthMultiplier = 0.85f;
             damage = 13;
         }};
-        High_tensionIII = new StatusEffect("High_tensionIII") {{
+        High_tensionIII = new StatusEffect("high_tensionIII") {{
             speedMultiplier = 0.45f;
             reloadMultiplier = 0.45f;
             healthMultiplier = 0.8f;
             damage = 20;
         }};
-        High_tensionIV = new StatusEffect("High_tensionIV") {{
+        High_tensionIV = new StatusEffect("high_tensionIV") {{
             speedMultiplier = 0.24f;
             reloadMultiplier = 0.24f;
             healthMultiplier = 0.75f;
             damage = 34;
         }};
-        High_tensionV = new StatusEffect("High_tensionV") {{
+        High_tensionV = new StatusEffect("high_tensionV") {{
             speedMultiplier = 0.1f;
             reloadMultiplier = 0.1f;
             healthMultiplier = 0.7f;
