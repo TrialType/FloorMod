@@ -1,6 +1,3 @@
-#define HIGHP
-
-//shades of test
 #define S2 vec3(100.0, 93.0, 49.0) / 100.0
 #define S1 vec3(100.0, 60.0, 25.0) / 100.0
 #define NSCALE 200.0 / 2.0
@@ -22,11 +19,11 @@ void main(){
     vec2 c = v_texCoords.xy;
     vec2 coords = (c * u_resolution) + u_campos;
 
-    float len = distance(coords,vec2(0.5,0.5));
+    float len = distance(coords,vec2(0.025,0.025));
 
-    if(len < 0.1){
+    if(len < 0.0125){
         gl_FragColor = vec4(0,0,0,1);
-    }else if(len < 0.2){
-        gl_FragColor = vec4((0.4-len)/0.6,0,0,1);
+    }else if(len < 0.025){
+        gl_FragColor = vec4((0.1-len)/0.15,0,0,1);
     }
 }
