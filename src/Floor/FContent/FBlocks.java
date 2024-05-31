@@ -5,6 +5,7 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
+import Floor.FType.DrawParts.EffectPart;
 import Floor.FType.FRender.FireBallRenderer;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -22,7 +23,9 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.WaveEffect;
+import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.FlarePart;
+import mindustry.entities.part.RegionPart;
 import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
@@ -733,6 +736,7 @@ public class FBlocks {
             health = 1300;
 
             ammoTypes.put(Items.blastCompound, new BasicBulletType() {{
+                Color c = Color.valueOf("ff795e");
                 trailEffect = Fx.none;
 
                 damage = 0;
@@ -740,7 +744,7 @@ public class FBlocks {
                 speed = 3f;
                 width = height = 6;
                 shrinkX = shrinkY = 0;
-                backColor = frontColor = Pal.darkPyraFlame;
+                backColor = frontColor = c;
 
                 reflectable = absorbable = false;
 
@@ -748,23 +752,26 @@ public class FBlocks {
                 trailWidth = 2;
                 trailChance = 1f;
                 trailRotation = true;
-                trailEffect = new MultiEffect(new Effect(90, e -> {
+                trailEffect = new Effect(90, e -> {
                     float len = (float) Math.abs(Math.cos(Math.toRadians((e.time + Time.time) * 6 - 3))) * 8,
                             x = e.x, y = e.y, rotation = e.rotation;
-                    Draw.color(Pal.darkPyraFlame);
+                    Draw.color(c);
                     Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation + 90))),
                             (float) (y + len * Math.sin(Math.toRadians(rotation + 90))), (1 - e.fin()) * 2);
                     Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation - 90))),
                             (float) (y + len * Math.sin(Math.toRadians(rotation - 90))), (1 - e.fin()) * 2);
-                }), new Effect(1, e -> FireBallRenderer.addPlace(e.x, e.y, 12, e.rotation, 100, Pal.darkPyraFlame)));
+                });
 
-                parts.addAll(new ShapePart() {{
+                parts.addAll(new EffectPart() {{
+                    lifetime = 300;
+                    effect = new Effect(1, e -> FireBallRenderer.addPlace(e.x, e.y, 25, e.rotation, 0, c));
+                }}, new ShapePart() {{
                     rotateSpeed = 3;
                     sides = 3;
                     lifetime = 400;
                     radius = 8;
                     radiusTo = 8;
-                    colorTo = color = Pal.darkPyraFlame;
+                    colorTo = color = c;
                 }}, new ShapePart() {{
                     rotateSpeed = 3;
                     sides = 3;
@@ -772,7 +779,7 @@ public class FBlocks {
                     rotation = 180;
                     radius = 8;
                     radiusTo = 8;
-                    colorTo = color = Pal.darkPyraFlame;
+                    colorTo = color = c;
                 }}, new ShapePart() {{
                     rotateSpeed = -3;
                     sides = 3;
@@ -780,7 +787,7 @@ public class FBlocks {
                     rotation = 30;
                     radius = 8;
                     radiusTo = 8;
-                    colorTo = color = Pal.darkPyraFlame;
+                    colorTo = color = c;
                 }}, new ShapePart() {{
                     rotateSpeed = -3;
                     sides = 3;
@@ -788,7 +795,7 @@ public class FBlocks {
                     rotation = 210;
                     radius = 8;
                     radiusTo = 8;
-                    colorTo = color = Pal.darkPyraFlame;
+                    colorTo = color = c;
                 }});
 
                 fragAngle = 0;
@@ -805,7 +812,7 @@ public class FBlocks {
 
                     fillRange = false;
                     windEffect = new Effect(120, 80f, e -> {
-                        Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
+                        Draw.color(c, c, Color.gray, e.fin());
                         randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 50,
                                 (x, y) -> Fill.circle(e.x + x, e.y + y, 1 * (1 - e.fin()))
                         );
@@ -863,7 +870,7 @@ public class FBlocks {
                         lifetime = 400;
                         radius = 8;
                         radiusTo = 0;
-                        colorTo = color = Pal.darkPyraFlame;
+                        colorTo = color = c;
                     }}, new ShapePart() {{
                         rotateSpeed = 3;
                         sides = 3;
@@ -871,7 +878,7 @@ public class FBlocks {
                         rotation = 180;
                         radius = 8;
                         radiusTo = 0;
-                        colorTo = color = Pal.darkPyraFlame;
+                        colorTo = color = c;
                     }}, new ShapePart() {{
                         rotateSpeed = 3;
                         sides = 3;
@@ -879,7 +886,7 @@ public class FBlocks {
                         rotation = 30;
                         radius = 8;
                         radiusTo = 0;
-                        colorTo = color = Pal.darkPyraFlame;
+                        colorTo = color = c;
                     }}, new ShapePart() {{
                         rotateSpeed = 3;
                         sides = 3;
@@ -887,7 +894,7 @@ public class FBlocks {
                         rotation = 210;
                         radius = 8;
                         radiusTo = 0;
-                        colorTo = color = Pal.darkPyraFlame;
+                        colorTo = color = c;
                     }});
                 }};
             }});

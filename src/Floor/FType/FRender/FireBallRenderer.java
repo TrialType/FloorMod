@@ -3,33 +3,37 @@ package Floor.FType.FRender;
 import Floor.FType.FShaders.FireBallShader;
 import arc.Events;
 import arc.graphics.Color;
+import arc.graphics.g2d.Bloom;
 import arc.graphics.g2d.Draw;
 import arc.graphics.gl.FrameBuffer;
 import arc.graphics.gl.Shader;
 import arc.struct.Seq;
 import mindustry.game.EventType;
+import mindustry.graphics.Layer;
 
 import static arc.Core.graphics;
+import static mindustry.Vars.renderer;
 
-public class FireBallRenderer{
-    public static boolean inited = false;
+public class FireBallRenderer {
+    public static int num = 1;
+    public static boolean init = false;
     public static FireBallShader shader;
     public final static Seq<FirePlace> places = new Seq<>();
     public static FrameBuffer buffer = new FrameBuffer();
 
     public static void init() {
-        inited = true;
+        init = true;
 
         Events.run(EventType.Trigger.draw, FireBallRenderer::FireDraw);
     }
 
     public static void FireDraw() {
-        Draw.draw(-1, () -> {
+        Draw.draw(Layer.max - 2, () -> {
             buffer.resize(graphics.getWidth(), graphics.getHeight());
             buffer.begin();
         });
 
-        Draw.draw(-1, () -> {
+        Draw.draw(Layer.max - 1, () -> {
             buffer.end();
 
             float[] fires = new float[places.size * 4];
@@ -51,36 +55,35 @@ public class FireBallRenderer{
                 rotations[i] = place.rotation;
             }
 
-            if (shader != null) {
-                shader.dispose();
+            if (places.size >= num || shader == null) {
+                if (shader != null) {
+                    shader.dispose();
+                }
+                if (places.size >= num) {
+                    num *= num;
+                }
+                Shader.prependFragmentCode = "#define MAX_NUM " + num + "\n";
+                shader = new FireBallShader();
+                Shader.prependFragmentCode = "";
             }
-
-            Shader.prependFragmentCode = "#define MAX_NUM " + FireBallRenderer.places.size + "\n";
-            shader = new FireBallShader();
-            Shader.prependFragmentCode = "";
 
             shader.fires = fires;
             shader.color = color;
             shader.rotations = rotations;
             buffer.blit(shader);
+
+            Bloom bloom = renderer.bloom;
+            if (bloom != null) {
+                bloom.capture();
+                bloom.render();
+            }
+
             places.clear();
         });
     }
 
-    public static void addPlace(float x, float y) {
-        addPlace(x, y, 4, 0, 0, Color.white);
-    }
-
-    public static void addPPlace(float x, float y, float rotation) {
-        addPlace(x, y, 4, rotation, 0, Color.white);
-    }
-
-    public static void addPlace(float x, float y, float range, float backTrail) {
-        addPlace(x, y, range, 0, backTrail, Color.white);
-    }
-
     public static void addPlace(float x, float y, float range, float rotation, float backTrail, Color color) {
-        if (!inited) init();
+        if (!init) init();
         places.add(new FirePlace(x, y, range, rotation, backTrail, color));
     }
 

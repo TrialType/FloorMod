@@ -21,12 +21,24 @@ vec4 blendOver(vec4 a, vec4 b) {
 void main(){
     vec2 c = v_texCoords.xy;
     vec2 coords = (c * u_resolution) + u_campos;
-    vec4 color = texture2D(u_texture, c);
+    vec4 color = vec4(0);
 
-    for (int i = 0;i<u_firenum;i++){
-        float len = distance(coords, u_fires[i].rg);
-        if (len < u_fires[i].b){
-            color = blendOver(color.rgba, u_colors[i] * (u_fires[i].b - len) / u_fires[i].b);
+    for (int i = 0; i < u_firenum; i++){
+        vec4 fire = u_fires[i];
+        float len = distance(coords, fire.rg);
+        if (len < fire.b){
+            color = blendOver(texture2D(u_texture, c).rgba, u_colors[i] * (fire.b - len / 1.5) / fire.b);
+            if ((len / fire.b) > 0.9){
+                float ro;
+                if (coords.x - fire.r == 0){
+                    ro = 90;
+                } else {
+                    ro = atan((coords.y - fire.g)/(coords.x - fire.r));
+                }
+                color = blendOver(texture2D(u_texture,
+                c + vec2(cos(ro), sin(ro)) * len/ 25),
+                u_colors[i] * (fire.b - len / 1.5) / fire.b);
+            }
         }
     }
 
