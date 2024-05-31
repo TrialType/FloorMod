@@ -2,6 +2,7 @@ uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
 
+uniform int u_firenum;
 uniform vec4 u_fires[MAX_NUM];
 uniform float u_rotations[MAX_NUM];
 uniform vec4 u_colors[MAX_NUM];
@@ -22,7 +23,7 @@ void main(){
     vec2 coords = (c * u_resolution) + u_campos;
     vec4 color = texture2D(u_texture, c);
 
-    for (int i = 0;i<MAX_NUM;i++){
+    for (int i = 0;i<u_firenum;i++){
         float len = distance(coords, u_fires[i].rg);
         if (len < u_fires[i].b){
             color = blendOver(color.rgba, u_colors[i] * (u_fires[i].b - len) / u_fires[i].b);

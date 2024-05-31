@@ -7,18 +7,17 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.gl.FrameBuffer;
 import arc.graphics.gl.Shader;
 import arc.struct.Seq;
-import mindustry.core.Renderer;
 import mindustry.game.EventType;
 
 import static arc.Core.graphics;
 
-public class FireBallRenderer extends Renderer {
+public class FireBallRenderer{
     public static boolean inited = false;
     public static FireBallShader shader;
     public final static Seq<FirePlace> places = new Seq<>();
     public static FrameBuffer buffer = new FrameBuffer();
 
-    public static void enable() {
+    public static void init() {
         inited = true;
 
         Events.run(EventType.Trigger.draw, FireBallRenderer::FireDraw);
@@ -81,7 +80,7 @@ public class FireBallRenderer extends Renderer {
     }
 
     public static void addPlace(float x, float y, float range, float rotation, float backTrail, Color color) {
-        if (!inited) enable();
+        if (!inited) init();
         places.add(new FirePlace(x, y, range, rotation, backTrail, color));
     }
 
