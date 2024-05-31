@@ -13,14 +13,15 @@ import mindustry.game.EventType;
 import static arc.Core.graphics;
 
 public class FireBallRenderer extends Renderer {
-    public final static FireBallShader shader = new FireBallShader();
+    public static boolean inited = false;
+    public static FireBallShader shader;
     public final static Seq<FirePlace> places = new Seq<>();
     public static FrameBuffer buffer = new FrameBuffer();
 
     public static void enable() {
-        Shader.prependFragmentCode = "#define num" + places.size + "\n";
+        inited = true;
+
         Events.run(EventType.Trigger.draw, FireBallRenderer::FireDraw);
-        Shader.prependFragmentCode = "";
     }
 
     public static void FireDraw() {
@@ -32,8 +33,8 @@ public class FireBallRenderer extends Renderer {
         Draw.draw(-1, () -> {
             buffer.end();
 
-            float[] fires = new float[places.size];
-            float[] color = new float[places.size];
+            float[] fires = new float[places.size * 4];
+            float[] color = new float[places.size * 4];
             float[] rotations = new float[places.size];
 
             for (int i = 0; i < places.size; i++) {
@@ -50,6 +51,14 @@ public class FireBallRenderer extends Renderer {
 
                 rotations[i] = place.rotation;
             }
+
+            if (shader != null) {
+                shader.dispose();
+            }
+
+            Shader.prependFragmentCode = "#define MAX_NUM " + FireBallRenderer.places.size + "\n";
+            shader = new FireBallShader();
+            Shader.prependFragmentCode = "";
 
             shader.fires = fires;
             shader.color = color;
@@ -72,6 +81,7 @@ public class FireBallRenderer extends Renderer {
     }
 
     public static void addPlace(float x, float y, float range, float rotation, float backTrail, Color color) {
+        if (!inited) enable();
         places.add(new FirePlace(x, y, range, rotation, backTrail, color));
     }
 

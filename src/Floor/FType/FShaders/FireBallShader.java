@@ -1,6 +1,5 @@
 package Floor.FType.FShaders;
 
-import Floor.FType.FRender.FireBallRenderer;
 import arc.Core;
 import arc.graphics.gl.Shader;
 
@@ -18,13 +17,12 @@ public class FireBallShader extends Shader {
     }
 
     @Override
-    public void apply(){
+    public void apply() {
         setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
         setUniformf("u_resolution", Core.camera.width, Core.camera.height);
 
-        setUniformi("num", FireBallRenderer.places.size);
-        setUniform4fv("fires", fires, 0, fires.length);
-        setUniform4fv("colors", color, 0, color.length);
-        setUniform4fv("rotations", rotations, 0, rotations.length);
+        setUniform4fv("u_fires", fires, 0, fires.length);
+        setUniform4fv("u_colors", color, 0, color.length);
+        setUniform1fv("u_rotations", rotations, 0, rotations.length);
     }
 }

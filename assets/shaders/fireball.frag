@@ -2,9 +2,9 @@ uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-uniform vec4[num] fires;
-uniform float[num] rotations;
-uniform vec4[num] colors;
+uniform vec4 u_fires[MAX_NUM];
+uniform float u_rotations[MAX_NUM];
+uniform vec4 u_colors[MAX_NUM];
 
 uniform sampler2D u_texture;
 
@@ -22,10 +22,10 @@ void main(){
     vec2 coords = (c * u_resolution) + u_campos;
     vec4 color = texture2D(u_texture, c);
 
-    for (float i = 0.0;i<num;i++){
-        float len = distance(coords, fires[i].rg);
-        if (len < fires[i].b){
-            color = blendOver(u_texture, colors[i] * (fires[i].b - len) / fires[i].b);
+    for (int i = 0;i<MAX_NUM;i++){
+        float len = distance(coords, u_fires[i].rg);
+        if (len < u_fires[i].b){
+            color = blendOver(color.rgba, u_colors[i] * (u_fires[i].b - len) / u_fires[i].b);
         }
     }
 
