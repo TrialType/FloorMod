@@ -1,10 +1,12 @@
-#define S2 vec3(100.0, 93.0, 49.0) / 100.0
-#define S1 vec3(100.0, 60.0, 25.0) / 100.0
-#define NSCALE 200.0 / 2.0
-
 uniform vec2 u_campos;
 uniform vec2 u_resolution;
 uniform float u_time;
+
+uniform vec4[num] fires;
+uniform float[num] rotations;
+uniform vec4[num] colors;
+
+uniform sampler2D u_texture;
 
 varying vec2 v_texCoords;
 
@@ -18,12 +20,14 @@ vec4 blendOver(vec4 a, vec4 b) {
 void main(){
     vec2 c = v_texCoords.xy;
     vec2 coords = (c * u_resolution) + u_campos;
+    vec4 color = texture2D(u_texture, c);
 
-    float len = distance(coords,vec2(10,10));
-
-    if(len < 0.0125){
-        gl_FragColor = vec4(0,0,0,1);
-    }else if(len < 0.025){
-        gl_FragColor = vec4((0.1-len)/0.15,0,0,1);
+    for (float i = 0.0;i<num;i++){
+        float len = distance(coords, fires[i].rg);
+        if (len < fires[i].b){
+            color = blendOver(u_texture, colors[i] * (fires[i].b - len) / fires[i].b);
+        }
     }
+
+    gl_FragColor = color;
 }

@@ -53,7 +53,7 @@ public class WindBulletType extends BulletType {
         float by = (float) (b.y - windLength / 7.5 * sin(toRadians(rot)));
 
         if (this.parts.size > 0) {
-            DrawPart.params.set(b.fin(), 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, bx, by, rot);
+            DrawPart.params.set(b.fin(), 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, b.x, b.y, rot);
             DrawPart.params.life = b.fin();
 
             for (int i = 0; i < this.parts.size; ++i) {

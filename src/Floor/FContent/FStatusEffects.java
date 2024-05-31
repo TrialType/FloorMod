@@ -17,6 +17,7 @@ public class FStatusEffects {
             burningII, burningIII, burningIV, burningV,
             breakHel, breakHelII, breakHelIII, breakHelIV, breakHelV, pureA, pureT,
             catalyzeI, catalyzeII, catalyzeIII, catalyzeIV, catalyzeV,
+            healthI, healthII, healthIII, healthIV, healthV,
             corrosionI, corrosionII, corrosionIII, corrosionIV, corrosionV, corrosionVI, corrosionVII, corrosionVIII, corrosionIX, corrosionX;
     public static WithMoreStatus pWet, pTarred, pFreezing, pMelting, pMuddy;
 
@@ -28,7 +29,6 @@ public class FStatusEffects {
             reloadMultiplier = 0.01f;
             dragMultiplier = 0.01f;
         }};
-
         pureA = new StatusEffect("pure-a") {{
             show = false;
             permanent = true;
@@ -506,6 +506,26 @@ public class FStatusEffects {
         breakHelV = new StatusEffect("break_helV") {{
             healthMultiplier = 0.3f;
             transitionDamage = 192;
+        }};
+        healthI = new StatusEffect("health-1") {{
+            healthMultiplier = 1.8f;
+            damage = -1;
+        }};
+        healthII = new StatusEffect("health-2") {{
+            healthMultiplier = 3;
+            damage = -2;
+        }};
+        healthIII = new StatusEffect("health-3") {{
+            healthMultiplier = 4.4f;
+            damage = -3;
+        }};
+        healthIV = new StatusEffect("health-4") {{
+            healthMultiplier = 6;
+            damage = -4;
+        }};
+        healthV = new StatusEffect("health-5") {{
+            healthMultiplier = 40;
+            damage = -60;
         }};
 
         burnings.addAll(StatusEffects.burning, burningII, burningIII, burningIV, burningV);

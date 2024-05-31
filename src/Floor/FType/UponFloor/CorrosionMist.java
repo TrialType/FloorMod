@@ -3,11 +3,12 @@ package Floor.FType.UponFloor;
 import Floor.FContent.FStatusEffects;
 import Floor.FTools.interfaces.Corrosion;
 import Floor.FTools.interfaces.RangePure;
+import arc.Events;
 import arc.struct.IntMap;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
-import arc.util.Time;
 import mindustry.entities.Units;
+import mindustry.game.EventType;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.Floor;
 
@@ -34,7 +35,7 @@ public class CorrosionMist {
         });
 
         if (update) {
-            Time.run(delta, CorrosionMist::update);
+            Events.run(EventType.Trigger.update, CorrosionMist::update);
         }
     }
 
@@ -191,8 +192,6 @@ public class CorrosionMist {
                 }
             }
         });
-
-        Time.run(reload, CorrosionMist::update);
     }
 
     public static class BoostWithTime {

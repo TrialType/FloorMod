@@ -117,12 +117,8 @@ public class FUnits {
             range = maxRange = 1000;
             isEnemy = false;
 
-            abilities.add(new StatusFieldAbility(new StatusEffect("Health_V") {{
-                healthMultiplier = 500;
-            }}, 2400, 1200, 160));
-            abilities.add(new StatusFieldAbility(new StatusEffect("Healthy_V") {{
-                damage = -40;
-            }}, 2400, 1200, 160));
+            abilities.add(new StatusFieldAbility(FStatusEffects.healthV, 2400, 1200, 160));
+            abilities.add(new StatusFieldAbility(FStatusEffects.healthV, 2400, 1200, 160));
             abilities.add(new ShieldRegenFieldAbility(5000, 100000, 600, 160));
 
             weapons.add(new RepairBeamWeapon() {{
@@ -130,7 +126,7 @@ public class FUnits {
                 rotateSpeed = 12;
                 reload = 1200;
 
-                repairSpeed = 0;
+                repairSpeed = 10;
                 fractionRepairSpeed = 0.4f;
             }});
         }};

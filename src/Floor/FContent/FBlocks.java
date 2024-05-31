@@ -5,7 +5,7 @@ import Floor.FEntities.FBulletType.AroundBulletType;
 import Floor.FEntities.FBulletType.FreeBulletType;
 import Floor.FEntities.FBulletType.WindBulletType;
 import Floor.FEntities.FBulletType.ownerBulletType;
-import arc.Core;
+import Floor.FType.FRender.FireBallRenderer;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -14,8 +14,8 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
-import arc.struct.IntSeq;
 import arc.struct.Seq;
+import arc.util.Time;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
@@ -31,17 +31,15 @@ import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
-import mindustry.mod.ContentParser;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
 import mindustry.type.UnitType;
-import mindustry.ui.dialogs.DatabaseDialog;
-import mindustry.ui.dialogs.PlanetDialog;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeCoolant;
@@ -738,13 +736,60 @@ public class FBlocks {
                 trailEffect = Fx.none;
 
                 damage = 0;
-                lifetime = 1800;
-                speed = 0.7f;
-                width = height = 36;
+                lifetime = 300;
+                speed = 3f;
+                width = height = 6;
                 shrinkX = shrinkY = 0;
                 backColor = frontColor = Pal.darkPyraFlame;
 
                 reflectable = absorbable = false;
+
+                trailLength = 100;
+                trailWidth = 2;
+                trailChance = 1f;
+                trailRotation = true;
+                trailEffect = new MultiEffect(new Effect(90, e -> {
+                    float len = (float) Math.abs(Math.cos(Math.toRadians((e.time + Time.time) * 6 - 3))) * 8,
+                            x = e.x, y = e.y, rotation = e.rotation;
+                    Draw.color(Pal.darkPyraFlame);
+                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation + 90))),
+                            (float) (y + len * Math.sin(Math.toRadians(rotation + 90))), (1 - e.fin()) * 2);
+                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation - 90))),
+                            (float) (y + len * Math.sin(Math.toRadians(rotation - 90))), (1 - e.fin()) * 2);
+                }), new Effect(1, e -> FireBallRenderer.addPlace(e.x, e.y, 12, e.rotation, 100, Pal.darkPyraFlame)));
+
+                parts.addAll(new ShapePart() {{
+                    rotateSpeed = 3;
+                    sides = 3;
+                    lifetime = 400;
+                    radius = 8;
+                    radiusTo = 8;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = 3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 180;
+                    radius = 8;
+                    radiusTo = 8;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = -3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 30;
+                    radius = 8;
+                    radiusTo = 8;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = -3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 210;
+                    radius = 8;
+                    radiusTo = 8;
+                    colorTo = color = Pal.darkPyraFlame;
+                }});
 
                 fragAngle = 0;
                 fragRandomSpread = 0;
@@ -811,6 +856,39 @@ public class FBlocks {
                             }
                         }
                     });
+
+                    parts.addAll(new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        radius = 8;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 180;
+                        radius = 8;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 30;
+                        radius = 8;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 210;
+                        radius = 8;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }});
                 }};
             }});
             ammoTypes.put(Items.metaglass, new PointBulletType() {{
@@ -930,9 +1008,56 @@ public class FBlocks {
                 damage = 0;
                 lifetime = 1800;
                 speed = 1.5f;
-                width = height = 77;
+                width = height = 0;
                 shrinkX = shrinkY = 0;
                 backColor = frontColor = Pal.darkPyraFlame;
+
+                trailLength = 130;
+                trailWidth = 2;
+                trailChance = 1f;
+                trailRotation = true;
+                trailEffect = new Effect(90, e -> {
+                    float len = (float) Math.abs(Math.cos(Math.toRadians((e.time + Time.time) * 5.5 - 2.75))) * 4,
+                            x = e.x, y = e.y, rotation = e.rotation;
+                    Draw.color(Pal.darkPyraFlame);
+                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation + 90))),
+                            (float) (y + len * Math.sin(Math.toRadians(rotation + 90))), (1 - e.fin()) * 2);
+                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation - 90))),
+                            (float) (y + len * Math.sin(Math.toRadians(rotation - 90))), (1 - e.fin()) * 2);
+                });
+
+                parts.addAll(new ShapePart() {{
+                    rotateSpeed = 3;
+                    sides = 3;
+                    lifetime = 400;
+                    radius = 10;
+                    radiusTo = 10;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = 3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 180;
+                    radius = 10;
+                    radiusTo = 10;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = -3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 30;
+                    radius = 10;
+                    radiusTo = 10;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = -3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 210;
+                    radius = 10;
+                    radiusTo = 10;
+                    colorTo = color = Pal.darkPyraFlame;
+                }});
 
                 fragAngle = 0;
                 fragRandomSpread = 0;
@@ -1000,6 +1125,39 @@ public class FBlocks {
                             }
                         }
                     });
+
+                    parts.addAll(new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        radius = 10;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 180;
+                        radius = 10;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 30;
+                        radius = 10;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 210;
+                        radius = 10;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }});
                 }};
             }});
             ammoTypes.put(Items.metaglass, new PointBulletType() {{
@@ -1120,9 +1278,56 @@ public class FBlocks {
                 damage = 0;
                 lifetime = 1800;
                 speed = 2.4f;
-                width = height = 104;
+                width = height = 0;
                 shrinkX = shrinkY = 0;
                 backColor = frontColor = Pal.darkPyraFlame;
+
+                trailLength = 168;
+                trailWidth = 2;
+                trailChance = 1f;
+                trailRotation = true;
+                trailEffect = new Effect(90, e -> {
+                    float len = (float) Math.abs(Math.cos(Math.toRadians((e.time + Time.time) * 5 - 2.5))) * 6,
+                            x = e.x, y = e.y, rotation = e.rotation;
+                    Draw.color(Pal.darkPyraFlame);
+                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation + 90))),
+                            (float) (y + len * Math.sin(Math.toRadians(rotation + 90))), (1 - e.fin()) * 2);
+                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation - 90))),
+                            (float) (y + len * Math.sin(Math.toRadians(rotation - 90))), (1 - e.fin()) * 2);
+                });
+
+                parts.addAll(new ShapePart() {{
+                    rotateSpeed = 3;
+                    sides = 3;
+                    lifetime = 400;
+                    radius = 14;
+                    radiusTo = 14;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = 3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 180;
+                    radius = 14;
+                    radiusTo = 14;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = -3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 30;
+                    radius = 14;
+                    radiusTo = 14;
+                    colorTo = color = Pal.darkPyraFlame;
+                }}, new ShapePart() {{
+                    rotateSpeed = -3;
+                    sides = 3;
+                    lifetime = 400;
+                    rotation = 210;
+                    radius = 14;
+                    radiusTo = 14;
+                    colorTo = color = Pal.darkPyraFlame;
+                }});
 
                 fragAngle = 0;
                 fragRandomSpread = 0;
@@ -1193,6 +1398,38 @@ public class FBlocks {
                         }
                     });
 
+                    parts.addAll(new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        radius = 14;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 180;
+                        radius = 14;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 30;
+                        radius = 14;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }}, new ShapePart() {{
+                        rotateSpeed = 3;
+                        sides = 3;
+                        lifetime = 400;
+                        rotation = 210;
+                        radius = 14;
+                        radiusTo = 0;
+                        colorTo = color = Pal.darkPyraFlame;
+                    }});
                 }};
             }});
             ammoTypes.put(Items.metaglass, new PointBulletType() {{
