@@ -231,7 +231,7 @@ public class UnitOverride {
         UnitTypes.flare.speed = 3;
         UnitTypes.flare.health = 160;
         UnitTypes.flare.circleTarget = true;
-        UnitTypes.flare.abilities.add(new ForceFieldAbility(14, 0.2f, 240, 12 * 60));
+        UnitTypes.flare.abilities.add(new ForceFieldAbility(12, 0.2f, 240, 12 * 60));
 
         UnitTypes.antumbra.health = 25200;
 
