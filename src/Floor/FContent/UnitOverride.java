@@ -16,15 +16,10 @@ import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.ForceFieldAbility;
-import mindustry.entities.abilities.ShieldArcAbility;
-import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.bullet.LaserBulletType;
-import mindustry.entities.effect.ExplosionEffect;
-import mindustry.entities.effect.MultiEffect;
-import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Sounds;
 import mindustry.gen.TimedKillUnit;
@@ -203,18 +198,16 @@ public class UnitOverride {
         weapon.bullet.incendChance = 0.1f;
         weapon.bullet.incendAmount = 1;
         UnitTypes.fortress.weapons.add(new Weapon() {{
-            reload = 12;
+            reload = 36;
             rotate = true;
             rotateSpeed = 10;
-            controllable = false;
-            aiControllable = true;
 
             bullet = new BasicBulletType() {{
                 width = height = 7;
-                damage = 5;
+                damage = 15;
                 speed = 2;
                 lifetime = 120;
-                collidesGround = false;
+                collidesTiles = false;
             }};
         }});
 
@@ -235,8 +228,8 @@ public class UnitOverride {
         UnitTypes.toxopid.health = 77000;
         /*-----------------------------------------------------------------------------*/
         UnitTypes.flare.armor = 6;
-        UnitTypes.flare.speed = 4;
-        UnitTypes.flare.health = 120;
+        UnitTypes.flare.speed = 3;
+        UnitTypes.flare.health = 160;
         UnitTypes.flare.circleTarget = true;
         UnitTypes.flare.abilities.add(new ForceFieldAbility(14, 0.2f, 240, 12 * 60));
 
@@ -411,8 +404,12 @@ public class UnitOverride {
         fAbility.regen = 0.8f;
         fAbility.max = 1000;
         UnitTypes.quasar.weapons.add(new Weapon() {{
+            x = y = 0;
+            mirror = false;
             reload = 120;
             bullet = new BulletType(0, 0) {{
+                despawnEffect = hitEffect = Fx.none;
+                collides = absorbable = reflectable = hittable = false;
                 rangeOverride = 135;
                 keepVelocity = false;
                 status = FStatusEffects.slowII;
