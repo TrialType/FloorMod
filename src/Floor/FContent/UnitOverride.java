@@ -9,19 +9,25 @@ import Floor.FEntities.FUnit.F.TimeUpGradeUnit;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FWeapon.SuctionWeapon;
 import arc.graphics.Color;
+import mindustry.ai.types.MissileAI;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.bullet.LaserBulletType;
+import mindustry.entities.effect.ExplosionEffect;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Sounds;
 import mindustry.gen.TimedKillUnit;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
+import mindustry.type.unit.MissileUnitType;
 
 public class UnitOverride {
     public static void load() {
@@ -143,6 +149,40 @@ public class UnitOverride {
         /*=================================================================*/
         /*=================================================================*/
         /*=================================================================*/
+        UnitTypes.dagger.speed = 0.3f;
+        UnitTypes.dagger.weapons.get(0).reload = 45;
+        UnitTypes.dagger.weapons.get(0).bullet = new BulletType(0, 0) {{
+            spawnUnit = new MissileUnitType("dagger1") {{
+                constructor = TimedKillUnit::create;
+                controller = u -> new MissileAI();
+
+                health = 350;
+                armor = 3;
+                speed = 5;
+                lifetime = 90;
+                rangeOverride = 450;
+
+                weapons.add(new Weapon() {{
+                    bullet = new ExplosionBulletType(5, 45);
+                }});
+                weapons.add(new Weapon() {{
+                    reload = 15;
+                    alwaysShooting = true;
+
+                    bullet = new BasicBulletType() {{
+                        width = height = 8;
+                        damage = 2;
+                        lifetime = 15;
+                        speed = 6;
+                    }};
+                }});
+            }};
+        }};
+
+        UnitTypes.mace.health = 1000;
+        UnitTypes.mace.armor = 8;
+        UnitTypes.mace.weapons.get(0).bullet.incendChance = 1;
+        UnitTypes.mace.weapons.get(0).bullet.incendAmount = 2;
 
         UnitTypes.scepter.health = 31500;
         UnitTypes.scepter.weapons.get(0).bullet.damage = 150;
@@ -164,6 +204,10 @@ public class UnitOverride {
         UnitTypes.toxopid.health = 77000;
 
         /*-----------------------------------------------------------------------------*/
+        UnitTypes.flare.armor = 4;
+        UnitTypes.flare.speed = 3;
+        UnitTypes.flare.health = 120;
+        UnitTypes.flare.abilities.add(new ShieldRegenFieldAbility(20, 60, 180, 8));
 
         UnitTypes.antumbra.health = 25200;
 

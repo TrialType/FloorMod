@@ -28,16 +28,16 @@ void main(){
         float len = distance(coords, fire.rg);
         if (len < fire.b){
             color = blendOver(texture2D(u_texture, c).rgba, u_colors[i] * (fire.b - len / 1.5) / fire.b);
-            if ((len / fire.b) > 0.9){
+            if ((len / fire.b) > 0.8){
                 float ro;
                 if (coords.x - fire.r == 0){
                     ro = 90;
                 } else {
-                    ro = atan((coords.y - fire.g)/(coords.x - fire.r));
+                    ro = atan(coords.y - fire.g, coords.x - fire.r);
                 }
-                color = blendOver(texture2D(u_texture,
-                c + vec2(cos(ro), sin(ro)) * len/ 25),
-                u_colors[i] * (fire.b - len / 1.5) / fire.b);
+                color = texture2D(u_texture, c + vec2(cos(ro), sin(ro)) / u_resolution)
+                /*blendOver(texture2D(u_texture, c + vec2(cos(ro), sin(ro))),
+                u_colors[i] * (fire.b - len / 2.5) / fire.b)*/;
             }
         }
     }

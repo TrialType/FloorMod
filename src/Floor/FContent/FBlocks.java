@@ -1,12 +1,7 @@
 package Floor.FContent;
 
 import Floor.FEntities.FBlock.*;
-import Floor.FEntities.FBulletType.AroundBulletType;
-import Floor.FEntities.FBulletType.FreeBulletType;
-import Floor.FEntities.FBulletType.WindBulletType;
-import Floor.FEntities.FBulletType.ownerBulletType;
-import Floor.FType.DrawParts.EffectPart;
-import Floor.FType.FRender.FireBallRenderer;
+import Floor.FEntities.FBulletType.*;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -23,9 +18,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.WaveEffect;
-import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.FlarePart;
-import mindustry.entities.part.RegionPart;
 import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
@@ -42,7 +35,6 @@ import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
-import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeCoolant;
@@ -65,26 +57,27 @@ public class FBlocks {
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
             stay, bind, tranquil,
-            fireStream;
+            fireStream, tortoise;
     //crafting
     public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
     //effect
     public static Block buildCore, slowProject;
 
     public static void load() {
+        //crafting
         primarySolidification = new StackCrafter("primary-solidification") {{
             itemCapacity = 60;
             liquidCapacity = 120;
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionCopper, 14),
-                    ItemStack.with(Items.copper, 6),
+                    ItemStack.with(Items.copper, 5),
                     LiquidStack.empty, 120
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionLead, 14),
-                    ItemStack.with(Items.lead, 6),
+                    ItemStack.with(Items.lead, 5),
                     LiquidStack.empty, 120
             ));
 
@@ -101,19 +94,19 @@ public class FBlocks {
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionCopper, 30),
-                    ItemStack.with(Items.copper, 15),
+                    ItemStack.with(Items.copper, 12),
                     LiquidStack.empty, 90
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionLead, 30),
-                    ItemStack.with(Items.lead, 15),
+                    ItemStack.with(Items.lead, 12),
                     LiquidStack.empty, 90
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionTitanium, 30),
-                    ItemStack.with(Items.titanium, 12),
+                    ItemStack.with(Items.titanium, 10),
                     LiquidStack.empty, 90
             ));
 
@@ -131,25 +124,25 @@ public class FBlocks {
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionCopper, 60),
-                    ItemStack.with(Items.copper, 36),
+                    ItemStack.with(Items.copper, 30),
                     LiquidStack.empty, 90
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionLead, 60),
-                    ItemStack.with(Items.lead, 36),
+                    ItemStack.with(Items.lead, 30),
                     LiquidStack.empty, 90
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionTitanium, 60),
-                    ItemStack.with(Items.titanium, 30),
+                    ItemStack.with(Items.titanium, 24),
                     LiquidStack.empty, 90
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionThorium, 60),
-                    ItemStack.with(Items.thorium, 24),
+                    ItemStack.with(Items.thorium, 20),
                     LiquidStack.empty, 90
             ));
 
@@ -167,25 +160,25 @@ public class FBlocks {
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionCopper, 90),
-                    ItemStack.with(Items.copper, 64),
+                    ItemStack.with(Items.copper, 48),
                     LiquidStack.empty, 60
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionLead, 90),
-                    ItemStack.with(Items.lead, 64),
+                    ItemStack.with(Items.lead, 48),
                     LiquidStack.empty, 60
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionTitanium, 90),
-                    ItemStack.with(Items.titanium, 64),
+                    ItemStack.with(Items.titanium, 48),
                     LiquidStack.empty, 60
             ));
             switchStack.add(new ProductStack(
                     ItemStack.empty,
                     LiquidStack.with(FLiquids.fusionThorium, 90),
-                    ItemStack.with(Items.thorium, 64),
+                    ItemStack.with(Items.thorium, 48),
                     LiquidStack.empty, 60
             ));
 
@@ -195,17 +188,6 @@ public class FBlocks {
                     Items.lead, 1400, Items.graphite, 1350, Items.titanium, 1400, Items.thorium, 1450, Items.surgeAlloy, 500));
         }};
 //======================================================================================================================
-        UnitFactory uf = (UnitFactory) Blocks.airFactory;
-        uf.plans.add(new UnitFactory.UnitPlan(FUnits.barb, 1800, ItemStack.with(Items.silicon, 20, Items.titanium, 10)));
-        Reconstructor rt = (Reconstructor) Blocks.additiveReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.barb, FUnits.hammer});
-        rt = (Reconstructor) Blocks.multiplicativeReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.hammer, FUnits.buying});
-        rt = (Reconstructor) Blocks.exponentialReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.buying, FUnits.crazy});
-        rt = (Reconstructor) Blocks.tetrativeReconstructor;
-        rt.upgrades.add(new UnitType[]{FUnits.crazy, FUnits.transition});
-
         specialUnitFactory = new UnitFactory("special-unit-factory") {{
             requirements(Category.units, with(Items.lead, 1500, Items.silicon, 700, Items.titanium, 1400, Items.thorium, 400, Items.plastanium, 200));
 
@@ -217,7 +199,6 @@ public class FBlocks {
 
             consume(new ConsumePower(12, 0, false));
         }};
-
         outPowerFactory = new GradeFactory("out_power_factory") {{
             requirements(Category.units, with(Items.copper, 500, Items.lead, 600, Items.silicon, 800));
 
@@ -353,7 +334,6 @@ public class FBlocks {
 
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
-
         pu = new PureProject("pu") {{
             health = 650;
 
@@ -362,6 +342,56 @@ public class FBlocks {
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
 //======================================================================================================================
+        tortoise = new ItemTurret("tortoise") {{
+            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 80, Items.titanium, 25, Items.silicon, 25));
+            ammo(
+                    Items.titanium, new BasicBulletType(4, 15) {{
+                        width = 7f;
+                        height = 9f;
+                        lifetime = 60f;
+                        ammoMultiplier = 4;
+                        shootEffect = Fx.shootBig;
+                        smokeEffect = Fx.shootBigSmoke;
+                        frontColor = backColor = Color.valueOf("8da1e3");
+                        pierce = true;
+                        pierceCap = 3;
+                    }},
+                    Items.thorium, new BasicBulletType(4, 18) {{
+                        width = 9f;
+                        height = 12f;
+                        shootEffect = Fx.shootBig;
+                        smokeEffect = Fx.shootBigSmoke;
+                        frontColor = backColor = Color.valueOf("f9a3c7");
+                        reloadMultiplier = 0.9f;
+                        ammoMultiplier = 4;
+                        lifetime = 60f;
+                        pierce = true;
+                        pierceCap = 2;
+                    }}
+            );
+
+            shoot = new ShootBarrel() {{
+                shots = 3;
+                shotDelay = 5;
+            }};
+
+            recoils = 2;
+
+            recoil = 0.5f;
+            shootY = 3f;
+            reload = 20;
+            size = 2;
+            range = 190;
+            shootCone = 15f;
+            ammoUseEffect = Fx.casing1;
+            health = 800;
+            inaccuracy = 0;
+            rotateSpeed = 10f;
+            coolant = consumeCoolant(0.1f);
+            researchCostMultiplier = 8f;
+
+            limitRange();
+        }};
         fireStream = new ItemTurret("fire_stream") {{
             requirements(Category.turret, ItemStack.with(
                     Items.titanium, 340,
@@ -409,7 +439,7 @@ public class FBlocks {
                 absorbable = reflectable = hittable = false;
 
                 damage = 38;
-                lifetime = 20;
+                lifetime = 30;
                 speed = 2.3f;
                 width = height = 0;
                 ammoMultiplier = 8;
@@ -422,7 +452,7 @@ public class FBlocks {
                 absorbable = reflectable = hittable = false;
 
                 damage = 64;
-                lifetime = 30;
+                lifetime = 45;
                 speed = 2.5f;
                 width = height = 0;
                 ammoMultiplier = 16;
@@ -481,19 +511,45 @@ public class FBlocks {
             consumeAmmoOnce = false;
             canOverdrive = false;
 
-            shootType = new PointBulletType() {{
-                speed = 100;
+            shootType = new BasicBulletType() {{
+                width = height = 12;
+                speed = 2.1f;
                 damage = 8;
-                lifetime = 180;
+                lifetime = 90;
 
                 lightColor = Pal.redLight;
                 status = StatusEffects.unmoving;
                 statusDuration = 24;
                 splashDamageRadius = 36;
 
+                fragBullets = 3;
+                fragBullet = new BulletType(3, 1) {{
+                    lifetime = 30;
+                    status = FStatusEffects.breakHel;
+                    statusDuration = 120;
+
+                    splashDamageRadius = 12;
+                    hitEffect = new WaveEffect() {{
+                        lifetime = 12;
+                        strokeFrom = 1;
+                        strokeTo = 0;
+                        sizeFrom = 35;
+                        sizeTo = 0;
+                        colorTo = colorFrom = Color.valueOf("221122");
+                    }};
+                    despawnEffect = Fx.none;
+                }};
+
                 shootEffect = smokeEffect = Fx.none;
-                hitEffect = Fx.smokeCloud;
-                despawnEffect = hitEffect;
+                hitEffect = new WaveEffect() {{
+                    lifetime = 12;
+                    strokeFrom = 36;
+                    strokeTo = 0;
+                    sizeFrom = 35;
+                    sizeTo = 0;
+                    colorTo = colorFrom = Color.valueOf("221122");
+                }};
+                despawnEffect = Fx.none;
             }};
 
             requirements(Category.turret, ItemStack.with(
@@ -762,10 +818,10 @@ public class FBlocks {
                             (float) (y + len * Math.sin(Math.toRadians(rotation - 90))), (1 - e.fin()) * 2);
                 });
 
-                parts.addAll(new EffectPart() {{
+                parts.addAll(/*new EffectPart() {{
                     lifetime = 300;
                     effect = new Effect(1, e -> FireBallRenderer.addPlace(e.x, e.y, 25, e.rotation, 0, c));
-                }}, new ShapePart() {{
+                }}, */new ShapePart() {{
                     rotateSpeed = 3;
                     sides = 3;
                     lifetime = 400;
@@ -1688,5 +1744,23 @@ public class FBlocks {
             unitCapModifier = 2;
             requirements(Category.effect, ItemStack.with(Items.copper, 1000, Items.lead, 1000, Items.graphite, 1000, Items.silicon, 1000, Items.titanium, 1000));
         }};
+//======================================================================================================================
+        blockOverride();
+    }
+
+    public static void blockOverride() {
+        UnitFactory uf = (UnitFactory) Blocks.airFactory;
+        uf.plans.add(new UnitFactory.UnitPlan(FUnits.barb, 1800, ItemStack.with(Items.silicon, 20, Items.titanium, 10)));
+        Reconstructor rt = (Reconstructor) Blocks.additiveReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.barb, FUnits.hammer});
+        rt = (Reconstructor) Blocks.multiplicativeReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.hammer, FUnits.buying});
+        rt = (Reconstructor) Blocks.exponentialReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.buying, FUnits.crazy});
+        rt = (Reconstructor) Blocks.tetrativeReconstructor;
+        rt.upgrades.add(new UnitType[]{FUnits.crazy, FUnits.transition});
+
+        ItemTurret turret = (ItemTurret) Blocks.salvo;
+        turret.ammoTypes.each((i, b) -> b.damage += 4);
     }
 }
