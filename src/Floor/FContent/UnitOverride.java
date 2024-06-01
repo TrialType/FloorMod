@@ -9,10 +9,14 @@ import Floor.FEntities.FUnit.F.TimeUpGradeUnit;
 import Floor.FEntities.FUnit.Override.*;
 import Floor.FEntities.FWeapon.SuctionWeapon;
 import arc.graphics.Color;
+import arc.graphics.g2d.Lines;
 import mindustry.ai.types.MissileAI;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
+import mindustry.entities.Effect;
+import mindustry.entities.abilities.ForceFieldAbility;
+import mindustry.entities.abilities.ShieldArcAbility;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
@@ -29,7 +33,12 @@ import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.unit.MissileUnitType;
 
+import static arc.graphics.g2d.Draw.color;
+import static arc.graphics.g2d.Lines.stroke;
+
 public class UnitOverride {
+    static Weapon weapon;
+
     public static void load() {
         UnitTypes.alpha.buildSpeed = 1f;
         UnitTypes.alpha.mineSpeed = 8f;
@@ -184,6 +193,31 @@ public class UnitOverride {
         UnitTypes.mace.weapons.get(0).bullet.incendChance = 1;
         UnitTypes.mace.weapons.get(0).bullet.incendAmount = 2;
 
+        UnitTypes.fortress.health = 1800;
+        weapon = UnitTypes.fortress.weapons.get(0);
+        weapon.bullet.lightning = 6;
+        weapon.bullet.lightColor = Pal.bulletYellow;
+        weapon.bullet.lightningDamage = 3;
+        weapon.bullet.lightningLength = 6;
+        weapon.bullet.lightningCone = 360;
+        weapon.bullet.incendChance = 0.1f;
+        weapon.bullet.incendAmount = 1;
+        UnitTypes.fortress.weapons.add(new Weapon() {{
+            reload = 12;
+            rotate = true;
+            rotateSpeed = 10;
+            controllable = false;
+            aiControllable = true;
+
+            bullet = new BasicBulletType() {{
+                width = height = 7;
+                damage = 5;
+                speed = 2;
+                lifetime = 120;
+                collidesGround = false;
+            }};
+        }});
+
         UnitTypes.scepter.health = 31500;
         UnitTypes.scepter.weapons.get(0).bullet.damage = 150;
         UnitTypes.scepter.weapons.get(0).bullet.lightningDamage = 60;
@@ -195,22 +229,18 @@ public class UnitOverride {
         UnitTypes.reign.weapons.get(0).bullet.fragBullet.damage = 60;
         UnitTypes.reign.weapons.get(0).bullet.fragBullet.splashDamage = 45;
         UnitTypes.reign.weapons.get(0).bullet.fragBullets = 6;
-
         /*-----------------------------------------------------------------------------*/
-
         UnitTypes.arkyid.health = 28000;
 
-
         UnitTypes.toxopid.health = 77000;
-
         /*-----------------------------------------------------------------------------*/
-        UnitTypes.flare.armor = 4;
-        UnitTypes.flare.speed = 3;
+        UnitTypes.flare.armor = 6;
+        UnitTypes.flare.speed = 4;
         UnitTypes.flare.health = 120;
-        UnitTypes.flare.abilities.add(new ShieldRegenFieldAbility(20, 60, 180, 8));
+        UnitTypes.flare.circleTarget = true;
+        UnitTypes.flare.abilities.add(new ForceFieldAbility(14, 0.2f, 240, 12 * 60));
 
         UnitTypes.antumbra.health = 25200;
-
 
         UnitTypes.eclipse.health = 77000;
         UnitTypes.eclipse.weapons.add(new Weapon() {{
@@ -376,6 +406,25 @@ public class UnitOverride {
         b.fragBullet.splashDamageRadius = 30f;
 
         /*-----------------------------------------------------------------------------*/
+        UnitTypes.quasar.health = 2000;
+        ForceFieldAbility fAbility = (ForceFieldAbility) UnitTypes.quasar.abilities.get(0);
+        fAbility.regen = 0.8f;
+        fAbility.max = 1000;
+        UnitTypes.quasar.weapons.add(new Weapon() {{
+            reload = 120;
+            bullet = new BulletType(0, 0) {{
+                rangeOverride = 135;
+                keepVelocity = false;
+                status = FStatusEffects.slowII;
+                statusDuration = 180;
+                splashDamageRadius = 135;
+                shootEffect = new Effect(45, e -> {
+                    color(Pal.heal);
+                    stroke(e.fout() * 2f);
+                    Lines.circle(e.x, e.y, 4f + e.finpow() * 135);
+                });
+            }};
+        }});
 
         UnitTypes.vela.health = 22000;
         UnitTypes.vela.weapons.get(0).bullet = new FlyContinuousLaserBulletType() {{
