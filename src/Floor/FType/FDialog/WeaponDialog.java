@@ -2,17 +2,23 @@ package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
+import arc.func.Cons;
 import arc.scene.ui.layout.Table;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.type.Weapon;
+import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 import mindustry.ui.dialogs.BaseDialog;
 
+import java.lang.reflect.Field;
+
 import static Floor.FType.FDialog.ProjectDialogUtils.*;
+import static mindustry.Vars.ui;
 
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Weapon weapon;
+    protected Weapon rollback;
     protected BulletDialog bulletDialog;
     protected LimitBulletType bullet;
     protected float bulletHeavy = 0;
@@ -28,18 +34,28 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public StrBool levUser = str -> couldUse(str, getVal(str));
     public BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
 
-    public WeaponDialog(String title) {
+    public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply) {
         super(title);
 
-        weapon = new Weapon();
+        this.rollback = rollback;
+        this.weapon = new Weapon();
         updateHeavy();
         bulletDialog = new BulletDialog(this, "");
         bulletDialog.hidden(() -> freeSize += this.heavy);
         bullet = new LimitBulletType();
-        buttons.button("@back", Icon.left, this::hide);
-        buttons.button("@apply", Icon.right, () -> {
+        buttons.button("@back", Icon.left, () -> {
+            apply.get(this.rollback);
+            weapon = this.rollback;
             updateHeavy();
             hide();
+        });
+        buttons.button("@apply", Icon.right, () -> {
+            updateHeavy();
+            if (heavy + weapon.shoot.shots * bulletHeavy <= freeSize) {
+                apply.get(weapon);
+                hide();
+            }
+            ui.showInfo("tooHeavy");
         });
         buttons.button("@setZero", () -> {
             weapon.reload = Float.MAX_VALUE;
@@ -55,6 +71,53 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     }
 
     public void rebuild() {
+        cont.table(t -> {
+            t.label(() -> Core.bundle.get("dialog.weapon." + type)).pad(5);
+            t.button(b -> {
+                b.image(Icon.pencilSmall);
+
+                b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
+                    tb.button(Core.bundle.get("dialog.weapon.default"), () -> {
+                        if (type.equals("default")) {
+                            hide.run();
+                            return;
+                        }
+                        Weapon w = new Weapon();
+                        cloneWeapon(weapon, w);
+                        weapon = w;
+                        type = "default";
+                        hide.run();
+                    });
+                    tb.row();
+                    tb.button(Core.bundle.get("dialog.weapon.defense"), () -> {
+                        if (type.equals("defense")) {
+                            hide.run();
+                            return;
+                        }
+                        PointDefenseWeapon w = new PointDefenseWeapon();
+                        cloneWeapon(weapon, w);
+                        weapon = w;
+                        type = "defense";
+                        rebuildType();
+                        hide.run();
+                    });
+                    tb.row();
+                    tb.button(Core.bundle.get("dialog.weapon.repair"), () -> {
+                        if (type.equals("repair")) {
+                            hide.run();
+                            return;
+                        }
+                        RepairBeamWeapon w = new RepairBeamWeapon();
+                        cloneWeapon(weapon, w);
+                        weapon = w;
+                        type = "repair";
+                        rebuildType();
+                        hide.run();
+                    });
+                }));
+            }, () -> {
+            });
+        });
         cont.clear();
         cont.pane(t -> baseOn = t);
         cont.pane(t -> typeOn = t);
@@ -161,6 +224,17 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         heavy += getHeavy("number", weapon.shoot.shots);
         heavy += getHeavy("reload", weapon.reload);
         heavy += getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
+    }
+
+    public void cloneWeapon(Weapon from, Weapon to) {
+        Field[] fields = Weapon.class.getFields();
+        for (Field field : fields) {
+            try {
+                field.set(to, field.get(from));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override

@@ -71,7 +71,7 @@ public class ProjectsLocated extends BaseDialog {
 
         public weaponPack() {
             weapon = new Weapon();
-            dialog = new WeaponDialog("", this);
+            dialog = new WeaponDialog("", weapon, w -> weapon = w);
         }
     }
 

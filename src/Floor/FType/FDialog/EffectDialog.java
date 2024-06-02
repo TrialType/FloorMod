@@ -51,7 +51,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
                     tb.clear();
                     tb.button(Core.bundle.get("dialog.effect.wave"), () -> {
-                        if (type.equals("wave")) return;
+                        if (type.equals("wave")) {
+                            hide.run();
+                            return;
+                        }
                         WaveEffect waveEffect = new WaveEffect();
                         waveEffect.lifetime = effect.lifetime;
                         waveEffect.clip = effect.clip;
@@ -67,7 +70,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                     }).growX();
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.wrap"), () -> {
-                        if (type.equals("wrap")) return;
+                        if (type.equals("wrap")) {
+                            hide.run();
+                            return;
+                        }
                         WrapEffect wrapEffect = new WrapEffect();
                         wrapEffect.lifetime = effect.lifetime;
                         wrapEffect.clip = effect.clip;
@@ -83,7 +89,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                     }).growX();
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.radial"), () -> {
-                        if (type.equals("radial")) return;
+                        if (type.equals("radial")) {
+                            hide.run();
+                            return;
+                        }
                         RadialEffect radialEffect = new RadialEffect();
                         radialEffect.lifetime = effect.lifetime;
                         radialEffect.clip = effect.clip;
@@ -99,7 +108,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                     }).growX();
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.particle"), () -> {
-                        if (type.equals("particle")) return;
+                        if (type.equals("particle")) {
+                            hide.run();
+                            return;
+                        }
                         ParticleEffect particleEffect = new ParticleEffect();
                         particleEffect.lifetime = effect.lifetime;
                         particleEffect.clip = effect.clip;
@@ -115,7 +127,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                     }).growX();
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.explosion"), () -> {
-                        if (type.equals("explosion")) return;
+                        if (type.equals("explosion")) {
+                            hide.run();
+                            return;
+                        }
                         ExplosionEffect explosionEffect = new ExplosionEffect();
                         explosionEffect.lifetime = effect.lifetime;
                         explosionEffect.clip = effect.clip;

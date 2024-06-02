@@ -68,7 +68,10 @@ public class PartsDialog extends BaseDialog {
             b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
                 tb.top();
                 tb.button(Core.bundle.get("dialog.part.shape"), () -> {
-                    if (type.equals("shape")) return;
+                    if (type.equals("shape")) {
+                        hide.run();
+                        return;
+                    }
                     ShapePart shapePart = new ShapePart();
                     shapePart.turretShading = part.turretShading;
                     shapePart.under = part.under;
@@ -80,7 +83,10 @@ public class PartsDialog extends BaseDialog {
                 });
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.hover"), () -> {
-                    if (type.equals("hover")) return;
+                    if (type.equals("hover")) {
+                        hide.run();
+                        return;
+                    }
                     HoverPart hoverPart = new HoverPart();
                     hoverPart.turretShading = part.turretShading;
                     hoverPart.under = part.under;
@@ -92,7 +98,10 @@ public class PartsDialog extends BaseDialog {
                 });
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.halo"), () -> {
-                    if (type.equals("halo")) return;
+                    if (type.equals("halo")) {
+                        hide.run();
+                        return;
+                    }
                     HaloPart haloPart = new HaloPart();
                     haloPart.turretShading = part.turretShading;
                     haloPart.under = part.under;
@@ -104,7 +113,10 @@ public class PartsDialog extends BaseDialog {
                 });
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.flare"), () -> {
-                    if (type.equals("flare")) return;
+                    if (type.equals("flare")) {
+                        hide.run();
+                        return;
+                    }
                     FlarePart flarePart = new FlarePart();
                     flarePart.turretShading = part.turretShading;
                     flarePart.under = part.under;
