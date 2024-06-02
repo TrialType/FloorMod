@@ -522,7 +522,10 @@ public class FBlocks {
                 statusDuration = 24;
                 splashDamageRadius = 36;
 
-                fragBullets = 3;
+                fragLifeMax = fragLifeMin = 0.5f;
+                fragVelocityMax = 3.5f;
+                fragVelocityMin = 2;
+                fragBullets = 5;
                 fragBullet = new BulletType(3, 1) {{
                     lifetime = 30;
                     status = FStatusEffects.breakHel;
@@ -666,7 +669,7 @@ public class FBlocks {
                 rangeOverride = 200;
 
                 status = StatusEffects.unmoving;
-                statusDuration = 45;
+                statusDuration = 60;
                 splashDamageRadius = 60;
                 splashDamage = 32;
 
@@ -725,22 +728,22 @@ public class FBlocks {
                     despawnEffect = hitEffect;
                 }};
 
-                intervalDelay = 3;
-                bulletInterval = 4;
+                intervalDelay = 2;
+                bulletInterval = 8;
                 intervalSpread = 22;
                 intervalAngle = -11;
                 intervalBullets = 2;
                 intervalBullet = new BasicBulletType() {{
                     speed = 1.5f;
-                    lifetime = 180;
+                    lifetime = 90;
 
                     frontColor = backColor = trailColor = Pal.redLight;
                     trailLength = 7;
 
-                    status = FStatusEffects.suppressII;
-                    statusDuration = 180;
+                    status = FStatusEffects.breakHelIII;
+                    statusDuration = 240;
 
-                    splashDamageRadius = 16;
+                    splashDamageRadius = 24;
                     splashDamage = 12;
 
                     hitEffect = new ExplosionEffect() {{
@@ -748,7 +751,7 @@ public class FBlocks {
 
                         waveColor = Pal.redLight;
                         waveRadBase = 16;
-                        waveRad = 18;
+                        waveRad = 28;
                         waveStroke = 1;
                         waveLife = 240;
 
