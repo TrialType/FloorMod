@@ -6,7 +6,6 @@ import Floor.FEntities.FEffect.IOMulti;
 import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
-import arc.graphics.Color;
 import arc.math.Interp;
 import arc.scene.Element;
 import arc.scene.actions.Actions;
@@ -14,16 +13,15 @@ import arc.scene.ui.Button;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Align;
-import arc.util.Strings;
 import arc.util.Tmp;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static mindustry.Vars.ui;
+import static Floor.FType.FDialog.DialogUtils.*;
 
-public class BulletDialog extends BaseDialog {
+public class BulletDialog extends BaseDialog implements TableGetter {
     public int boost = 1;
     public WeaponDialog parentW;
     public BulletDialog parentB;
@@ -35,11 +33,18 @@ public class BulletDialog extends BaseDialog {
     public LimitBulletType bullet = new LimitBulletType();
     public LimitBulletType FBullet;
     public float bulletHeavy = 0;
-    public float fromHeavy = 0;
     public float heavy = 0.5f;
     public Table typeOn;
     public Table baseOn;
     public Table effectOn;
+
+    public static final String dia = "bullet";
+    public Runnable re = () -> {
+        rebuildBase();
+        rebuildType();
+    };
+    public StrBool levUser = str -> ProjectsLocated.couldUse(str, findVal(str));
+    public BoolGetter hevUser = () -> boost * heavy + bullet.fragBullets * bulletHeavy <= ProjectsLocated.freeSize;
 
     public BulletDialog(BaseDialog parent, String title) {
         super(title);
@@ -50,7 +55,6 @@ public class BulletDialog extends BaseDialog {
             this.parentW = wd;
             (wd.bullet == null ? new LimitBulletType() : wd.bullet).copyTo(this.bullet);
             updateHeavy();
-            this.fromHeavy = parentW.heavy;
             this.bulletHeavy = parentW.bulletHeavy - this.heavy;
             newType = bullet.type;
             boost = wd.weapon.shoot.shots;
@@ -58,7 +62,6 @@ public class BulletDialog extends BaseDialog {
             this.parentB = bd;
             (bd.FBullet == null ? new LimitBulletType() : bd.FBullet).copyTo(this.bullet);
             updateHeavy();
-            this.fromHeavy = parentB.fromHeavy + parentB.heavy * parentB.boost;
             this.bulletHeavy = parentB.bulletHeavy - this.heavy;
             newType = bullet.type;
             boost = bd.bullet.fragBullets * bd.boost;
@@ -142,7 +145,7 @@ public class BulletDialog extends BaseDialog {
             }).size(25).left().pad(5);
             t.row();
             t.label(() -> Core.bundle.get("@heavyUse") + ": " +
-                    (heavy + fromHeavy + bulletHeavy) + " / " +
+                    (heavy + bulletHeavy) + " / " +
                     ProjectsLocated.freeSize).size(25).left().width(100).pad(5);
         }).pad(2).growX().row();
 
@@ -151,6 +154,8 @@ public class BulletDialog extends BaseDialog {
         table.row();
         table.table(t -> baseOn = t).pad(2).left().growX();
         rebuildBase();
+
+        table.table(this::rebuildEffect).pad(2).left().growX();
     }
 
     public void rebuildType() {
@@ -158,58 +163,57 @@ public class BulletDialog extends BaseDialog {
         typeOn.background(Tex.buttonDown);
         switch (newType) {
             case "bullet" -> {
-                createLevDialog("range", "bulletBase", typeOn, bullet.range,
-                        f -> bullet.range = f, f -> bullet.range = f);
-                createNumberDialog("lifetime", typeOn, bullet.lifetime, 0, Float.MAX_VALUE,
-                        f -> {
-                            bullet.lifetime = f;
-                            bullet.speed = bullet.range / (f == 0 ? 0.0001f : f);
-                        });
-                createNumberDialog("bulletWide", typeOn, bullet.width, 0, 45,
-                        f -> bullet.width = f);
-                createNumberDialog("bulletHeight", typeOn, bullet.height, 0, 45,
-                        f -> bullet.height = f);
+                createLevDialog(typeOn, dia, "range", "bulletBase", bullet.range,
+                        f -> bullet.range = f, re, this::updateHeavy, levUser, hevUser);
+                createNumberDialog(typeOn, dia, "lifetime", bullet.lifetime, f -> {
+                    bullet.lifetime = f;
+                    bullet.speed = bullet.range / (f == 0 ? 0.0001f : f);
+                }, re);
+                createNumberDialogWithLimit(typeOn, dia, "bulletWide", bullet.width,
+                        45, 0, f -> bullet.width = f, re);
+                createNumberDialogWithLimit(typeOn, dia, "bulletHeight", bullet.height,
+                        45, 0, f -> bullet.height = f, re);
                 typeOn.row();
             }
             case "laser" -> {
-                createLevDialog("laserLength", "bulletBase", typeOn, bullet.laserCLength,
-                        f -> bullet.laserCLength = f, f -> bullet.laserCLength = f);
-                createNumberDialog("laserWidth", typeOn, bullet.width, 0.01f, 45,
-                        f -> bullet.width = f);
+                createLevDialog(typeOn, dia, "laserLength", "bulletBase", bullet.laserCLength,
+                        f -> bullet.laserCLength = f, re, this::updateHeavy, levUser, hevUser);
+                createNumberDialogWithLimit(typeOn, dia, "laserWidth", bullet.width,
+                        45, 0.001f, f -> bullet.width = f, re);
             }
             case "lightning" -> {
-                createLevDialog("bulletLightningLength", "bulletBase", typeOn, bullet.bulletLightningLength,
-                        f -> bullet.bulletLightningLength = (int) (f + 0), f -> bullet.bulletLightningLength = (int) (f + 0));
-                createLevDialog("bulletLightningLengthRand", "bulletBase", typeOn, bullet.bulletLightningLengthRand,
-                        f -> bullet.bulletLightningLengthRand = (int) (f + 0), f -> bullet.bulletLightningLengthRand = (int) (f + 0));
+                createLevDialog(typeOn, dia, "bulletLightningLength", "bulletBase", bullet.bulletLightningLength,
+                        f -> bullet.bulletLightningLength = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
+                createLevDialog(typeOn, dia, "bulletLightningLengthRand", "bulletBase", bullet.bulletLightningLengthRand,
+                        f -> bullet.bulletLightningLengthRand = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
             }
             case "continuousF" -> {
-                createLevDialog("flareLength", "bulletBase", typeOn, bullet.laserCLength,
-                        f -> bullet.laserCLength = f, f -> bullet.laserCLength = f);
-                createLevDialog("lifetime", "bulletBase", typeOn, bullet.lifetime,
-                        f -> bullet.lifetime = f, f -> bullet.lifetime = f);
-                createNumberDialog("flareWidth", typeOn, bullet.flareWidth, 0, 30,
-                        f -> bullet.flareWidth = f);
+                createLevDialog(typeOn, dia, "flareLength", "bulletBase", bullet.laserCLength,
+                        f -> bullet.laserCLength = f, re, this::updateHeavy, levUser, hevUser);
+                createLevDialog(typeOn, dia, "lifetime", "bulletBase", bullet.lifetime,
+                        f -> bullet.lifetime = f, re, this::updateHeavy, levUser, hevUser);
+                createNumberDialogWithLimit(typeOn, dia, "flareWidth", bullet.flareWidth,
+                        30, 0, f -> bullet.flareWidth = f, re);
             }
             case "continuousL" -> {
-                createLevDialog("laserCLength", "bulletBase", typeOn, bullet.flareLength,
-                        f -> bullet.flareLength = f, f -> bullet.flareLength = f);
-                createLevDialog("lifetime", "bulletBase", typeOn, bullet.lifetime,
-                        f -> bullet.lifetime = f, f -> bullet.lifetime = f);
-                createNumberDialog("fadeTime", typeOn, bullet.fadeTime, 12, 36,
-                        f -> bullet.fadeTime = f);
+                createLevDialog(typeOn, dia, "laserCLength", "bulletBase", bullet.flareLength,
+                        f -> bullet.flareLength = f, re, this::updateHeavy, levUser, hevUser);
+                createLevDialog(typeOn, dia, "lifetime", "bulletBase", bullet.lifetime,
+                        f -> bullet.lifetime = f, re, this::updateHeavy, levUser, hevUser);
+                createNumberDialogWithLimit(typeOn, dia, "fadeTime", bullet.fadeTime,
+                        36, 12, f -> bullet.fadeTime = f, re);
             }
             case "point" -> {
-                createLevDialog("range", "bulletBase", typeOn, bullet.range,
-                        f -> bullet.range = f, f -> bullet.range = f);
-                createNumberDialog("trailSpacing", typeOn, 10, 10, 180,
-                        f -> bullet.trailSpacing = f);
+                createLevDialog(typeOn, dia, "range", "bulletBase", bullet.range,
+                        f -> bullet.range = f, re, this::updateHeavy, levUser, hevUser);
+                createNumberDialogWithLimit(typeOn, dia, "trailSpacing", bullet.trailSpacing,
+                        180, 2, f -> bullet.trailSpacing = f, re);
             }
             case "rail" -> {
-                createLevDialog("railLength", "bulletBase", typeOn, bullet.railLength,
-                        f -> bullet.railLength = f, f -> bullet.railLength = f);
-                createNumberDialog("pointEffectSpace", typeOn, 10, 10, 180,
-                        f -> bullet.pointEffectSpace = f);
+                createLevDialog(typeOn, dia, "railLength", "bulletBase", bullet.railLength,
+                        f -> bullet.railLength = f, re, this::updateHeavy, levUser, hevUser);
+                createNumberDialogWithLimit(typeOn, dia, "pointEffectSpace", bullet.pointEffectSpace,
+                        180, 10, f -> bullet.pointEffectSpace = f, re);
             }
         }
     }
@@ -220,18 +224,18 @@ public class BulletDialog extends BaseDialog {
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
-            createLevDialog("damage", "bulletBase", s, bullet.damage,
-                    f -> bullet.damage = f, f -> bullet.damage = f);
+            createLevDialog(s, dia, "damage", "bulletBase", bullet.damage,
+                    f -> bullet.damage = f, re, this::updateHeavy, levUser, hevUser);
         }).growX();
 
         createTypeLine(baseOn, "frags");
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
-            createNumberDialog("fragAngle", s, bullet.fragAngle, -12, 12,
-                    f -> bullet.fragAngle = f);
-            createLevDialog("frags", "frags", s, bullet.fragBullets,
-                    f -> bullet.fragBullets = (int) (f + 0), f -> bullet.fragBullets = (int) (f + 0));
+            createNumberDialogWithLimit(s, dia, "fragAngle", bullet.fragAngle,
+                    12, -12, f -> bullet.fragAngle = f, re);
+            createLevDialog(s, dia, "frags", "fragBullets", bullet.fragBullets,
+                    f -> bullet.fragBullets = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
             s.row();
             s.label(() -> Core.bundle.get("writeFrag") + "->").width(150);
             s.button(Icon.pencilSmall, () -> {
@@ -247,25 +251,25 @@ public class BulletDialog extends BaseDialog {
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
-            createNumberDialog("lightningAngle", s, bullet.lightningAngle, 0, 360,
-                    f -> bullet.lightningAngle = f);
-            createNumberDialog("lightningAngleRand", s, bullet.lightningAngleRand, 0, 360,
-                    f -> bullet.lightningAngle = f);
-            createLevDialog("lightningLength", "lightning", s, bullet.lightningLength,
-                    f -> bullet.lightningLength = (int) (f + 0), f -> bullet.lightningLength = (int) (f + 0));
+            createNumberDialogWithLimit(s, dia, "lightningAngle", bullet.lightningAngle,
+                    360, 0, f -> bullet.lightningAngle = f, re);
+            createNumberDialogWithLimit(s, dia, "lightningAngleRand", bullet.lightningAngleRand,
+                    360, 0, f -> bullet.lightningAngle = f, re);
+            createLevDialog(s, dia, "lightningLength", "lightning", bullet.lightningLength,
+                    f -> bullet.lightningLength = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
             s.row();
-            createLevDialog("lightningLengthRand", "lightning", s, bullet.lightningLengthRand,
-                    f -> bullet.lightningLengthRand = (int) (f + 0), f -> bullet.lightningLengthRand = (int) (f + 0));
-            createLevDialog("lightningDamage", "lightning", s, bullet.lightningDamage,
-                    f -> bullet.lightningDamage = f + 0, f -> bullet.lightningDamage = f + 0);
-            createLevDialog("lightnings", "lightning", s, bullet.lightning,
-                    f -> bullet.lightning = (int) (f + 0), f -> bullet.lightning = (int) (f + 0));
+            createLevDialog(s, dia, "lightningLengthRand", "lightning", bullet.lightningLengthRand,
+                    f -> bullet.lightningLengthRand = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
+            createLevDialog(s, dia, "lightningDamage", "lightning", bullet.lightningDamage,
+                    f -> bullet.lightningDamage = f + 0, re, this::updateHeavy, levUser, hevUser);
+            createLevDialog(s, dia, "lightnings", "lightning", bullet.lightning,
+                    f -> bullet.lightning = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
         }).growX();
 
         createTypeLine(baseOn, "percent");
 
-        baseOn.table(p -> createLevDialog("percent", "percent", p, bullet.percent,
-                f -> bullet.percent = f, f -> bullet.percent = f));
+        baseOn.table(p -> createLevDialog(p, dia, "percent", "percent", bullet.percent,
+                f -> bullet.percent = f, re, this::updateHeavy, levUser, hevUser));
 
         baseOn.row();
         baseOn.label(() -> Core.bundle.get("dialog.bullet.effects") + ": ");
@@ -276,60 +280,13 @@ public class BulletDialog extends BaseDialog {
 
     public void rebuildEffect(Table on) {
         on.clear();
-        on.table(l -> createEffectLine(l, "shootEffect", bullet.shootEffect)).growX();
-        on.table(l -> createEffectLine(l, "despawnEffect", bullet.despawnEffect)).growX();
+        on.table(l -> createEffectLine(l, this, dia, "shootEffect", bullet.shootEffect)).growX();
+        on.table(l -> createEffectLine(l, this, dia, "despawnEffect", bullet.despawnEffect)).growX();
         on.row();
-        on.table(l -> createEffectLine(l, "hitEffect", bullet.hitEffect)).growX();
-        on.table(l -> createEffectLine(l, "chargeEffect", bullet.chargeEffect)).growX();
+        on.table(l -> createEffectLine(l, this, dia, "hitEffect", bullet.hitEffect)).growX();
+        on.table(l -> createEffectLine(l, this, dia, "chargeEffect", bullet.chargeEffect)).growX();
         on.row();
-        on.table(l -> createEffectLine(l, "smokeEffect", bullet.smokeEffect)).growX();
-    }
-
-    public void createEffectLine(Table t, String name, IOMulti list) {
-        t.label(() -> Core.bundle.get("dialog.bullet." + name) + "->");
-        t.button(Icon.pencil, () -> {
-            BaseDialog bd = new BaseDialog("");
-            bd.cont.pane(li -> {
-                li.table(ta -> {
-                    effectOn = ta;
-                    rebuildEffectList(list);
-                }).grow();
-                li.row();
-                li.button(Icon.add, () -> {
-                    IOEffect effect = new IOEffect();
-                    IOEffect[] effects = new IOEffect[list.effects.length + 1];
-                    System.arraycopy(list.effects, 0, effects, 0, list.effects.length);
-                    effects[effects.length - 1] = effect;
-                    list.effects = effects;
-                    rebuildEffectList(list);
-                });
-            }).growX().growY();
-            bd.row();
-            bd.buttons.button(Icon.left, bd::hide);
-            bd.show();
-        });
-    }
-
-    public void rebuildEffectList(IOMulti list) {
-        effectOn.clear();
-        for (int i = 0; i < list.effects.length; i++) {
-            int finalI = i;
-            effectOn.table(t -> {
-                t.label(() -> finalI + "").growX();
-                t.button(Icon.pencil, () -> createEffectDialog(list.effects[finalI], () -> rebuildEffectList(list))).growX();
-                t.button(Icon.trash, () -> {
-                    IOEffect[] effects = new IOEffect[list.effects.length - 1];
-                    for (int j = 0; j < list.effects.length; j++) {
-                        if (j != finalI) {
-                            effects[j] = list.effects[j];
-                        }
-                    }
-                    list.effects = effects;
-                    rebuildEffectList(list);
-                }).growX();
-            }).growX();
-            effectOn.row();
-        }
+        on.table(l -> createEffectLine(l, this, dia, "smokeEffect", bullet.smokeEffect)).growX();
     }
 
     public void createTypeLine(Table t, String type) {
@@ -342,113 +299,6 @@ public class BulletDialog extends BaseDialog {
             table.label(() -> Core.bundle.get("@maxLevel") + ":  " + ProjectsLocated.maxLevel.get(type)).left().pad(5);
         });
         t.row();
-    }
-
-    public void createEffectDialog(IOEffect body, Runnable hide) {
-        EffectDialog ed = new EffectDialog("");
-        ed.hidden(hide);
-        ed.setEffect(body).show();
-    }
-
-    public void createLevDialog(String name, String line, Table t, float value, Cons<Float> changer, Cons<Float> rollback) {
-        t.table(type -> {
-            type.add(Core.bundle.get("dialog.bullet." + name) + ":").pad(3).color(Color.red);
-            type.label(() -> value + "").pad(3);
-            type.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + name), "", 15, value + "", true, str -> {
-                if (Strings.canParsePositiveFloat(str)) {
-                    float amount = Strings.parseFloat(str);
-                    changer.get(amount);
-                    float now = this.heavy;
-                    updateHeavy();
-                    if (ProjectsLocated.couldUse(line, findVal(line)) && boost * heavy +
-                            bullet.fragBullets * bulletHeavy + fromHeavy <= ProjectsLocated.freeSize) {
-                        rebuildBase();
-                        rebuildType();
-                    } else {
-                        if (!ProjectsLocated.couldUse(line, findVal(line))) {
-                            ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
-                        } else if (!(heavy + bulletHeavy + fromHeavy <= ProjectsLocated.freeSize)) {
-                            ui.showInfo(Core.bundle.get("@tooHeavy"));
-                        }
-                        this.heavy = now;
-                        rollback.get(value);
-                    }
-                    return;
-                }
-                ui.showInfo(Core.bundle.get("@inputError"));
-            })).size(55);
-        }).pad(10).fillX();
-    }
-
-    public void createNumberDialog(String name, Table t, float value, float min, float max, Cons<Float> changer) {
-        t.table(base -> {
-            base.add(Core.bundle.get("dialog.bullet." + name) + ":");
-            base.label(() -> value + "").pad(3);
-            base.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.bullet." + name), "", 15, value + "", true, str -> {
-                if (Strings.canParsePositiveFloat(str)) {
-                    float amount = Strings.parseFloat(str);
-                    if ((amount >= min && amount <= max) || max < min) {
-                        changer.get(amount);
-                        rebuildBase();
-                        rebuildType();
-                        return;
-                    }
-                }
-                ui.showInfo(Core.bundle.format("configure.invalid", min, max));
-            })).size(55);
-        }).pad(10).fillX();
-    }
-
-    public void createSelectDialog(Button b, Cons2<Table, Runnable> table) {
-        Table ta = new Table() {
-            @Override
-            public float getPrefHeight() {
-                return Math.min(super.getPrefHeight(), Core.graphics.getHeight());
-            }
-
-            @Override
-            public float getPrefWidth() {
-                return Math.min(super.getPrefWidth(), Core.graphics.getWidth());
-            }
-        };
-        ta.margin(4);
-
-        Element hitter = new Element();
-
-        Runnable hide = () -> {
-            Core.app.post(hitter::remove);
-            ta.actions(Actions.fadeOut(0.3f, Interp.fade), Actions.remove());
-        };
-
-        hitter.fillParent = true;
-        hitter.tapped(hide);
-
-        Core.scene.add(hitter);
-
-        ta.update(() -> {
-            if (b.parent == null || !b.isDescendantOf(Core.scene.root)) {
-                Core.app.post(() -> {
-                    hitter.remove();
-                    ta.remove();
-                });
-                return;
-            }
-
-            b.localToStageCoordinates(Tmp.v1.set(b.getWidth() / 2f, b.getHeight() / 2f));
-            ta.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
-            if (ta.getWidth() > Core.scene.getWidth()) ta.setWidth(Core.graphics.getWidth());
-            if (ta.getHeight() > Core.scene.getHeight()) ta.setHeight(Core.graphics.getHeight());
-            ta.keepInStage();
-            ta.invalidateHierarchy();
-            ta.pack();
-        });
-
-        Core.scene.add(ta);
-
-        ta.top().pane(select -> table.get(select, hide)).pad(0f).top().scrollX(false);
-        ta.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
-
-        ta.pack();
     }
 
     public float findVal(String name) {
@@ -527,5 +377,15 @@ public class BulletDialog extends BaseDialog {
         heavy += ProjectsLocated.getHeavy("percent", findVal("percent"));
         heavy += ProjectsLocated.getHeavy("frags", findVal("frags"));
         heavy += ProjectsLocated.getHeavy("knock", findVal("knock"));
+    }
+
+    @Override
+    public Table get() {
+        return effectOn;
+    }
+
+    @Override
+    public void set(Table table) {
+        effectOn = table;
     }
 }

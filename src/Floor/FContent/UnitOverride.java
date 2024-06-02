@@ -153,7 +153,7 @@ public class UnitOverride {
         /*=================================================================*/
         /*=================================================================*/
         /*=================================================================*/
-        UnitTypes.dagger.speed = 0.3f;
+        UnitTypes.dagger.speed = 0.2f;
         UnitTypes.dagger.weapons.get(0).reload = 45;
         UnitTypes.dagger.weapons.get(0).bullet = new BulletType(0, 0) {{
             spawnUnit = new MissileUnitType("dagger1") {{
@@ -162,16 +162,18 @@ public class UnitOverride {
 
                 health = 350;
                 armor = 3;
-                speed = 5;
+                speed = 4;
                 lifetime = 90;
-                rangeOverride = 450;
+                rangeOverride = 360;
 
                 weapons.add(new Weapon() {{
-                    bullet = new ExplosionBulletType(5, 45){{
-                        rangeOverride = 0;
+                    bullet = new ExplosionBulletType(12, 36){{
+                        rangeOverride = 30;
                     }};
                 }});
                 weapons.add(new Weapon() {{
+                    x = y = 0;
+                    mirror = false;
                     reload = 15;
                     alwaysShooting = true;
 

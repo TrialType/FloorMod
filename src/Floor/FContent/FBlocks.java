@@ -2,6 +2,7 @@ package Floor.FContent;
 
 import Floor.FEntities.FBlock.*;
 import Floor.FEntities.FBulletType.*;
+import Floor.FType.DrawParts.EffectPart;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -9,9 +10,11 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.Rand;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.Time;
+import arc.util.Tmp;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
@@ -27,10 +30,8 @@ import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
-import mindustry.type.Category;
-import mindustry.type.ItemStack;
-import mindustry.type.LiquidStack;
-import mindustry.type.UnitType;
+import mindustry.type.*;
+import mindustry.type.unit.MissileUnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
@@ -40,6 +41,7 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeCoolant;
 import mindustry.world.consumers.ConsumePower;
 
+import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
 import static mindustry.type.ItemStack.with;
@@ -57,7 +59,7 @@ public class FBlocks {
     public static Block fourNet, fireBoost,
             smallWindTurret, middleWindTurret, largeWindTurret,
             stay, bind, tranquil,
-            fireStream, tortoise;
+            fireStream, tortoise, explode;
     //crafting
     public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
     //effect
@@ -342,6 +344,122 @@ public class FBlocks {
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
 //======================================================================================================================
+        explode = new ItemTurret("explode") {{
+            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 60, Items.titanium, 60, Items.silicon, 60));
+
+            ammo(
+                    Items.titanium, new BulletType(0, 0) {{
+                        rangeOverride = 540;
+                        ammoMultiplier = 2f;
+                        absorbable = reflectable = hittable = collides = false;
+                        spawnUnit = new MissileUnitType("explode1") {{
+                            health = 600;
+                            armor = 3;
+                            lifetime = 135;
+                            speed = 4;
+                            trailLength = 36;
+                            trailColor = Color.valueOf("8da1e3");
+
+                            weapons.add(new Weapon() {{
+                                x = y = 0;
+                                mirror = false;
+                                bullet = new ExplosionBulletType(36, 36) {{
+                                    absorbable = reflectable = hittable = false;
+                                    rangeOverride = 30;
+
+                                    lightning = 6;
+                                    lightningDamage = 12;
+                                    lightningLength = 8;
+                                    lightningColor = Color.valueOf("8da1e3");
+                                }};
+                            }});
+
+                            parts.add(new EffectPart() {{
+                                effect = new Effect(50, e -> {
+                                    color(Color.valueOf("8da1e3"));
+                                    Rand rand = new Rand(e.id);
+                                    for (int i = 0; i < 3; i++) {
+                                        float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+                                        if (fin <= 1f) {
+                                            Tmp.v1.trns(angle, fin * 24f * len);
+
+                                            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                                            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+                                        }
+                                    }
+                                });
+                            }});
+                        }};
+                    }},
+                    Items.thorium, new BulletType(0, 0) {{
+                        rangeOverride = 360;
+                        ammoMultiplier = 1f;
+                        absorbable = reflectable = hittable = collides = false;
+                        spawnUnit = new MissileUnitType("explode2") {{
+                            health = 400;
+                            armor = 1;
+                            lifetime = 90;
+                            speed = 4;
+                            trailLength = 36;
+                            trailColor = Color.valueOf("f9a3c7");
+
+                            weapons.add(new Weapon() {{
+                                x = y = 0;
+                                mirror = false;
+                                bullet = new ExplosionBulletType(48, 36) {{
+                                    absorbable = reflectable = hittable = false;
+                                    rangeOverride = 30;
+
+                                    fragVelocityMax = 1;
+                                    fragVelocityMin = 0.5f;
+                                    fragLifeMax = 2;
+                                    fragLifeMin = 1;
+                                    fragBullets = 4;
+                                    fragBullet = new BasicBulletType() {{
+                                        width = height = 8;
+                                        damage = 0;
+                                        splashDamage = 16;
+                                        splashDamageRadius = 24;
+                                        frontColor = backColor = Color.valueOf("f9a3c7");
+                                    }};
+                                }};
+                            }});
+
+                            parts.add(new EffectPart() {{
+                                effect = new Effect(50, e -> {
+                                    color(Color.valueOf("f9a3c7"));
+                                    Rand rand = new Rand(e.id);
+                                    for (int i = 0; i < 3; i++) {
+                                        float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+                                        if (fin <= 1f) {
+                                            Tmp.v1.trns(angle, fin * 24f * len);
+
+                                            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                                            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+                                        }
+                                    }
+                                });
+                            }});
+                        }};
+                    }}
+            );
+
+            size = 2;
+            recoil = 3;
+            shootY = 3f;
+            reload = 150;
+            range = 540;
+            shootCone = 15f;
+            ammoUseEffect = Fx.casing1;
+            ammoPerShot = 10;
+            health = 1000;
+            inaccuracy = 0;
+            rotateSpeed = 10f;
+            coolant = consumeCoolant(0.05f);
+            researchCostMultiplier = 8f;
+        }};
         tortoise = new ItemTurret("tortoise") {{
             requirements(Category.turret, with(Items.copper, 100, Items.graphite, 80, Items.titanium, 25, Items.silicon, 25));
             ammo(

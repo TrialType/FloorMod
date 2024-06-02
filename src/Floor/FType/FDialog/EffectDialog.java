@@ -2,29 +2,22 @@ package Floor.FType.FDialog;
 
 import Floor.FEntities.FEffect.IOEffect;
 import arc.Core;
-import arc.func.Cons;
-import arc.func.Cons2;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
-import arc.math.Interp;
 import arc.math.geom.Vec2;
-import arc.scene.Element;
-import arc.scene.actions.Actions;
-import arc.scene.ui.Button;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.Align;
 import arc.util.Strings;
-import arc.util.Tmp;
 import mindustry.entities.Effect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
-import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
+import static Floor.FType.FDialog.DialogUtils.createNumberDialog;
+import static Floor.FType.FDialog.DialogUtils.createSelectDialog;
 import static mindustry.Vars.ui;
 
 public class EffectDialog extends BaseDialog {
@@ -38,6 +31,8 @@ public class EffectDialog extends BaseDialog {
     public String typeNow = "circle";
     public String cls = "";
     public float[] acs = new float[10];
+
+    public static final String dia = "effect";
 
     public EffectDialog(String title) {
         super(title);
@@ -77,14 +72,14 @@ public class EffectDialog extends BaseDialog {
     public void rebuildBase() {
         base.clear();
         base.background(Tex.buttonEdge3);
-        base.table(table -> createNumberTable(table, "lifetime", effect.lifetime,
+        base.table(table -> createNumberDialog(table, dia, "lifetime", effect.lifetime,
                 f -> effect.lifetime = f, this::rebuildBase)).growX();
-        base.table(table -> createNumberTable(table, "startDelay", effect.startDelay,
+        base.table(table -> createNumberDialog(table, dia, "startDelay", effect.startDelay,
                 f -> effect.startDelay = f, this::rebuildBase)).growX();
         base.row();
-        base.table(table -> createNumberTable(table, "clip", effect.clip,
+        base.table(table -> createNumberDialog(table, dia, "clip", effect.clip,
                 f -> effect.clip = f, this::rebuildBase)).growX();
-        base.table(table -> createNumberTable(table, "baseRotation", effect.baseRotation,
+        base.table(table -> createNumberDialog(table, dia, "baseRotation", effect.baseRotation,
                 f -> effect.baseRotation = f, this::rebuildBase)).growX();
         base.row();
         base.table(table -> {
@@ -139,41 +134,41 @@ public class EffectDialog extends BaseDialog {
         now.clear();
         switch (typeNow) {
             case "circle": {
-                createNumberTable(now, "circleNumber", acs[0], f -> acs[0] = f, this::rebuildNow);
-                createNumberTable(now, "circleLengthFrom", acs[1], f -> acs[1] = f, this::rebuildNow);
-                createNumberTable(now, "circleLengthTo", acs[2], f -> acs[2] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleNumber", acs[0], f -> acs[0] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleLengthFrom", acs[1], f -> acs[1] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleLengthTo", acs[2], f -> acs[2] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "circleRangeFrom", acs[3], f -> acs[3] = f, this::rebuildNow);
-                createNumberTable(now, "circleRangeTo", acs[4], f -> acs[4] = f, this::rebuildNow);
-                createNumberTable(now, "circleAngle", acs[5], f -> acs[5] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleRangeFrom", acs[3], f -> acs[3] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleRangeTo", acs[4], f -> acs[4] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleAngle", acs[5], f -> acs[5] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "circleAngleRand", acs[6], f -> acs[6] = f, this::rebuildNow);
-                createNumberTable(now, "circleMinRange", acs[7], f -> acs[7] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleAngleRand", acs[6], f -> acs[6] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "circleMinRange", acs[7], f -> acs[7] = f, this::rebuildNow);
                 break;
             }
             case "line": {
-                createNumberTable(now, "lineNumber", acs[0], f -> acs[0] = f, this::rebuildNow);
-                createNumberTable(now, "lineLengthFrom", acs[1], f -> acs[1] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineNumber", acs[0], f -> acs[0] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineLengthFrom", acs[1], f -> acs[1] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "lineLengthTo", acs[2], f -> acs[2] = f, this::rebuildNow);
-                createNumberTable(now, "lineStrokeFrom", acs[3], f -> acs[3] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineLengthTo", acs[2], f -> acs[2] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineStrokeFrom", acs[3], f -> acs[3] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "lineStrokeTo", acs[4], f -> acs[4] = f, this::rebuildNow);
-                createNumberTable(now, "lineRangeFrom", acs[5], f -> acs[5] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineStrokeTo", acs[4], f -> acs[4] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineRangeFrom", acs[5], f -> acs[5] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "lineRangeTo", acs[6], f -> acs[6] = f, this::rebuildNow);
-                createNumberTable(now, "lineAngle", acs[7], f -> acs[7] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineRangeTo", acs[6], f -> acs[6] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineAngle", acs[7], f -> acs[7] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "lineAngleRand", acs[8], f -> acs[8] = f, this::rebuildNow);
-                createNumberTable(now, "lineMinRange", acs[9], f -> acs[9] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineAngleRand", acs[8], f -> acs[8] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "lineMinRange", acs[9], f -> acs[9] = f, this::rebuildNow);
                 break;
             }
             case "wave": {
-                createNumberTable(now, "waveStrokeFrom", acs[0], f -> acs[0] = f, this::rebuildNow);
-                createNumberTable(now, "waveStrokeTo", acs[1], f -> acs[1] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "waveStrokeFrom", acs[0], f -> acs[0] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "waveStrokeTo", acs[1], f -> acs[1] = f, this::rebuildNow);
                 now.row();
-                createNumberTable(now, "waveRangeFrom", acs[2], f -> acs[2] = f, this::rebuildNow);
-                createNumberTable(now, "waveRangeTo", acs[3], f -> acs[3] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "waveRangeFrom", acs[2], f -> acs[2] = f, this::rebuildNow);
+                createNumberDialog(now, dia, "waveRangeTo", acs[3], f -> acs[3] = f, this::rebuildNow);
                 break;
             }
         }
@@ -358,70 +353,6 @@ public class EffectDialog extends BaseDialog {
         bd.show();
     }
 
-    public void createNumberTable(Table t, String name, float value, Cons<Float> apply, updater updater) {
-        t.label(() -> Core.bundle.get("dialog.effect." + name) + ": " + value);
-        t.button(Icon.pencil, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog.effect." + name), "", 15, value + "", true, str -> {
-            if (Strings.canParsePositiveFloat(str)) {
-                apply.get(Float.parseFloat(str));
-                updater.update();
-                return;
-            }
-            ui.showInfo(Core.bundle.format("configure.invalid"));
-        })).size(55);
-    }
-
-    public void createSelectDialog(Button b, Cons2<Table, Runnable> table) {
-        Table ta = new Table() {
-            @Override
-            public float getPrefHeight() {
-                return Math.min(super.getPrefHeight(), Core.graphics.getHeight());
-            }
-
-            @Override
-            public float getPrefWidth() {
-                return Math.min(super.getPrefWidth(), Core.graphics.getWidth());
-            }
-        };
-        ta.margin(4);
-
-        Element hitter = new Element();
-
-        Runnable hide = () -> {
-            Core.app.post(hitter::remove);
-            ta.actions(Actions.fadeOut(0.3f, Interp.fade), Actions.remove());
-        };
-
-        hitter.fillParent = true;
-        hitter.tapped(hide);
-
-        Core.scene.add(hitter);
-
-        ta.update(() -> {
-            if (b.parent == null || !b.isDescendantOf(Core.scene.root)) {
-                Core.app.post(() -> {
-                    hitter.remove();
-                    ta.remove();
-                });
-                return;
-            }
-
-            b.localToStageCoordinates(Tmp.v1.set(b.getWidth() / 2f, b.getHeight() / 2f));
-            ta.setPosition(Tmp.v1.x, Tmp.v1.y, Align.center);
-            if (ta.getWidth() > Core.scene.getWidth()) ta.setWidth(Core.graphics.getWidth());
-            if (ta.getHeight() > Core.scene.getHeight()) ta.setHeight(Core.graphics.getHeight());
-            ta.keepInStage();
-            ta.invalidateHierarchy();
-            ta.pack();
-        });
-
-        Core.scene.add(ta);
-
-        ta.top().pane(select -> table.get(select, hide)).pad(0f).top().scrollX(false);
-        ta.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
-
-        ta.pack();
-    }
-
     public String[] loadOut() {
         renderers.clear();
         String[] allValues = new String[all.size];
@@ -499,10 +430,6 @@ public class EffectDialog extends BaseDialog {
 
     public interface effectAction {
         void get(Effect.EffectContainer e);
-    }
-
-    public interface updater {
-        void update();
     }
 
     public static class EAction {
