@@ -14,6 +14,7 @@ import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -197,6 +198,18 @@ abstract class DialogUtils {
         ta.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
 
         ta.pack();
+    }
+
+    public static void createTypeLine(Table t, String dia, String type, float value) {
+        t.row();
+        t.table(table -> {
+            table.background(Tex.scroll);
+            table.label(() -> Core.bundle.get("dialog." + dia + "." + type)).left();
+            table.row();
+            table.label(() -> Core.bundle.get("@heavyUse") + ":  " + ProjectsLocated.getHeavy(type, value)).left().pad(5);
+            table.label(() -> Core.bundle.get("@maxLevel") + ":  " + ProjectsLocated.maxLevel.get(type)).left().pad(5);
+        });
+        t.row();
     }
 
     public interface BoolGetter {

@@ -93,7 +93,7 @@ public class ProjectsLocated extends BaseDialog {
         heavies.put("reload", i -> i * 1.5f);
         heavies.put("target", i -> i * 1.5f);
 
-        levels.put("number", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 3 ? 3 : f <= 4 ? 4 : f <= 5 ? 5 : 6);
+        levels.put("number", f -> f <= 1 ? 0 : f <= 2 ? 1 : f <= 3 ? 2 : f <= 4 ? 3 : f <= 5 ? 4 : f <= 6 ? 5 : 6);
         levels.put("reload", f -> f >= 150 ? 0 : f >= 120 ? 1 : f >= 90 ? 2 : f >= 60 ? 3 : f >= 30 ? 4 : f >= 15 ? 5 : 6);
         levels.put("target", f -> f >= 60 ? 0 : f >= 50 ? 1 : f >= 40 ? 2 : f >= 30 ? 3 : f >= 20 ? 4 : f >= 10 ? 5 : 6);
 

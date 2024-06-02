@@ -11,21 +11,22 @@ import static Floor.FType.FDialog.DialogUtils.*;
 
 public class WeaponDialog extends BaseDialog implements TableGetter {
     public Weapon weapon;
-    public ProjectsLocated.weaponPack pack;
-    public BulletDialog bulletDialog;
-    public LimitBulletType bullet;
-    public float bulletHeavy = 0;
-    public float heavy = 0;
-    public String type = "default";
-    public Table baseOn;
-    public Table typeOn;
-    public Table effectOn;
+    protected ProjectsLocated.weaponPack pack;
+    protected BulletDialog bulletDialog;
+    protected LimitBulletType bullet;
+    protected float bulletHeavy = 0;
+    protected float heavy = 0;
+    protected String type = "default";
+    protected Table baseOn;
+    protected Table typeOn;
+    protected Table effectOn;
+
+
     public Runnable re = () -> {
         rebuildType();
         rebuildBase();
     };
-
-    public static final String dia = "weapon";
+    public static String dia = "weapon";
     public StrBool levUser = str -> ProjectsLocated.couldUse(str, getVal(str));
     public BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= ProjectsLocated.freeSize;
 
@@ -111,6 +112,15 @@ public class WeaponDialog extends BaseDialog implements TableGetter {
         baseOn.row();
         createNumberDialog(baseOn, dia, "recoilPow", weapon.recoilPow, f -> weapon.recoilPow = f, re);
         createNumberDialogWithLimit(baseOn, dia, "xRand", weapon.xRand, 25, 0, f -> weapon.xRand = f, re);
+        createNumberDialogWithLimit(baseOn, dia, "rotationLimit", weapon.rotationLimit, 361, 0, f -> weapon.rotationLimit = f, re);
+        baseOn.row();
+        createNumberDialogWithLimit(baseOn, dia, "minWarmup", weapon.minWarmup, 0.99f, 0, f -> weapon.minWarmup = f, re);
+        createNumberDialogWithLimit(baseOn, dia, "shootWarmupSpeed", weapon.shootWarmupSpeed, 0.99f, 0, f -> weapon.shootWarmupSpeed = f, re);
+        createNumberDialogWithLimit(baseOn, dia, "smoothReloadSpeed", weapon.smoothReloadSpeed, 0.99f, 0, f -> weapon.smoothReloadSpeed = f, re);
+        baseOn.row();
+        createBooleanDialog(baseOn, dia, "ignoreRotation", weapon.ignoreRotation, b -> weapon.ignoreRotation = b, re);
+        createBooleanDialog(baseOn, dia, "noAttack", weapon.noAttack, b -> weapon.noAttack = b, re);
+        createBooleanDialog(baseOn, dia, "linearWarmup", weapon.linearWarmup, b -> weapon.linearWarmup = b, re);
     }
 
     public void rebuildType() {

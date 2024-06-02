@@ -1,19 +1,9 @@
 package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
-import Floor.FEntities.FEffect.IOEffect;
-import Floor.FEntities.FEffect.IOMulti;
 import arc.Core;
-import arc.func.Cons;
-import arc.func.Cons2;
-import arc.math.Interp;
-import arc.scene.Element;
-import arc.scene.actions.Actions;
-import arc.scene.ui.Button;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.Align;
-import arc.util.Tmp;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -22,29 +12,29 @@ import mindustry.ui.dialogs.BaseDialog;
 import static Floor.FType.FDialog.DialogUtils.*;
 
 public class BulletDialog extends BaseDialog implements TableGetter {
-    public int boost = 1;
-    public WeaponDialog parentW;
-    public BulletDialog parentB;
-    public final Seq<String> types = new Seq<>(new String[]{
+    protected int boost = 1;
+    protected WeaponDialog parentW;
+    protected BulletDialog parentB;
+    protected static final Seq<String> types = new Seq<>(new String[]{
             "bullet", "laser", "lightning", "continuousF", "continuousL", "point", "rail"
     });
-    public String newType = "bullet";
+    protected String newType = "bullet";
     //global
-    public LimitBulletType bullet = new LimitBulletType();
-    public LimitBulletType FBullet;
-    public float bulletHeavy = 0;
-    public float heavy = 0.5f;
-    public Table typeOn;
-    public Table baseOn;
-    public Table effectOn;
+    protected LimitBulletType bullet = new LimitBulletType();
+    protected LimitBulletType FBullet;
+    protected float bulletHeavy = 0;
+    protected float heavy = 0.5f;
+    protected Table typeOn;
+    protected Table baseOn;
+    protected Table effectOn;
 
-    public static final String dia = "bullet";
-    public Runnable re = () -> {
+    protected static String dia = "bullet";
+    protected Runnable re = () -> {
         rebuildBase();
         rebuildType();
     };
-    public StrBool levUser = str -> ProjectsLocated.couldUse(str, findVal(str));
-    public BoolGetter hevUser = () -> boost * heavy + bullet.fragBullets * bulletHeavy <= ProjectsLocated.freeSize;
+    protected StrBool levUser = str -> ProjectsLocated.couldUse(str, findVal(str));
+    protected BoolGetter hevUser = () -> boost * heavy + bullet.fragBullets * bulletHeavy <= ProjectsLocated.freeSize;
 
     public BulletDialog(BaseDialog parent, String title) {
         super(title);
@@ -220,7 +210,7 @@ public class BulletDialog extends BaseDialog implements TableGetter {
 
     public void rebuildBase() {
         baseOn.clear();
-        createTypeLine(baseOn, "bulletBase");
+        createTypeLine(baseOn, dia, "bulletBase", findVal("bulletBase"));
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
@@ -228,7 +218,7 @@ public class BulletDialog extends BaseDialog implements TableGetter {
                     f -> bullet.damage = f, re, this::updateHeavy, levUser, hevUser);
         }).growX();
 
-        createTypeLine(baseOn, "frags");
+        createTypeLine(baseOn, dia, "frags", findVal("frags"));
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
@@ -247,7 +237,7 @@ public class BulletDialog extends BaseDialog implements TableGetter {
             s.row();
         }).growX();
 
-        createTypeLine(baseOn, "lightning");
+        createTypeLine(baseOn, dia, "lightning", findVal("lightning"));
 
         baseOn.table(s -> {
             s.background(Tex.buttonDown);
@@ -266,7 +256,7 @@ public class BulletDialog extends BaseDialog implements TableGetter {
                     f -> bullet.lightning = (int) (f + 0), re, this::updateHeavy, levUser, hevUser);
         }).growX();
 
-        createTypeLine(baseOn, "percent");
+        createTypeLine(baseOn, dia, "percent", findVal("percent"));
 
         baseOn.table(p -> createLevDialog(p, dia, "percent", "percent", bullet.percent,
                 f -> bullet.percent = f, re, this::updateHeavy, levUser, hevUser));
@@ -287,18 +277,6 @@ public class BulletDialog extends BaseDialog implements TableGetter {
         on.table(l -> createEffectLine(l, this, dia, "chargeEffect", bullet.chargeEffect)).growX();
         on.row();
         on.table(l -> createEffectLine(l, this, dia, "smokeEffect", bullet.smokeEffect)).growX();
-    }
-
-    public void createTypeLine(Table t, String type) {
-        t.row();
-        t.table(table -> {
-            table.background(Tex.scroll);
-            table.label(() -> Core.bundle.get("dialog.bullet." + type)).left();
-            table.row();
-            table.label(() -> Core.bundle.get("@heavyUse") + ":  " + ProjectsLocated.getHeavy(type, findVal(type))).left().pad(5);
-            table.label(() -> Core.bundle.get("@maxLevel") + ":  " + ProjectsLocated.maxLevel.get(type)).left().pad(5);
-        });
-        t.row();
     }
 
     public float findVal(String name) {
