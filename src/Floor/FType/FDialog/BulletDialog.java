@@ -4,6 +4,7 @@ import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -11,7 +12,7 @@ import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.DialogUtils.*;
 
-public class BulletDialog extends BaseDialog implements TableGetter {
+public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected int boost = 1;
     protected WeaponDialog parentW;
     protected BulletDialog parentB;
@@ -269,6 +270,21 @@ public class BulletDialog extends BaseDialog implements TableGetter {
     }
 
     public void rebuildEffect(Table on) {
+        if (bullet.shootEffect == null) {
+            bullet.shootEffect = new MultiEffect();
+        }
+        if (bullet.despawnEffect == null) {
+            bullet.despawnEffect = new MultiEffect();
+        }
+        if (bullet.hitEffect == null) {
+            bullet.hitEffect = new MultiEffect();
+        }
+        if (bullet.chargeEffect == null) {
+            bullet.chargeEffect = new MultiEffect();
+        }
+        if (bullet.smokeEffect == null) {
+            bullet.smokeEffect = new MultiEffect();
+        }
         on.clear();
         on.table(l -> createEffectLine(l, this, dia, "shootEffect", bullet.shootEffect)).growX();
         on.table(l -> createEffectLine(l, this, dia, "despawnEffect", bullet.despawnEffect)).growX();

@@ -20,7 +20,6 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.EmpBulletType;
 import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -41,11 +40,11 @@ public class LimitBulletType extends BulletType {
     static boolean any = false;
 
 
-    public IOMulti hitEffect = new IOMulti();
-    public IOMulti despawnEffect = new IOMulti();
-    public IOMulti shootEffect = new IOMulti();
-    public IOMulti chargeEffect = new IOMulti();
-    public IOMulti smokeEffect = new IOMulti();
+    public Effect hitEffect;
+    public Effect despawnEffect;
+    public Effect shootEffect;
+    public Effect chargeEffect;
+    public Effect smokeEffect;
 
     public float percent = 0;
 

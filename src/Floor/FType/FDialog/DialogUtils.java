@@ -1,7 +1,5 @@
 package Floor.FType.FDialog;
 
-import Floor.FEntities.FEffect.IOEffect;
-import Floor.FEntities.FEffect.IOMulti;
 import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
@@ -13,6 +11,8 @@ import arc.scene.ui.layout.Table;
 import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
+import mindustry.entities.Effect;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -95,57 +95,63 @@ abstract class DialogUtils {
         }).pad(10).fillX();
     }
 
-    public static void createEffectLine(Table t, TableGetter on, String dia, String name, IOMulti list) {
-        t.label(() -> Core.bundle.get("dialog." + dia + "." + name) + "->");
-        t.button(Icon.pencil, () -> {
-            BaseDialog bd = new BaseDialog("");
-            bd.cont.pane(li -> {
-                li.table(ta -> {
-                    on.set(ta);
-                    rebuildEffectList(on.get(), list);
-                }).grow();
-                li.row();
-                li.button(Icon.add, () -> {
-                    IOEffect effect = new IOEffect();
-                    IOEffect[] effects = new IOEffect[list.effects.length + 1];
-                    System.arraycopy(list.effects, 0, effects, 0, list.effects.length);
-                    effects[effects.length - 1] = effect;
-                    list.effects = effects;
-                    rebuildEffectList(on.get(), list);
-                });
-            }).growX().growY();
-            bd.row();
-            bd.buttons.button(Icon.left, bd::hide);
-            bd.show();
-        });
-    }
-
-    public static void rebuildEffectList(Table on, IOMulti list) {
-        on.clear();
-        for (int i = 0; i < list.effects.length; i++) {
-            int finalI = i;
-            on.table(t -> {
-                t.label(() -> finalI + "").growX();
-                t.button(Icon.pencil, () -> createEffectDialog(list.effects[finalI], () -> rebuildEffectList(on, list))).growX();
-                t.button(Icon.trash, () -> {
-                    IOEffect[] effects = new IOEffect[list.effects.length - 1];
-                    for (int j = 0; j < list.effects.length; j++) {
-                        if (j != finalI) {
-                            effects[j] = list.effects[j];
-                        }
-                    }
-                    list.effects = effects;
-                    rebuildEffectList(on, list);
-                }).growX();
-            }).growX();
-            on.row();
+    public static void createEffectLine(Table t, EffectTableGetter on, String dia, String name, Effect list) {
+        MultiEffect multi = (MultiEffect) list;
+        if (multi != null) {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + name) + "->");
+            t.button(Icon.pencil, () -> {
+                BaseDialog bd = new BaseDialog("");
+                bd.cont.pane(li -> {
+                    li.table(ta -> {
+                        on.set(ta);
+                        rebuildEffectList(on.get(), list);
+                    }).grow();
+                    li.row();
+                    li.button(Icon.add, () -> {
+                        Effect effect = new Effect();
+                        Effect[] effects = new Effect[multi.effects.length + 1];
+                        System.arraycopy(multi.effects, 0, effects, 0, multi.effects.length);
+                        effects[effects.length - 1] = effect;
+                        multi.effects = effects;
+                        rebuildEffectList(on.get(), list);
+                    });
+                }).growX().growY();
+                bd.row();
+                bd.buttons.button(Icon.left, bd::hide);
+                bd.show();
+            });
         }
     }
 
-    public static void createEffectDialog(IOEffect body, Runnable hide) {
-        EffectDialog ed = new EffectDialog("");
+    private static void rebuildEffectList(Table on, Effect list) {
+        on.clear();
+        MultiEffect effect = (MultiEffect) list;
+        if (effect != null) {
+            for (int i = 0; i < effect.effects.length; i++) {
+                int finalI = i;
+                on.table(t -> {
+                    t.label(() -> finalI + "").growX();
+                    t.button(Icon.pencil, () -> createEffectDialog(e -> effect.effects[finalI] = e,
+                            () -> rebuildEffectList(on, list))).growX();
+                    t.button(Icon.trash, () -> {
+                        Effect[] effects = new Effect[effect.effects.length - 1];
+                        for (int j = 0; j < effect.effects.length; j++) {
+                            if (j != finalI) {
+                                effects[j] = effect.effects[j];
+                            }
+                        }
+                        effect.effects = effects;
+                        rebuildEffectList(on, list);
+                    }).growX();
+                }).growX();
+                on.row();
+            }
+        }
+    }
+
+    private static void createEffectDialog(Cons<Effect> apply, Runnable hide) {
+        EffectDialog ed = new EffectDialog("", apply);
         ed.hidden(hide);
-        ed.setEffect(body).show();
     }
 
     public static void createSelectDialog(Button b, Cons2<Table, Runnable> table) {
@@ -212,6 +218,11 @@ abstract class DialogUtils {
         t.row();
     }
 
+    public static void createMessageLine(Table on, String dia, String name) {
+        on.row();
+        on.label(() -> Core.bundle.get("dialog." + dia + "." + name)).width(35).pad(5);
+    }
+
     public interface BoolGetter {
         boolean get();
     }
@@ -220,7 +231,7 @@ abstract class DialogUtils {
         boolean get(String str);
     }
 
-    public interface TableGetter {
+    public interface EffectTableGetter {
         Table get();
 
         void set(Table table);
