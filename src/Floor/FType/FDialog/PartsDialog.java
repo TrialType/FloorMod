@@ -39,7 +39,7 @@ public class PartsDialog extends BaseDialog {
     }
 
     public void setParts(Seq<DrawPart> parts) {
-        this.parts = parts;
+        this.parts = parts == null ? new Seq<>() : parts;
     }
 
     public void rebuild() {

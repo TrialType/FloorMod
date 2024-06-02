@@ -8,6 +8,7 @@ import arc.scene.Element;
 import arc.scene.actions.Actions;
 import arc.scene.ui.Button;
 import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
@@ -266,6 +267,16 @@ abstract class ProjectDialogUtils {
                 }
             })).size(55);
         }).pad(10).fillX();
+    }
+
+    public static void createPartsDialog(Table on, String dia, String tile, Seq<DrawPart> parts, Cons<Seq<DrawPart>> apply) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
+            t.button(Icon.pencilSmall, () -> {
+                PartsDialog pd = new PartsDialog("", apply, parts);
+                pd.show();
+            });
+        });
     }
 
     public static void createEffectList(Table on, EffectTableGetter data, String dia, String name, Effect list) {

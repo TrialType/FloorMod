@@ -13,7 +13,6 @@ import static Floor.FType.FDialog.ProjectDialogUtils.*;
 
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Weapon weapon;
-    protected ProjectsLocated.weaponPack pack;
     protected BulletDialog bulletDialog;
     protected LimitBulletType bullet;
     protected float bulletHeavy = 0;
@@ -29,29 +28,30 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public StrBool levUser = str -> couldUse(str, getVal(str));
     public BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
 
-    public WeaponDialog(String title, ProjectsLocated.weaponPack pack) {
+    public WeaponDialog(String title) {
         super(title);
 
-        this.pack = pack;
-        weapon = pack.weapon == null ? new Weapon() : pack.weapon;
+        weapon = new Weapon();
         updateHeavy();
         bulletDialog = new BulletDialog(this, "");
         bulletDialog.hidden(() -> freeSize += this.heavy);
         bullet = new LimitBulletType();
         buttons.button("@back", Icon.left, this::hide);
         buttons.button("@apply", Icon.right, () -> {
-            pack.weapon = this.weapon;
-            pack.heavy = this.heavy + this.bulletHeavy;
+            updateHeavy();
             hide();
         });
         buttons.button("@setZero", () -> {
             weapon.reload = Float.MAX_VALUE;
             weapon.shoot.shots = 0;
             weapon.targetSwitchInterval = weapon.targetInterval = Float.MAX_VALUE;
+            if (weapon instanceof RepairBeamWeapon r) {
+                r.repairSpeed = r.fractionRepairSpeed = r.beamWidth = 0;
+            }
+            updateHeavy();
             rebuild();
         });
         shown(this::rebuild);
-        hidden(() -> pack.weapon = this.weapon);
     }
 
     public void rebuild() {
@@ -73,7 +73,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             weapon.ejectEffect = new MultiEffect();
         }
         baseOn.row();
-        createEffectLine(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
+        createEffectList(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
         baseOn.row();
         createNumberDialog(baseOn, dia, "x", weapon.x, f -> weapon.x = f, reBase);
         createNumberDialog(baseOn, dia, "y", weapon.y, f -> weapon.y = f, reBase);
