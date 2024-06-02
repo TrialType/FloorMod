@@ -18,10 +18,10 @@ import static mindustry.Vars.ui;
 
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Weapon weapon;
-    protected Weapon rollback;
     protected BulletDialog bulletDialog;
     protected LimitBulletType bullet;
     protected float bulletHeavy = 0;
+    protected float heavyBack;
     protected float heavy = 0;
     protected String type = "default";
     protected Table baseOn;
@@ -37,15 +37,16 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply) {
         super(title);
 
-        this.rollback = rollback;
-        this.weapon = new Weapon();
-        updateHeavy();
+        if (this.weapon == null) {
+            this.weapon = rollback;
+            updateHeavy();
+            heavyBack = heavy;
+        }
+        setWeapon(weapon);
         bulletDialog = new BulletDialog(this, "");
         bulletDialog.hidden(() -> freeSize += this.heavy);
         bullet = new LimitBulletType();
         buttons.button("@back", Icon.left, () -> {
-            apply.get(this.rollback);
-            weapon = this.rollback;
             updateHeavy();
             hide();
         });
@@ -196,9 +197,6 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         if (type.equals("defense")) {
 
         } else if (type.equals("repair")) {
-            if (!(weapon instanceof RepairBeamWeapon)) {
-                weapon = new RepairBeamWeapon();
-            }
             RepairBeamWeapon r = (RepairBeamWeapon) weapon;
             createBooleanDialog(typeOn, dia, "targetBuildings", r.targetBuildings,
                     b -> r.targetBuildings = b, reType);
@@ -224,6 +222,45 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         heavy += getHeavy("number", weapon.shoot.shots);
         heavy += getHeavy("reload", weapon.reload);
         heavy += getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
+    }
+
+    public void setWeapon(Weapon weapon) {
+        if (weapon instanceof RepairBeamWeapon r) {
+            this.weapon = new RepairBeamWeapon();
+            RepairBeamWeapon rb = (RepairBeamWeapon) this.weapon;
+            Field[] fields = RepairBeamWeapon.class.getFields();
+            for (Field field : fields) {
+                try {
+                    field.set(rb, field.get(r));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else if (weapon instanceof PointDefenseWeapon p) {
+            this.weapon = new PointDefenseWeapon();
+            PointDefenseWeapon pw = (PointDefenseWeapon) this.weapon;
+            Field[] fields = PointDefenseWeapon.class.getFields();
+            for (Field field : fields) {
+                try {
+                    field.set(pw, field.get(p));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            this.weapon = new Weapon();
+            cloneWeapon(weapon, this.weapon);
+        }
+    }
+
+    public void updateType() {
+        if (weapon instanceof PointDefenseWeapon) {
+            type = "defense";
+        } else if (weapon instanceof RepairBeamWeapon) {
+            type = "repair";
+        } else {
+            type = "default";
+        }
     }
 
     public void cloneWeapon(Weapon from, Weapon to) {
