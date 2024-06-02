@@ -610,8 +610,8 @@ public class FBlocks {
                 fragBullet = new BulletType() {{
                     damage = 3;
                     speed = 2.5f;
-                    splashDamageRadius = 6;
-                    status = FStatusEffects.suppressI;
+                    splashDamageRadius = 36;
+                    status = FStatusEffects.breakHelII;
                     statusDuration = 240;
 
                     hitEffect = new ExplosionEffect() {{

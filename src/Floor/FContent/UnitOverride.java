@@ -167,7 +167,9 @@ public class UnitOverride {
                 rangeOverride = 450;
 
                 weapons.add(new Weapon() {{
-                    bullet = new ExplosionBulletType(5, 45);
+                    bullet = new ExplosionBulletType(5, 45){{
+                        rangeOverride = 0;
+                    }};
                 }});
                 weapons.add(new Weapon() {{
                     reload = 15;
