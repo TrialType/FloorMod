@@ -8,7 +8,7 @@ import mindustry.entities.part.*;
 import mindustry.gen.Icon;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.DialogUtils.*;
+import static Floor.FType.FDialog.ProjectDialogUtils.*;
 
 public class PartsDialog extends BaseDialog {
     protected Table listOn;
@@ -31,6 +31,15 @@ public class PartsDialog extends BaseDialog {
             apply.get(parts);
             hide();
         });
+    }
+
+    public PartsDialog(String title, Cons<Seq<DrawPart>> apply, Seq<DrawPart> parts) {
+        this(title, apply);
+        setParts(parts);
+    }
+
+    public void setParts(Seq<DrawPart> parts) {
+        this.parts = parts;
     }
 
     public void rebuild() {
@@ -67,6 +76,7 @@ public class PartsDialog extends BaseDialog {
                     shapePart.recoilIndex = part.recoilIndex;
                     parts.set(index, shapePart);
                     rebuildPart(t, index, "shape", part);
+                    hide.run();
                 });
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.hover"), () -> {
@@ -78,6 +88,7 @@ public class PartsDialog extends BaseDialog {
                     hoverPart.recoilIndex = part.recoilIndex;
                     parts.set(index, hoverPart);
                     rebuildPart(t, index, "hover", part);
+                    hide.run();
                 });
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.halo"), () -> {
@@ -89,6 +100,7 @@ public class PartsDialog extends BaseDialog {
                     haloPart.recoilIndex = part.recoilIndex;
                     parts.set(index, haloPart);
                     rebuildPart(t, index, "halo", part);
+                    hide.run();
                 });
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.flare"), () -> {
@@ -100,6 +112,7 @@ public class PartsDialog extends BaseDialog {
                     flarePart.recoilIndex = part.recoilIndex;
                     parts.set(index, flarePart);
                     rebuildPart(t, index, "flare", part);
+                    hide.run();
                 });
             }));
         }, () -> {
@@ -175,6 +188,7 @@ public class PartsDialog extends BaseDialog {
                         f -> shapePart.layer = f, reb);
                 createNumberDialog(t, dia, "layerOffset", shapePart.layerOffset,
                         f -> shapePart.layerOffset = f, reb);
+                createPartProgressSelect(t, dia, "progress", p -> shapePart.progress = p);
             }
             case "hover": {
                 HoverPart hoverPart = (HoverPart) part;
@@ -263,6 +277,8 @@ public class PartsDialog extends BaseDialog {
                         f -> haloPart.layer = f, reb);
                 createNumberDialog(t, dia, "layerOffset", haloPart.layerOffset,
                         f -> haloPart.layerOffset = f, reb);
+                t.row();
+                createPartProgressSelect(t, dia, "progress", p -> haloPart.progress = p);
             }
             case "flare": {
                 FlarePart flarePart = (FlarePart) part;
@@ -296,8 +312,8 @@ public class PartsDialog extends BaseDialog {
                 t.row();
                 createBooleanDialog(t, dia, "followRotation", flarePart.followRotation,
                         b -> flarePart.followRotation = b, reb);
+                createPartProgressSelect(t, dia, "progress", p -> flarePart.progress = p);
             }
-
         }
     }
 

@@ -16,7 +16,7 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.DialogUtils.*;
+import static Floor.FType.FDialog.ProjectDialogUtils.*;
 import static mindustry.Vars.ui;
 
 
@@ -36,11 +36,11 @@ abstract class DiscardEffectDialog extends BaseDialog {
 
     protected static String dia = "effect";
 
-    public DiscardEffectDialog(String title) {
+    private DiscardEffectDialog(String title) {
         super(title);
     }
 
-    public DiscardEffectDialog setEffect(IOEffect effect) {
+    private DiscardEffectDialog setEffect(IOEffect effect) {
         this.effect = effect;
         for (String v : effect.values) {
             all.add(EAction.in(v));

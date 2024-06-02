@@ -10,7 +10,8 @@ import mindustry.gen.Tex;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.DialogUtils.*;
+import static Floor.FType.FDialog.ProjectDialogUtils.*;
+import static mindustry.Vars.ui;
 
 public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected int boost = 1;
@@ -34,8 +35,8 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         rebuildBase();
         rebuildType();
     };
-    protected StrBool levUser = str -> ProjectsLocated.couldUse(str, findVal(str));
-    protected BoolGetter hevUser = () -> boost * heavy + bullet.fragBullets * bulletHeavy <= ProjectsLocated.freeSize;
+    protected StrBool levUser = str -> couldUse(str, findVal(str));
+    protected BoolGetter hevUser = () -> boost * heavy + bullet.fragBullets * bulletHeavy <= freeSize;
 
     public BulletDialog(BaseDialog parent, String title) {
         super(title);
@@ -67,35 +68,39 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             }
         }).size(210f, 64f);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
-            if (ProjectsLocated.getHeavy("percent", findVal("percent")) > 0) {
-                bullet.havePercent = true;
-            }
-            if (ProjectsLocated.getHeavy("emp", findVal("emp")) > 0) {
-                bullet.haveEmp = true;
-            }
-            if (newType.equals("lightning")) {
-                if (bullet.havePercent) {
-                    bullet.lightningType = new LimitBulletType() {{
-                        havePercent = true;
-                        percent = bullet.percent;
-                        lightningDamage = bullet.lightningDamage;
-                    }};
+            if (boost * heavy + bullet.fragBullets * bulletHeavy <= freeSize) {
+                if (getHeavy("percent", findVal("percent")) > 0) {
+                    bullet.havePercent = true;
                 }
-            }
-            if (parentB != null) {
-                if (parentB.FBullet == null) {
-                    parentB.FBullet = new LimitBulletType();
+                if (getHeavy("emp", findVal("emp")) > 0) {
+                    bullet.haveEmp = true;
                 }
-                bullet.copyTo(parentB.FBullet);
-                parentB.bulletHeavy = this.heavy * boost + this.bulletHeavy;
-            } else if (parentW != null) {
-                if (parentW.bullet == null) {
-                    parentW.bullet = new LimitBulletType();
+                if (newType.equals("lightning")) {
+                    if (bullet.havePercent) {
+                        bullet.lightningType = new LimitBulletType() {{
+                            havePercent = true;
+                            percent = bullet.percent;
+                            lightningDamage = bullet.lightningDamage;
+                        }};
+                    }
                 }
-                bullet.copyTo(parentW.bullet);
-                parentW.bulletHeavy = this.heavy * boost + this.bulletHeavy;
+                if (parentB != null) {
+                    if (parentB.FBullet == null) {
+                        parentB.FBullet = new LimitBulletType();
+                    }
+                    bullet.copyTo(parentB.FBullet);
+                    parentB.bulletHeavy = this.heavy * boost + this.bulletHeavy;
+                } else if (parentW != null) {
+                    if (parentW.bullet == null) {
+                        parentW.bullet = new LimitBulletType();
+                    }
+                    bullet.copyTo(parentW.bullet);
+                    parentW.bulletHeavy = this.heavy * boost + this.bulletHeavy;
+                }
+                hide();
+            } else {
+                ui.showInfo(Core.bundle.get("@tooHeavy"));
             }
-            hide();
         }).size(210f, 64f);
         buttons.button("@toZero", Icon.defense, () -> {
             bullet.setZero();
@@ -136,8 +141,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             }).size(25).left().pad(5);
             t.row();
             t.label(() -> Core.bundle.get("@heavyUse") + ": " +
-                    (heavy + bulletHeavy) + " / " +
-                    ProjectsLocated.freeSize).size(25).left().width(100).pad(5);
+                    (heavy + bulletHeavy) + " / " + freeSize).size(25).left().width(100).pad(5);
         }).pad(2).growX().row();
 
         table.table(t -> typeOn = t).pad(2).left().growX();
@@ -230,9 +234,9 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             s.row();
             s.label(() -> Core.bundle.get("writeFrag") + "->").width(150);
             s.button(Icon.pencilSmall, () -> {
-                ProjectsLocated.freeSize -= this.heavy * boost;
+                freeSize -= this.heavy * boost;
                 BulletDialog bd = new BulletDialog(this, "");
-                bd.hidden(() -> ProjectsLocated.freeSize += this.heavy * boost);
+                bd.hidden(() -> freeSize += this.heavy * boost);
                 bd.show();
             }).pad(15).width(24);
             s.row();
@@ -286,13 +290,13 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             bullet.smokeEffect = new MultiEffect();
         }
         on.clear();
-        on.table(l -> createEffectLine(l, this, dia, "shootEffect", bullet.shootEffect)).growX();
-        on.table(l -> createEffectLine(l, this, dia, "despawnEffect", bullet.despawnEffect)).growX();
+        on.table(l -> createEffectList(l, this, dia, "shootEffect", bullet.shootEffect)).growX();
+        on.table(l -> createEffectList(l, this, dia, "despawnEffect", bullet.despawnEffect)).growX();
         on.row();
-        on.table(l -> createEffectLine(l, this, dia, "hitEffect", bullet.hitEffect)).growX();
-        on.table(l -> createEffectLine(l, this, dia, "chargeEffect", bullet.chargeEffect)).growX();
+        on.table(l -> createEffectList(l, this, dia, "hitEffect", bullet.hitEffect)).growX();
+        on.table(l -> createEffectList(l, this, dia, "chargeEffect", bullet.chargeEffect)).growX();
         on.row();
-        on.table(l -> createEffectLine(l, this, dia, "smokeEffect", bullet.smokeEffect)).growX();
+        on.table(l -> createEffectList(l, this, dia, "smokeEffect", bullet.smokeEffect)).growX();
     }
 
     public float findVal(String name) {
@@ -364,13 +368,13 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
 
     public void updateHeavy() {
         heavy = 0.5f;
-        heavy += ProjectsLocated.getHeavy("bulletBase", findVal("bulletBase"));
-        heavy += ProjectsLocated.getHeavy("emp", findVal("emp"));
-        heavy += ProjectsLocated.getHeavy("splash", findVal("splash"));
-        heavy += ProjectsLocated.getHeavy("lightning", findVal("lightning"));
-        heavy += ProjectsLocated.getHeavy("percent", findVal("percent"));
-        heavy += ProjectsLocated.getHeavy("frags", findVal("frags"));
-        heavy += ProjectsLocated.getHeavy("knock", findVal("knock"));
+        heavy += getHeavy("bulletBase", findVal("bulletBase"));
+        heavy += getHeavy("emp", findVal("emp"));
+        heavy += getHeavy("splash", findVal("splash"));
+        heavy += getHeavy("lightning", findVal("lightning"));
+        heavy += getHeavy("percent", findVal("percent"));
+        heavy += getHeavy("frags", findVal("frags"));
+        heavy += getHeavy("knock", findVal("knock"));
     }
 
     @Override

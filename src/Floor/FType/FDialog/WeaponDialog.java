@@ -6,11 +6,10 @@ import arc.scene.ui.layout.Table;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.type.Weapon;
-import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.DialogUtils.*;
+import static Floor.FType.FDialog.ProjectDialogUtils.*;
 
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Weapon weapon;
@@ -27,8 +26,8 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Runnable reBase = this::rebuildBase;
     public Runnable reType = this::rebuildType;
     public static String dia = "weapon";
-    public StrBool levUser = str -> ProjectsLocated.couldUse(str, getVal(str));
-    public BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= ProjectsLocated.freeSize;
+    public StrBool levUser = str -> couldUse(str, getVal(str));
+    public BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
 
     public WeaponDialog(String title, ProjectsLocated.weaponPack pack) {
         super(title);
@@ -37,7 +36,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         weapon = pack.weapon == null ? new Weapon() : pack.weapon;
         updateHeavy();
         bulletDialog = new BulletDialog(this, "");
-        bulletDialog.hidden(() -> ProjectsLocated.freeSize += this.heavy);
+        bulletDialog.hidden(() -> freeSize += this.heavy);
         bullet = new LimitBulletType();
         buttons.button("@back", Icon.left, this::hide);
         buttons.button("@apply", Icon.right, () -> {
@@ -67,7 +66,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         baseOn.clear();
         baseOn.label(() -> Core.bundle.get("dialog.weapon.bullet")).width(160);
         baseOn.button(Icon.pencilSmall, () -> {
-            ProjectsLocated.freeSize -= this.heavy;
+            freeSize -= this.heavy;
             bulletDialog.show();
         }).size(15).pad(15);
         if (weapon.ejectEffect == null) {
@@ -159,9 +158,9 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public void updateHeavy() {
         heavy = 0.5f;
-        heavy += ProjectsLocated.getHeavy("number", weapon.shoot.shots);
-        heavy += ProjectsLocated.getHeavy("reload", weapon.reload);
-        heavy += ProjectsLocated.getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
+        heavy += getHeavy("number", weapon.shoot.shots);
+        heavy += getHeavy("reload", weapon.reload);
+        heavy += getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
     }
 
     @Override
