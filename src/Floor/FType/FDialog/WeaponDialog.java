@@ -28,13 +28,13 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     protected Table typeOn;
     protected Table effectOn;
 
-    public Runnable reBase = this::rebuildBase;
-    public Runnable reType = this::rebuildType;
-    public static String dia = "weapon";
-    public StrBool levUser = str -> couldUse(str, getVal(str));
-    public BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
+    protected Runnable reBase = this::rebuildBase;
+    protected Runnable reType = this::rebuildType;
+    protected static String dia = "weapon";
+    protected StrBool levUser = str -> couldUse(str, getVal(str));
+    protected BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
 
-    public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply) {
+    public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
 
         if (this.weapon == null) {
@@ -47,6 +47,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         bulletDialog.hidden(() -> freeSize += this.heavy);
         bullet = new LimitBulletType();
         buttons.button("@back", Icon.left, () -> {
+            weapon = rollback;
             updateHeavy();
             hide();
         });
@@ -69,6 +70,11 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             rebuild();
         });
         shown(this::rebuild);
+        hidden(() -> {
+            freeSize -= this.heavy;
+            freeSize -= weapon.shoot.shots * bulletHeavy;
+            heavyApply.get(weapon.shoot.shots * bulletHeavy + this.heavy);
+        });
     }
 
     public void rebuild() {
@@ -190,18 +196,55 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         createBooleanDialog(baseOn, dia, "noAttack", weapon.noAttack, b -> weapon.noAttack = b, reBase);
         createBooleanDialog(baseOn, dia, "linearWarmup", weapon.linearWarmup, b -> weapon.linearWarmup = b, reBase);
         baseOn.row();
+        createPartsDialog(baseOn, dia, "parts", weapon.parts, p -> weapon.parts = p);
     }
 
     public void rebuildType() {
         typeOn.clear();
         if (type.equals("defense")) {
-
+            PointDefenseWeapon p = (PointDefenseWeapon) weapon;
+            createColorDialog(typeOn, dia, "color", p.color,
+                    c -> p.color = c, reType);
+            if (p.beamEffect == null) {
+                p.beamEffect = new MultiEffect();
+            }
+            createEffectList(typeOn, this, dia, "effect", p.beamEffect);
         } else if (type.equals("repair")) {
             RepairBeamWeapon r = (RepairBeamWeapon) weapon;
             createBooleanDialog(typeOn, dia, "targetBuildings", r.targetBuildings,
                     b -> r.targetBuildings = b, reType);
             createBooleanDialog(typeOn, dia, "targetUnits", r.targetUnits,
                     b -> r.targetUnits = b, reType);
+            createNumberDialogWithLimit(typeOn, dia, "recentDamageMultiplier", r.recentDamageMultiplier, 1, 0,
+                    f -> r.recentDamageMultiplier = f, reType);
+            typeOn.row();
+            createLevDialog(typeOn, dia, "target", "repairSpeed", r.repairSpeed,
+                    f -> r.repairSpeed = f, reType, this::updateHeavy, levUser, hevUser);
+            createLevDialog(typeOn, dia, "target", "fractionRepairSpeed", r.fractionRepairSpeed,
+                    f -> r.fractionRepairSpeed = f, reType, this::updateHeavy, levUser, hevUser);
+            createLevDialog(typeOn, dia, "target", "beamWidth", r.beamWidth,
+                    f -> r.beamWidth = f, reType, this::updateHeavy, levUser, hevUser);
+            typeOn.row();
+            createNumberDialog(typeOn, dia, "pulseRadius", r.pulseRadius,
+                    f -> r.pulseRadius = f, reType);
+            createNumberDialog(typeOn, dia, "pulseStroke", r.pulseStroke,
+                    f -> r.pulseStroke = f, reType);
+            createNumberDialog(typeOn, dia, "widthSinMag", r.widthSinMag,
+                    f -> r.widthSinMag = f, reType);
+            typeOn.row();
+            createNumberDialog(typeOn, dia, "widthSinScl", r.widthSinScl,
+                    f -> r.widthSinScl = f, reType);
+            if (r.healEffect == null) {
+                r.healEffect = new MultiEffect();
+            }
+            createEffectList(typeOn, this, dia, "healEffect", r.healEffect);
+            createColorDialog(typeOn, dia, "laserColor", r.laserColor,
+                    c -> r.laserColor = c, reType);
+            typeOn.row();
+            createColorDialog(typeOn, dia, "laserTopColor", r.laserTopColor,
+                    c -> r.laserTopColor = c, reType);
+            createColorDialog(typeOn, dia, "healColor", r.healColor,
+                    c -> r.healColor = c, reType);
         }
     }
 
@@ -236,6 +279,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                     throw new RuntimeException(e);
                 }
             }
+            type = "repair";
         } else if (weapon instanceof PointDefenseWeapon p) {
             this.weapon = new PointDefenseWeapon();
             PointDefenseWeapon pw = (PointDefenseWeapon) this.weapon;
@@ -247,18 +291,10 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                     throw new RuntimeException(e);
                 }
             }
+            type = "defense";
         } else {
             this.weapon = new Weapon();
             cloneWeapon(weapon, this.weapon);
-        }
-    }
-
-    public void updateType() {
-        if (weapon instanceof PointDefenseWeapon) {
-            type = "defense";
-        } else if (weapon instanceof RepairBeamWeapon) {
-            type = "repair";
-        } else {
             type = "default";
         }
     }

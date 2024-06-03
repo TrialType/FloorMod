@@ -3,6 +3,7 @@ package Floor.FType.FDialog;
 import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
+import arc.graphics.Color;
 import arc.math.Interp;
 import arc.scene.Element;
 import arc.scene.actions.Actions;
@@ -29,6 +30,7 @@ import static Floor.FType.FDialog.ProjectsLocated.weapons;
 import static mindustry.Vars.ui;
 
 abstract class ProjectDialogUtils {
+    public static Table colorList;
     public static float maxSize = 0;
     public static float freeSize = 0;
     public static final HashMap<String, heavyGetter> heavies = new HashMap<>();
@@ -279,6 +281,50 @@ abstract class ProjectDialogUtils {
         });
     }
 
+    public static void createColorDialog(Table on, String dia, String tile, Color def, Cons<Color> apply, Runnable reb) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
+            t.button(b -> {
+                b.setSize(5);
+                b.setColor(def);
+
+                b.clicked(() -> ui.showTextInput(Core.bundle.get("dialog.color.input"),
+                        Core.bundle.get("dialog.color.input"), def.toString(), s -> {
+                            Color c = Color.valueOf(s);
+                            apply.get(c);
+                            reb.run();
+                        }));
+            }, () -> {
+            }).pad(5);
+        }).growX();
+    }
+
+    public static void createColorDialogList(Table on, String dia, String tile, Color[] def, Cons<Color[]> apply, Runnable reb) {
+        Seq<Color> cs = new Seq<>(def);
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
+            t.button(Icon.pencilSmall, () -> {
+                BaseDialog bd = new BaseDialog("");
+                bd.cont.pane(ta -> {
+                    colorList = ta;
+                    rebuildColorList(cs);
+                }).grow();
+                bd.buttons.button(Icon.left, bd::hide);
+                bd.buttons.button(Icon.add, () -> {
+                    Color color = new Color();
+                    cs.add(color);
+                    rebuildColorList(cs);
+                });
+                bd.buttons.button(Icon.right, () -> {
+                    apply.get(cs.items);
+                    bd.hide();
+                });
+                bd.show();
+                bd.hidden(reb);
+            }).pad(5);
+        }).growX();
+    }
+
     public static void createEffectList(Table on, EffectTableGetter data, String dia, String name, Effect list) {
         MultiEffect multi = (MultiEffect) list;
         if (multi != null) {
@@ -338,6 +384,31 @@ abstract class ProjectDialogUtils {
         EffectDialog ed = new EffectDialog("", apply, def);
         ed.hidden(hide);
         ed.show();
+    }
+
+    private static void rebuildColorList(Seq<Color> list) {
+        colorList.clear();
+        for (int i = 0; i < list.size; i++) {
+            int finalI = i;
+            colorList.table(c -> {
+                c.label(() -> finalI + 1 + "").pad(5);
+                c.button(b -> {
+                    b.setSize(5);
+                    b.setColor(list.get(finalI));
+
+                    b.clicked(() -> ui.showTextInput(Core.bundle.get("dialog.color.input"),
+                            Core.bundle.get("dialog.color.input"), list.get(finalI).toString(), s -> {
+                                Color co = Color.valueOf(s);
+                                list.set(finalI, co);
+                                rebuildColorList(list);
+                            }));
+                }, () -> {
+                }).pad(5);
+            }).growX();
+            if (finalI % 3 == 0) {
+                colorList.row();
+            }
+        }
     }
 
     public static void createSelectDialog(Button b, Cons2<Table, Runnable> table) {
