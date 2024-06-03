@@ -8,6 +8,8 @@ import mindustry.entities.effect.*;
 import mindustry.gen.Icon;
 import mindustry.ui.dialogs.BaseDialog;
 
+import java.lang.reflect.Field;
+
 import static Floor.FType.FDialog.ProjectDialogUtils.*;
 
 public class EffectDialog extends BaseDialog implements EffectTableGetter {
@@ -37,7 +39,76 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
     }
 
     public void setEffect(Effect effect) {
-        this.effect = effect == null ? new WaveEffect() : effect;
+        if (effect != null) {
+            if (effect instanceof WaveEffect w) {
+                this.effect = new WaveEffect();
+                WaveEffect we = (WaveEffect) this.effect;
+                Field[] fields = WaveEffect.class.getFields();
+                for (Field field : fields) {
+                    try {
+                        field.set(we, field.get(w));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else if (effect instanceof WrapEffect w) {
+                this.effect = new WrapEffect();
+                WrapEffect we = (WrapEffect) this.effect;
+                Field[] fields = WaveEffect.class.getFields();
+                for (Field field : fields) {
+                    try {
+                        field.set(we, field.get(w));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else if (effect instanceof RadialEffect r) {
+                this.effect = new RadialEffect();
+                RadialEffect re = (RadialEffect) this.effect;
+                Field[] fields = WaveEffect.class.getFields();
+                for (Field field : fields) {
+                    try {
+                        field.set(re, field.get(r));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else if (effect instanceof ParticleEffect p) {
+                this.effect = new ParticleEffect();
+                ParticleEffect pe = (ParticleEffect) this.effect;
+                Field[] fields = WaveEffect.class.getFields();
+                for (Field field : fields) {
+                    try {
+                        field.set(pe, field.get(p));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else if (effect instanceof ExplosionEffect ex) {
+                this.effect = new ExplosionEffect();
+                ExplosionEffect ee = (ExplosionEffect) this.effect;
+                Field[] fields = WaveEffect.class.getFields();
+                for (Field field : fields) {
+                    try {
+                        field.set(ee, field.get(ex));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else {
+                this.effect = new WaveEffect();
+                Field[] fields = Effect.class.getFields();
+                for (Field field : fields) {
+                    try {
+                        field.set(this.effect, field.get(effect));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        } else {
+            this.effect = new WaveEffect();
+        }
         setType();
     }
 
@@ -65,6 +136,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         waveEffect.layer = effect.layer;
                         waveEffect.layerDuration = effect.layerDuration;
                         effect = waveEffect;
+                        type = "wave";
                         rebuildType();
                         hide.run();
                     }).growX();
@@ -85,6 +157,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         wrapEffect.layerDuration = effect.layerDuration;
                         effect = wrapEffect;
                         rebuildType();
+                        type = "wrap";
                         hide.run();
                     }).growX();
                     tb.row();
@@ -104,6 +177,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         radialEffect.layerDuration = effect.layerDuration;
                         effect = radialEffect;
                         rebuildType();
+                        type = "radial";
                         hide.run();
                     }).growX();
                     tb.row();
@@ -123,6 +197,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         particleEffect.layerDuration = effect.layerDuration;
                         effect = particleEffect;
                         rebuildType();
+                        type = "particle";
                         hide.run();
                     }).growX();
                     tb.row();
@@ -142,6 +217,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         explosionEffect.layerDuration = effect.layerDuration;
                         effect = explosionEffect;
                         rebuildType();
+                        type = "explosion";
                         hide.run();
                     }).growX();
                 }));
@@ -213,6 +289,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         c -> waveEffect.colorTo = c, ret);
                 createColorDialog(tty, dia, "lightColor", waveEffect.lightColor,
                         c -> waveEffect.lightColor = c, ret);
+                break;
             }
             case "wrap": {
                 WrapEffect wrapEffect = (WrapEffect) effect;
@@ -224,6 +301,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 createEffectList(tty, this, dia, "effect", wrapEffect.effect);
                 createColorDialog(tty, dia, "color", wrapEffect.color,
                         c -> wrapEffect.color = c, ret);
+                break;
             }
             case "radial": {
                 RadialEffect radialEffect = (RadialEffect) effect;
@@ -240,6 +318,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                     radialEffect.effect = new MultiEffect();
                 }
                 createEffectList(tty, this, dia, "effect", radialEffect.effect);
+                break;
             }
             case "particle": {
                 ParticleEffect particleEffect = (ParticleEffect) effect;
@@ -275,6 +354,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         c -> particleEffect.colorTo = c, ret);
                 createColorDialog(tty, dia, "lightColor", particleEffect.lightColor,
                         c -> particleEffect.lightColor = c, ret);
+                break;
             }
             case "explosion": {
                 ExplosionEffect explosionEffect = (ExplosionEffect) effect;
@@ -312,6 +392,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         c -> explosionEffect.smokeColor = c, ret);
                 createColorDialog(tty, dia, "sparkColor", explosionEffect.sparkColor,
                         c -> explosionEffect.sparkColor = c, ret);
+                break;
             }
         }
     }

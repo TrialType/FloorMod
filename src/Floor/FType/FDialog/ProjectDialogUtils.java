@@ -272,11 +272,11 @@ abstract class ProjectDialogUtils {
         }).pad(10).fillX();
     }
 
-    public static void createPartsDialog(Table on, String dia, String tile, Seq<DrawPart> parts, Cons<Seq<DrawPart>> apply) {
+    public static void createPartsDialog(Table on, String dia, String tile, Seq<DrawPart> parts) {
         on.table(t -> {
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
             t.button(Icon.pencilSmall, () -> {
-                PartsDialog pd = new PartsDialog("", apply, parts);
+                PartsDialog pd = new PartsDialog(parts);
                 pd.show();
             });
         });

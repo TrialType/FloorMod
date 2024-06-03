@@ -9,32 +9,28 @@ import mindustry.gen.Icon;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.ProjectDialogUtils.*;
+import static mindustry.Vars.ui;
 
 public class PartsDialog extends BaseDialog {
     protected Table listOn;
     protected Seq<DrawPart> parts = new Seq<>();
-    protected Cons<Seq<DrawPart>> apply;
 
     protected static String dia = "part";
 
-    public PartsDialog(String title, Cons<Seq<DrawPart>> apply) {
-        super(title);
+    public PartsDialog() {
+        super(Core.bundle.get("dialog.part.warning"));
 
-        this.apply = apply;
         shown(this::rebuild);
+        shown(() -> ui.showInfo(Core.bundle.get("dialog.part.warning")));
         buttons.button("@back", Icon.left, this::hide);
         buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
             parts.add(new ShapePart());
             rebuildList();
         });
-        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
-            apply.get(parts);
-            hide();
-        });
     }
 
-    public PartsDialog(String title, Cons<Seq<DrawPart>> apply, Seq<DrawPart> parts) {
-        this(title, apply);
+    public PartsDialog(Seq<DrawPart> parts) {
+        this();
         setParts(parts);
     }
 

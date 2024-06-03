@@ -161,7 +161,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         createBooleanDialog(baseOn, dia, "rotate", weapon.rotate, b -> weapon.rotate = b, reBase);
         baseOn.row();
         createNumberDialog(baseOn, dia, "rotateSpeed", weapon.rotateSpeed, f -> weapon.rotateSpeed = f, reBase);
-        createPartsDialog(baseOn, dia, "parts", weapon.parts, p -> weapon.parts = p);
+        createPartsDialog(baseOn, dia, "parts", weapon.parts);
         createNumberDialog(baseOn, dia, "baseRotation", weapon.baseRotation, f -> weapon.baseRotation = f, reBase);
         baseOn.row();
         createBooleanDialog(baseOn, dia, "mirror", weapon.mirror, b -> weapon.mirror = b, reBase);
