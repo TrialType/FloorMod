@@ -52,10 +52,8 @@ public class PartsDialog extends BaseDialog {
         listOn.clear();
         for (int i = 0; i < parts.size; i++) {
             int finI = i;
-            DrawPart part = parts.get(finI);
-            String type = findType(part);
             listOn.row();
-            listOn.table(t -> rebuildPart(t, finI, type, part)).grow();
+            listOn.table(t -> rebuildPart(t, finI, findType(parts.get(finI), p -> parts.set(finI, p)), parts.get(finI))).grow();
         }
     }
 
@@ -78,7 +76,7 @@ public class PartsDialog extends BaseDialog {
                     shapePart.weaponIndex = part.weaponIndex;
                     shapePart.recoilIndex = part.recoilIndex;
                     parts.set(index, shapePart);
-                    rebuildPart(t, index, "shape", part);
+                    rebuildPart(t, index, "shape", parts.get(index));
                     hide.run();
                 });
                 tb.row();
@@ -93,7 +91,7 @@ public class PartsDialog extends BaseDialog {
                     hoverPart.weaponIndex = part.weaponIndex;
                     hoverPart.recoilIndex = part.recoilIndex;
                     parts.set(index, hoverPart);
-                    rebuildPart(t, index, "hover", part);
+                    rebuildPart(t, index, "hover", parts.get(index));
                     hide.run();
                 });
                 tb.row();
@@ -108,7 +106,7 @@ public class PartsDialog extends BaseDialog {
                     haloPart.weaponIndex = part.weaponIndex;
                     haloPart.recoilIndex = part.recoilIndex;
                     parts.set(index, haloPart);
-                    rebuildPart(t, index, "halo", part);
+                    rebuildPart(t, index, "halo", parts.get(index));
                     hide.run();
                 });
                 tb.row();
@@ -123,7 +121,7 @@ public class PartsDialog extends BaseDialog {
                     flarePart.weaponIndex = part.weaponIndex;
                     flarePart.recoilIndex = part.recoilIndex;
                     parts.set(index, flarePart);
-                    rebuildPart(t, index, "flare", part);
+                    rebuildPart(t, index, "flare", parts.get(index));
                     hide.run();
                 });
             }));
@@ -135,6 +133,7 @@ public class PartsDialog extends BaseDialog {
         }).pad(5);
         t.row();
         t.table(b -> rebuildPartBase(b, part));
+        t.row();
         t.table(y -> rebuildPartType(y, type, part));
     }
 
@@ -159,7 +158,7 @@ public class PartsDialog extends BaseDialog {
         createMessageLine(t, dia, "type");
         t.row();
         switch (type) {
-            case "shape": {
+            case "shape" -> {
                 ShapePart shapePart = (ShapePart) part;
                 createBooleanDialog(t, dia, "circle", shapePart.circle,
                         b -> shapePart.circle = b, reb);
@@ -207,7 +206,7 @@ public class PartsDialog extends BaseDialog {
                 createColorDialog(t, dia, "colorTo", shapePart.colorTo,
                         c -> shapePart.colorTo = c, reb);
             }
-            case "hover": {
+            case "hover" -> {
                 HoverPart hoverPart = (HoverPart) part;
                 createNumberDialog(t, dia, "x", hoverPart.x,
                         f -> hoverPart.x = f, reb);
@@ -240,7 +239,7 @@ public class PartsDialog extends BaseDialog {
                 createColorDialog(t, dia, "color", hoverPart.color,
                         c -> hoverPart.color = c, reb);
             }
-            case "halo": {
+            case "halo" -> {
                 HaloPart haloPart = (HaloPart) part;
                 createBooleanDialog(t, dia, "tri", haloPart.tri,
                         b -> haloPart.tri = b, reb);
@@ -304,7 +303,7 @@ public class PartsDialog extends BaseDialog {
                 createColorDialog(t, dia, "colorTo", haloPart.colorTo,
                         c -> haloPart.colorTo = c, reb);
             }
-            case "flare": {
+            case "flare" -> {
                 FlarePart flarePart = (FlarePart) part;
                 createNumberDialog(t, dia, "sides", flarePart.sides,
                         f -> flarePart.sides = (int) (f + 0), reb);
@@ -346,7 +345,7 @@ public class PartsDialog extends BaseDialog {
         }
     }
 
-    public String findType(DrawPart part) {
+    public String findType(DrawPart part, Cons<DrawPart> changer) {
         if (part instanceof ShapePart) {
             return "shape";
         } else if (part instanceof HoverPart) {
@@ -355,7 +354,9 @@ public class PartsDialog extends BaseDialog {
             return "halo";
         } else if (part instanceof FlarePart) {
             return "flare";
+        } else {
+            changer.get(new ShapePart());
+            return "shape";
         }
-        return "shape";
     }
 }

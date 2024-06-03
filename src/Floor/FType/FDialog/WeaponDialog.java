@@ -98,6 +98,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                         cloneWeapon(weapon, w);
                         weapon = w;
                         type = "default";
+                        typeOn.clear();
                         hide.run();
                     });
                     tb.row();
