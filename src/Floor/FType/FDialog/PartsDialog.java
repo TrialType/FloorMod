@@ -201,6 +201,11 @@ public class PartsDialog extends BaseDialog {
                 createNumberDialog(t, dia, "layerOffset", shapePart.layerOffset,
                         f -> shapePart.layerOffset = f, reb);
                 createPartProgressSelect(t, dia, "progress", p -> shapePart.progress = p);
+                t.row();
+                createColorDialog(t, dia, "color", shapePart.color,
+                        c -> shapePart.color = c, reb);
+                createColorDialog(t, dia, "colorTo", shapePart.colorTo,
+                        c -> shapePart.colorTo = c, reb);
             }
             case "hover": {
                 HoverPart hoverPart = (HoverPart) part;
@@ -231,6 +236,9 @@ public class PartsDialog extends BaseDialog {
                         f -> hoverPart.layer = f, reb);
                 createNumberDialog(t, dia, "layerOffset", hoverPart.layerOffset,
                         f -> hoverPart.layerOffset = f, reb);
+                t.row();
+                createColorDialog(t, dia, "color", hoverPart.color,
+                        c -> hoverPart.color = c, reb);
             }
             case "halo": {
                 HaloPart haloPart = (HaloPart) part;
@@ -291,6 +299,10 @@ public class PartsDialog extends BaseDialog {
                         f -> haloPart.layerOffset = f, reb);
                 t.row();
                 createPartProgressSelect(t, dia, "progress", p -> haloPart.progress = p);
+                createColorDialog(t, dia, "color", haloPart.color,
+                        c -> haloPart.color = c, reb);
+                createColorDialog(t, dia, "colorTo", haloPart.colorTo,
+                        c -> haloPart.colorTo = c, reb);
             }
             case "flare": {
                 FlarePart flarePart = (FlarePart) part;
@@ -325,6 +337,11 @@ public class PartsDialog extends BaseDialog {
                 createBooleanDialog(t, dia, "followRotation", flarePart.followRotation,
                         b -> flarePart.followRotation = b, reb);
                 createPartProgressSelect(t, dia, "progress", p -> flarePart.progress = p);
+                createColorDialog(t, dia, "color1", flarePart.color1,
+                        c -> flarePart.color1 = c, reb);
+                t.row();
+                createColorDialog(t, dia, "color2", flarePart.color2,
+                        c -> flarePart.color2 = c, reb);
             }
         }
     }

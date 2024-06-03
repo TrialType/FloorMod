@@ -19,7 +19,6 @@ import static mindustry.Vars.ui;
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Weapon weapon;
     protected BulletDialog bulletDialog;
-    protected LimitBulletType bullet;
     protected float bulletHeavy = 0;
     protected float heavyBack;
     protected float heavy = 0;
@@ -37,21 +36,26 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
 
+        ProjectDialogUtils.init();
+
         if (this.weapon == null) {
             this.weapon = rollback;
             updateHeavy();
             heavyBack = heavy;
         }
         setWeapon(weapon);
-        bulletDialog = new BulletDialog(this, "");
+        if (!(weapon.bullet instanceof LimitBulletType)) {
+            weapon.bullet = new LimitBulletType();
+        }
+        bulletDialog = new BulletDialog(weapon.bullet, f -> bulletHeavy = f,
+                b -> weapon.bullet = b, "", weapon.shoot.shots, bulletHeavy);
         bulletDialog.hidden(() -> freeSize += this.heavy);
-        bullet = new LimitBulletType();
         buttons.button("@back", Icon.left, () -> {
             weapon = rollback;
             updateHeavy();
             hide();
         });
-        buttons.button("@apply", Icon.right, () -> {
+        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             updateHeavy();
             if (heavy + weapon.shoot.shots * bulletHeavy <= freeSize) {
                 apply.get(weapon);
@@ -78,6 +82,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     }
 
     public void rebuild() {
+        cont.clear();
         cont.table(t -> {
             t.label(() -> Core.bundle.get("dialog.weapon." + type)).pad(5);
             t.button(b -> {
@@ -124,9 +129,10 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                 }));
             }, () -> {
             });
-        });
-        cont.clear();
+        }).growX();
+        cont.row();
         cont.pane(t -> baseOn = t);
+        cont.row();
         cont.pane(t -> typeOn = t);
         rebuildBase();
         rebuildType();
@@ -139,7 +145,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             freeSize -= this.heavy;
             bulletDialog.show();
         }).size(15).pad(15);
-        if (weapon.ejectEffect == null) {
+        if (!(weapon.ejectEffect instanceof MultiEffect)) {
             weapon.ejectEffect = new MultiEffect();
         }
         baseOn.row();
@@ -154,7 +160,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         createBooleanDialog(baseOn, dia, "rotate", weapon.rotate, b -> weapon.rotate = b, reBase);
         baseOn.row();
         createNumberDialog(baseOn, dia, "rotateSpeed", weapon.rotateSpeed, f -> weapon.rotateSpeed = f, reBase);
-        createNumberDialog(baseOn, dia, "rotationLimit", weapon.rotationLimit, f -> weapon.rotationLimit = f, reBase);
+        createPartsDialog(baseOn, dia, "parts", weapon.parts, p -> weapon.parts = p);
         createNumberDialog(baseOn, dia, "baseRotation", weapon.baseRotation, f -> weapon.baseRotation = f, reBase);
         baseOn.row();
         createBooleanDialog(baseOn, dia, "mirror", weapon.mirror, b -> weapon.mirror = b, reBase);
@@ -178,7 +184,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         createLevDialog(baseOn, dia, "reload", "reload", weapon.reload,
                 f -> weapon.reload = f, reBase, this::updateHeavy, levUser, hevUser);
         createNumberDialog(baseOn, dia, "inaccuracy", weapon.inaccuracy, f -> weapon.inaccuracy = f, reBase);
-        createNumberDialog(baseOn, dia, "inaccuracy", weapon.shake, f -> weapon.shake = f, reBase);
+        createNumberDialog(baseOn, dia, "shake", weapon.shake, f -> weapon.shake = f, reBase);
         baseOn.row();
         createNumberDialog(baseOn, dia, "recoil", weapon.recoil, f -> weapon.recoil = f, reBase);
         createNumberDialog(baseOn, dia, "recoils", weapon.recoils, f -> weapon.recoils = (int) (f + 0), reBase);
@@ -195,8 +201,6 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         createBooleanDialog(baseOn, dia, "ignoreRotation", weapon.ignoreRotation, b -> weapon.ignoreRotation = b, reBase);
         createBooleanDialog(baseOn, dia, "noAttack", weapon.noAttack, b -> weapon.noAttack = b, reBase);
         createBooleanDialog(baseOn, dia, "linearWarmup", weapon.linearWarmup, b -> weapon.linearWarmup = b, reBase);
-        baseOn.row();
-        createPartsDialog(baseOn, dia, "parts", weapon.parts, p -> weapon.parts = p);
     }
 
     public void rebuildType() {
@@ -205,7 +209,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             PointDefenseWeapon p = (PointDefenseWeapon) weapon;
             createColorDialog(typeOn, dia, "color", p.color,
                     c -> p.color = c, reType);
-            if (p.beamEffect == null) {
+            if (!(p.beamEffect instanceof MultiEffect)) {
                 p.beamEffect = new MultiEffect();
             }
             createEffectList(typeOn, this, dia, "effect", p.beamEffect);
@@ -234,7 +238,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             typeOn.row();
             createNumberDialog(typeOn, dia, "widthSinScl", r.widthSinScl,
                     f -> r.widthSinScl = f, reType);
-            if (r.healEffect == null) {
+            if (!(r.healEffect instanceof MultiEffect)) {
                 r.healEffect = new MultiEffect();
             }
             createEffectList(typeOn, this, dia, "healEffect", r.healEffect);
@@ -249,7 +253,9 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     }
 
     public float getVal(String type) {
-        RepairBeamWeapon r = (RepairBeamWeapon) weapon;
+        RepairBeamWeapon r = weapon instanceof RepairBeamWeapon ? (RepairBeamWeapon) weapon : new RepairBeamWeapon() {{
+            repairSpeed = fractionRepairSpeed = beamWidth = 0;
+        }};
         return switch (type) {
             case "number" -> weapon.shoot.shots;
             case "reload" -> weapon.reload;

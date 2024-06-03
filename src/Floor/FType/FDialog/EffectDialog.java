@@ -206,15 +206,24 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         f -> waveEffect.offsetY = f, ret);
                 createInterpolSelect(tty, dia, "interp", i -> waveEffect.interp = i);
                 createInterpolSelect(tty, dia, "lightInterp", i -> waveEffect.lightInterp = i);
+                tty.row();
+                createColorDialog(tty, dia, "colorFrom", waveEffect.colorFrom,
+                        c -> waveEffect.colorFrom = c, ret);
+                createColorDialog(tty, dia, "colorTo", waveEffect.colorTo,
+                        c -> waveEffect.colorTo = c, ret);
+                createColorDialog(tty, dia, "lightColor", waveEffect.lightColor,
+                        c -> waveEffect.lightColor = c, ret);
             }
             case "wrap": {
                 WrapEffect wrapEffect = (WrapEffect) effect;
                 createNumberDialog(tty, dia, "rotation", wrapEffect.rotation,
                         f -> wrapEffect.rotation = f, ret);
-                if (wrapEffect.effect == null) {
+                if (!(wrapEffect.effect instanceof MultiEffect)) {
                     wrapEffect.effect = new MultiEffect();
                 }
                 createEffectList(tty, this, dia, "effect", wrapEffect.effect);
+                createColorDialog(tty, dia, "color", wrapEffect.color,
+                        c -> wrapEffect.color = c, ret);
             }
             case "radial": {
                 RadialEffect radialEffect = (RadialEffect) effect;
@@ -227,7 +236,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 tty.row();
                 createNumberDialog(tty, dia, "amount", radialEffect.amount,
                         f -> radialEffect.amount = (int) (f + 0), ret);
-                if (radialEffect.effect == null) {
+                if (!(radialEffect.effect instanceof MultiEffect)) {
                     radialEffect.effect = new MultiEffect();
                 }
                 createEffectList(tty, this, dia, "effect", radialEffect.effect);
@@ -259,6 +268,13 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         f -> particleEffect.lightOpacity = f, ret);
                 createInterpolSelect(tty, dia, "interp", i -> particleEffect.interp = i);
                 createInterpolSelect(tty, dia, "sizeInterp", i -> particleEffect.sizeInterp = i);
+                tty.row();
+                createColorDialog(tty, dia, "colorFrom", particleEffect.colorFrom,
+                        c -> particleEffect.colorFrom = c, ret);
+                createColorDialog(tty, dia, "colorTo", particleEffect.colorTo,
+                        c -> particleEffect.colorTo = c, ret);
+                createColorDialog(tty, dia, "lightColor", particleEffect.lightColor,
+                        c -> particleEffect.lightColor = c, ret);
             }
             case "explosion": {
                 ExplosionEffect explosionEffect = (ExplosionEffect) effect;
@@ -290,6 +306,12 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 createNumberDialog(tty, dia, "sparks", explosionEffect.sparks,
                         f -> explosionEffect.sparks = (int) (f + 0), ret);
                 tty.row();
+                createColorDialog(tty, dia, "waveColor", explosionEffect.waveColor,
+                        c -> explosionEffect.waveColor = c, ret);
+                createColorDialog(tty, dia, "smokeColor", explosionEffect.smokeColor,
+                        c -> explosionEffect.smokeColor = c, ret);
+                createColorDialog(tty, dia, "sparkColor", explosionEffect.sparkColor,
+                        c -> explosionEffect.sparkColor = c, ret);
             }
         }
     }
@@ -304,6 +326,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
         } else if (effect instanceof ExplosionEffect) {
             type = "explosion";
         } else {
+            if (!(effect instanceof WaveEffect)) effect = new WaveEffect();
             type = "wave";
         }
     }
