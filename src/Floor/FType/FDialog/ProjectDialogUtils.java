@@ -212,7 +212,7 @@ abstract class ProjectDialogUtils {
                     ui.showInfo(Core.bundle.get("@inputError"));
                 }
             })).size(55);
-        }).pad(10).fillX();
+        }).pad(10).width(250);
     }
 
     public static void createBooleanDialog(Table on, String dia, String tile, boolean def, Cons<Boolean> apply, Runnable rebuild) {
@@ -223,7 +223,7 @@ abstract class ProjectDialogUtils {
                 apply.get(!def);
                 rebuild.run();
             });
-        });
+        }).pad(10).width(250);
     }
 
     public static void createNumberDialogWithLimit(Table on, String dia, String tile, float def, float max, float min, Cons<Float> apply, Runnable rebuild) {
@@ -243,11 +243,12 @@ abstract class ProjectDialogUtils {
                     ui.showInfo(Core.bundle.get("@inputError"));
                 }
             })).size(55);
-        });
+        }).pad(10).width(250);
     }
 
     public static void createLevDialog(Table on, String dia, String type, String tile, float def, Cons<Float> apply, Runnable rebuild, Runnable updateHeavy, StrBool levUser, BoolGetter hevUser) {
         on.table(t -> {
+            t.setBackground(Tex.underline2);
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile) + ": ");
             t.label(() -> def + "").pad(3);
             t.button(Icon.pencilSmall, Styles.flati, () -> ui.showTextInput(Core.bundle.get("dialog." + dia + "." + tile), "", 15, def + "", true, str -> {
@@ -269,7 +270,7 @@ abstract class ProjectDialogUtils {
                     ui.showInfo(Core.bundle.get("@inputError"));
                 }
             })).size(55);
-        }).pad(10).fillX();
+        }).pad(10).width(250);
     }
 
     public static void createPartsDialog(Table on, String dia, String tile, Seq<DrawPart> parts) {
@@ -279,7 +280,7 @@ abstract class ProjectDialogUtils {
                 PartsDialog pd = new PartsDialog(parts);
                 pd.show();
             });
-        });
+        }).pad(10).width(250);
     }
 
     public static void createColorDialog(Table on, String dia, String tile, Color def, Cons<Color> apply, Runnable reb) {
@@ -298,7 +299,7 @@ abstract class ProjectDialogUtils {
                         }));
             }, () -> {
             }).pad(5);
-        }).growX();
+        }).pad(10).width(250);
     }
 
     public static void createColorDialogList(Table on, String dia, String tile, Color[] def, Cons<Color[]> apply, Runnable reb) {
@@ -324,7 +325,7 @@ abstract class ProjectDialogUtils {
                 bd.show();
                 bd.hidden(reb);
             }).pad(5);
-        }).growX();
+        }).pad(10).width(250);
     }
 
     public static void createEffectList(Table on, EffectTableGetter data, String dia, String name, Effect list) {
@@ -362,11 +363,12 @@ abstract class ProjectDialogUtils {
             for (int i = 0; i < effect.effects.length; i++) {
                 int finalI = i;
                 on.table(t -> {
+                    t.setBackground(Tex.underline);
                     t.label(() -> finalI + "").width(100);
                     t.button(Icon.pencil, () -> createEffectDialog(effect.effects[finalI],
                             e -> effect.effects[finalI] = e,
                             () -> {
-                            })).width(100).pad(5);
+                            })).grow();
                     t.button(b -> {
                         b.image(Icon.pencilSmall);
 
@@ -1331,7 +1333,7 @@ abstract class ProjectDialogUtils {
                             }).width(100).row();
                         }));
                     }, () -> {
-                    }).width(100).pad(5);
+                    }).grow();
                     t.button(Icon.trash, () -> {
                         Effect[] effects = new Effect[effect.effects.length - 1];
                         for (int j = 0; j < effect.effects.length; j++) {
@@ -1340,8 +1342,8 @@ abstract class ProjectDialogUtils {
                             }
                         }
                         effect.effects = effects;
-                        rebuildEffectList(on, list);
-                    }).width(100).pad(5);
+                        rebuildEffectList(on, effect);
+                    }).grow();
                 }).growX();
                 on.row();
             }
@@ -1359,6 +1361,7 @@ abstract class ProjectDialogUtils {
         for (int i = 0; i < list.size; i++) {
             int finalI = i;
             colorList.table(c -> {
+                c.setBackground(Tex.buttonDown);
                 c.label(() -> finalI + 1 + "").pad(5);
                 c.button(b -> {
                     b.setSize(5);
@@ -1425,7 +1428,10 @@ abstract class ProjectDialogUtils {
 
         Core.scene.add(ta);
 
-        ta.top().pane(select -> table.get(select, hide)).pad(0f).top().scrollX(false);
+        ta.top().pane(select -> {
+            select.setBackground(Tex.buttonDown);
+            table.get(select, hide);
+        }).pad(0f).top().scrollX(false);
         ta.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
 
         ta.pack();
@@ -1442,199 +1448,199 @@ abstract class ProjectDialogUtils {
                     tb.button("linear", () -> {
                         apply.get(Interp.linear);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("reverse", () -> {
                         apply.get(Interp.reverse);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow2", () -> {
                         apply.get(Interp.pow2);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow2In", () -> {
                         apply.get(Interp.pow2In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow2Out", () -> {
                         apply.get(Interp.pow2Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("smooth", () -> {
                         apply.get(Interp.smooth);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("smooth2", () -> {
                         apply.get(Interp.smooth2);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("one", () -> {
                         apply.get(Interp.one);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("zero", () -> {
                         apply.get(Interp.zero);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("slope", () -> {
                         apply.get(Interp.slope);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("smoother", () -> {
                         apply.get(Interp.smoother);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow2InInverse", () -> {
                         apply.get(Interp.pow2InInverse);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow2OutInverse", () -> {
                         apply.get(Interp.pow2OutInverse);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow3", () -> {
                         apply.get(Interp.pow3);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow3In", () -> {
                         apply.get(Interp.pow3In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow3Out", () -> {
                         apply.get(Interp.pow3Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow3InInverse", () -> {
                         apply.get(Interp.pow3InInverse);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow3OutInverse", () -> {
                         apply.get(Interp.pow3OutInverse);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow4", () -> {
                         apply.get(Interp.pow4);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow4In", () -> {
                         apply.get(Interp.pow4In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow4Out", () -> {
                         apply.get(Interp.pow4Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow5", () -> {
                         apply.get(Interp.pow5);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow5In", () -> {
                         apply.get(Interp.pow5In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow10In", () -> {
                         apply.get(Interp.pow10In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow10Out", () -> {
                         apply.get(Interp.pow10Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("pow5Out", () -> {
                         apply.get(Interp.pow5Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("sine", () -> {
                         apply.get(Interp.sine);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("sineIn", () -> {
                         apply.get(Interp.sineIn);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("sineOut", () -> {
                         apply.get(Interp.sineOut);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("exp10", () -> {
                         apply.get(Interp.exp10);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("exp10In", () -> {
                         apply.get(Interp.exp10In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("exp10Out", () -> {
                         apply.get(Interp.exp10Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("exp5", () -> {
                         apply.get(Interp.exp5);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("exp5In", () -> {
                         apply.get(Interp.exp5In);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("exp5Out", () -> {
                         apply.get(Interp.exp5Out);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("circle", () -> {
                         apply.get(Interp.circle);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("circleIn", () -> {
                         apply.get(Interp.circleIn);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("circleOut", () -> {
                         apply.get(Interp.circleOut);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("circleOut", () -> {
                         apply.get(Interp.circleOut);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("elastic", () -> {
                         apply.get(Interp.elastic);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("elasticIn", () -> {
                         apply.get(Interp.elasticIn);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("elasticOut", () -> {
                         apply.get(Interp.elasticOut);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("swing", () -> {
                         apply.get(Interp.swing);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("swingIn", () -> {
                         apply.get(Interp.swingIn);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("swingOut", () -> {
                         apply.get(Interp.swingOut);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("bounce", () -> {
                         apply.get(Interp.bounce);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("bounceIn", () -> {
                         apply.get(Interp.bounceIn);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("bounceOut", () -> {
                         apply.get(Interp.bounceOut);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                 }));
             }, () -> {
             });
-        }).growX();
+        }).pad(10).width(250);
     }
 
     public static void createPartProgressSelect(Table on, String dia, String tile, Cons<DrawPart.PartProgress> apply) {
@@ -1648,41 +1654,41 @@ abstract class ProjectDialogUtils {
                     tb.button("reload", () -> {
                         apply.get(DrawPart.PartProgress.reload);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("smoothReload", () -> {
                         apply.get(DrawPart.PartProgress.smoothReload);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("warmup", () -> {
                         apply.get(DrawPart.PartProgress.warmup);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("charge", () -> {
                         apply.get(DrawPart.PartProgress.charge);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("recoil", () -> {
                         apply.get(DrawPart.PartProgress.recoil);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("heat", () -> {
                         apply.get(DrawPart.PartProgress.heat);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                     tb.button("life", () -> {
                         apply.get(DrawPart.PartProgress.life);
                         hide.run();
-                    }).row();
+                    }).width(100).row();
                 }));
             }, () -> {
             });
-        }).growX();
+        }).pad(10).width(250);
     }
 
     public static void createTypeLine(Table on, String dia, String type, float value) {
         on.row();
         on.table(table -> {
-            table.background(Tex.scroll);
+            table.setBackground(Tex.underline);
             table.label(() -> Core.bundle.get("dialog." + dia + "." + type)).left();
             table.row();
             table.label(() -> Core.bundle.get("@heavyUse") + ":  " + getHeavy(type, value)).left().pad(5);
@@ -1693,7 +1699,8 @@ abstract class ProjectDialogUtils {
 
     public static void createMessageLine(Table on, String dia, String name) {
         on.row();
-        on.label(() -> Core.bundle.get("dialog." + dia + "." + name)).width(35).pad(5);
+        on.setBackground(Tex.underline);
+        on.label(() -> Core.bundle.get("dialog." + dia + "." + name)).center().width(35).pad(5);
     }
 
     public interface BoolGetter {

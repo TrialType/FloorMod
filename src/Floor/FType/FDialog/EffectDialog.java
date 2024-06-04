@@ -6,9 +6,8 @@ import arc.scene.ui.layout.Table;
 import mindustry.entities.Effect;
 import mindustry.entities.effect.*;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
-
-import java.lang.reflect.Field;
 
 import static Floor.FType.FDialog.ProjectDialogUtils.*;
 
@@ -43,68 +42,132 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
             if (effect instanceof WaveEffect w) {
                 this.effect = new WaveEffect();
                 WaveEffect we = (WaveEffect) this.effect;
-                Field[] fields = WaveEffect.class.getFields();
-                for (Field field : fields) {
-                    try {
-                        field.set(we, field.get(w));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                we.lifetime = w.lifetime;
+                we.clip = w.clip;
+                we.startDelay = w.startDelay;
+                we.baseRotation = w.baseRotation;
+                we.layer = w.layer;
+                we.layerDuration = w.layerDuration;
+                we.followParent = w.followParent;
+                we.rotWithParent = w.rotWithParent;
+
+                we.sizeFrom = w.sizeFrom;
+                we.sizeTo = w.sizeTo;
+                we.sides = w.sides;
+                we.lightScl = w.lightScl;
+                we.lightOpacity = w.lightOpacity;
+                we.rotation = w.rotation;
+                we.strokeFrom = w.strokeFrom;
+                we.strokeTo = w.strokeTo;
+                we.offsetX = w.offsetX;
+                we.offsetY = w.offsetY;
+                we.interp = w.interp;
+                we.lightInterp = w.lightInterp;
+                we.colorFrom = w.colorFrom;
+                we.colorTo = w.colorTo;
+                we.lightColor = w.lightColor;
             } else if (effect instanceof WrapEffect w) {
                 this.effect = new WrapEffect();
                 WrapEffect we = (WrapEffect) this.effect;
-                Field[] fields = WaveEffect.class.getFields();
-                for (Field field : fields) {
-                    try {
-                        field.set(we, field.get(w));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                we.lifetime = w.lifetime;
+                we.clip = w.clip;
+                we.startDelay = w.startDelay;
+                we.baseRotation = w.baseRotation;
+                we.layer = w.layer;
+                we.layerDuration = w.layerDuration;
+                we.followParent = w.followParent;
+                we.rotWithParent = w.rotWithParent;
+
+                we.rotation = w.rotation;
+                we.effect = w.effect;
+                we.color = w.color;
             } else if (effect instanceof RadialEffect r) {
                 this.effect = new RadialEffect();
                 RadialEffect re = (RadialEffect) this.effect;
-                Field[] fields = WaveEffect.class.getFields();
-                for (Field field : fields) {
-                    try {
-                        field.set(re, field.get(r));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                re.lifetime = r.lifetime;
+                re.clip = r.clip;
+                re.startDelay = r.startDelay;
+                re.baseRotation = r.baseRotation;
+                re.layer = r.layer;
+                re.layerDuration = r.layerDuration;
+                re.followParent = r.followParent;
+                re.rotWithParent = r.rotWithParent;
+
+                re.rotationSpacing = r.rotationSpacing;
+                re.rotationOffset = r.rotationOffset;
+                re.lengthOffset = r.lengthOffset;
+                re.amount = r.amount;
+                re.effect = r.effect;
             } else if (effect instanceof ParticleEffect p) {
                 this.effect = new ParticleEffect();
                 ParticleEffect pe = (ParticleEffect) this.effect;
-                Field[] fields = WaveEffect.class.getFields();
-                for (Field field : fields) {
-                    try {
-                        field.set(pe, field.get(p));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                pe.lifetime = p.lifetime;
+                pe.clip = p.clip;
+                pe.startDelay = p.startDelay;
+                pe.baseRotation = p.baseRotation;
+                pe.layer = p.layer;
+                pe.layerDuration = p.layerDuration;
+                pe.followParent = p.followParent;
+                pe.rotWithParent = p.rotWithParent;
+
+                pe.particles = p.particles;
+                pe.randLength = p.randLength;
+                pe.casingFlip = p.casingFlip;
+                pe.cone = p.cone;
+                pe.length = p.length;
+                pe.baseLength = p.baseLength;
+                pe.offsetX = p.offsetX;
+                pe.offsetY = p.offsetY;
+                pe.lightScl = p.lightScl;
+                pe.strokeFrom = p.strokeFrom;
+                pe.strokeTo = p.strokeTo;
+                pe.lenFrom = p.lenFrom;
+                pe.lenTo = p.lenTo;
+                pe.line = p.line;
+                pe.cap = p.cap;
+                pe.lightOpacity = p.lightOpacity;
+                pe.interp = p.interp;
+                pe.sizeInterp = p.sizeInterp;
+                pe.colorFrom = p.colorFrom;
+                pe.colorTo = p.colorTo;
+                pe.lightColor = p.lightColor;
             } else if (effect instanceof ExplosionEffect ex) {
                 this.effect = new ExplosionEffect();
                 ExplosionEffect ee = (ExplosionEffect) this.effect;
-                Field[] fields = WaveEffect.class.getFields();
-                for (Field field : fields) {
-                    try {
-                        field.set(ee, field.get(ex));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                ee.lifetime = ex.lifetime;
+                ee.clip = ex.clip;
+                ee.startDelay = ex.startDelay;
+                ee.baseRotation = ex.baseRotation;
+                ee.layer = ex.layer;
+                ee.layerDuration = ex.layerDuration;
+                ee.followParent = ex.followParent;
+                ee.rotWithParent = ex.rotWithParent;
+
+                ee.waveLife = ex.waveLife;
+                ee.waveStroke = ex.waveStroke;
+                ee.waveRad = ex.waveRad;
+                ee.waveRadBase = ex.waveRadBase;
+                ee.sparkStroke = ex.sparkStroke;
+                ee.sparkRad = ex.sparkRad;
+                ee.sparkLen = ex.sparkLen;
+                ee.smokeSize = ex.smokeSize;
+                ee.smokeSizeBase = ex.smokeSizeBase;
+                ee.smokeRad = ex.smokeRad;
+                ee.smokes = ex.smokes;
+                ee.sparks = ex.sparks;
+                ee.waveColor = ex.waveColor;
+                ee.smokeColor = ex.smokeColor;
+                ee.sparkColor = ex.sparkColor;
             } else {
                 this.effect = new WaveEffect();
-                Field[] fields = Effect.class.getFields();
-                for (Field field : fields) {
-                    try {
-                        field.set(this.effect, field.get(effect));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+                this.effect.lifetime = effect.lifetime;
+                this.effect.clip = effect.clip;
+                this.effect.startDelay = effect.startDelay;
+                this.effect.baseRotation = effect.baseRotation;
+                this.effect.layer = effect.layer;
+                this.effect.layerDuration = effect.layerDuration;
+                this.effect.followParent = effect.followParent;
+                this.effect.rotWithParent = effect.rotWithParent;
             }
         } else {
             this.effect = new WaveEffect();
@@ -139,7 +202,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         type = "wave";
                         rebuildType();
                         hide.run();
-                    }).growX();
+                    }).width(100);
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.wrap"), () -> {
                         if (type.equals("wrap")) {
@@ -156,10 +219,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         wrapEffect.layer = effect.layer;
                         wrapEffect.layerDuration = effect.layerDuration;
                         effect = wrapEffect;
-                        rebuildType();
                         type = "wrap";
+                        rebuildType();
                         hide.run();
-                    }).growX();
+                    }).width(100);
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.radial"), () -> {
                         if (type.equals("radial")) {
@@ -176,10 +239,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         radialEffect.layer = effect.layer;
                         radialEffect.layerDuration = effect.layerDuration;
                         effect = radialEffect;
-                        rebuildType();
                         type = "radial";
+                        rebuildType();
                         hide.run();
-                    }).growX();
+                    }).width(100);
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.particle"), () -> {
                         if (type.equals("particle")) {
@@ -196,10 +259,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         particleEffect.layer = effect.layer;
                         particleEffect.layerDuration = effect.layerDuration;
                         effect = particleEffect;
-                        rebuildType();
                         type = "particle";
+                        rebuildType();
                         hide.run();
-                    }).growX();
+                    }).width(100);
                     tb.row();
                     tb.button(Core.bundle.get("dialog.effect.explosion"), () -> {
                         if (type.equals("explosion")) {
@@ -216,16 +279,24 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         explosionEffect.layer = effect.layer;
                         explosionEffect.layerDuration = effect.layerDuration;
                         effect = explosionEffect;
-                        rebuildType();
                         type = "explosion";
+                        rebuildType();
                         hide.run();
-                    }).growX();
+                    }).width(100);
                 }));
             }, () -> {
             });
         }).growX();
-        cont.pane(t -> base = t);
-        cont.pane(t -> tty = t);
+        cont.row();
+        cont.pane(t -> {
+            t.setBackground(Tex.buttonEdge1);
+            base = t;
+        }).grow();
+        cont.row();
+        cont.pane(t -> {
+            t.setBackground(Tex.buttonEdge1);
+            tty = t;
+        }).grow();
         rebuildBase();
         rebuildType();
     }
@@ -342,6 +413,20 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                         f -> particleEffect.offsetY = f, ret);
                 createNumberDialog(tty, dia, "lightScl", particleEffect.lightScl,
                         f -> particleEffect.lightScl = f, ret);
+                tty.row();
+                createNumberDialog(tty, dia, "strokeFrom", particleEffect.strokeFrom,
+                        f -> particleEffect.strokeFrom = f, ret);
+                createNumberDialog(tty, dia, "strokeTo", particleEffect.strokeTo,
+                        f -> particleEffect.strokeTo = f, ret);
+                createNumberDialog(tty, dia, "lenFrom", particleEffect.lenFrom,
+                        f -> particleEffect.lenFrom = f, ret);
+                tty.row();
+                createNumberDialog(tty, dia, "lenTo", particleEffect.lenTo,
+                        f -> particleEffect.lenTo = f, ret);
+                createBooleanDialog(tty, dia, "line", particleEffect.line,
+                        b -> particleEffect.line = b, ret);
+                createBooleanDialog(tty, dia, "cap", particleEffect.cap,
+                        b -> particleEffect.cap = b, ret);
                 tty.row();
                 createNumberDialog(tty, dia, "lightOpacity", particleEffect.lightOpacity,
                         f -> particleEffect.lightOpacity = f, ret);

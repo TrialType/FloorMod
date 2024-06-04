@@ -6,6 +6,7 @@ import arc.func.Cons;
 import arc.scene.ui.layout.Table;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
@@ -54,7 +55,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             weapon = rollback;
             updateHeavy();
             hide();
-        });
+        }).width(200);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             updateHeavy();
             if (heavy + weapon.shoot.shots * bulletHeavy <= freeSize) {
@@ -62,8 +63,8 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                 hide();
             }
             ui.showInfo("tooHeavy");
-        });
-        buttons.button("@setZero", () -> {
+        }).width(200);
+        buttons.button(Core.bundle.get("@setZero"), () -> {
             weapon.reload = Float.MAX_VALUE;
             weapon.shoot.shots = 0;
             weapon.targetSwitchInterval = weapon.targetInterval = Float.MAX_VALUE;
@@ -72,7 +73,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             }
             updateHeavy();
             rebuild();
-        });
+        }).width(200);
         shown(this::rebuild);
         hidden(() -> {
             freeSize -= this.heavy;
@@ -84,59 +85,69 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public void rebuild() {
         cont.clear();
         cont.table(t -> {
-            t.label(() -> Core.bundle.get("dialog.weapon." + type)).pad(5);
-            t.button(b -> {
-                b.image(Icon.pencilSmall);
+            t.table(s -> {
+                s.setBackground(Tex.buttonEdge1);
+                s.label(() -> Core.bundle.get("dialog.weapon." + type)).center();
+                s.button(b -> {
+                    b.image(Icon.pencilSmall);
 
-                b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
-                    tb.button(Core.bundle.get("dialog.weapon.default"), () -> {
-                        if (type.equals("default")) {
+                    b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
+                        tb.button(Core.bundle.get("dialog.weapon.default"), () -> {
+                            if (type.equals("default")) {
+                                hide.run();
+                                return;
+                            }
+                            Weapon w = new Weapon();
+                            cloneWeapon(weapon, w);
+                            weapon = w;
+                            type = "default";
+                            typeOn.clear();
                             hide.run();
-                            return;
-                        }
-                        Weapon w = new Weapon();
-                        cloneWeapon(weapon, w);
-                        weapon = w;
-                        type = "default";
-                        typeOn.clear();
-                        hide.run();
-                    });
-                    tb.row();
-                    tb.button(Core.bundle.get("dialog.weapon.defense"), () -> {
-                        if (type.equals("defense")) {
+                        }).width(100);
+                        tb.row();
+                        tb.button(Core.bundle.get("dialog.weapon.defense"), () -> {
+                            if (type.equals("defense")) {
+                                hide.run();
+                                return;
+                            }
+                            PointDefenseWeapon w = new PointDefenseWeapon();
+                            cloneWeapon(weapon, w);
+                            weapon = w;
+                            type = "defense";
+                            rebuildType();
                             hide.run();
-                            return;
-                        }
-                        PointDefenseWeapon w = new PointDefenseWeapon();
-                        cloneWeapon(weapon, w);
-                        weapon = w;
-                        type = "defense";
-                        rebuildType();
-                        hide.run();
-                    });
-                    tb.row();
-                    tb.button(Core.bundle.get("dialog.weapon.repair"), () -> {
-                        if (type.equals("repair")) {
+                        }).width(100);
+                        tb.row();
+                        tb.button(Core.bundle.get("dialog.weapon.repair"), () -> {
+                            if (type.equals("repair")) {
+                                hide.run();
+                                return;
+                            }
+                            RepairBeamWeapon w = new RepairBeamWeapon();
+                            cloneWeapon(weapon, w);
+                            weapon = w;
+                            type = "repair";
+                            rebuildType();
                             hide.run();
-                            return;
-                        }
-                        RepairBeamWeapon w = new RepairBeamWeapon();
-                        cloneWeapon(weapon, w);
-                        weapon = w;
-                        type = "repair";
-                        rebuildType();
-                        hide.run();
-                    });
-                }));
-            }, () -> {
-            });
-        }).growX();
-        cont.row();
-        cont.pane(t -> baseOn = t);
-        cont.row();
-        cont.pane(t -> typeOn = t);
-        rebuildBase();
-        rebuildType();
+                        }).width(100);
+                    }));
+                }, () -> {
+                }).size(25).center().pad(5);
+            }).growX();
+
+            t.row();
+            t.table(ta -> {
+                ta.setBackground(Tex.buttonEdge1);
+                baseOn = ta;
+            }).grow();
+            t.row();
+            t.table(ta -> {
+                ta.setBackground(Tex.buttonEdge1);
+                typeOn = ta;
+            }).grow();
+            rebuildBase();
+            rebuildType();
+        }).grow();
     }
 
     public void rebuildBase() {
@@ -145,7 +156,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         baseOn.button(Icon.pencilSmall, () -> {
             freeSize -= this.heavy;
             bulletDialog.show();
-        }).size(15).pad(15);
+        }).size(45).pad(15);
         if (!(weapon.ejectEffect instanceof MultiEffect)) {
             weapon.ejectEffect = new MultiEffect();
         }

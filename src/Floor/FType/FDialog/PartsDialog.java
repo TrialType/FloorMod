@@ -6,6 +6,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.part.*;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.ProjectDialogUtils.*;
@@ -40,7 +41,10 @@ public class PartsDialog extends BaseDialog {
 
     public void rebuild() {
         cont.clear();
-        cont.pane(t -> listOn = t);
+        cont.pane(t -> {
+            t.setBackground(Tex.buttonDown);
+            listOn = t;
+        }).grow();
         rebuildList();
     }
 
@@ -74,7 +78,7 @@ public class PartsDialog extends BaseDialog {
                     parts.set(index, shapePart);
                     rebuildPart(t, index, "shape", parts.get(index));
                     hide.run();
-                });
+                }).width(100);
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.hover"), () -> {
                     if (type.equals("hover")) {
@@ -89,7 +93,7 @@ public class PartsDialog extends BaseDialog {
                     parts.set(index, hoverPart);
                     rebuildPart(t, index, "hover", parts.get(index));
                     hide.run();
-                });
+                }).width(100);
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.halo"), () -> {
                     if (type.equals("halo")) {
@@ -104,7 +108,7 @@ public class PartsDialog extends BaseDialog {
                     parts.set(index, haloPart);
                     rebuildPart(t, index, "halo", parts.get(index));
                     hide.run();
-                });
+                }).width(100);
                 tb.row();
                 tb.button(Core.bundle.get("dialog.part.flare"), () -> {
                     if (type.equals("flare")) {
@@ -119,7 +123,7 @@ public class PartsDialog extends BaseDialog {
                     parts.set(index, flarePart);
                     rebuildPart(t, index, "flare", parts.get(index));
                     hide.run();
-                });
+                }).width(100);
             }));
         }, () -> {
         });
