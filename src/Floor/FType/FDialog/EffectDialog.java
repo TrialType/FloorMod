@@ -178,9 +178,10 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
     public void rebuild() {
         cont.clear();
         cont.pane(t -> {
+            t.setBackground(Tex.buttonEdge1);
             t.label(() -> Core.bundle.get("dialog.effect." + type)).pad(5);
             t.button(b -> {
-                b.image(Icon.pencilSmall);
+                b.image(Icon.rotate);
 
                 b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
                     tb.clear();
@@ -286,17 +287,17 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 }));
             }, () -> {
             });
-        }).growX();
+        }).width(1400);
         cont.row();
         cont.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
             base = t;
-        }).grow();
+        }).width(1400);
         cont.row();
         cont.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
             tty = t;
-        }).grow();
+        }).width(1400);
         rebuildBase();
         rebuildType();
     }

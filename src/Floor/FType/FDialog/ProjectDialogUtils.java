@@ -4,6 +4,7 @@ import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
 import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
 import arc.math.Interp;
 import arc.scene.Element;
 import arc.scene.actions.Actions;
@@ -286,9 +287,9 @@ abstract class ProjectDialogUtils {
     public static void createColorDialog(Table on, String dia, String tile, Color def, Cons<Color> apply, Runnable reb) {
         Color color = def == null ? new Color() : Color.valueOf(def.toString());
         on.table(t -> {
-            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile));
             t.button(b -> {
-                b.setSize(5);
+                b.setSize(25);
                 b.setColor(color);
 
                 b.clicked(() -> ui.showTextInput(Core.bundle.get("dialog.color.input"),
@@ -299,7 +300,7 @@ abstract class ProjectDialogUtils {
                         }));
             }, () -> {
             }).pad(5);
-        }).pad(10).width(250);
+        }).width(250);
     }
 
     public static void createColorDialogList(Table on, String dia, String tile, Color[] def, Cons<Color[]> apply, Runnable reb) {
@@ -330,17 +331,20 @@ abstract class ProjectDialogUtils {
 
     public static void createEffectList(Table on, EffectTableGetter data, String dia, String name, Effect list) {
         MultiEffect multi = (MultiEffect) list;
-        on.label(() -> Core.bundle.get("dialog." + dia + "." + name) + "->");
-        if (multi != null) {
-            on.button(Icon.pencil, () -> {
-                BaseDialog bd = new BaseDialog("");
-                bd.cont.pane(li -> {
-                    li.table(ta -> {
-                        data.set(ta);
-                        rebuildEffectList(data.get(), list);
-                    }).grow();
-                    li.row();
-                    li.button(Icon.add, () -> {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + name) + "->");
+            if (multi != null) {
+                t.button(Icon.pencil, () -> {
+                    BaseDialog bd = new BaseDialog("");
+                    bd.cont.pane(li -> {
+                        li.table(ta -> {
+                            data.set(ta);
+                            rebuildEffectList(data.get(), list);
+                        }).grow();
+                        li.row();
+                    }).width(1400);
+                    bd.buttons.button(Icon.left, bd::hide);
+                    bd.buttons.button(Icon.add, () -> {
                         Effect effect = new Effect();
                         Effect[] effects = new Effect[multi.effects.length + 1];
                         System.arraycopy(multi.effects, 0, effects, 0, multi.effects.length);
@@ -348,12 +352,10 @@ abstract class ProjectDialogUtils {
                         multi.effects = effects;
                         rebuildEffectList(data.get(), list);
                     });
-                }).growX().growY();
-                bd.row();
-                bd.buttons.button(Icon.left, bd::hide);
-                bd.show();
-            });
-        }
+                    bd.show();
+                }).pad(3).size(25);
+            }
+        }).pad(10).width(250);
     }
 
     private static void rebuildEffectList(Table on, Effect list) {
@@ -1344,7 +1346,7 @@ abstract class ProjectDialogUtils {
                         effect.effects = effects;
                         rebuildEffectList(on, effect);
                     }).grow();
-                }).growX();
+                }).width(1400);
                 on.row();
             }
         }

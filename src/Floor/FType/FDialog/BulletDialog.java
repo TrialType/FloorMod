@@ -1,13 +1,11 @@
 package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
-import Floor.Floor;
 import arc.Core;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.FlakBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -78,7 +76,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                 ui.showInfo(Core.bundle.get("@tooHeavy"));
             }
         }).size(210f, 64f);
-        buttons.button(Core.bundle.get("@toZero"), Icon.defense, () -> {
+        buttons.button(Core.bundle.get("@setZero"), Icon.defense, () -> {
             bullet.setZero();
             updateHeavy();
             rebuildBase();
@@ -118,23 +116,21 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             t.row();
             t.label(() -> Core.bundle.get("@heavyUse") + ": " +
                     (heavy + bulletHeavy) + " / " + freeSize).size(25).left().width(100).pad(5);
-        }).pad(2).growX().row();
-
-
-        table.table(t -> {
+        }).width(1400);
+        table.row();
+        table.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
             baseOn = t;
-        }).grow();
+        }).width(1400);
         rebuildBase();
         table.row();
-        table.table(t -> {
+        table.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
             typeOn = t;
-        }).grow();
+        }).width(1400);
         rebuildType();
-
         table.row();
-        table.table(this::rebuildEffect).grow();
+        table.pane(this::rebuildEffect).width(1400);
     }
 
     public void rebuildBase() {
@@ -193,8 +189,6 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             createLevDialog(p, dia, "percent", "percent", bullet.percent,
                     f -> bullet.percent = f, reb, this::updateHeavy, levUser, hevUser);
         }).width(1400);
-
-        baseOn.row();
     }
 
     public void rebuildType() {

@@ -84,7 +84,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public void rebuild() {
         cont.clear();
-        cont.table(t -> {
+        cont.pane(t -> {
             t.table(s -> {
                 s.setBackground(Tex.buttonEdge1);
                 s.label(() -> Core.bundle.get("dialog.weapon." + type)).center();
@@ -133,21 +133,21 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                     }));
                 }, () -> {
                 }).size(25).center().pad(5);
-            }).growX();
+            }).width(1400);
 
             t.row();
             t.table(ta -> {
                 ta.setBackground(Tex.buttonEdge1);
                 baseOn = ta;
-            }).grow();
+            }).width(1400);
             t.row();
             t.table(ta -> {
                 ta.setBackground(Tex.buttonEdge1);
                 typeOn = ta;
-            }).grow();
+            }).width(1400);
             rebuildBase();
             rebuildType();
-        }).grow();
+        }).width(1400);
     }
 
     public void rebuildBase() {

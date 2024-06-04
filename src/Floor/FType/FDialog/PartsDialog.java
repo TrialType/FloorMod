@@ -23,11 +23,11 @@ public class PartsDialog extends BaseDialog {
 
         shown(this::rebuild);
         shown(() -> ui.showInfo(Core.bundle.get("dialog.part.warning")));
-        buttons.button("@back", Icon.left, this::hide);
+        buttons.button("@back", Icon.left, this::hide).width(200);
         buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
             parts.add(new ShapePart());
             rebuildList();
-        });
+        }).width(200);
     }
 
     public PartsDialog(Seq<DrawPart> parts) {
@@ -41,10 +41,7 @@ public class PartsDialog extends BaseDialog {
 
     public void rebuild() {
         cont.clear();
-        cont.pane(t -> {
-            t.setBackground(Tex.buttonDown);
-            listOn = t;
-        }).grow();
+        cont.pane(t -> listOn = t).width(1400);
         rebuildList();
     }
 
@@ -53,88 +50,94 @@ public class PartsDialog extends BaseDialog {
         for (int i = 0; i < parts.size; i++) {
             int finI = i;
             listOn.row();
-            listOn.table(t -> rebuildPart(t, finI, findType(parts.get(finI), p -> parts.set(finI, p)), parts.get(finI))).grow();
+            listOn.table(t -> {
+                t.setBackground(Tex.buttonEdge1);
+                rebuildPart(t, finI, findType(parts.get(finI), p -> parts.set(finI, p)), parts.get(finI));
+            }).width(1400);
         }
     }
 
     public void rebuildPart(Table t, int index, String type, DrawPart part) {
         t.clear();
-        t.label(() -> Core.bundle.get("dialog.part." + type)).pad(5);
-        t.button(b -> {
-            b.image(Icon.pencilSmall);
+        t.pane(tt -> {
+            tt.setBackground(Tex.underlineOver);
+            tt.label(() -> Core.bundle.get("dialog.part." + type)).right().width(200).pad(5);
+            tt.button(b -> {
+                b.image(Icon.rotate);
 
-            b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
-                tb.top();
-                tb.button(Core.bundle.get("dialog.part.shape"), () -> {
-                    if (type.equals("shape")) {
+                b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
+                    tb.top();
+                    tb.button(Core.bundle.get("dialog.part.shape"), () -> {
+                        if (type.equals("shape")) {
+                            hide.run();
+                            return;
+                        }
+                        ShapePart shapePart = new ShapePart();
+                        shapePart.turretShading = part.turretShading;
+                        shapePart.under = part.under;
+                        shapePart.weaponIndex = part.weaponIndex;
+                        shapePart.recoilIndex = part.recoilIndex;
+                        parts.set(index, shapePart);
+                        rebuildPart(t, index, "shape", parts.get(index));
                         hide.run();
-                        return;
-                    }
-                    ShapePart shapePart = new ShapePart();
-                    shapePart.turretShading = part.turretShading;
-                    shapePart.under = part.under;
-                    shapePart.weaponIndex = part.weaponIndex;
-                    shapePart.recoilIndex = part.recoilIndex;
-                    parts.set(index, shapePart);
-                    rebuildPart(t, index, "shape", parts.get(index));
-                    hide.run();
-                }).width(100);
-                tb.row();
-                tb.button(Core.bundle.get("dialog.part.hover"), () -> {
-                    if (type.equals("hover")) {
+                    }).width(100);
+                    tb.row();
+                    tb.button(Core.bundle.get("dialog.part.hover"), () -> {
+                        if (type.equals("hover")) {
+                            hide.run();
+                            return;
+                        }
+                        HoverPart hoverPart = new HoverPart();
+                        hoverPart.turretShading = part.turretShading;
+                        hoverPart.under = part.under;
+                        hoverPart.weaponIndex = part.weaponIndex;
+                        hoverPart.recoilIndex = part.recoilIndex;
+                        parts.set(index, hoverPart);
+                        rebuildPart(t, index, "hover", parts.get(index));
                         hide.run();
-                        return;
-                    }
-                    HoverPart hoverPart = new HoverPart();
-                    hoverPart.turretShading = part.turretShading;
-                    hoverPart.under = part.under;
-                    hoverPart.weaponIndex = part.weaponIndex;
-                    hoverPart.recoilIndex = part.recoilIndex;
-                    parts.set(index, hoverPart);
-                    rebuildPart(t, index, "hover", parts.get(index));
-                    hide.run();
-                }).width(100);
-                tb.row();
-                tb.button(Core.bundle.get("dialog.part.halo"), () -> {
-                    if (type.equals("halo")) {
+                    }).width(100);
+                    tb.row();
+                    tb.button(Core.bundle.get("dialog.part.halo"), () -> {
+                        if (type.equals("halo")) {
+                            hide.run();
+                            return;
+                        }
+                        HaloPart haloPart = new HaloPart();
+                        haloPart.turretShading = part.turretShading;
+                        haloPart.under = part.under;
+                        haloPart.weaponIndex = part.weaponIndex;
+                        haloPart.recoilIndex = part.recoilIndex;
+                        parts.set(index, haloPart);
+                        rebuildPart(t, index, "halo", parts.get(index));
                         hide.run();
-                        return;
-                    }
-                    HaloPart haloPart = new HaloPart();
-                    haloPart.turretShading = part.turretShading;
-                    haloPart.under = part.under;
-                    haloPart.weaponIndex = part.weaponIndex;
-                    haloPart.recoilIndex = part.recoilIndex;
-                    parts.set(index, haloPart);
-                    rebuildPart(t, index, "halo", parts.get(index));
-                    hide.run();
-                }).width(100);
-                tb.row();
-                tb.button(Core.bundle.get("dialog.part.flare"), () -> {
-                    if (type.equals("flare")) {
+                    }).width(100);
+                    tb.row();
+                    tb.button(Core.bundle.get("dialog.part.flare"), () -> {
+                        if (type.equals("flare")) {
+                            hide.run();
+                            return;
+                        }
+                        FlarePart flarePart = new FlarePart();
+                        flarePart.turretShading = part.turretShading;
+                        flarePart.under = part.under;
+                        flarePart.weaponIndex = part.weaponIndex;
+                        flarePart.recoilIndex = part.recoilIndex;
+                        parts.set(index, flarePart);
+                        rebuildPart(t, index, "flare", parts.get(index));
                         hide.run();
-                        return;
-                    }
-                    FlarePart flarePart = new FlarePart();
-                    flarePart.turretShading = part.turretShading;
-                    flarePart.under = part.under;
-                    flarePart.weaponIndex = part.weaponIndex;
-                    flarePart.recoilIndex = part.recoilIndex;
-                    parts.set(index, flarePart);
-                    rebuildPart(t, index, "flare", parts.get(index));
-                    hide.run();
-                }).width(100);
-            }));
-        }, () -> {
-        });
-        t.button(Icon.trash, () -> {
-            parts.remove(index);
-            rebuildList();
-        }).pad(5);
+                    }).width(100);
+                }));
+            }, () -> {
+            }).right().pad(5);
+            tt.button(Icon.trash, () -> {
+                parts.remove(index);
+                rebuildList();
+            }).right().pad(5);
+        }).width(1400);
         t.row();
-        t.table(b -> rebuildPartBase(b, part));
+        t.pane(b -> rebuildPartBase(b, part)).width(1400);
         t.row();
-        t.table(y -> rebuildPartType(y, type, part));
+        t.pane(y -> rebuildPartType(y, type, part)).width(1400);
     }
 
     public void rebuildPartBase(Table t, DrawPart part) {
