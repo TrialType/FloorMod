@@ -65,8 +65,8 @@ public class ProjectsLocated extends BaseDialog {
 
         projects = this;
 
-        ProjectUtils.init();
         init(seed);
+        ProjectUtils.init();
 
         shown(this::rebuild);
 

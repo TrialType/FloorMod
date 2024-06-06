@@ -38,7 +38,6 @@ abstract class ProjectUtils {
     public static final HashMap<String, Integer> maxLevel = new HashMap<>();
 
     public static void init() {
-        //just for effect
         heavies.put("none", i -> 0);
 
         levels.put("none", f -> 0);

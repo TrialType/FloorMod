@@ -51,7 +51,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             apply.get(bullet);
             heavyApply.get(heavy + bullet.fragBullets * bulletHeavy);
             hide();
-        }).size(210f);
+        }).width(210f);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             if (boost * heavy + bullet.fragBullets * bulletHeavy <= freeSize) {
                 if (getHeavy("percent", findVal("percent")) > 0) {
@@ -75,13 +75,13 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             } else {
                 ui.showInfo(Core.bundle.get("@tooHeavy"));
             }
-        }).size(210f);
+        }).width(210f);
         buttons.button(Core.bundle.get("@setZero"), Icon.defense, () -> {
             bullet.setZero();
             updateHeavy();
             rebuildBase();
             rebuildType();
-        }).size(210f);
+        }).width(210f);
     }
 
     public void loadBase() {

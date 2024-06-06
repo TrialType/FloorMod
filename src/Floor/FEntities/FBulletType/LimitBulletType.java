@@ -614,6 +614,7 @@ public class LimitBulletType extends BulletType {
         speed = 0;
         fragBullets = 0;
         lightning = 0;
+        lightningDamage = 0;
         lightningLength = lightningLengthRand = bulletLightningLengthRand = bulletLightningLength = 0;
         lifetime = flareLength = laserLength = laserCLength = range = maxRange = radius = railLength = 0;
         splashDamage = splashDamageRadius = percent = 0;
@@ -634,12 +635,5 @@ public class LimitBulletType extends BulletType {
         despawnSound.at(b);
 
         Effect.shake(despawnShake, despawnShake, b);
-    }
-
-    public void write(int id) {
-    }
-
-    public LimitBulletType read(int id) {
-        return this;
     }
 }
