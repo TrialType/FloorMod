@@ -1,12 +1,14 @@
 package Floor.FType.FDialog;
 
 import arc.Core;
+import arc.Events;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.entities.units.WeaponMount;
+import mindustry.game.EventType;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
@@ -71,6 +73,13 @@ public class ProjectsLocated extends BaseDialog {
         init(seed);
         ProjectUtils.init();
 
+        hidden(() -> Events.on(EventType.UnitCreateEvent.class, e -> {
+            if (e.unit.hasWeapons()) {
+                weapons.get(0).weapon.load();
+                weapons.get(0).weapon.bullet.load();
+                e.unit.mounts[0] = new WeaponMount(weapons.get(0).weapon);
+            }
+        }));
         shown(this::rebuild);
 
         buttons.button("@back", Icon.left, this::hide).width(100);
@@ -79,8 +88,11 @@ public class ProjectsLocated extends BaseDialog {
             write();
         }).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
-            weapons.add(new weaponPack());
-            rebuildWeapon();
+            if (freeSize >= 0.5f) {
+                weapons.add(new weaponPack());
+                freeSize -= 0.5f;
+                rebuildWeapon();
+            }
         }).width(300);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
             abilities.add(new abilityPack());
@@ -90,11 +102,6 @@ public class ProjectsLocated extends BaseDialog {
 
     public void rebuild() {
         cont.clear();
-        cont.pane(t -> {
-            t.setBackground(Tex.buttonEdge1);
-            t.label(() -> Core.bundle.get("@heavyUse") + (maxSize - freeSize) + "/" + maxSize);
-        }).growX();
-        cont.row();
         cont.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
             located = t;
@@ -120,6 +127,10 @@ public class ProjectsLocated extends BaseDialog {
 
     public void rebuildWeapon() {
         LWeapon.clear();
+        LWeapon.table(t -> {
+            t.setBackground(Tex.buttonEdge1);
+            t.label(() -> Core.bundle.get("@heavyUse") + getWeaponHeavy() + "/" + maxSize);
+        }).width(500).row();
         for (int i = 0; i < weapons.size; i++) {
             weaponPack wp = weapons.get(i);
             int finalI = i;
@@ -128,10 +139,11 @@ public class ProjectsLocated extends BaseDialog {
                     pushW = pushW == wp ? null : pushW;
                     t.setBackground(pushW == wp ? Tex.buttonEdge3 : Tex.windowEmpty);
                 });
-                t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(200).pad(5);
+                t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(100).pad(5);
                 t.label(() -> Core.bundle.get("@heavyUse") + wp.heavy).left().width(100).pad(5);
-                t.button(Icon.pencilSmall, () -> wp.dialog.show()).pad(5);
+                t.button(Icon.pencil, () -> wp.dialog.show()).pad(5);
                 t.button(Icon.trash, () -> {
+                    freeSize += wp.heavy;
                     weapons.remove(finalI);
                     pushW = pushW == wp ? null : pushW;
                     rebuildWeapon();
@@ -179,6 +191,14 @@ public class ProjectsLocated extends BaseDialog {
         }
     }
 
+    public float getWeaponHeavy() {
+        float h = 0;
+        for (weaponPack wp : weapons) {
+            h += wp.heavy;
+        }
+        return h;
+    }
+
     public static class weaponPack {
         Weapon weapon;
         WeaponDialog dialog;
@@ -186,6 +206,9 @@ public class ProjectsLocated extends BaseDialog {
 
         public weaponPack() {
             this.weapon = new Weapon();
+            weapon.reload = 500;
+            weapon.shoot.shots = 1;
+            weapon.targetSwitchInterval = weapon.targetInterval = 500;
             this.dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
             this.heavy = 0.5f;
         }

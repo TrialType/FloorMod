@@ -423,5 +423,18 @@ public class FItems {
         allWeapon = new Item[][]{allReload, allTargetInterval, allBulletNumber};
         allAbility = new Item[][]{allShield};
         allBase = new Item[][]{allSize, allHealth, allSpeed};
+
+        sizeProject10.alwaysUnlocked = true;
+        bulletProject5.alwaysUnlocked = true;
+        splashProject5.alwaysUnlocked = true;
+        knockProject5.alwaysUnlocked = true;
+        percentProject5.alwaysUnlocked = true;
+        lightningProject5.alwaysUnlocked = true;
+        empProject5.alwaysUnlocked = true;
+        fragProject5.alwaysUnlocked = true;
+        shieldProject5.alwaysUnlocked = true;
+        reloadProject5.alwaysUnlocked = true;
+        targetIntervalProject5.alwaysUnlocked = true;
+        bulletNumberProject5.alwaysUnlocked = true;
     }
 }

@@ -36,7 +36,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
         shown(this::rebuild);
-        shown(() -> freeSize += this.heavy * weapon.shoot.shots * bulletHeavy);
+        shown(() -> freeSize += this.heavy + weapon.shoot.shots * bulletHeavy);
         hidden(() -> {
             freeSize -= this.heavy;
             freeSize -= weapon.shoot.shots * bulletHeavy;
@@ -68,9 +68,9 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             }
         }).width(200);
         buttons.button(Core.bundle.get("@setZero"), () -> {
-            weapon.reload = 500;
-            weapon.shoot.shots = 0;
-            weapon.targetSwitchInterval = weapon.targetInterval = 500;
+            weapon.reload = 300;
+            weapon.shoot.shots = 1;
+            weapon.targetSwitchInterval = weapon.targetInterval = 240;
             if (weapon instanceof RepairBeamWeapon r) {
                 r.repairSpeed = r.fractionRepairSpeed = r.beamWidth = 0;
             }
@@ -86,7 +86,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                 s.setBackground(Tex.buttonEdge1);
                 s.label(() -> Core.bundle.get("dialog.weapon." + type)).center();
                 s.label(() -> Core.bundle.get("@heavyUse") +
-                        heavy + bulletHeavy * weapon.shoot.shots + "/" + freeSize).pad(5);
+                        (heavy + bulletHeavy * weapon.shoot.shots) + "/" + freeSize).pad(5);
                 s.button(b -> {
                     b.image(Icon.pencil);
 
@@ -329,7 +329,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             this.weapon = new Weapon();
             cloneWeapon(weapon, this.weapon);
             weapon.reload = 500;
-            weapon.shoot.shots = 0;
+            weapon.shoot.shots = 1;
             weapon.targetSwitchInterval = weapon.targetInterval = 500;
             type = "default";
         }
@@ -351,7 +351,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             if (!(weapon.bullet instanceof LimitBulletType)) {
                 weapon.bullet = new LimitBulletType();
             }
-            bulletDialog = new BulletDialog(weapon.bullet, f -> bulletHeavy = f,
+            bulletDialog = new BulletDialog(() -> weapon.bullet, f -> bulletHeavy = f,
                     b -> weapon.bullet = b, "", () -> weapon.shoot.shots);
             bulletDialog.hidden(() -> freeSize += this.heavy);
             bulletDialog.shown(() -> freeSize -= this.heavy);

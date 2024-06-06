@@ -53,7 +53,7 @@ abstract class ProjectUtils {
 
         levels.put("bulletBase", f -> f <= 0 ? 0 : f <= 36 ? 1 : f <= 72 ? 2 : f <= 144 ? 3 : f <= 288 ? 4 : f <= 576 ? 5 : 6);
         levels.put("splash", f -> f <= 0 ? 0 : f <= 3 ? 1 : f <= 4.2 ? 2 : f <= 7 ? 3 : f <= 12 ? 4 : f <= 19 ? 5 : 6);
-        levels.put("lightning", f -> f <= 0 ? 0 : f <= 2 ? 1 : f <= 4 ? 2 : f <= 8 ? 3 : f <= 12 ? 4 : f <= 20 ? 5 : 6);
+        levels.put("lightning", f -> f <= 10 ? 0 : f <= 14 ? 1 : f <= 18 ? 2 : f <= 23 ? 3 : f <= 28 ? 4 : f <= 34 ? 5 : 6);
         levels.put("percent", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.3 ? 3 : f <= 0.45 ? 4 : f <= 0.65 ? 5 : 6);
         levels.put("frags", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 3 ? 3 : f <= 4 ? 4 : f <= 5 ? 5 : 6);
         levels.put("emp", f -> f <= 0 ? 0 : f <= 60 ? 1 : f <= 90 ? 2 : f <= 130 ? 3 : f <= 180 ? 4 : f <= 260 ? 5 : 6);
@@ -91,8 +91,8 @@ abstract class ProjectUtils {
         maxSize = 2;
         for (int i = allSize.length; i > 0; i--) {
             if (allSize[i - 1].unlocked()) {
-                maxSize = 2 + (i == 1 ? 1 : i == 2 ? 2 : i == 3 ? 3 : i == 4 ? 4 : i == 5 ? 5 : i == 6 ? 6 : i == 7 ? 7 :
-                        i == 8 ? 8 : i == 9 ? 9 : 10);
+                maxSize = 2 + (i == 1 ? 4 : i == 2 ? 6 : i == 3 ? 10 : i == 4 ? 14 : i == 5 ? 18 : i == 6 ? 24 : i == 7 ? 28 :
+                        i == 8 ? 34 : i == 9 ? 40 : 50);
                 break;
             }
         }
