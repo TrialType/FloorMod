@@ -19,10 +19,9 @@ import static mindustry.Vars.ui;
 
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public Weapon weapon;
+    public float bulletHeavy = 0;
+    public float heavy = 0;
     protected BulletDialog bulletDialog;
-    protected float bulletHeavy = 0;
-    protected float heavyBack;
-    protected float heavy = 0;
     protected String type = "default";
     protected Table baseOn;
     protected Table typeOn;
@@ -36,19 +35,24 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
+        shown(this::rebuild);
+        shown(() -> freeSize += this.heavy * weapon.shoot.shots * bulletHeavy);
+        hidden(() -> {
+            freeSize -= this.heavy;
+            freeSize -= weapon.shoot.shots * bulletHeavy;
+            heavyApply.get(weapon.shoot.shots * bulletHeavy + this.heavy);
+        });
 
         if (this.weapon == null) {
             this.weapon = rollback;
             updateHeavy();
-            heavyBack = heavy;
         }
         setWeapon(weapon);
-        if (!(weapon.bullet instanceof LimitBulletType)) {
-            weapon.bullet = new LimitBulletType();
+        if (weapon.bullet != null) {
+            updateDialog(true);
+            bulletHeavy = bulletDialog.heavyOut();
         }
-        bulletDialog = new BulletDialog(weapon.bullet, f -> bulletHeavy = f,
-                b -> weapon.bullet = b, "", weapon.shoot.shots, bulletHeavy);
-        bulletDialog.hidden(() -> freeSize += this.heavy);
+
         buttons.button("@back", Icon.left, () -> {
             weapon = rollback;
             updateHeavy();
@@ -73,12 +77,6 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             updateHeavy();
             rebuild();
         }).width(200);
-        shown(this::rebuild);
-        hidden(() -> {
-            freeSize -= this.heavy;
-            freeSize -= weapon.shoot.shots * bulletHeavy;
-            heavyApply.get(weapon.shoot.shots * bulletHeavy + this.heavy);
-        });
     }
 
     public void rebuild() {
@@ -87,8 +85,10 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             t.table(s -> {
                 s.setBackground(Tex.buttonEdge1);
                 s.label(() -> Core.bundle.get("dialog.weapon." + type)).center();
+                s.label(() -> Core.bundle.get("@heavyUse") +
+                        heavy + bulletHeavy * weapon.shoot.shots + "/" + freeSize).pad(5);
                 s.button(b -> {
-                    b.image(Icon.pencilSmall);
+                    b.image(Icon.pencil);
 
                     b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
                         tb.button(Core.bundle.get("dialog.weapon.default"), () -> {
@@ -151,11 +151,27 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public void rebuildBase() {
         baseOn.clear();
-        baseOn.label(() -> Core.bundle.get("dialog.weapon.bullet")).width(100);
-        baseOn.button(Icon.pencilSmall, () -> {
-            freeSize -= this.heavy;
-            bulletDialog.show();
-        }).size(25).pad(15);
+        baseOn.table(b -> {
+            b.label(() -> Core.bundle.get("dialog.weapon.bullet")).width(100);
+            if (bulletDialog != null) {
+                b.button(Icon.pencil, () -> {
+                    if (heavy + weapon.shoot.shots * bulletHeavy <= freeSize) {
+                        bulletDialog.show();
+                    } else {
+                        ui.showInfo(Core.bundle.get("@tooHeavy"));
+                    }
+                }).pad(5);
+                b.button(Icon.trash, () -> {
+                    updateDialog(false);
+                    rebuildBase();
+                }).pad(5);
+            } else {
+                b.button(Icon.add, () -> {
+                    updateDialog(true);
+                    rebuildBase();
+                }).pad(5);
+            }
+        });
         if (!(weapon.ejectEffect instanceof MultiEffect)) {
             weapon.ejectEffect = new MultiEffect();
         }
@@ -281,6 +297,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         heavy += getHeavy("number", weapon.shoot.shots);
         heavy += getHeavy("reload", weapon.reload);
         heavy += getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
+        bulletHeavy = bulletDialog == null ? 0 : bulletDialog.heavyOut();
     }
 
     public void setWeapon(Weapon weapon) {
@@ -311,6 +328,9 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         } else {
             this.weapon = new Weapon();
             cloneWeapon(weapon, this.weapon);
+            weapon.reload = 500;
+            weapon.shoot.shots = 0;
+            weapon.targetSwitchInterval = weapon.targetInterval = 500;
             type = "default";
         }
     }
@@ -323,6 +343,23 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public void updateDialog(boolean add) {
+        if (add) {
+            if (!(weapon.bullet instanceof LimitBulletType)) {
+                weapon.bullet = new LimitBulletType();
+            }
+            bulletDialog = new BulletDialog(weapon.bullet, f -> bulletHeavy = f,
+                    b -> weapon.bullet = b, "", () -> weapon.shoot.shots);
+            bulletDialog.hidden(() -> freeSize += this.heavy);
+            bulletDialog.shown(() -> freeSize -= this.heavy);
+            bulletHeavy = bulletDialog.heavyOut();
+        } else {
+            bulletDialog = null;
+            weapon.bullet = null;
+            bulletHeavy = 0;
         }
     }
 

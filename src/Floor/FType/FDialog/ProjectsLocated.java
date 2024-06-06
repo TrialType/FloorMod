@@ -13,6 +13,9 @@ import mindustry.gen.Unit;
 import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
+import static Floor.FType.FDialog.ProjectUtils.freeSize;
+import static Floor.FType.FDialog.ProjectUtils.maxSize;
+
 public class ProjectsLocated extends BaseDialog {
     public static ProjectsLocated projects;
     public final Seq<weaponPack> weapons = new Seq<>();
@@ -89,6 +92,11 @@ public class ProjectsLocated extends BaseDialog {
         cont.clear();
         cont.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
+            t.label(() -> Core.bundle.get("@heavyUse") + (maxSize - freeSize) + "/" + maxSize);
+        }).growX();
+        cont.row();
+        cont.pane(t -> {
+            t.setBackground(Tex.buttonEdge1);
             located = t;
         }).width(1000).height(1000);
         cont.pane(t -> {
@@ -121,6 +129,7 @@ public class ProjectsLocated extends BaseDialog {
                     t.setBackground(pushW == wp ? Tex.buttonEdge3 : Tex.windowEmpty);
                 });
                 t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(200).pad(5);
+                t.label(() -> Core.bundle.get("@heavyUse") + wp.heavy).left().width(100).pad(5);
                 t.button(Icon.pencilSmall, () -> wp.dialog.show()).pad(5);
                 t.button(Icon.trash, () -> {
                     weapons.remove(finalI);
@@ -173,32 +182,36 @@ public class ProjectsLocated extends BaseDialog {
     public static class weaponPack {
         Weapon weapon;
         WeaponDialog dialog;
-        float heavy = 0;
+        float heavy;
 
         public weaponPack() {
-            weapon = new Weapon();
-            dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
+            this.weapon = new Weapon();
+            this.dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
+            this.heavy = 0.5f;
         }
 
         public weaponPack(Weapon weapon) {
-            this();
             this.weapon = weapon;
+            this.dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
+            this.heavy = dialog.heavy * dialog.weapon.shoot.shots * dialog.bulletHeavy;
         }
     }
 
     public static class abilityPack {
         Ability ability;
         AbilityDialog dialog;
-        float heavy = 0;
+        float heavy;
 
         public abilityPack() {
-            ability = new ForceFieldAbility(0, 0, 0, Float.MAX_VALUE, 0, 0);
-            dialog = new AbilityDialog("", this);
+            this.ability = new ForceFieldAbility(0, 0, 0, Float.MAX_VALUE, 0, 0);
+            this.dialog = new AbilityDialog("", this);
+            this.heavy = 0.5f;
         }
 
         public abilityPack(Ability ability) {
-            this();
             this.ability = ability;
+            this.dialog = new AbilityDialog("", this);
+            this.heavy = dialog.heavy;
         }
     }
 }

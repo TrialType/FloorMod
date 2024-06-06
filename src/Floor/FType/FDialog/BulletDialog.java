@@ -3,6 +3,7 @@ package Floor.FType.FDialog;
 import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
 import arc.func.Cons;
+import arc.func.Intp;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.bullet.BulletType;
@@ -22,6 +23,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected String newType = "bullet";
     //global
     protected LimitBulletType bullet;
+    protected BulletDialog dialog;
     protected float bulletHeavy = 0;
     protected float heavy = 0.5f;
     protected Table typeOn;
@@ -37,15 +39,17 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected StrBool levUser = str -> couldUse(str, findVal(str));
     protected BoolGetter hevUser = () -> boost * (heavy + bullet.fragBullets * bulletHeavy) <= freeSize;
 
-    public BulletDialog(BulletType def, Cons<Float> heavyApply, Cons<BulletType> apply, String title, int boost, float heavy) {
+    public BulletDialog(BulletType def, Cons<Float> heavyApply, Cons<BulletType> apply, String title, Intp boost) {
         super(title);
         shown(this::loadBase);
         this.apply = apply;
-        this.boost = boost;
+        this.boost = boost.get();
         this.heavyApply = heavyApply;
         this.bullet = def instanceof LimitBulletType l ? l : new LimitBulletType();
+        if (bullet.fragBullet != null) {
+            updateDialog(true);
+        }
         updateHeavy();
-        bulletHeavy = (heavy - this.heavy) / bullet.fragBullets;
 
         buttons.button("@back", Icon.left, () -> {
             apply.get(bullet);
@@ -53,7 +57,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             hide();
         }).width(210f);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
-            if (boost * heavy + bullet.fragBullets * bulletHeavy <= freeSize) {
+            if (this.boost * (heavy + bullet.fragBullets * bulletHeavy) <= freeSize) {
                 if (getHeavy("percent", findVal("percent")) > 0) {
                     bullet.havePercent = true;
                 }
@@ -79,8 +83,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         buttons.button(Core.bundle.get("@setZero"), Icon.defense, () -> {
             bullet.setZero();
             updateHeavy();
-            rebuildBase();
-            rebuildType();
+            loadBase();
         }).width(210f);
     }
 
@@ -152,14 +155,19 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             createLevDialog(s, dia, "frags", "fragBullets", bullet.fragBullets,
                     f -> bullet.fragBullets = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
             s.row();
-            s.label(() -> Core.bundle.get("dialog.bullet.writeFrag") + "->").width(150);
-            s.button(Icon.pencilSmall, () -> {
-                freeSize -= this.heavy * boost;
-                BulletDialog bd = new BulletDialog(bullet.fragBullet, f -> bulletHeavy = f,
-                        b -> b.fragBullet = b, "", bullet.fragBullets, bulletHeavy);
-                bd.hidden(() -> freeSize += this.heavy * boost);
-                bd.show();
-            }).pad(15).width(24);
+            s.label(() -> Core.bundle.get("dialog.bullet.writeFrag") + "->").width(100);
+            if (dialog == null) {
+                s.button(Icon.add, () -> {
+                    updateDialog(true);
+                    rebuildBase();
+                }).pad(5);
+            } else {
+                s.button(Icon.pencil, () -> dialog.show()).pad(5);
+                s.button(Icon.trash, () -> {
+                    updateDialog(false);
+                    rebuildBase();
+                }).pad(5);
+            }
             s.row();
         }).width(1400);
 
@@ -353,6 +361,32 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         heavy += getHeavy("percent", findVal("percent"));
         heavy += getHeavy("frags", findVal("frags"));
         heavy += getHeavy("knock", findVal("knock"));
+    }
+
+    public void updateDialog(boolean add) {
+        if (add) {
+            if (!(bullet.fragBullet instanceof LimitBulletType)) {
+                bullet.fragBullet = new LimitBulletType();
+            }
+            dialog = new BulletDialog(bullet.fragBullet, f -> bulletHeavy = f,
+                    b -> bullet.fragBullet = b, "", () -> bullet.fragBullets);
+            bulletHeavy = dialog.heavyOut();
+            dialog.shown(() -> freeSize -= boost * heavy);
+            dialog.hidden(() -> freeSize += boost * heavy);
+        } else {
+            bullet.fragBullet = null;
+            dialog = null;
+            bulletHeavy = 0;
+        }
+    }
+
+    public float heavyOut() {
+        updateHeavy();
+        float other = 0;
+        if (dialog != null) {
+            other = dialog.heavyOut();
+        }
+        return heavy + other;
     }
 
     @Override
