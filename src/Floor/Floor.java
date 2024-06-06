@@ -2,18 +2,15 @@ package Floor;
 
 import Floor.FContent.*;
 import Floor.FEntities.FBulletType.EMPLarge;
-import Floor.FType.FDialog.WeaponDialog;
+import Floor.FType.FDialog.ProjectsLocated;
 import arc.util.Time;
 import mindustry.mod.ClassMap;
 import mindustry.mod.Mod;
-import mindustry.type.Weapon;
 
 public class Floor extends Mod {
     public Floor() {
         ClassMap.classes.put("EMPLarge", EMPLarge.class);
-        Time.run(600, () -> new WeaponDialog("", new Weapon(), w -> {
-        }, f -> {
-        }).show());
+        Time.runTask(600, () -> new ProjectsLocated("", 0).show());
     }
 
     @Override

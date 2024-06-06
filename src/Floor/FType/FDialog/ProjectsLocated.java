@@ -1,23 +1,23 @@
 package Floor.FType.FDialog;
 
+import arc.Core;
 import arc.func.Cons;
-import arc.scene.ui.Dialog;
+import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.abilities.Ability;
+import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.entities.units.WeaponMount;
+import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.gen.Unit;
 import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
-import java.util.HashMap;
-
-import static Floor.FContent.FItems.*;
-
 public class ProjectsLocated extends BaseDialog {
-    public static ProjectsLocated dialog;
-    public static final Seq<ProjectsLocated.weaponPack> weapons = new Seq<>();
-    public static final Seq<ProjectsLocated.abilityPack> abilities = new Seq<>();
-    public static Cons<Unit> upper = u -> {
+    public static ProjectsLocated projects;
+    public final Seq<weaponPack> weapons = new Seq<>();
+    public final Seq<abilityPack> abilities = new Seq<>();
+    public Cons<Unit> upper = u -> {
         Seq<Weapon> we = new Seq<>();
         Seq<Ability> ab = new Seq<>();
         for (ProjectsLocated.weaponPack wp : weapons) {
@@ -54,14 +54,120 @@ public class ProjectsLocated extends BaseDialog {
         }
     };
 
-    public ProjectsLocated(String title, Dialog.DialogStyle style) {
-        super(title, style);
-        ProjectDialogUtils.init();
+    protected int seed;
+    protected Table located, LWeapon, LAbility;
+
+    private weaponPack pushW = null;
+    private abilityPack pushA = null;
+
+    public ProjectsLocated(String title, int seed) {
+        super(title);
+
+        projects = this;
+
+        ProjectUtils.init();
+        init(seed);
+
+        shown(this::rebuild);
+
+        buttons.button("@back", Icon.left, this::hide).width(100);
+        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
+            hide();
+            write();
+        }).width(100);
+        buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
+            weapons.add(new weaponPack());
+            rebuildWeapon();
+        }).width(300);
+        buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
+            abilities.add(new abilityPack());
+            rebuildAbility();
+        }).width(300);
     }
 
-    public ProjectsLocated(String title) {
-        super(title);
-        ProjectDialogUtils.init();
+    public void rebuild() {
+        cont.clear();
+        cont.pane(t -> {
+            t.setBackground(Tex.buttonEdge1);
+            located = t;
+        }).width(1000).height(1000);
+        cont.pane(t -> {
+            t.table(w -> {
+                w.setBackground(Tex.buttonEdge1);
+                LWeapon = w;
+            }).width(500).growY();
+            t.table(a -> {
+                a.setBackground(Tex.buttonEdge1);
+                LAbility = a;
+            }).width(500).growY();
+        }).width(1000);
+
+        rebuildLocated();
+        rebuildWeapon();
+        rebuildAbility();
+    }
+
+    public void rebuildLocated() {
+    }
+
+    public void rebuildWeapon() {
+        LWeapon.clear();
+        for (int i = 0; i < weapons.size; i++) {
+            weaponPack wp = weapons.get(i);
+            int finalI = i;
+            LWeapon.table(t -> {
+                t.clicked(() -> {
+                    pushW = pushW == wp ? null : pushW;
+                    t.setBackground(pushW == wp ? Tex.buttonEdge3 : Tex.windowEmpty);
+                });
+                t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(200).pad(5);
+                t.button(Icon.pencilSmall, () -> wp.dialog.show()).pad(5);
+                t.button(Icon.trash, () -> {
+                    weapons.remove(finalI);
+                    pushW = pushW == wp ? null : pushW;
+                    rebuildWeapon();
+                }).pad(5);
+            }).width(500);
+            LWeapon.row();
+        }
+    }
+
+    public void rebuildAbility() {
+    }
+
+    public void init(int seed) {
+        this.seed = seed;
+        read();
+    }
+
+    public void write() {
+        Seq<Weapon> w = new Seq<>();
+        Seq<Ability> a = new Seq<>();
+        for (weaponPack p : weapons) {
+            w.add(p.weapon);
+        }
+        for (abilityPack p : abilities) {
+            a.add(p.ability);
+        }
+        Core.settings.putJson("floor-project-weapons-" + seed, Seq.class, w);
+        Core.settings.putJson("floor-project-abilities-" + seed, Seq.class, a);
+    }
+
+    public void read() {
+        weapons.clear();
+        abilities.clear();
+        Seq<Weapon> w;
+        Seq<Ability> a;
+        //noinspection unchecked
+        w = (Seq<Weapon>) Core.settings.getJson("floor-project-weapons-" + seed, Seq.class, Seq::new);
+        //noinspection unchecked
+        a = (Seq<Ability>) Core.settings.getJson("floor-project-abilities-" + seed, Seq.class, Seq::new);
+        for (Weapon ww : w) {
+            weapons.add(new weaponPack(ww));
+        }
+        for (Ability ab : a) {
+            abilities.add(new abilityPack(ab));
+        }
     }
 
     public static class weaponPack {
@@ -73,6 +179,11 @@ public class ProjectsLocated extends BaseDialog {
             weapon = new Weapon();
             dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
         }
+
+        public weaponPack(Weapon weapon) {
+            this();
+            this.weapon = weapon;
+        }
     }
 
     public static class abilityPack {
@@ -81,7 +192,13 @@ public class ProjectsLocated extends BaseDialog {
         float heavy = 0;
 
         public abilityPack() {
+            ability = new ForceFieldAbility(0, 0, 0, Float.MAX_VALUE, 0, 0);
             dialog = new AbilityDialog("", this);
+        }
+
+        public abilityPack(Ability ability) {
+            this();
+            this.ability = ability;
         }
     }
 }

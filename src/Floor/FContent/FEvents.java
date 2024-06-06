@@ -17,6 +17,7 @@ import mindustry.gen.Unit;
 
 import java.util.Random;
 
+import static Floor.FType.FDialog.ProjectsLocated.projects;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -43,7 +44,7 @@ public class FEvents {
 
         Events.on(EventType.UnitCreateEvent.class, e -> {
             if (e.unit.spawnedByCore() && !e.unit.team.isAI()) {
-                ProjectsLocated.upper.get(e.unit);
+                projects.upper.get(e.unit);
             }
         });
         Events.on(EventType.UnitCreateEvent.class, e -> {

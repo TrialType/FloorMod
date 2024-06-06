@@ -16,7 +16,7 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.ProjectDialogUtils.*;
+import static Floor.FType.FDialog.ProjectUtils.*;
 import static mindustry.Vars.ui;
 
 

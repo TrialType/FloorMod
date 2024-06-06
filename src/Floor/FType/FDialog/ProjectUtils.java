@@ -4,7 +4,6 @@ import arc.Core;
 import arc.func.Cons;
 import arc.func.Cons2;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
 import arc.math.Interp;
 import arc.scene.Element;
 import arc.scene.actions.Actions;
@@ -27,11 +26,10 @@ import java.util.HashMap;
 
 import static Floor.FContent.FItems.*;
 import static Floor.FContent.FItems.allTargetInterval;
-import static Floor.FType.FDialog.ProjectsLocated.abilities;
-import static Floor.FType.FDialog.ProjectsLocated.weapons;
+import static Floor.FType.FDialog.ProjectsLocated.projects;
 import static mindustry.Vars.ui;
 
-abstract class ProjectDialogUtils {
+abstract class ProjectUtils {
     public static Table colorList;
     public static float maxSize = 0;
     public static float freeSize = 0;
@@ -100,10 +98,10 @@ abstract class ProjectDialogUtils {
             }
         }
         freeSize = maxSize;
-        for (ProjectsLocated.weaponPack wp : weapons) {
+        for (ProjectsLocated.weaponPack wp : projects.weapons) {
             freeSize -= wp.heavy;
         }
-        for (ProjectsLocated.abilityPack ap : abilities) {
+        for (ProjectsLocated.abilityPack ap : projects.abilities) {
             freeSize -= ap.heavy;
         }
     }

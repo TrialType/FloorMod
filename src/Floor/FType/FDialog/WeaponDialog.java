@@ -14,7 +14,7 @@ import mindustry.ui.dialogs.BaseDialog;
 
 import java.lang.reflect.Field;
 
-import static Floor.FType.FDialog.ProjectDialogUtils.*;
+import static Floor.FType.FDialog.ProjectUtils.*;
 import static mindustry.Vars.ui;
 
 public class WeaponDialog extends BaseDialog implements EffectTableGetter {
@@ -36,8 +36,6 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
-
-        ProjectDialogUtils.init();
 
         if (this.weapon == null) {
             this.weapon = rollback;
@@ -61,13 +59,14 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             if (heavy + weapon.shoot.shots * bulletHeavy <= freeSize) {
                 apply.get(weapon);
                 hide();
+            } else {
+                ui.showInfo(Core.bundle.get("@tooHeavy"));
             }
-            ui.showInfo("tooHeavy");
         }).width(200);
         buttons.button(Core.bundle.get("@setZero"), () -> {
-            weapon.reload = Float.MAX_VALUE;
+            weapon.reload = 500;
             weapon.shoot.shots = 0;
-            weapon.targetSwitchInterval = weapon.targetInterval = Float.MAX_VALUE;
+            weapon.targetSwitchInterval = weapon.targetInterval = 500;
             if (weapon instanceof RepairBeamWeapon r) {
                 r.repairSpeed = r.fractionRepairSpeed = r.beamWidth = 0;
             }
@@ -152,15 +151,14 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public void rebuildBase() {
         baseOn.clear();
-        baseOn.label(() -> Core.bundle.get("dialog.weapon.bullet")).width(160);
+        baseOn.label(() -> Core.bundle.get("dialog.weapon.bullet")).width(100);
         baseOn.button(Icon.pencilSmall, () -> {
             freeSize -= this.heavy;
             bulletDialog.show();
-        }).size(45).pad(15);
+        }).size(25).pad(15);
         if (!(weapon.ejectEffect instanceof MultiEffect)) {
             weapon.ejectEffect = new MultiEffect();
         }
-        baseOn.row();
         createEffectList(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
         baseOn.row();
         createNumberDialog(baseOn, dia, "x", weapon.x, f -> weapon.x = f, reBase);
@@ -273,7 +271,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             case "reload" -> weapon.reload;
             case "target" ->
                     this.type.equals("repair") ? r.repairSpeed * 15 + r.fractionRepairSpeed * 60 + r.beamWidth / 4 :
-                            this.type.equals("defense") ? weapon.targetInterval * weapon.targetSwitchInterval : 0;
+                            this.type.equals("defense") ? weapon.targetInterval * weapon.targetSwitchInterval : 500;
             default -> -1;
         };
     }
