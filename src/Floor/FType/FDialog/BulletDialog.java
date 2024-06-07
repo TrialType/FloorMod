@@ -2,9 +2,7 @@ package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
-import arc.func.Cons;
-import arc.func.Intp;
-import arc.func.Prov;
+import arc.func.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.bullet.BulletType;
@@ -37,8 +35,8 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected static String dia = "bullet";
     protected Runnable reb = this::rebuildBase;
     protected Runnable ret = this::rebuildType;
-    protected StrBool levUser = str -> couldUse(str, findVal(str));
-    protected BoolGetter hevUser = () -> boost * (heavy + bullet.fragBullets * bulletHeavy) <= freeSize;
+    protected Boolf<String> levUser = str -> couldUse(str, findVal(str));
+    protected Boolp hevUser = () -> boost * (heavy + bullet.fragBullets * bulletHeavy) <= freeSize;
 
     public BulletDialog(Prov<BulletType> def, Cons<Float> heavyApply, Cons<BulletType> apply, String title, Intp boost) {
         super(title);

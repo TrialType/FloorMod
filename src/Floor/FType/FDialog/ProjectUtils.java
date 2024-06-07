@@ -1,8 +1,7 @@
 package Floor.FType.FDialog;
 
 import arc.Core;
-import arc.func.Cons;
-import arc.func.Cons2;
+import arc.func.*;
 import arc.graphics.Color;
 import arc.math.Interp;
 import arc.scene.Element;
@@ -17,6 +16,8 @@ import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.DrawPart;
+import mindustry.entities.pattern.ShootMulti;
+import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -244,7 +245,7 @@ abstract class ProjectUtils {
         }).pad(10).width(250);
     }
 
-    public static void createLevDialog(Table on, String dia, String type, String tile, float def, Cons<Float> apply, Runnable rebuild, Runnable updateHeavy, StrBool levUser, BoolGetter hevUser) {
+    public static void createLevDialog(Table on, String dia, String type, String tile, float def, Cons<Float> apply, Runnable rebuild, Runnable updateHeavy, Boolf<String> levUser, Boolp hevUser) {
         on.table(t -> {
             t.setBackground(Tex.underline2);
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile) + ": ");
@@ -274,11 +275,47 @@ abstract class ProjectUtils {
     public static void createPartsDialog(Table on, String dia, String tile, Seq<DrawPart> parts) {
         on.table(t -> {
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
-            t.button(Icon.pencilSmall, () -> {
+            t.button(Core.bundle.get("dialog.part.warning"), Icon.pencil, () -> {
                 PartsDialog pd = new PartsDialog(parts);
                 pd.show();
-            });
+            }).width(300);
+        }).pad(10).width(400);
+    }
+
+    public static void createShootDialog(Table on, String dia, String tile, float use, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(50);
+            t.label(() -> Core.bundle.get("@heavyUse") + use).width(100);
+            t.button(Icon.pencil, () -> new ShootDialog("", def, apply, couldUse, heavyIn, heavyUp).show()).size(25);
         }).pad(10).width(250);
+    }
+
+    public static void createShootList(Table on, String dia, String tile, Prov<ShootPattern[]> def, Cons<ShootPattern[]> apply, Boolp levPass, Boolp heavyPass) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(100);
+            t.button(Core.bundle.get("dialog.part.warning"), Icon.pencil, () -> {
+                BaseDialog bd = new BaseDialog("");
+                bd.buttons.button("@back", Icon.left, () -> {
+                    apply.get(def.get());
+                    if (!levPass.get()) {
+                        ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
+                    } else if (!heavyPass.get()) {
+                        ui.showInfo(Core.bundle.get("@tooHeavy"));
+                    } else {
+                        bd.hide();
+                    }
+                }).width(100);
+                bd.buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
+                    ShootPattern[] nn = new ShootPattern[def.get().length + 1];
+                    System.arraycopy(def.get(), 0, nn, 0, def.get().length);
+                    apply.get(nn);
+
+                    bd.cont.clear();
+                    bd.cont.pane(tb -> rebuildShootList(tb, nn, apply));
+                }).width(100);
+                bd.cont.pane(tb -> rebuildShootList(tb, def.get(), apply));
+            }).width(300);
+        }).pad(10).width(400);
     }
 
     public static void createColorDialog(Table on, String dia, String tile, Color def, Cons<Color> apply, Runnable reb) {
@@ -1355,6 +1392,29 @@ abstract class ProjectUtils {
         ed.show();
     }
 
+    private static void rebuildShootList(Table on, ShootPattern[] values, Cons<ShootPattern[]> apply) {
+        on.clear();
+        for (int i = 0; i < values.length; i++) {
+            int finalI = i;
+            on.table(t -> {
+                t.label(() -> finalI + "").width(20);
+                t.button(Icon.pencil, () -> new ShootDialog("", () -> values[finalI], s -> values[finalI] = s, s -> true, () -> true, () -> {
+                }).show()).size(25).pad(5);
+                t.button(Icon.trash, () -> {
+                    ShootPattern[] n = new ShootPattern[values.length - 1];
+                    for (int j = 0, k = 0; j < values.length; j++) {
+                        if (j != finalI) {
+                            n[k] = values[j];
+                            k++;
+                        }
+                    }
+                    apply.get(n);
+                    rebuildShootList(on, n, apply);
+                }).size(25).pad(5);
+            });
+        }
+    }
+
     private static void rebuildColorList(Seq<Color> list) {
         colorList.clear();
         for (int i = 0; i < list.size; i++) {
@@ -1702,12 +1762,17 @@ abstract class ProjectUtils {
         on.label(() -> Core.bundle.get("dialog." + dia + "." + name)).center().width(35).pad(5);
     }
 
-    public interface BoolGetter {
-        boolean get();
-    }
-
-    public interface StrBool {
-        boolean get(String str);
+    public static float getShootVal(ShootPattern shoot) {
+        float val = 0;
+        if (shoot instanceof ShootMulti sm) {
+            for (ShootPattern s : sm.dest) {
+                val += getShootVal(s);
+            }
+            val = val * sm.source.shots;
+        } else {
+            val = shoot.shots;
+        }
+        return val;
     }
 
     public interface EffectTableGetter {

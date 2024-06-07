@@ -2,6 +2,8 @@ package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
+import arc.func.Boolf;
+import arc.func.Boolp;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
 import mindustry.entities.effect.MultiEffect;
@@ -30,8 +32,8 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     protected Runnable reBase = this::rebuildBase;
     protected Runnable reType = this::rebuildType;
     protected static String dia = "weapon";
-    protected StrBool levUser = str -> couldUse(str, getVal(str));
-    protected BoolGetter hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
+    protected Boolf<String> levUser = str -> couldUse(str, getVal(str));
+    protected Boolp hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
 
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
@@ -176,6 +178,8 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             weapon.ejectEffect = new MultiEffect();
         }
         createEffectList(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
+        createShootDialog(baseOn, dia, "shoot", getHeavy("number", getVal("number")), () -> weapon.shoot,
+                s -> weapon.shoot = s, s -> couldUse("number", getVal("number")), hevUser, this::updateHeavy);
         baseOn.row();
         createNumberDialog(baseOn, dia, "x", weapon.x, f -> weapon.x = f, reBase);
         createNumberDialog(baseOn, dia, "y", weapon.y, f -> weapon.y = f, reBase);
@@ -283,7 +287,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             repairSpeed = fractionRepairSpeed = beamWidth = 0;
         }};
         return switch (type) {
-            case "number" -> weapon.shoot.shots;
+            case "number" -> getShootVal(weapon.shoot);
             case "reload" -> weapon.reload;
             case "target" ->
                     this.type.equals("repair") ? r.repairSpeed * 15 + r.fractionRepairSpeed * 60 + r.beamWidth / 4 :

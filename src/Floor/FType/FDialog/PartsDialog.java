@@ -22,7 +22,6 @@ public class PartsDialog extends BaseDialog {
         super(Core.bundle.get("dialog.part.warning"));
 
         shown(this::rebuild);
-        shown(() -> ui.showInfo(Core.bundle.get("dialog.part.warning")));
         buttons.button("@back", Icon.left, this::hide).width(200);
         buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
             parts.add(new ShapePart());
@@ -60,7 +59,7 @@ public class PartsDialog extends BaseDialog {
     public void rebuildPart(Table t, int index, String type, DrawPart part) {
         t.clear();
         t.pane(tt -> {
-            tt.setBackground(Tex.underlineOver);
+            tt.setBackground(Tex.buttonEdge1);
             tt.label(() -> Core.bundle.get("dialog.part." + type)).right().width(200).pad(5);
             tt.button(b -> {
                 b.image(Icon.rotate);
