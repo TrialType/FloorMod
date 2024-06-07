@@ -158,11 +158,11 @@ public class ShootDialog extends BaseDialog {
     public void rebuildBase() {
         base.clear();
         base.setBackground(Tex.buttonEdge1);
-        createLevDialog(base, dia, "number", "shots", shoot.shots, f -> shoot.shots = (int) (f + 0),
+        createLevDialog(base, dia, "number", shot.equals("multi") ? "shots2" : "shots", shoot.shots, f -> shoot.shots = (int) (f + 0),
                 this::rebuildBase, heavyUp, use, heavy);
-        createNumberDialog(base, dia, "shotDelay", shoot.shotDelay,
+        createNumberDialog(base, dia, shot.equals("multi") ? "shotDelay2" : "shotDelay", shoot.shotDelay,
                 f -> shoot.shotDelay = f, this::rebuildBase);
-        createNumberDialog(base, dia, "firstShotDelay", shoot.firstShotDelay,
+        createNumberDialog(base, dia, shot.equals("multi") ? "firstShotDelay2" : "firstShotDelay", shoot.firstShotDelay,
                 f -> shoot.firstShotDelay = f, this::rebuildBase);
     }
 
@@ -199,7 +199,7 @@ public class ShootDialog extends BaseDialog {
             case "multi": {
                 ShootMulti sm = (ShootMulti) shoot;
                 createShootList(type, dia, "dest", () -> sm.dest, s -> sm.dest = s, () -> use.get("number"), heavy);
-                createShootDialog(type, dia, "", getHeavy("number", getShootVal(sm.source)), () -> sm.source,
+                createShootDialog(type, dia, "source", getHeavy("number", getShootVal(sm.source)), () -> sm.source,
                         s -> sm.source = s, s -> couldUse("number", getShootVal(sm.source)), heavy, heavyUp);
                 break;
             }
@@ -230,10 +230,12 @@ public class ShootDialog extends BaseDialog {
                         bd.buttons.button(Core.bundle.get("@apply"), Icon.right, bd::hide).width(100);
                         bd.buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
                             float[] nn = new float[sb.barrels.length + 3];
-                            System.arraycopy(sb.barrels, 0, nn, 0, n.length);
+                            System.arraycopy(sb.barrels, 0, nn, 0, sb.barrels.length);
+                            nn[nn.length - 1] = nn[nn.length - 2] = nn[nn.length - 3] = 0;
                             sb.barrels = nn;
                             rebuildFloatList(sb.barrels, f -> sb.barrels = f);
                         }).width(100);
+                        t.row();
                         bd.pane(tb -> flo = tb).width(1400);
                         rebuildFloatList(sb.barrels, f -> sb.barrels = f);
                         bd.show();

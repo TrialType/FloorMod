@@ -284,15 +284,15 @@ abstract class ProjectUtils {
 
     public static void createShootDialog(Table on, String dia, String tile, float use, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp) {
         on.table(t -> {
-            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(50);
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(100);
             t.label(() -> Core.bundle.get("@heavyUse") + use).width(100);
-            t.button(Icon.pencil, () -> new ShootDialog("", def, apply, couldUse, heavyIn, heavyUp).show()).size(25);
+            t.button(Icon.pencil, () -> new ShootDialog("", def, apply, couldUse, heavyIn, heavyUp).show()).size(20);
         }).pad(10).width(250);
     }
 
     public static void createShootList(Table on, String dia, String tile, Prov<ShootPattern[]> def, Cons<ShootPattern[]> apply, Boolp levPass, Boolp heavyPass) {
         on.table(t -> {
-            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(100);
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(150);
             t.button(Core.bundle.get("dialog.part.warning"), Icon.pencil, () -> {
                 BaseDialog bd = new BaseDialog("");
                 bd.buttons.button("@back", Icon.left, () -> {
@@ -308,14 +308,16 @@ abstract class ProjectUtils {
                 bd.buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
                     ShootPattern[] nn = new ShootPattern[def.get().length + 1];
                     System.arraycopy(def.get(), 0, nn, 0, def.get().length);
+                    nn[nn.length-1] = new ShootPattern();
                     apply.get(nn);
 
                     bd.cont.clear();
                     bd.cont.pane(tb -> rebuildShootList(tb, nn, apply));
                 }).width(100);
                 bd.cont.pane(tb -> rebuildShootList(tb, def.get(), apply));
+                bd.show();
             }).width(300);
-        }).pad(10).width(400);
+        }).pad(10).width(450);
     }
 
     public static void createColorDialog(Table on, String dia, String tile, Color def, Cons<Color> apply, Runnable reb) {
