@@ -1,6 +1,5 @@
 package Floor.FEntities.FBulletType;
 
-import Floor.FEntities.FEffect.IOMulti;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
@@ -55,6 +54,8 @@ public class LimitBulletType extends BulletType {
     public float timeIncrease = 2.5f, timeDuration = 60f * 10f;
     public float powerDamageScl = 2f, powerSclDecrease = 0.2f;
     public float unitDamageScl = 0.7f;
+    //emp//
+
 
     public Effect hitPowerEffect = Fx.hitEmpSpark, chainEffect = Fx.chainEmp, applyEffect = Fx.heal;
     public boolean hitUnits = true;

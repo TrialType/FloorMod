@@ -1,6 +1,7 @@
 package Floor.FType.FDialog;
 
 import arc.Core;
+import arc.audio.Sound;
 import arc.func.*;
 import arc.graphics.Color;
 import arc.math.Interp;
@@ -13,13 +14,16 @@ import arc.util.Align;
 import arc.util.Strings;
 import arc.util.Tmp;
 import mindustry.content.Fx;
+import mindustry.content.Liquids;
 import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.DrawPart;
 import mindustry.entities.pattern.ShootMulti;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Icon;
+import mindustry.gen.Sounds;
 import mindustry.gen.Tex;
+import mindustry.type.Liquid;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -51,6 +55,8 @@ abstract class ProjectUtils {
         heavies.put("frags", i -> i * 1.8f);
         heavies.put("emp", i -> i);
         heavies.put("knock", i -> i * 2);
+        heavies.put("suppression", i -> i);
+        heavies.put("puddles", i -> i);
 
         levels.put("bulletBase", f -> f <= 0 ? 0 : f <= 36 ? 1 : f <= 72 ? 2 : f <= 144 ? 3 : f <= 288 ? 4 : f <= 576 ? 5 : 6);
         levels.put("splash", f -> f <= 0 ? 0 : f <= 3 ? 1 : f <= 4.2 ? 2 : f <= 7 ? 3 : f <= 12 ? 4 : f <= 19 ? 5 : 6);
@@ -59,6 +65,8 @@ abstract class ProjectUtils {
         levels.put("frags", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 3 ? 3 : f <= 4 ? 4 : f <= 5 ? 5 : 6);
         levels.put("emp", f -> f <= 0 ? 0 : f <= 60 ? 1 : f <= 90 ? 2 : f <= 130 ? 3 : f <= 180 ? 4 : f <= 260 ? 5 : 6);
         levels.put("knock", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.2 ? 3 : f <= 0.25 ? 4 : f <= 0.3 ? 5 : 6);
+        levels.put("suppression", f -> f <= 4 ? 0 : f <= 8 ? 1 : f <= 12 ? 2 : f <= 18 ? 3 : f <= 24 ? 4 : f <= 32 ? 5 : 6);
+        levels.put("puddles", f -> f <= 15 ? 0 : f <= 30 ? 1 : f <= 45 ? 2 : f <= 60 ? 3 : f <= 85 ? 4 : f <= 100 ? 5 : 6);
 
         //weapon
         heavies.put("number", i -> i * 1.1f);
@@ -225,6 +233,25 @@ abstract class ProjectUtils {
         }).pad(10).width(250);
     }
 
+    public static void createBooleanLevDialog(Table on, String dia, String tile, boolean def, Cons<Boolean> apply, Runnable rebuild, Boolp lev, Boolp hev) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile) + ":").pad(5);
+            t.label(() -> Core.bundle.get("@" + def)).pad(5);
+            t.button(Icon.rotateSmall, () -> {
+                apply.get(!def);
+                if (!lev.get()) {
+                    apply.get(def);
+                    ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
+                } else if (!hev.get()) {
+                    apply.get(def);
+                    ui.showInfo(Core.bundle.get("@tooHeavy"));
+                } else {
+                    rebuild.run();
+                }
+            });
+        }).width(250);
+    }
+
     public static void createNumberDialogWithLimit(Table on, String dia, String tile, float def, float max, float min, Cons<Float> apply, Runnable rebuild) {
         on.table(t -> {
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile) + ": ");
@@ -349,7 +376,7 @@ abstract class ProjectUtils {
         }).width(250);
     }
 
-    public static void createColorDialogList(Table on, String dia, String tile, Color[] def, Cons<Color[]> apply, Runnable reb) {
+    public static void createColorDialogList(Table on, String dia, String tile, Color[] def, Cons<Color[]> apply) {
         Seq<Color> cs = new Seq<>(def);
         on.table(t -> {
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
@@ -370,7 +397,6 @@ abstract class ProjectUtils {
                     bd.hide();
                 });
                 bd.show();
-                bd.hidden(reb);
             }).pad(5);
         }).pad(10).width(250);
     }
@@ -1510,6 +1536,477 @@ abstract class ProjectUtils {
         ta.pack();
     }
 
+    public static void createLiquidSelect(Table on, String dia, String tile, Cons<Liquid> apply) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
+
+            t.button(b -> {
+                b.image(Icon.pencil);
+
+                b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
+                    tb.button("water", () -> {
+                        apply.get(Liquids.water);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("slag", () -> {
+                        apply.get(Liquids.slag);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("oil", () -> {
+                        apply.get(Liquids.oil);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("cryofluid", () -> {
+                        apply.get(Liquids.cryofluid);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("arkycite", () -> {
+                        apply.get(Liquids.arkycite);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("gallium", () -> {
+                        apply.get(Liquids.gallium);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("neoplasm", () -> {
+                        apply.get(Liquids.neoplasm);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("ozone", () -> {
+                        apply.get(Liquids.ozone);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("hydrogen", () -> {
+                        apply.get(Liquids.hydrogen);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("nitrogen", () -> {
+                        apply.get(Liquids.nitrogen);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("cyanogen", () -> {
+                        apply.get(Liquids.cyanogen);
+                        hide.run();
+                    }).width(100).row();
+                }));
+            }, () -> {
+            });
+        }).pad(10).width(250);
+    }
+
+    public static void createSoundSelect(Table on, String dia, String tile, Cons<Sound> apply) {
+        on.table(t -> {
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
+            t.button(b -> {
+                b.image(Icon.pencil);
+
+                b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
+                    tb.button("artillery", () -> {
+                        apply.get(Sounds.artillery);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("back", () -> {
+                        apply.get(Sounds.back);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("bang", () -> {
+                        apply.get(Sounds.bang);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("beam", () -> {
+                        apply.get(Sounds.beam);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("bigshot", () -> {
+                        apply.get(Sounds.bigshot);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("bioLoop", () -> {
+                        apply.get(Sounds.bioLoop);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("blaster", () -> {
+                        apply.get(Sounds.blaster);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("bolt", () -> {
+                        apply.get(Sounds.bolt);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("boom", () -> {
+                        apply.get(Sounds.boom);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("breaks", () -> {
+                        apply.get(Sounds.breaks);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("build", () -> {
+                        apply.get(Sounds.build);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("buttonClick", () -> {
+                        apply.get(Sounds.buttonClick);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("cannon", () -> {
+                        apply.get(Sounds.cannon);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("chatMessage", () -> {
+                        apply.get(Sounds.chatMessage);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("click", () -> {
+                        apply.get(Sounds.click);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("combustion", () -> {
+                        apply.get(Sounds.combustion);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("conveyor", () -> {
+                        apply.get(Sounds.conveyor);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("corexplode", () -> {
+                        apply.get(Sounds.corexplode);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("cutter", () -> {
+                        apply.get(Sounds.cutter);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("door", () -> {
+                        apply.get(Sounds.door);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("drill", () -> {
+                        apply.get(Sounds.drill);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("drillCharge", () -> {
+                        apply.get(Sounds.drillCharge);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("drillImpact", () -> {
+                        apply.get(Sounds.drillImpact);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("dullExplosion", () -> {
+                        apply.get(Sounds.dullExplosion);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("electricHum", () -> {
+                        apply.get(Sounds.electricHum);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("explosion", () -> {
+                        apply.get(Sounds.explosion);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("explosionbig", () -> {
+                        apply.get(Sounds.explosionbig);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("extractLoop", () -> {
+                        apply.get(Sounds.extractLoop);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("fire", () -> {
+                        apply.get(Sounds.fire);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("flame", () -> {
+                        apply.get(Sounds.flame);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("flame2", () -> {
+                        apply.get(Sounds.flame2);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("flux", () -> {
+                        apply.get(Sounds.flux);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("glow", () -> {
+                        apply.get(Sounds.glow);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("grinding", () -> {
+                        apply.get(Sounds.grinding);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("hum", () -> {
+                        apply.get(Sounds.hum);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("largeCannon", () -> {
+                        apply.get(Sounds.largeCannon);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("largeExplosion", () -> {
+                        apply.get(Sounds.largeExplosion);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("laser", () -> {
+                        apply.get(Sounds.laser);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("laserbeam", () -> {
+                        apply.get(Sounds.laserbeam);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("laserbig", () -> {
+                        apply.get(Sounds.laserbig);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("laserblast", () -> {
+                        apply.get(Sounds.laserblast);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("lasercharge", () -> {
+                        apply.get(Sounds.lasercharge);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("lasercharge2", () -> {
+                        apply.get(Sounds.lasercharge2);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("lasershoot", () -> {
+                        apply.get(Sounds.lasershoot);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("machine", () -> {
+                        apply.get(Sounds.machine);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("malignShoot", () -> {
+                        apply.get(Sounds.malignShoot);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("mediumCannon", () -> {
+                        apply.get(Sounds.mediumCannon);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("message", () -> {
+                        apply.get(Sounds.message);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("mineDeploy", () -> {
+                        apply.get(Sounds.mineDeploy);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("minebeam", () -> {
+                        apply.get(Sounds.minebeam);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("missile", () -> {
+                        apply.get(Sounds.missile);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("missileLarge", () -> {
+                        apply.get(Sounds.missileLarge);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("missileLaunch", () -> {
+                        apply.get(Sounds.missileLaunch);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("missileSmall", () -> {
+                        apply.get(Sounds.missileSmall);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("missileTrail", () -> {
+                        apply.get(Sounds.missileTrail);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("mud", () -> {
+                        apply.get(Sounds.mud);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("noammo", () -> {
+                        apply.get(Sounds.noammo);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("pew", () -> {
+                        apply.get(Sounds.pew);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("place", () -> {
+                        apply.get(Sounds.place);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("plantBreak", () -> {
+                        apply.get(Sounds.plantBreak);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("plasmaboom", () -> {
+                        apply.get(Sounds.plasmaboom);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("plasmadrop", () -> {
+                        apply.get(Sounds.plasmadrop);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("press", () -> {
+                        apply.get(Sounds.press);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("pulse", () -> {
+                        apply.get(Sounds.pulse);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("pulseBlast", () -> {
+                        apply.get(Sounds.pulseBlast);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("railgun", () -> {
+                        apply.get(Sounds.railgun);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("rain", () -> {
+                        apply.get(Sounds.rain);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("release", () -> {
+                        apply.get(Sounds.release);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("respawn", () -> {
+                        apply.get(Sounds.respawn);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("respawning", () -> {
+                        apply.get(Sounds.respawning);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("rockBreak", () -> {
+                        apply.get(Sounds.rockBreak);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("sap", () -> {
+                        apply.get(Sounds.sap);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shield", () -> {
+                        apply.get(Sounds.shield);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shockBlast", () -> {
+                        apply.get(Sounds.shockBlast);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shoot", () -> {
+                        apply.get(Sounds.shoot);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shootAlt", () -> {
+                        apply.get(Sounds.shootAlt);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shootAltLong", () -> {
+                        apply.get(Sounds.shootAltLong);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shootBig", () -> {
+                        apply.get(Sounds.shootBig);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shootSmite", () -> {
+                        apply.get(Sounds.shootSmite);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shootSnap", () -> {
+                        apply.get(Sounds.shootSnap);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("shotgun", () -> {
+                        apply.get(Sounds.shotgun);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("smelter", () -> {
+                        apply.get(Sounds.smelter);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("spark", () -> {
+                        apply.get(Sounds.spark);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("spellLoop", () -> {
+                        apply.get(Sounds.spellLoop);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("splash", () -> {
+                        apply.get(Sounds.splash);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("spray", () -> {
+                        apply.get(Sounds.spray);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("steam", () -> {
+                        apply.get(Sounds.steam);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("swish", () -> {
+                        apply.get(Sounds.swish);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("techloop", () -> {
+                        apply.get(Sounds.techloop);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("thruster", () -> {
+                        apply.get(Sounds.thruster);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("titanExplosion", () -> {
+                        apply.get(Sounds.titanExplosion);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("torch", () -> {
+                        apply.get(Sounds.torch);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("tractorbeam", () -> {
+                        apply.get(Sounds.tractorbeam);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("unlock", () -> {
+                        apply.get(Sounds.unlock);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("wave", () -> {
+                        apply.get(Sounds.wave);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("wind", () -> {
+                        apply.get(Sounds.wind);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("wind2", () -> {
+                        apply.get(Sounds.wind2);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("wind3", () -> {
+                        apply.get(Sounds.wind3);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("windhowl", () -> {
+                        apply.get(Sounds.windhowl);
+                        hide.run();
+                    }).width(100).row();
+                    tb.button("none", () -> {
+                        apply.get(Sounds.none);
+                        hide.run();
+                    }).width(100).row();
+                }));
+            }, () -> {
+            });
+        }).pad(10).width(250);
+    }
+
     public static void createInterpolSelect(Table on, String dia, String tile, Cons<Interp> apply) {
         on.table(t -> {
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).pad(5);
@@ -1756,18 +2253,6 @@ abstract class ProjectUtils {
             }, () -> {
             });
         }).pad(10).width(250);
-    }
-
-    public static void createTypeLine(Table on, String dia, String type, float value) {
-        on.row();
-        on.table(table -> {
-            table.setBackground(Tex.underline);
-            table.label(() -> Core.bundle.get("dialog." + dia + "." + type)).left();
-            table.row();
-            table.label(() -> Core.bundle.get("@heavyUse") + ":  " + getHeavy(type, value)).left().pad(5);
-            table.label(() -> Core.bundle.get("@maxLevel") + ":  " + maxLevel.get(type)).left().pad(5);
-        });
-        on.row();
     }
 
     public static void createMessageLine(Table on, String dia, String name) {
