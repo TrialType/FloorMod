@@ -41,6 +41,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     public BulletDialog(Prov<BulletType> def, Cons<Float> heavyApply, Cons<BulletType> apply, String title, Intp boost) {
         super(title);
         shown(this::loadBase);
+        hidden(this::heavyOut);
 
         this.apply = apply;
         this.boost = boost.get();
@@ -146,65 +147,43 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
 
     public void rebuildBase() {
         baseOn.clear();
-        createTypeLine(baseOn, dia, "bulletBase", findVal("bulletBase"));
-
-        baseOn.table(s -> {
-            s.setBackground(Tex.underlineOver);
-            createLevDialog(s, dia, "bulletBase", "damage", bullet.damage,
-                    f -> bullet.damage = f, reb, this::updateHeavy, levUser, hevUser);
-        }).width(1400);
-
-        createTypeLine(baseOn, dia, "frags", findVal("frags"));
-
-        baseOn.table(s -> {
-            s.setBackground(Tex.underlineOver);
-            createNumberDialogWithLimit(s, dia, "fragAngle", bullet.fragAngle,
-                    12, -12, f -> bullet.fragAngle = f, reb);
-            createLevDialog(s, dia, "frags", "fragBullets", bullet.fragBullets,
-                    f -> bullet.fragBullets = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
-            s.row();
-            s.label(() -> Core.bundle.get("dialog.bullet.writeFrag") + "->").width(100);
-            if (dialog == null) {
-                s.button(Icon.add, () -> {
-                    updateDialog(true);
-                    rebuildBase();
-                }).pad(5);
-            } else {
-                s.button(Icon.pencil, () -> dialog.show()).pad(5);
-                s.button(Icon.trash, () -> {
-                    updateDialog(false);
-                    rebuildBase();
-                }).pad(5);
-            }
-            s.row();
-        }).width(1400);
-
-        createTypeLine(baseOn, dia, "lightning", findVal("lightning"));
-
-        baseOn.table(s -> {
-            s.setBackground(Tex.underlineOver);
-            createNumberDialogWithLimit(s, dia, "lightningAngle", bullet.lightningAngle,
-                    360, 0, f -> bullet.lightningAngle = f, reb);
-            createNumberDialogWithLimit(s, dia, "lightningAngleRand", bullet.lightningAngleRand,
-                    360, 0, f -> bullet.lightningAngleRand = f, reb);
-            createLevDialog(s, dia, "lightning", "lightning", bullet.lightningLength,
-                    f -> bullet.lightningLength = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
-            s.row();
-            createLevDialog(s, dia, "lightning", "lightningLengthRand", bullet.lightningLengthRand,
-                    f -> bullet.lightningLengthRand = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
-            createLevDialog(s, dia, "lightning", "lightningDamage", bullet.lightningDamage,
-                    f -> bullet.lightningDamage = f, reb, this::updateHeavy, levUser, hevUser);
-            createLevDialog(s, dia, "lightning", "lightnings", bullet.lightning,
-                    f -> bullet.lightning = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
-        }).width(1400);
-
-        createTypeLine(baseOn, dia, "percent", findVal("percent"));
-
-        baseOn.table(p -> {
-            p.setBackground(Tex.underlineOver);
-            createLevDialog(p, dia, "percent", "percent", bullet.percent,
-                    f -> bullet.percent = f, reb, this::updateHeavy, levUser, hevUser);
-        }).width(1400);
+        baseOn.setBackground(Tex.underlineOver);
+        createLevDialog(baseOn, dia, "bulletBase", "damage", bullet.damage,
+                f -> bullet.damage = f, reb, this::updateHeavy, levUser, hevUser);
+        createNumberDialogWithLimit(baseOn, dia, "fragAngle", bullet.fragAngle,
+                12, -12, f -> bullet.fragAngle = f, reb);
+        createLevDialog(baseOn, dia, "frags", "fragBullets", bullet.fragBullets,
+                f -> bullet.fragBullets = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
+        baseOn.row();
+        baseOn.label(() -> Core.bundle.get("dialog.bullet.writeFrag") + "->").width(100);
+        if (dialog == null) {
+            baseOn.button(Icon.add, () -> {
+                updateDialog(true);
+                rebuildBase();
+            }).pad(5);
+        } else {
+            baseOn.button(Icon.pencil, () -> dialog.show()).pad(5);
+            baseOn.button(Icon.trash, () -> {
+                updateDialog(false);
+                rebuildBase();
+            }).pad(5);
+        }
+        createNumberDialogWithLimit(baseOn, dia, "lightningAngle", bullet.lightningAngle,
+                360, 0, f -> bullet.lightningAngle = f, reb);
+        createNumberDialogWithLimit(baseOn, dia, "lightningAngleRand", bullet.lightningAngleRand,
+                360, 0, f -> bullet.lightningAngleRand = f, reb);
+        baseOn.row();
+        createLevDialog(baseOn, dia, "lightning", "lightning", bullet.lightningLength,
+                f -> bullet.lightningLength = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
+        createLevDialog(baseOn, dia, "lightning", "lightningLengthRand", bullet.lightningLengthRand,
+                f -> bullet.lightningLengthRand = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
+        createLevDialog(baseOn, dia, "lightning", "lightningDamage", bullet.lightningDamage,
+                f -> bullet.lightningDamage = f, reb, this::updateHeavy, levUser, hevUser);
+        baseOn.row();
+        createLevDialog(baseOn, dia, "lightning", "lightnings", bullet.lightning,
+                f -> bullet.lightning = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
+        createLevDialog(baseOn, dia, "percent", "percent", bullet.percent,
+                f -> bullet.percent = f, reb, this::updateHeavy, levUser, hevUser);
     }
 
     public void rebuildType() {
@@ -369,7 +348,6 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         heavy += getHeavy("percent", findVal("percent"));
         heavy += getHeavy("frags", findVal("frags"));
         heavy += getHeavy("knock", findVal("knock"));
-        heavy *= boost;
         bulletHeavy = dialog == null ? 0 : dialog.heavyOut();
     }
 

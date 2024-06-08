@@ -29,8 +29,16 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     protected Table typeOn;
     protected Table effectOn;
 
-    protected Runnable reBase = this::rebuildBase;
-    protected Runnable reType = this::rebuildType;
+    protected Runnable rebuildHeavy = () -> {
+    };
+    protected Runnable reBase = () -> {
+        rebuildBase();
+        rebuildHeavy.run();
+    };
+    protected Runnable reType = () -> {
+        rebuildType();
+        rebuildHeavy.run();
+    };
     protected static String dia = "weapon";
     protected Boolf<String> levUser = str -> couldUse(str, getVal(str));
     protected Boolp hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
@@ -41,7 +49,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         shown(() -> freeSize += this.heavy + weapon.shoot.shots * bulletHeavy);
         hidden(() -> {
             freeSize -= this.heavy;
-            freeSize -= weapon.shoot.shots * bulletHeavy;
+            freeSize -= getShootVal(weapon.shoot) * bulletHeavy;
             heavyApply.get(weapon.shoot.shots * bulletHeavy + this.heavy);
         });
 
@@ -87,8 +95,15 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             t.table(s -> {
                 s.setBackground(Tex.buttonEdge1);
                 s.label(() -> Core.bundle.get("dialog.weapon." + type)).center();
-                s.label(() -> Core.bundle.get("@heavyUse") +
-                        (heavy + bulletHeavy * weapon.shoot.shots) + "/" + freeSize).pad(5);
+                s.table(h -> {
+                    rebuildHeavy = () -> {
+                        h.clear();
+                        updateHeavy();
+                        h.label(() -> Core.bundle.get("@heavyUse") +
+                                (heavy + bulletHeavy * getShootVal(weapon.shoot)) + "/" + freeSize).pad(5);
+                    };
+                    rebuildHeavy.run();
+                });
                 s.button(b -> {
                     b.image(Icon.pencil);
 
@@ -179,7 +194,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         }
         createEffectList(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
         createShootDialog(baseOn, dia, "shoot", getHeavy("number", getVal("number")), () -> weapon.shoot,
-                s -> weapon.shoot = s, s -> couldUse("number", getVal("number")), hevUser, this::updateHeavy);
+                s -> weapon.shoot = s, s -> couldUse("number", getVal("number")), hevUser, this::updateHeavy, this::rebuildBase);
         baseOn.row();
         createNumberDialog(baseOn, dia, "x", weapon.x, f -> weapon.x = f, reBase);
         createNumberDialog(baseOn, dia, "y", weapon.y, f -> weapon.y = f, reBase);
@@ -298,7 +313,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
 
     public void updateHeavy() {
         heavy = 0.5f;
-        heavy += getHeavy("number", weapon.shoot.shots);
+        heavy += getHeavy("number", getShootVal(weapon.shoot));
         heavy += getHeavy("reload", weapon.reload);
         heavy += getHeavy("target", weapon.targetInterval * weapon.targetSwitchInterval);
         bulletHeavy = bulletDialog == null ? 0 : bulletDialog.heavyOut();
@@ -356,7 +371,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                 weapon.bullet = new LimitBulletType();
             }
             bulletDialog = new BulletDialog(() -> weapon.bullet, f -> bulletHeavy = f,
-                    b -> weapon.bullet = b, "", () -> weapon.shoot.shots);
+                    b -> weapon.bullet = b, "", () -> (int) getShootVal(weapon.shoot));
             bulletDialog.hidden(() -> freeSize += this.heavy);
             bulletDialog.shown(() -> freeSize -= this.heavy);
             bulletHeavy = bulletDialog.heavyOut();

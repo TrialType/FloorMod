@@ -15,6 +15,7 @@ import static mindustry.Vars.ui;
 public class ShootDialog extends BaseDialog {
     public String shot = "pattern";
     public ShootPattern shoot;
+    public Prov<ShootPattern> def;
     public Cons<ShootPattern> apply;
     public Boolp heavy;
     public Boolf<String> use;
@@ -22,15 +23,29 @@ public class ShootDialog extends BaseDialog {
     public Table base, type, flo;
     protected static String dia = "shoot";
 
-    public ShootDialog(String title, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp) {
+    public ShootDialog(String title, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp, Runnable reb) {
         super(title);
 
+        this.def = def;
         setShoot(def.get());
         this.apply = apply;
-        use = couldUse;
-        heavy = heavyIn;
+        use = str -> {
+            ShootPattern s = def.get();
+            apply.get(shoot);
+            boolean b = couldUse.get(str);
+            apply.get(s);
+            return b;
+        };
+        heavy = () -> {
+            ShootPattern s = def.get();
+            apply.get(shoot);
+            boolean b = heavyIn.get();
+            apply.get(s);
+            return b;
+        };
         this.heavyUp = heavyUp;
         shown(this::rebuild);
+        hidden(reb);
 
         buttons.button("@back", Icon.left, this::hide).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -200,7 +215,7 @@ public class ShootDialog extends BaseDialog {
                 ShootMulti sm = (ShootMulti) shoot;
                 createShootList(type, dia, "dest", () -> sm.dest, s -> sm.dest = s, () -> use.get("number"), heavy);
                 createShootDialog(type, dia, "source", getHeavy("number", getShootVal(sm.source)), () -> sm.source,
-                        s -> sm.source = s, s -> couldUse("number", getShootVal(sm.source)), heavy, heavyUp);
+                        s -> sm.source = s, use, heavy, heavyUp, this::rebuildType);
                 break;
             }
             case "helix": {
@@ -235,8 +250,7 @@ public class ShootDialog extends BaseDialog {
                             sb.barrels = nn;
                             rebuildFloatList(sb.barrels, f -> sb.barrels = f);
                         }).width(100);
-                        t.row();
-                        bd.pane(tb -> flo = tb).width(1400);
+                        bd.cont.pane(tb -> flo = tb).width(1400);
                         rebuildFloatList(sb.barrels, f -> sb.barrels = f);
                         bd.show();
                     });
@@ -260,6 +274,8 @@ public class ShootDialog extends BaseDialog {
         for (int i = 0; i * 3 < values.length; i++) {
             int finalI = i;
             flo.table(t -> {
+                t.setBackground(Tex.buttonEdge1);
+
                 t.label(() -> Core.bundle.get("dialog.shoot.shootX") + ":" + values[finalI * 3]).width(200);
                 t.label(() -> Core.bundle.get("dialog.shoot.shootY") + ":" + values[finalI * 3 + 1]).width(200);
                 t.label(() -> Core.bundle.get("dialog.shoot.shootRo") + ":" + values[finalI * 3 + 2]).width(200);
@@ -276,7 +292,7 @@ public class ShootDialog extends BaseDialog {
                             }
                             apply.get(values);
                             rebuildFloatList(values, apply);
-                        })).size(25).pad(5);
+                        })).width(100).pad(5);
                 t.button(Icon.trash, () -> {
                     float[] n = new float[values.length - 3];
                     for (int j = 0, k = 0; j * 3 < values.length; j++) {
@@ -289,8 +305,8 @@ public class ShootDialog extends BaseDialog {
                     }
                     apply.get(n);
                     rebuildFloatList(n, apply);
-                }).size(25).pad(5);
-            });
+                }).width(100).pad(5);
+            }).width(1400);
             flo.row();
         }
     }

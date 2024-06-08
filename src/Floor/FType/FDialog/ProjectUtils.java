@@ -54,14 +54,14 @@ abstract class ProjectUtils {
 
         levels.put("bulletBase", f -> f <= 0 ? 0 : f <= 36 ? 1 : f <= 72 ? 2 : f <= 144 ? 3 : f <= 288 ? 4 : f <= 576 ? 5 : 6);
         levels.put("splash", f -> f <= 0 ? 0 : f <= 3 ? 1 : f <= 4.2 ? 2 : f <= 7 ? 3 : f <= 12 ? 4 : f <= 19 ? 5 : 6);
-        levels.put("lightning", f -> f <= 10 ? 0 : f <= 14 ? 1 : f <= 18 ? 2 : f <= 23 ? 3 : f <= 28 ? 4 : f <= 34 ? 5 : 6);
+        levels.put("lightning", f -> f <= 10 ? 0 : f <= 30 ? 1 : f <= 50 ? 2 : f <= 70 ? 3 : f <= 90 ? 4 : f <= 120 ? 5 : 6);
         levels.put("percent", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.3 ? 3 : f <= 0.45 ? 4 : f <= 0.65 ? 5 : 6);
         levels.put("frags", f -> f <= 0 ? 0 : f <= 1 ? 1 : f <= 2 ? 2 : f <= 3 ? 3 : f <= 4 ? 4 : f <= 5 ? 5 : 6);
         levels.put("emp", f -> f <= 0 ? 0 : f <= 60 ? 1 : f <= 90 ? 2 : f <= 130 ? 3 : f <= 180 ? 4 : f <= 260 ? 5 : 6);
         levels.put("knock", f -> f <= 0 ? 0 : f <= 0.1 ? 1 : f <= 0.15 ? 2 : f <= 0.2 ? 3 : f <= 0.25 ? 4 : f <= 0.3 ? 5 : 6);
 
         //weapon
-        heavies.put("number", i -> i * 1.8f);
+        heavies.put("number", i -> i * 1.1f);
         heavies.put("reload", i -> i * 1.5f);
         heavies.put("target", i -> i * 1.5f);
 
@@ -258,10 +258,12 @@ abstract class ProjectUtils {
                     if (!levUser.get(type)) {
                         ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
                         apply.get(def);
+                        updateHeavy.run();
                         return;
                     } else if (!hevUser.get()) {
                         ui.showInfo(Core.bundle.get("@tooHeavy"));
                         apply.get(def);
+                        updateHeavy.run();
                         return;
                     }
                     rebuild.run();
@@ -278,16 +280,16 @@ abstract class ProjectUtils {
             t.button(Core.bundle.get("dialog.part.warning"), Icon.pencil, () -> {
                 PartsDialog pd = new PartsDialog(parts);
                 pd.show();
-            }).width(300);
+            }).width(250);
         }).pad(10).width(400);
     }
 
-    public static void createShootDialog(Table on, String dia, String tile, float use, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp) {
+    public static void createShootDialog(Table on, String dia, String tile, float use, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp, Runnable reb) {
         on.table(t -> {
-            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(100);
+            t.label(() -> Core.bundle.get("dialog." + dia + "." + tile)).width(150);
             t.label(() -> Core.bundle.get("@heavyUse") + use).width(100);
-            t.button(Icon.pencil, () -> new ShootDialog("", def, apply, couldUse, heavyIn, heavyUp).show()).size(20);
-        }).pad(10).width(250);
+            t.button(Icon.pencil, () -> new ShootDialog("", def, apply, couldUse, heavyIn, heavyUp, reb).show()).width(50);
+        }).pad(10).width(300);
     }
 
     public static void createShootList(Table on, String dia, String tile, Prov<ShootPattern[]> def, Cons<ShootPattern[]> apply, Boolp levPass, Boolp heavyPass) {
@@ -306,17 +308,25 @@ abstract class ProjectUtils {
                     }
                 }).width(100);
                 bd.buttons.button(Core.bundle.get("@add"), Icon.add, () -> {
-                    ShootPattern[] nn = new ShootPattern[def.get().length + 1];
-                    System.arraycopy(def.get(), 0, nn, 0, def.get().length);
-                    nn[nn.length-1] = new ShootPattern();
+                    ShootPattern[] old = def.get();
+                    ShootPattern[] nn = new ShootPattern[old.length + 1];
+                    System.arraycopy(old, 0, nn, 0, old.length);
+                    nn[nn.length - 1] = new ShootPattern();
                     apply.get(nn);
-
-                    bd.cont.clear();
-                    bd.cont.pane(tb -> rebuildShootList(tb, nn, apply));
+                    if (!levPass.get()) {
+                        apply.get(old);
+                        ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
+                    } else if (!heavyPass.get()) {
+                        apply.get(old);
+                        ui.showInfo(Core.bundle.get("@tooHeavy"));
+                    } else {
+                        bd.cont.clear();
+                        bd.cont.pane(tb -> rebuildShootList(tb, nn, apply));
+                    }
                 }).width(100);
                 bd.cont.pane(tb -> rebuildShootList(tb, def.get(), apply));
                 bd.show();
-            }).width(300);
+            }).width(250);
         }).pad(10).width(450);
     }
 
@@ -1401,7 +1411,8 @@ abstract class ProjectUtils {
             on.table(t -> {
                 t.label(() -> finalI + "").width(20);
                 t.button(Icon.pencil, () -> new ShootDialog("", () -> values[finalI], s -> values[finalI] = s, s -> true, () -> true, () -> {
-                }).show()).size(25).pad(5);
+                }, () -> {
+                }).show()).width(200).pad(5);
                 t.button(Icon.trash, () -> {
                     ShootPattern[] n = new ShootPattern[values.length - 1];
                     for (int j = 0, k = 0; j < values.length; j++) {
@@ -1412,8 +1423,9 @@ abstract class ProjectUtils {
                     }
                     apply.get(n);
                     rebuildShootList(on, n, apply);
-                }).size(25).pad(5);
-            });
+                }).width(200).pad(5);
+            }).width(1400);
+            on.row();
         }
     }
 
