@@ -34,16 +34,8 @@ public class LimitBulletType extends BulletType {
     public boolean haveEmp = false;
     public boolean havePercent = false;
 
-
     static float furthest = 0;
     static boolean any = false;
-
-
-    public Effect hitEffect;
-    public Effect despawnEffect;
-    public Effect shootEffect;
-    public Effect chargeEffect;
-    public Effect smokeEffect;
 
     public float percent = 0;
 
@@ -619,22 +611,8 @@ public class LimitBulletType extends BulletType {
         lightningLength = lightningLengthRand = bulletLightningLengthRand = bulletLightningLength = 0;
         lifetime = flareLength = laserLength = laserCLength = range = maxRange = radius = railLength = 0;
         splashDamage = splashDamageRadius = percent = 0;
-    }
-
-    public void despawned(Bullet b) {
-        if (despawnHit) {
-            hit(b);
-        } else {
-            createUnits(b, b.x, b.y);
-        }
-
-        if (!fragOnHit) {
-            createFrags(b, b.x, b.y);
-        }
-
-        despawnEffect.at(b.x, b.y, b.rotation(), hitColor);
-        despawnSound.at(b);
-
-        Effect.shake(despawnShake, despawnShake, b);
+        suppressionDuration = suppressionRange = suppressionEffectChance = 0;
+        puddles = 0;
+        puddleAmount = puddleRange = 0;
     }
 }

@@ -6,9 +6,7 @@ import arc.func.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Strings;
-import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.bullet.ContinuousLaserBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -107,10 +105,10 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
 
     public void Front(Table table) {
         table.table(t -> {
-            t.add(Core.bundle.get("dialog.bullet-type") + " : ").size(25).left().width(100);
+            t.add(Core.bundle.get("dialog.bullet.type") + " : ").size(25).left().width(100);
             t.label(() -> Core.bundle.format("dialog." + newType)).size(25).left().width(100).pad(1);
             t.button(b -> {
-                b.image(Icon.down).size(25);
+                b.image(Icon.rotate).size(25);
 
                 b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
                     tb.top();
@@ -149,7 +147,6 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
 
     public void rebuildBase() {
         baseOn.clear();
-        baseOn.setBackground(Tex.underlineOver);
         createLevDialog(baseOn, dia, "bulletBase", "damage", bullet.damage,
                 f -> bullet.damage = f, reb, this::updateHeavy, levUser, hevUser);
         createNumberDialogWithLimit(baseOn, dia, "fragAngle", bullet.fragAngle,
@@ -217,9 +214,6 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         createEffectList(baseOn, this, dia, "applyEffect", bullet.applyEffect);
         baseOn.clear();
         createBooleanDialog(baseOn, dia, "hitUnits", bullet.hitUnits, b -> bullet.hitUnits = b, this::rebuildBase);
-        createColorDialog(baseOn, dia, "mixColorFrom", bullet.mixColorFrom, b -> bullet.mixColorFrom = b, this::rebuildBase);
-        createColorDialog(baseOn, dia, "mixColorTo", bullet.mixColorTo, b -> bullet.mixColorTo = b, this::rebuildBase);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "lifetime", bullet.lifetime, f -> {
             bullet.lifetime = Math.max(0.001f, f);
             bullet.speed = bullet.rangeOverride / bullet.lifetime;
@@ -228,30 +222,30 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             bullet.speed = Math.max(0.001f, f);
             bullet.lifetime = bullet.rangeOverride / bullet.speed;
         }, reb);
+        baseOn.row();
         createNumberDialogWithLimit(baseOn, dia, "hitSize", bullet.hitSize,
                 360, 0, f -> bullet.hitSize = f, reb);
-        baseOn.row();
         createNumberDialogWithLimit(baseOn, dia, "drawSize", bullet.drawSize,
                 360, 0, f -> bullet.drawSize = f, reb);
         createNumberDialogWithLimit(baseOn, dia, "drag", bullet.drag,
                 360, 0, f -> bullet.drag = f, reb);
+        baseOn.row();
         createNumberDialogWithLimit(baseOn, dia, "pierceCap", bullet.pierceCap,
                 360, 0, f -> bullet.pierceCap = (int) (f + 0), reb);
-        baseOn.row();
         createNumberDialogWithLimit(baseOn, dia, "pierceDamageFactor", bullet.pierceDamageFactor,
                 360, 0, f -> bullet.pierceDamageFactor = f, reb);
         createNumberDialogWithLimit(baseOn, dia, "optimalLifeFract", bullet.optimalLifeFract,
                 360, 0, f -> bullet.optimalLifeFract = f, reb);
+        baseOn.row();
         createNumberDialogWithLimit(baseOn, dia, "layer", bullet.layer,
                 360, 0, f -> bullet.layer = f, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "pierce", bullet.pierce,
                 b -> bullet.pierce = b, reb);
         createBooleanDialog(baseOn, dia, "pierceBuilding", bullet.pierceBuilding,
                 b -> bullet.pierceBuilding = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "removeAfterPierce", bullet.removeAfterPierce,
                 b -> bullet.removeAfterPierce = b, reb);
-        baseOn.row();
         if (!(bullet.shootEffect instanceof MultiEffect)) {
             bullet.shootEffect = new MultiEffect();
         }
@@ -263,8 +257,8 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         }
         createEffectList(baseOn, this, dia, "shootEffect", bullet.shootEffect);
         createEffectList(baseOn, this, dia, "despawnEffect", bullet.despawnEffect);
-        createEffectList(baseOn, this, dia, "hitEffect", bullet.hitEffect);
         baseOn.row();
+        createEffectList(baseOn, this, dia, "hitEffect", bullet.hitEffect);
         if (!(bullet.chargeEffect instanceof MultiEffect)) {
             bullet.chargeEffect = new MultiEffect();
         }
@@ -273,104 +267,102 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         }
         createEffectList(baseOn, this, dia, "chargeEffect", bullet.chargeEffect);
         createEffectList(baseOn, this, dia, "smokeEffect", bullet.smokeEffect);
-        createSoundSelect(baseOn, dia, "hitSound", s -> bullet.hitSound = s);
         baseOn.row();
+        createSoundSelect(baseOn, dia, "hitSound", s -> bullet.hitSound = s);
         createNumberDialog(baseOn, dia, "hitSoundPitch", bullet.hitSoundPitch,
                 f -> bullet.hitSoundPitch = f, reb);
         createNumberDialog(baseOn, dia, "hitSoundVolume", bullet.hitSoundVolume,
                 f -> bullet.hitSoundVolume = f, reb);
-        createSoundSelect(baseOn, dia, "despawnSound", s -> bullet.despawnSound = s);
         baseOn.row();
+        createSoundSelect(baseOn, dia, "despawnSound", s -> bullet.despawnSound = s);
         createNumberDialog(baseOn, dia, "inaccuracy", bullet.inaccuracy,
                 f -> bullet.inaccuracy = f, reb);
         createNumberDialog(baseOn, dia, "ammoMultiplier", bullet.ammoMultiplier,
                 f -> bullet.ammoMultiplier = f, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "reloadMultiplier", bullet.reloadMultiplier,
                 f -> bullet.reloadMultiplier = f, reb);
-        baseOn.row();
-        createNumberDialog(baseOn, dia, "buildingDamageMultiplier", bullet.buildingDamageMultiplier,
-                f -> bullet.buildingDamageMultiplier = f, reb);
+        createNumberDialogWithLimit(baseOn, dia, "buildingDamageMultiplier", bullet.buildingDamageMultiplier,
+                1, 0, f -> bullet.buildingDamageMultiplier = f, reb);
         createNumberDialog(baseOn, dia, "recoil", bullet.recoil,
                 f -> bullet.recoil = f, reb);
+        baseOn.row();
         createLevDialog(baseOn, dia, "splash", "splashDamage", bullet.splashDamage,
                 f -> bullet.splashDamage = f, reb, this::updateHeavy, levUser, hevUser);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "killShooter", bullet.killShooter,
                 b -> bullet.killShooter = b, reb);
         createBooleanDialog(baseOn, dia, "instantDisappear", bullet.instantDisappear,
                 b -> bullet.instantDisappear = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "scaledSplashDamage", bullet.scaledSplashDamage,
                 b -> bullet.scaledSplashDamage = b, reb);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "knockback", bullet.knockback,
                 f -> bullet.knockback = f, reb);
         createNumberDialog(baseOn, dia, "createChance", bullet.createChance,
                 f -> bullet.createChance = f, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "rangeChange", bullet.rangeChange,
                 f -> bullet.rangeChange = f, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "impact", bullet.impact,
                 b -> bullet.impact = b, reb);
         createBooleanDialog(baseOn, dia, "collidesTiles", bullet.collidesTiles,
                 b -> bullet.collidesTiles = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "collidesTeam", bullet.collidesTeam,
                 b -> bullet.collidesTeam = b, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "collidesAir", bullet.collidesAir,
                 b -> bullet.collidesAir = b, reb);
         createBooleanDialog(baseOn, dia, "collidesGround", bullet.collidesGround,
                 b -> bullet.collidesGround = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "collides", bullet.collides,
                 b -> bullet.collides = b, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "collideFloor", bullet.collideFloor,
                 b -> bullet.collideFloor = b, reb);
         createBooleanDialog(baseOn, dia, "collideTerrain", bullet.collideTerrain,
                 b -> bullet.collideTerrain = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "keepVelocity", bullet.keepVelocity,
                 b -> bullet.keepVelocity = b, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "scaleLife", bullet.scaleLife,
                 b -> bullet.scaleLife = b, reb);
         createBooleanDialog(baseOn, dia, "hittable", bullet.hittable,
                 b -> bullet.hittable = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "reflectable", bullet.reflectable,
                 b -> bullet.reflectable = b, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "absorbable", bullet.absorbable,
                 b -> bullet.absorbable = b, reb);
         createBooleanDialog(baseOn, dia, "backMove", bullet.backMove,
                 b -> bullet.backMove = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "ignoreSpawnAngle", bullet.ignoreSpawnAngle,
                 b -> bullet.ignoreSpawnAngle = b, reb);
-        baseOn.row();
         createLevDialog(baseOn, dia, "bulletBase", "rangeOverride", bullet.rangeOverride,
                 f -> bullet.rangeOverride = f, reb, this::updateHeavy, levUser, hevUser);
         createLevDialog(baseOn, dia, "bulletBase", "healPercent", bullet.healPercent,
                 f -> bullet.healPercent = f, reb, this::updateHeavy, levUser, hevUser);
+        baseOn.row();
         createLevDialog(baseOn, dia, "bulletBase", "healAmount", bullet.healAmount,
                 f -> bullet.healAmount = f, reb, this::updateHeavy, levUser, hevUser);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "fragOnHit", bullet.fragOnHit,
                 b -> bullet.fragOnHit = b, reb);
         createBooleanDialog(baseOn, dia, "fragOnAbsorb", bullet.fragOnAbsorb,
                 b -> bullet.fragOnAbsorb = b, reb);
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "pierceArmor", bullet.pierceArmor,
                 b -> bullet.pierceArmor = b, reb);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "hitShake", bullet.hitShake,
                 f -> bullet.hitShake = f, reb);
         createNumberDialog(baseOn, dia, "despawnShake", bullet.despawnShake,
                 f -> bullet.despawnShake = f, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "fragRandomSpread", bullet.fragRandomSpread,
                 f -> bullet.fragRandomSpread = f, reb);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "fragSpread", bullet.fragSpread,
                 f -> bullet.fragSpread = f, reb);
         createNumberDialog(baseOn, dia, "fragAngle", bullet.fragAngle,
                 f -> bullet.fragAngle = f, reb);
-        createNumberDialog(baseOn, dia, "fragRandomSpread", bullet.fragRandomSpread,
-                f -> bullet.fragRandomSpread = f, reb);
         baseOn.row();
         createColorDialog(baseOn, dia, "hitColor", bullet.hitColor, c -> bullet.hitColor = c, reb);
         createColorDialog(baseOn, dia, "healColor", bullet.healColor, c -> bullet.healColor = c, reb);
@@ -379,104 +371,101 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         }
         createEffectList(baseOn, this, dia, "healEffect", bullet.healEffect);
         baseOn.row();
-        createBooleanDialog(baseOn, dia, "faceOutwards", bullet.faceOutwards,
-                b -> bullet.faceOutwards = b, reb);
         createBooleanDialog(baseOn, dia, "trailRotation", bullet.trailRotation,
                 b -> bullet.trailRotation = b, reb);
         createBooleanLevDialog(baseOn, dia, "splashDamagePierce", bullet.splashDamagePierce,
                 b -> bullet.splashDamagePierce = b, reb, () -> levUser.get("pierce"), hevUser);
-        baseOn.row();
         createPartsDialog(baseOn, dia, "parts", bullet.parts);
+        baseOn.row();
         createColorDialog(baseOn, dia, "trailColor", bullet.trailColor, c -> bullet.trailColor = c, reb);
         createInterpolSelect(baseOn, dia, "trailInterp", i -> bullet.trailInterp = i);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "trailChance", bullet.trailChance,
                 f -> bullet.trailChance = f, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "trailInterval", bullet.trailInterval,
                 f -> bullet.trailInterval = f, reb);
         createNumberDialog(baseOn, dia, "trailParam", bullet.trailParam,
                 f -> bullet.trailParam = f, reb);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "trailLength", bullet.trailLength,
                 f -> bullet.trailLength = (int) (f + 0), reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "trailWidth", bullet.trailWidth,
                 f -> bullet.trailWidth = f, reb);
         createNumberDialog(baseOn, dia, "trailSinMag", bullet.trailSinMag,
                 f -> bullet.trailSinMag = f, reb);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "trailSinScl", bullet.trailSinScl,
                 f -> bullet.trailSinScl = f, reb);
+        baseOn.row();
         if (!(bullet.trailEffect instanceof MultiEffect)) {
             bullet.trailEffect = new MultiEffect();
         }
         createEffectList(baseOn, this, dia, "trailEffect", bullet.trailEffect);
         createLevDialog(baseOn, dia, "splash", "splashDamageRadius", bullet.splashDamageRadius,
                 f -> bullet.splashDamageRadius = f, reb, this::updateHeavy, levUser, hevUser);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "homingPower", bullet.homingPower,
                 f -> bullet.homingPower = f, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "homingRange", bullet.homingRange,
                 f -> bullet.homingRange = f, reb);
         createNumberDialog(baseOn, dia, "homingDelay", bullet.homingDelay,
                 f -> bullet.homingDelay = f, reb);
-        baseOn.row();
         createLevDialog(baseOn, dia, "suppression", "suppressionRange", bullet.suppressionRange,
                 f -> bullet.suppressionRange = f, reb, this::updateHeavy, levUser, hevUser);
+        baseOn.row();
         createLevDialog(baseOn, dia, "suppression", "suppressionDuration", bullet.suppressionDuration,
                 f -> bullet.suppressionDuration = f, reb, this::updateHeavy, levUser, hevUser);
         createLevDialog(baseOn, dia, "suppression", "suppressionEffectChance", bullet.suppressionEffectChance,
                 f -> bullet.suppressionEffectChance = f, reb, this::updateHeavy, levUser, hevUser);
-        baseOn.row();
         createColorDialog(baseOn, dia, "lightningColor", bullet.lightningColor, c -> bullet.lightningColor = c, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "weaveScale", bullet.weaveScale,
                 f -> bullet.weaveScale = f, reb);
         createNumberDialog(baseOn, dia, "weaveMag", bullet.weaveMag,
                 f -> bullet.weaveMag = f, reb);
-        baseOn.row();
         createBooleanDialog(baseOn, dia, "weaveRandom", bullet.weaveRandom,
                 b -> bullet.weaveRandom = b, reb);
+        baseOn.row();
         createLiquidSelect(baseOn, dia, "puddleLiquid", l -> bullet.puddleLiquid = l);
         createColorDialog(baseOn, dia, "lightColor", bullet.lightColor,
                 c -> bullet.lightColor = c, reb);
-        baseOn.row();
         createLevDialog(baseOn, dia, "puddles", "puddles", bullet.puddles,
                 f -> bullet.puddles = (int) (f + 0), reb, this::updateHeavy, levUser, hevUser);
+        baseOn.row();
         createLevDialog(baseOn, dia, "puddles", "puddleRange", bullet.puddleRange,
                 f -> bullet.puddleRange = f, reb, this::updateHeavy, levUser, hevUser);
         createLevDialog(baseOn, dia, "puddles", "puddleAmount", bullet.puddleAmount,
                 f -> bullet.puddleAmount = f, reb, this::updateHeavy, levUser, hevUser);
-        baseOn.row();
         createNumberDialog(baseOn, dia, "lightRadius", bullet.lightRadius,
                 f -> bullet.lightRadius = f, reb);
+        baseOn.row();
         createNumberDialog(baseOn, dia, "lightOpacity", bullet.lightOpacity,
                 f -> bullet.lightOpacity = f, reb);
     }
 
     public void rebuildType() {
         typeOn.clear();
-        typeOn.setBackground(Tex.buttonEdge1);
         switch (newType) {
             case "bullet" -> {
-                createNumberDialog(baseOn, dia, "width", bullet.width,
+                createNumberDialog(typeOn, dia, "width", bullet.width,
                         f -> bullet.width = f, ret);
-                createNumberDialog(baseOn, dia, "height", bullet.height,
+                createNumberDialog(typeOn, dia, "height", bullet.height,
                         f -> bullet.height = f, ret);
-                createNumberDialog(baseOn, dia, "shrinkX", bullet.shrinkX,
+                createNumberDialog(typeOn, dia, "shrinkX", bullet.shrinkX,
                         f -> bullet.shrinkX = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "shrinkY", bullet.shrinkY,
+                createNumberDialog(typeOn, dia, "shrinkY", bullet.shrinkY,
                         f -> bullet.shrinkY = f, ret);
-                createNumberDialog(baseOn, dia, "spin", bullet.spin,
+                createNumberDialog(typeOn, dia, "spin", bullet.spin,
                         f -> bullet.spin = f, ret);
-                createNumberDialog(baseOn, dia, "rotationOffset", bullet.rotationOffset,
+                createNumberDialog(typeOn, dia, "rotationOffset", bullet.rotationOffset,
                         f -> bullet.rotationOffset = f, ret);
                 typeOn.row();
-                createColorDialog(baseOn, dia, "backColor", bullet.backColor, c -> bullet.backColor = c, ret);
-                createColorDialog(baseOn, dia, "frontColor", bullet.frontColor, c -> bullet.frontColor = c, ret);
+                createColorDialog(typeOn, dia, "backColor", bullet.backColor, c -> bullet.backColor = c, ret);
+                createColorDialog(typeOn, dia, "frontColor", bullet.frontColor, c -> bullet.frontColor = c, ret);
                 createInterpolSelect(typeOn, dia, "shrinkInterp", i -> bullet.shrinkInterp = i);
                 typeOn.row();
-                createColorDialog(baseOn, dia, "mixColorFrom", bullet.mixColorFrom, c -> bullet.mixColorFrom = c, ret);
-                createColorDialog(baseOn, dia, "mixColorTo", bullet.mixColorTo, c -> bullet.mixColorTo = c, ret);
+                createColorDialog(typeOn, dia, "mixColorFrom", bullet.mixColorFrom, c -> bullet.mixColorFrom = c, ret);
+                createColorDialog(typeOn, dia, "mixColorTo", bullet.mixColorTo, c -> bullet.mixColorTo = c, ret);
             }
             case "laser" -> {
                 createColorDialogList(typeOn, dia, "colors", bullet.colors,
@@ -484,36 +473,36 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                 if (!(bullet.laserEffect instanceof MultiEffect)) {
                     bullet.laserEffect = new MultiEffect();
                 }
-                createEffectList(typeOn, this, dia, "", bullet.laserEffect);
+                createEffectList(typeOn, this, dia, "largeHit", bullet.laserEffect);
                 createBooleanDialog(typeOn, dia, "largeHit", bullet.largeHit,
                         b -> bullet.largeHit = b, ret);
                 typeOn.row();
-                createLevDialog(baseOn, dia, "bulletBase", "laserLength", bullet.laserLength,
+                createLevDialog(typeOn, dia, "bulletBase", "laserLength", bullet.laserLength,
                         f -> bullet.laserLength = f, ret, this::updateHeavy, levUser, hevUser);
-                createNumberDialog(baseOn, dia, "width", bullet.width,
+                createNumberDialog(typeOn, dia, "width", bullet.width,
                         f -> bullet.width = f, ret);
-                createNumberDialog(baseOn, dia, "lengthFalloff", bullet.lengthFalloff,
+                createNumberDialog(typeOn, dia, "lengthFalloff", bullet.lengthFalloff,
                         f -> bullet.lengthFalloff = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "sideLength", bullet.sideLength,
+                createNumberDialog(typeOn, dia, "sideLength", bullet.sideLength,
                         f -> bullet.sideLength = f, ret);
-                createNumberDialog(baseOn, dia, "sideWidth", bullet.sideWidth,
+                createNumberDialog(typeOn, dia, "sideWidth", bullet.sideWidth,
                         f -> bullet.sideWidth = f, ret);
-                createNumberDialog(baseOn, dia, "sideAngle", bullet.sideAngle,
+                createNumberDialog(typeOn, dia, "sideAngle", bullet.sideAngle,
                         f -> bullet.sideAngle = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "lightningSpacing", bullet.lightningSpacing,
-                        f -> bullet.lightningSpacing = f, ret);
-                createNumberDialog(baseOn, dia, "lightningDelay", bullet.lightningDelay,
+                createLevDialog(typeOn, dia, "lightning", "lightningSpacing", bullet.lightningSpacing,
+                        f -> bullet.lightningSpacing = f, ret, this::updateHeavy, levUser, hevUser);
+                createNumberDialog(typeOn, dia, "lightningDelay", bullet.lightningDelay,
                         f -> bullet.lightningDelay = f, ret);
                 createNumberDialog(baseOn, dia, "lightningAngleRand", bullet.lightningAngleRand,
                         f -> bullet.lightningAngleRand = f, ret);
             }
             case "lightning" -> {
-                createColorDialog(baseOn, dia, "bulletLightningColor", bullet.bulletLightningColor, c -> bullet.bulletLightningColor = c, ret);
-                createLevDialog(baseOn, dia, "bulletBase", "bulletLightningLength", bullet.bulletLightningLength,
+                createColorDialog(typeOn, dia, "bulletLightningColor", bullet.bulletLightningColor, c -> bullet.bulletLightningColor = c, ret);
+                createLevDialog(typeOn, dia, "bulletBase", "bulletLightningLength", bullet.bulletLightningLength,
                         f -> bullet.bulletLightningLength = (int) (f + 0), ret, this::updateHeavy, levUser, hevUser);
-                createLevDialog(baseOn, dia, "bulletBase", "bulletLightningLengthRand", bullet.bulletLightningLengthRand,
+                createLevDialog(typeOn, dia, "bulletBase", "bulletLightningLengthRand", bullet.bulletLightningLengthRand,
                         f -> bullet.bulletLightningLengthRand = (int) (f + 0), ret, this::updateHeavy, levUser, hevUser);
             }
             case "continuousF" -> {
@@ -524,30 +513,30 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                 createColorDialog(typeOn, dia, "flareColor", bullet.flareColor,
                         c -> bullet.flareColor = c, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "lightStroke", bullet.lightStroke,
+                createNumberDialog(typeOn, dia, "lightStroke", bullet.lightStroke,
                         f -> bullet.lightStroke = f, ret);
-                createNumberDialog(baseOn, dia, "width", bullet.width,
+                createNumberDialog(typeOn, dia, "width", bullet.width,
                         f -> bullet.width = f, ret);
-                createNumberDialog(baseOn, dia, "oscScl", bullet.oscScl,
+                createNumberDialog(typeOn, dia, "oscScl", bullet.oscScl,
                         f -> bullet.oscScl = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "divisions", bullet.divisions,
+                createNumberDialog(typeOn, dia, "divisions", bullet.divisions,
                         f -> bullet.divisions = (int) (f + 0), ret);
-                createNumberDialog(baseOn, dia, "flareWidth", bullet.flareWidth,
+                createNumberDialog(typeOn, dia, "flareWidth", bullet.flareWidth,
                         f -> bullet.flareWidth = f, ret);
-                createNumberDialog(baseOn, dia, "oscMag", bullet.oscMag,
+                createNumberDialog(typeOn, dia, "oscMag", bullet.oscMag,
                         f -> bullet.oscMag = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "flareInnerScl", bullet.flareInnerScl,
+                createNumberDialog(typeOn, dia, "flareInnerScl", bullet.flareInnerScl,
                         f -> bullet.flareInnerScl = f, ret);
-                createLevDialog(baseOn, dia, "bulletBase", "flareLength", bullet.flareLength,
+                createLevDialog(typeOn, dia, "bulletBase", "flareLength", bullet.flareLength,
                         f -> bullet.flareLength = f, ret, this::updateHeavy, levUser, hevUser);
-                createNumberDialog(baseOn, dia, "flareInnerLenScl", bullet.flareInnerLenScl,
+                createNumberDialog(typeOn, dia, "flareInnerLenScl", bullet.flareInnerLenScl,
                         f -> bullet.flareInnerLenScl = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "flareLayer", bullet.flareLayer,
+                createNumberDialog(typeOn, dia, "flareLayer", bullet.flareLayer,
                         f -> bullet.flareLayer = f, ret);
-                createNumberDialog(baseOn, dia, "flareRotSpeed", bullet.flareRotSpeed,
+                createNumberDialog(typeOn, dia, "flareRotSpeed", bullet.flareRotSpeed,
                         f -> bullet.flareRotSpeed = f, ret);
                 createInterpolSelect(typeOn, dia, "lengthInterp", i -> bullet.lengthInterp = i);
                 typeOn.row();
@@ -578,30 +567,30 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                 });
             }
             case "continuousL" -> {
-                createNumberDialog(baseOn, dia, "fadeTime", bullet.fadeTime,
+                createNumberDialog(typeOn, dia, "fadeTime", bullet.fadeTime,
                         f -> bullet.fadeTime = f, ret);
-                createNumberDialog(baseOn, dia, "lightStroke", bullet.lightStroke,
+                createNumberDialog(typeOn, dia, "lightStroke", bullet.lightStroke,
                         f -> bullet.lightStroke = f, ret);
-                createNumberDialog(baseOn, dia, "divisions", bullet.divisions,
+                createNumberDialog(typeOn, dia, "divisions", bullet.divisions,
                         f -> bullet.divisions = (int) (f + 0), ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "strokeFrom", bullet.strokeFrom,
+                createNumberDialog(typeOn, dia, "strokeFrom", bullet.strokeFrom,
                         f -> bullet.strokeFrom = f, ret);
-                createNumberDialog(baseOn, dia, "strokeTo", bullet.strokeTo,
+                createNumberDialog(typeOn, dia, "strokeTo", bullet.strokeTo,
                         f -> bullet.strokeTo = f, ret);
-                createNumberDialog(baseOn, dia, "pointyScaling", bullet.pointyScaling,
+                createNumberDialog(typeOn, dia, "pointyScaling", bullet.pointyScaling,
                         f -> bullet.pointyScaling = (int) (f + 0), ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "backLength", bullet.backLength,
+                createNumberDialog(typeOn, dia, "backLength", bullet.backLength,
                         f -> bullet.backLength = f, ret);
-                createNumberDialog(baseOn, dia, "frontLength", bullet.frontLength,
+                createNumberDialog(typeOn, dia, "frontLength", bullet.frontLength,
                         f -> bullet.frontLength = f, ret);
-                createNumberDialog(baseOn, dia, "width", bullet.width,
+                createNumberDialog(typeOn, dia, "width", bullet.width,
                         f -> bullet.width = f, ret);
                 typeOn.row();
-                createNumberDialog(baseOn, dia, "oscScl", bullet.oscScl,
+                createNumberDialog(typeOn, dia, "oscScl", bullet.oscScl,
                         f -> bullet.oscScl = f, ret);
-                createNumberDialog(baseOn, dia, "oscMag", bullet.oscMag,
+                createNumberDialog(typeOn, dia, "oscMag", bullet.oscMag,
                         f -> bullet.oscMag = f, ret);
                 createLevDialog(typeOn, dia, "bulletBase", "laserCLength", bullet.laserCLength,
                         f -> bullet.laserCLength = f, ret, this::updateHeavy, levUser, hevUser);
@@ -610,30 +599,30 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                         c -> bullet.colors = c);
             }
             case "point" -> {
-                createNumberDialog(baseOn, dia, "trailSpacing", bullet.trailSpacing,
+                createNumberDialog(typeOn, dia, "trailSpacing", bullet.trailSpacing,
                         f -> bullet.trailSpacing = f, ret);
             }
             case "rail" -> {
                 if (!(bullet.pierceEffect instanceof MultiEffect)) {
                     bullet.pierceEffect = new MultiEffect();
                 }
-                createEffectList(typeOn, this, dia, "", bullet.pierceEffect);
+                createEffectList(typeOn, this, dia, "pierceEffect", bullet.pierceEffect);
                 if (!(bullet.pointEffect instanceof MultiEffect)) {
                     bullet.pointEffect = new MultiEffect();
                 }
-                createEffectList(typeOn, this, dia, "", bullet.pointEffect);
+                createEffectList(typeOn, this, dia, "pointEffect", bullet.pointEffect);
                 if (!(bullet.lineEffect instanceof MultiEffect)) {
                     bullet.lineEffect = new MultiEffect();
                 }
-                createEffectList(typeOn, this, dia, "", bullet.lineEffect);
+                createEffectList(typeOn, this, dia, "lineEffect", bullet.lineEffect);
                 typeOn.row();
                 if (!(bullet.endEffect instanceof MultiEffect)) {
                     bullet.endEffect = new MultiEffect();
                 }
-                createEffectList(typeOn, this, dia, "", bullet.endEffect);
-                createLevDialog(baseOn, dia, "bulletBase", "railLength", bullet.railLength,
+                createEffectList(typeOn, this, dia, "endEffect", bullet.endEffect);
+                createLevDialog(typeOn, dia, "bulletBase", "railLength", bullet.railLength,
                         f -> bullet.railLength = f, ret, this::updateHeavy, levUser, hevUser);
-                createNumberDialog(baseOn, dia, "pointEffectSpace", bullet.pointEffectSpace,
+                createNumberDialog(typeOn, dia, "pointEffectSpace", bullet.pointEffectSpace,
                         f -> bullet.pointEffectSpace = f, ret);
             }
         }
@@ -713,13 +702,16 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                 default -> 100000;
             };
             case "lightning" -> switch (newType) {
-                case "point", "bullet", "laser" ->
+                case "point", "bullet" ->
                         bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand / 4;
                 case "continuousF", "continuousL" ->
                         bullet.lightning * bullet.lightningDamage * bullet.lightningLength *
                                 bullet.lightningLengthRand * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) / 4;
                 case "lightning", "rail" ->
                         bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand * 1.2f / 4;
+                case "laser" ->
+                        bullet.lightning * bullet.lightningDamage * bullet.lightningLength * bullet.lightningLengthRand / 4 *
+                                (1 + bullet.lightningSpacing <= 0 ? 0 : (bullet.laserLength / bullet.lightningSpacing) / 1.3f);
                 default -> 100000;
             };
             case "percent" -> switch (newType) {
