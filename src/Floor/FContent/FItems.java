@@ -19,10 +19,12 @@ public class FItems {
             empProject1, empProject2, empProject3, empProject4, empProject5,
             fragProject1, fragProject2, fragProject3, fragProject4, fragProject5,
             targetIntervalProject1, targetIntervalProject2, targetIntervalProject3, targetIntervalProject4, targetIntervalProject5,
-            bulletNumberProject1, bulletNumberProject2, bulletNumberProject3, bulletNumberProject4, bulletNumberProject5;
+            bulletNumberProject1, bulletNumberProject2, bulletNumberProject3, bulletNumberProject4, bulletNumberProject5,
+            suppressionProject1, suppressionProject2, suppressionProject3, suppressionProject4, suppressionProject5,
+            puddlesProject1, puddlesProject2, puddlesProject3, puddlesProject4, puddlesProject5;
     public static Item[] allSize, allSpeed, allHealth, allBulletBase, allReload,
             allShield, allSplash, allKnock, allPercent, allTargetInterval,
-            allLightning, allEmp, allFrag, allBulletNumber;
+            allLightning, allEmp, allFrag, allBulletNumber, allSuppression, allPuddles;
     public static Item[][] allBullet, allAbility, allBase, allWeapon;
 
     public static void load() {
@@ -367,6 +369,46 @@ public class FItems {
             hidden = true;
             buildable = false;
         }};
+        suppressionProject1 = new Item("suppression-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        suppressionProject2 = new Item("suppression-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        suppressionProject3 = new Item("suppression-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        suppressionProject4 = new Item("suppression-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        suppressionProject5 = new Item("suppression-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        puddlesProject1 = new Item("puddles-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        puddlesProject2 = new Item("puddles-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        puddlesProject3 = new Item("puddles-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        puddlesProject4 = new Item("puddles-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        puddlesProject5 = new Item("puddles-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
 
         //base
         allSize = new Item[]{
@@ -402,6 +444,12 @@ public class FItems {
         allFrag = new Item[]{
                 fragProject1, fragProject2, fragProject3, fragProject4, fragProject5
         };
+        allSuppression = new Item[]{
+                suppressionProject1, suppressionProject2, suppressionProject3, suppressionProject4, suppressionProject5
+        };
+        allPuddles = new Item[]{
+                puddlesProject1, puddlesProject2, puddlesProject3, puddlesProject4, puddlesProject5
+        };
 
         //ability
         allShield = new Item[]{
@@ -419,7 +467,7 @@ public class FItems {
                 bulletNumberProject1, bulletNumberProject2, bulletNumberProject3, bulletNumberProject4, bulletNumberProject5
         };
 
-        allBullet = new Item[][]{allBulletBase, allSplash, allKnock, allPercent, allLightning, allEmp, allFrag};
+        allBullet = new Item[][]{allBulletBase, allSplash, allKnock, allPercent, allLightning, allEmp, allFrag, allSuppression, allPuddles};
         allWeapon = new Item[][]{allReload, allTargetInterval, allBulletNumber};
         allAbility = new Item[][]{allShield};
         allBase = new Item[][]{allSize, allHealth, allSpeed};
@@ -436,5 +484,7 @@ public class FItems {
         reloadProject5.alwaysUnlocked = true;
         targetIntervalProject5.alwaysUnlocked = true;
         bulletNumberProject5.alwaysUnlocked = true;
+        suppressionProject5.alwaysUnlocked = true;
+        puddlesProject5.alwaysUnlocked = true;
     }
 }

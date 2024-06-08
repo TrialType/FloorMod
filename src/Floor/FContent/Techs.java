@@ -270,6 +270,26 @@ public class Techs {
                     });
                 });
             });
+            node(suppressionProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(suppressionProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(suppressionProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(suppressionProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(suppressionProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(puddlesProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(puddlesProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(puddlesProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(puddlesProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(puddlesProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
         });
         tf.parent = head;
         head.children.add(tf);
