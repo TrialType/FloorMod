@@ -104,6 +104,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     }
 
     public void Front(Table table) {
+        table.clear();
         table.table(t -> {
             t.add(Core.bundle.get("dialog.bullet.type") + " : ").size(25).left().width(100);
             t.label(() -> Core.bundle.format("dialog." + newType)).size(25).left().width(100).pad(1);
@@ -119,7 +120,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                             hide.run();
                             updateHeavy();
 
-                            rebuildType();
+                            Front(table);
 
                         }).width(100);
                         tb.row();
@@ -212,7 +213,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             bullet.applyEffect = new MultiEffect();
         }
         createEffectList(baseOn, this, dia, "applyEffect", bullet.applyEffect);
-        baseOn.clear();
+        baseOn.row();
         createBooleanDialog(baseOn, dia, "hitUnits", bullet.hitUnits, b -> bullet.hitUnits = b, this::rebuildBase);
         createNumberDialog(baseOn, dia, "lifetime", bullet.lifetime, f -> {
             bullet.lifetime = Math.max(0.001f, f);
@@ -674,22 +675,22 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         return switch (name) {
             case "bulletBase" -> switch (newType) {
                 case "point" -> bullet.damage / 1.4f + bullet.range / 8 + 100 *
-                        Math.max(0, bullet.healPercent) + Math.max(0, bullet.healAmount);
+                        Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 case "bullet" -> bullet.damage + bullet.range / 8 + bullet.pierceCap + 100 *
-                        Math.max(0, bullet.healPercent) + Math.max(0, bullet.healAmount);
+                        Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 case "laser" -> bullet.damage + bullet.laserLength / 8 + bullet.pierceCap + 100 *
-                        Math.max(0, bullet.healPercent) + Math.max(0, bullet.healAmount);
+                        Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 case "continuousF" ->
                         bullet.damage * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) + bullet.flareLength / 8 +
-                                100 * Math.max(0, bullet.healPercent) + Math.max(0, bullet.healAmount);
+                                100 * Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 case "continuousL" ->
                         bullet.damage * 1.2f * bullet.lifetime * (40 / bullet.damageInterval) + bullet.laserCLength / 8 +
-                                100 * Math.max(0, bullet.healPercent) + Math.max(0, bullet.healAmount);
+                                100 * Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 case "lightning" ->
                         bullet.damage * 1.2f + (bullet.bulletLightningLength + bullet.bulletLightningLengthRand / 1.2f) /
-                                8 + 100 * Math.max(0, bullet.healPercent) + Math.max(0, bullet.healAmount);
+                                8 + 100 * Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 default -> bullet.damage * 1.2f + bullet.railLength / 8 + 100 * Math.max(0, bullet.healPercent) +
-                        Math.max(0, bullet.healAmount);
+                        30 * Math.max(0, bullet.healAmount);
             };
             case "splash" -> switch (newType) {
                 case "point", "bullet", "laser" ->

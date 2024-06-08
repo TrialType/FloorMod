@@ -15,8 +15,7 @@ import mindustry.gen.Unit;
 import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.ProjectUtils.freeSize;
-import static Floor.FType.FDialog.ProjectUtils.maxSize;
+import static Floor.FType.FDialog.ProjectUtils.*;
 
 public class ProjectsLocated extends BaseDialog {
     public static ProjectsLocated projects;
@@ -73,6 +72,7 @@ public class ProjectsLocated extends BaseDialog {
         init(seed);
         ProjectUtils.init();
 
+        shown(this::rebuild);
         hidden(() -> Events.on(EventType.UnitCreateEvent.class, e -> {
             if (e.unit.hasWeapons()) {
                 weapons.get(0).weapon.load();
@@ -80,7 +80,6 @@ public class ProjectsLocated extends BaseDialog {
                 e.unit.mounts[0] = new WeaponMount(weapons.get(0).weapon);
             }
         }));
-        shown(this::rebuild);
 
         buttons.button("@back", Icon.left, this::hide).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -205,18 +204,17 @@ public class ProjectsLocated extends BaseDialog {
         float heavy;
 
         public weaponPack() {
-            this.weapon = new Weapon();
+            weapon = new Weapon();
             weapon.reload = 500;
-            weapon.shoot.shots = 1;
             weapon.targetSwitchInterval = weapon.targetInterval = 500;
-            this.dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
-            this.heavy = 0.5f;
+            dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
+            heavy = 0.5f + dialog.bulletHeavy;
         }
 
         public weaponPack(Weapon weapon) {
             this.weapon = weapon;
             this.dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
-            this.heavy = dialog.heavy * dialog.weapon.shoot.shots * dialog.bulletHeavy;
+            this.heavy = dialog.heavy + getShootVal(weapon.shoot) * dialog.bulletHeavy;
         }
     }
 
