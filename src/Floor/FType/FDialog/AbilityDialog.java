@@ -13,6 +13,7 @@ import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.ProjectUtils.*;
+import static mindustry.Vars.ui;
 
 public class AbilityDialog extends BaseDialog implements EffectTableGetter {
     public Table type, effect;
@@ -27,7 +28,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             statusUse = () -> couldUse("abilityStatus", findVal("abilityStatus"));
     protected static String dia = "ability";
 
-    public AbilityDialog(String title, Prov<Ability> def, Cons<Ability> apply) {
+    public AbilityDialog(String title, Prov<Ability> def, Cons<Ability> apply, Cons<Float> heavyApply) {
         super(title);
         setAbility(def.get());
         updateHeavy();
@@ -38,7 +39,13 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             hide();
         });
         buttons.button("@apply", Icon.right, () -> {
-            apply.get(ability);
+            updateHeavy();
+            if (heavy + bulletHeavy <= freeSize) {
+                apply.get(ability);
+                heavyApply.get(heavy);
+            } else {
+                ui.showInfo(Core.bundle.get("@tooHeavy"));
+            }
             hide();
         });
     }

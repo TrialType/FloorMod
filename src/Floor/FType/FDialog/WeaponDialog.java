@@ -46,7 +46,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
         shown(this::rebuild);
-        shown(() -> freeSize += this.heavy + weapon.shoot.shots * bulletHeavy);
+        shown(() -> freeSize += this.heavy + getShootVal(weapon.shoot) * bulletHeavy);
         hidden(() -> {
             freeSize -= this.heavy;
             freeSize -= getShootVal(weapon.shoot) * bulletHeavy;

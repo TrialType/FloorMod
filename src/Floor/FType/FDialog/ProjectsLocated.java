@@ -1,14 +1,12 @@
 package Floor.FType.FDialog;
 
 import arc.Core;
-import arc.Events;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.entities.units.WeaponMount;
-import mindustry.game.EventType;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
@@ -16,6 +14,7 @@ import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.ProjectUtils.*;
+import static mindustry.Vars.ui;
 
 public class ProjectsLocated extends BaseDialog {
     public static ProjectsLocated projects;
@@ -73,13 +72,6 @@ public class ProjectsLocated extends BaseDialog {
         ProjectUtils.init();
 
         shown(this::rebuild);
-//        hidden(() -> Events.on(EventType.UnitCreateEvent.class, e -> {
-//            if (e.unit.hasWeapons()) {
-//                weapons.get(0).weapon.load();
-//                weapons.get(0).weapon.bullet.load();
-//                e.unit.mounts[0] = new WeaponMount(weapons.get(0).weapon);
-//            }
-//        }));
 
         buttons.button("@back", Icon.left, this::hide).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -94,8 +86,11 @@ public class ProjectsLocated extends BaseDialog {
             }
         }).width(300);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
-            abilities.add(new abilityPack());
-            rebuildAbility();
+            if (freeSize >= 0.5f) {
+                abilities.add(new abilityPack());
+                freeSize -= 0.5f;
+                rebuildAbility();
+            }
         }).width(300);
     }
 
@@ -136,19 +131,27 @@ public class ProjectsLocated extends BaseDialog {
             weaponPack wp = weapons.get(i);
             int finalI = i;
             LWeapon.table(t -> {
-                t.setBackground(pushW == wp ? Tex.buttonEdge1 : Tex.windowEmpty);
+                t.setBackground(pushW == wp ? Tex.buttonEdge3 : Tex.windowEmpty);
 
                 t.clicked(() -> {
-                    pushW = pushW == wp ? null : pushW;
+                    pushW = pushW == wp ? null : wp;
+                    rebuildLocated();
                     rebuildWeapon();
                 });
                 t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(100).pad(5);
                 t.label(() -> Core.bundle.get("@heavyUse") + wp.heavy).left().width(100).pad(5);
-                t.button(Icon.pencil, () -> wp.dialog.show()).pad(5);
+                t.button(Icon.pencil, () -> {
+                    if (freeSize > 0) {
+                        wp.dialog.show();
+                    } else {
+                        ui.showInfo(Core.bundle.get("tooHeavyDrop"));
+                    }
+                }).pad(5);
                 t.button(Icon.trash, () -> {
                     freeSize += wp.heavy;
                     weapons.remove(finalI);
                     pushW = pushW == wp ? null : pushW;
+                    rebuildLocated();
                     rebuildWeapon();
                 }).pad(5);
             }).width(500);
@@ -157,6 +160,40 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     public void rebuildAbility() {
+        LAbility.clear();
+        LAbility.table(t -> {
+            t.setBackground(Tex.buttonEdge1);
+            t.label(() -> Core.bundle.get("@heavyUse") + getAbilityHeavy() + "/" + maxSize);
+        }).width(500).row();
+        for (int i = 0; i < abilities.size; i++) {
+            int finalI = i;
+            abilityPack ap = abilities.get(finalI);
+            LAbility.table(t -> {
+                t.setBackground(ap == pushA ? Tex.buttonEdge2 : Tex.windowEmpty);
+
+                t.clicked(() -> {
+                    pushA = pushA == ap ? null : ap;
+                    rebuildLocated();
+                    rebuildAbility();
+                });
+                t.label(() -> Core.bundle.get("dialog.ability.index") + ": " + finalI).left().width(100).pad(5);
+                t.label(() -> Core.bundle.get("@heavyUse") + ap.heavy);
+                t.button(Icon.pencil, () -> {
+                    if (freeSize > 0) {
+                        ap.dialog.show();
+                    } else {
+                        ui.showInfo(Core.bundle.get("tooHeavyDrop"));
+                    }
+                }).pad(5);
+                t.button(Icon.trash, () -> {
+                    freeSize += ap.heavy;
+                    weapons.remove(finalI);
+                    pushA = pushA == ap ? null : pushA;
+                    rebuildLocated();
+                    rebuildAbility();
+                }).pad(5);
+            }).width(500).row();
+        }
     }
 
     public void init(int seed) {
@@ -202,6 +239,14 @@ public class ProjectsLocated extends BaseDialog {
         return h;
     }
 
+    public float getAbilityHeavy() {
+        float heavy = 0;
+        for (abilityPack ap : abilities) {
+            heavy += ap.heavy;
+        }
+        return heavy;
+    }
+
     public static class weaponPack {
         public Weapon weapon;
         public WeaponDialog dialog;
@@ -229,13 +274,13 @@ public class ProjectsLocated extends BaseDialog {
 
         public abilityPack() {
             ability = new ForceFieldAbility(90, 0, 0, Float.MAX_VALUE, 0, 0);
-            dialog = new AbilityDialog("", () -> ability, a -> ability = a);
+            dialog = new AbilityDialog("", () -> ability, a -> ability = a, f -> heavy = f);
             heavy = dialog.heavy;
         }
 
         public abilityPack(Ability ability) {
             this.ability = ability;
-            dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a);
+            dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a, f -> heavy = f);
             heavy = dialog.heavy + dialog.bulletHeavy;
         }
     }
