@@ -1,5 +1,6 @@
 package Floor.FType.FDialog;
 
+import Floor.FEntities.FAbility.SprintingAbility;
 import arc.Core;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
@@ -10,6 +11,7 @@ import mindustry.entities.units.WeaponMount;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
+import mindustry.type.StatusEffect;
 import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -18,9 +20,16 @@ import static mindustry.Vars.ui;
 
 public class ProjectsLocated extends BaseDialog {
     public static ProjectsLocated projects;
+    public static StatusEffect heal, speed;
+    public float healthBoost, SpeedBoost;
+    public SprintingAbility boost;
     public final Seq<weaponPack> weapons = new Seq<>();
     public final Seq<abilityPack> abilities = new Seq<>();
     public Cons<Unit> upper = u -> {
+        heal.healthMultiplier = healthBoost;
+        speed.speedMultiplier = SpeedBoost;
+        u.apply(heal);
+        u.apply(speed);
         Seq<Weapon> we = new Seq<>();
         Seq<Ability> ab = new Seq<>();
         for (ProjectsLocated.weaponPack wp : weapons) {
@@ -62,6 +71,14 @@ public class ProjectsLocated extends BaseDialog {
 
     private weaponPack pushW = null;
     private abilityPack pushA = null;
+
+    static {
+        heal = new StatusEffect("floor-project-heal");
+        speed = new StatusEffect("floor-project-speed");
+
+        heal.show = speed.show = false;
+        heal.permanent = speed.permanent = true;
+    }
 
     public ProjectsLocated(String title, int seed) {
         super(title);
