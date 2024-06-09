@@ -88,18 +88,11 @@ public class FUnits {
                     damage = 12;
                     speed = 8;
                     lifetime = 60;
-                    shootEffect = new Effect(60, e -> Draw.draw(1f, () -> {
-                        Draw.drawRange(Layer.floor, 11, () -> renderer.effectBuffer.begin(), () -> {
-                            renderer.effectBuffer.end();
-                            renderer.effectBuffer.blit(new Shader(
-                                    files.internal("shaders/screenspace.vert"),
-                                    tree.get("shaders/test.frag")));
-                        });
-                    }));
                 }};
             }});
 
             abilities.add(new SprintingAbility());
+            abilities.add(new MoveLightningAbility(12, 12, 1, 0, 1, 2, Pal.bulletYellow));
             flying = true;
             speed = 2;
             health = 114514;

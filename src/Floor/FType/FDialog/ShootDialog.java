@@ -18,21 +18,21 @@ public class ShootDialog extends BaseDialog {
     public Prov<ShootPattern> def;
     public Cons<ShootPattern> apply;
     public Boolp heavy;
-    public Boolf<String> use;
+    public Boolp use;
     public Runnable heavyUp;
     public Table base, type, flo;
     protected static String dia = "shoot";
 
-    public ShootDialog(String title, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolf<String> couldUse, Boolp heavyIn, Runnable heavyUp, Runnable reb) {
+    public ShootDialog(String title, Prov<ShootPattern> def, Cons<ShootPattern> apply, Boolp couldUse, Boolp heavyIn, Runnable heavyUp) {
         super(title);
 
         this.def = def;
         setShoot(def.get());
         this.apply = apply;
-        use = str -> {
+        use = () -> {
             ShootPattern s = def.get();
             apply.get(shoot);
-            boolean b = couldUse.get(str);
+            boolean b = couldUse.get();
             apply.get(s);
             return b;
         };
@@ -45,7 +45,6 @@ public class ShootDialog extends BaseDialog {
         };
         this.heavyUp = heavyUp;
         shown(this::rebuild);
-        hidden(reb);
 
         buttons.button("@back", Icon.left, this::hide).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -213,7 +212,7 @@ public class ShootDialog extends BaseDialog {
             }
             case "multi": {
                 ShootMulti sm = (ShootMulti) shoot;
-                createShootList(type, dia, "dest", () -> sm.dest, s -> sm.dest = s, () -> use.get("number"), heavy);
+                createShootList(type, dia, "dest", () -> sm.dest, s -> sm.dest = s, () -> use.get(), heavy);
                 createShootDialog(type, dia, "source", getHeavy("number", getShootVal(sm.source)), () -> sm.source,
                         s -> sm.source = s, use, heavy, heavyUp, this::rebuildType);
                 break;

@@ -73,13 +73,13 @@ public class ProjectsLocated extends BaseDialog {
         ProjectUtils.init();
 
         shown(this::rebuild);
-        hidden(() -> Events.on(EventType.UnitCreateEvent.class, e -> {
-            if (e.unit.hasWeapons()) {
-                weapons.get(0).weapon.load();
-                weapons.get(0).weapon.bullet.load();
-                e.unit.mounts[0] = new WeaponMount(weapons.get(0).weapon);
-            }
-        }));
+//        hidden(() -> Events.on(EventType.UnitCreateEvent.class, e -> {
+//            if (e.unit.hasWeapons()) {
+//                weapons.get(0).weapon.load();
+//                weapons.get(0).weapon.bullet.load();
+//                e.unit.mounts[0] = new WeaponMount(weapons.get(0).weapon);
+//            }
+//        }));
 
         buttons.button("@back", Icon.left, this::hide).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -122,6 +122,8 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     public void rebuildLocated() {
+        located.clear();
+        located.image(Core.atlas.find("gamma", "")).width(950).height(950);
     }
 
     public void rebuildWeapon() {
@@ -199,9 +201,9 @@ public class ProjectsLocated extends BaseDialog {
     }
 
     public static class weaponPack {
-        Weapon weapon;
-        WeaponDialog dialog;
-        float heavy;
+        public Weapon weapon;
+        public WeaponDialog dialog;
+        public float heavy;
 
         public weaponPack() {
             weapon = new Weapon();
@@ -213,26 +215,26 @@ public class ProjectsLocated extends BaseDialog {
 
         public weaponPack(Weapon weapon) {
             this.weapon = weapon;
-            this.dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
-            this.heavy = dialog.heavy + getShootVal(weapon.shoot) * dialog.bulletHeavy;
+            dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
+            heavy = dialog.heavy + getShootVal(weapon.shoot) * dialog.bulletHeavy;
         }
     }
 
     public static class abilityPack {
-        Ability ability;
-        AbilityDialog dialog;
-        float heavy;
+        public Ability ability;
+        public AbilityDialog dialog;
+        public float heavy;
 
         public abilityPack() {
-            this.ability = new ForceFieldAbility(0, 0, 0, Float.MAX_VALUE, 0, 0);
-            this.dialog = new AbilityDialog("", this);
-            this.heavy = 0.5f;
+            ability = new ForceFieldAbility(90, 0, 0, Float.MAX_VALUE, 0, 0);
+            dialog = new AbilityDialog("", () -> ability, a -> ability = a);
+            heavy = 0.5f;
         }
 
         public abilityPack(Ability ability) {
             this.ability = ability;
-            this.dialog = new AbilityDialog("", this);
-            this.heavy = dialog.heavy;
+            dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a);
+            heavy = dialog.heavy;
         }
     }
 }

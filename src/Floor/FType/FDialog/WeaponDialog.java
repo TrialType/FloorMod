@@ -2,7 +2,6 @@ package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
-import arc.func.Boolf;
 import arc.func.Boolp;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
@@ -40,8 +39,10 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         rebuildHeavy.run();
     };
     protected static String dia = "weapon";
-    protected Boolf<String> levUser = str -> couldUse(str, getVal(str));
-    protected Boolp hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize;
+    protected Boolp
+            hevUser = () -> weapon.shoot.shots * bulletHeavy + heavy <= freeSize,
+            targetUse = () -> couldUse("target", getVal("target")),
+            reloadUse = () -> couldUse("reload", getVal("reload"));
 
     public WeaponDialog(String title, Weapon rollback, Cons<Weapon> apply, Cons<Float> heavyApply) {
         super(title);
@@ -194,7 +195,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         }
         createEffectList(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
         createShootDialog(baseOn, dia, "shoot", getHeavy("number", getVal("number")), () -> weapon.shoot,
-                s -> weapon.shoot = s, s -> couldUse("number", getVal("number")), hevUser, this::updateHeavy, this::rebuildBase);
+                s -> weapon.shoot = s, () -> couldUse("number", getVal("number")), hevUser, this::updateHeavy, this::rebuildBase);
         baseOn.row();
         createNumberDialog(baseOn, dia, "x", weapon.x, f -> weapon.x = f, reBase);
         createNumberDialog(baseOn, dia, "y", weapon.y, f -> weapon.y = f, reBase);
@@ -222,12 +223,12 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         baseOn.row();
         createBooleanDialog(baseOn, dia, "useAttackRange", weapon.useAttackRange, b -> weapon.useAttackRange = b, reBase);
         createLevDialog(baseOn, dia, "target", "targetInterval", weapon.targetInterval,
-                f -> weapon.targetInterval = f, reBase, this::updateHeavy, levUser, hevUser);
+                f -> weapon.targetInterval = f, reBase, this::updateHeavy, targetUse, hevUser);
         createLevDialog(baseOn, dia, "target", "targetSwitchInterval", weapon.targetSwitchInterval,
-                f -> weapon.targetSwitchInterval = f, reBase, this::updateHeavy, levUser, hevUser);
+                f -> weapon.targetSwitchInterval = f, reBase, this::updateHeavy, targetUse, hevUser);
         baseOn.row();
         createLevDialog(baseOn, dia, "reload", "reload", weapon.reload,
-                f -> weapon.reload = f, reBase, this::updateHeavy, levUser, hevUser);
+                f -> weapon.reload = f, reBase, this::updateHeavy, reloadUse, hevUser);
         createNumberDialog(baseOn, dia, "inaccuracy", weapon.inaccuracy, f -> weapon.inaccuracy = f, reBase);
         createNumberDialog(baseOn, dia, "shake", weapon.shake, f -> weapon.shake = f, reBase);
         baseOn.row();
@@ -268,11 +269,11 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                     f -> r.recentDamageMultiplier = f, reType);
             typeOn.row();
             createLevDialog(typeOn, dia, "target", "repairSpeed", r.repairSpeed,
-                    f -> r.repairSpeed = f, reType, this::updateHeavy, levUser, hevUser);
+                    f -> r.repairSpeed = f, reType, this::updateHeavy, targetUse, hevUser);
             createLevDialog(typeOn, dia, "target", "fractionRepairSpeed", r.fractionRepairSpeed,
-                    f -> r.fractionRepairSpeed = f, reType, this::updateHeavy, levUser, hevUser);
+                    f -> r.fractionRepairSpeed = f, reType, this::updateHeavy, targetUse, hevUser);
             createLevDialog(typeOn, dia, "target", "beamWidth", r.beamWidth,
-                    f -> r.beamWidth = f, reType, this::updateHeavy, levUser, hevUser);
+                    f -> r.beamWidth = f, reType, this::updateHeavy, targetUse, hevUser);
             typeOn.row();
             createNumberDialog(typeOn, dia, "pulseRadius", r.pulseRadius,
                     f -> r.pulseRadius = f, reType);

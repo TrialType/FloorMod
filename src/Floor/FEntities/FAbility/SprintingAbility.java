@@ -194,9 +194,11 @@ public class SprintingAbility extends Ability {
                     float angle = Angles.angle(dx, dy);
                     if (!onSign()) {
                         unit.lookAt(dx + unit.x, dy + unit.y);
+                        unit.lookAt(dx + unit.x, dy + unit.y);
+                        unit.lookAt(dx + unit.x, dy + unit.y);
                     }
-                    unit.x += (float) (unit.speed() * cos(toRadians(angle)));
-                    unit.y += (float) (unit.speed() * sin(toRadians(angle)));
+                    unit.vel.x += (float) (unit.speed() * cos(toRadians(angle)));
+                    unit.vel.y += (float) (unit.speed() * sin(toRadians(angle)));
                     break;
                 }
             }
@@ -215,10 +217,8 @@ public class SprintingAbility extends Ability {
 
                 if (getting) {
                     if (!Vars.mobile) {
-                        Vec2 mover = new Vec2(unit.vel);
-                        mover.setLength(mover.len() * 1.8f);
-                        unit.vel.setZero();
-                        unit.move(mover);
+                        unit.lookAt(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
+                        unit.lookAt(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
                         unit.lookAt(Angles.angle(Core.input.mouseWorldX() - x, Core.input.mouseWorldY() - y));
                         powerTimer += Time.delta;
                     } else if (stats == 1) {
@@ -227,10 +227,8 @@ public class SprintingAbility extends Ability {
                                     Core.input.mouseY(i) <= 1000 && Core.input.mouseY(i) >= 700) {
                                 powerTimer += Time.delta;
                                 float dx = Core.input.mouseX(i) - 1650, dy = Core.input.mouseY(i) - 850;
-                                Vec2 mover = new Vec2(unit.vel);
-                                mover.setLength(mover.len() * 1.8f);
-                                unit.vel.setZero();
-                                unit.move(mover);
+                                unit.lookAt(Angles.angle(dx, dy));
+                                unit.lookAt(Angles.angle(dx, dy));
                                 unit.lookAt(Angles.angle(dx, dy));
                                 break;
                             }
@@ -238,7 +236,6 @@ public class SprintingAbility extends Ability {
                     } else if (stats == 2) {
                         powerTimer += Time.delta;
                         Vec2 mover = new Vec2(unit.vel);
-                        mover.setLength(mover.len() * 1.4f);
                         unit.vel.setZero();
                         unit.move(mover);
                         unit.lookAt(Core.input.mouseWorld());
@@ -262,7 +259,7 @@ public class SprintingAbility extends Ability {
                     needPress = true;
                     Teamc target = Units.closestTarget(unit.team, x, y, maxLength * 2);
                     if (target != null) {
-                        if (Angles.angleDist(Angles.angle(x, y, target.x(), target.y()), unit.rotation) <= 2) {
+                        if (Angles.angleDist(Angles.angle(x, y, target.x(), target.y()), unit.rotation) <= 0) {
                             powerTimer = 0;
                             timer = 0;
                             float angle = Angles.angle(x, y, target.x(), target.y());
@@ -339,7 +336,7 @@ public class SprintingAbility extends Ability {
             float len = (float) sqrt((x - u.x) * (x - u.x) + (y - u.y) * (y - u.y));
 
             if (angle <= 90) {
-                if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= killer.hitSize) {
+                if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= killer.hitSize * 1.4f) {
                     damage(killer, u, damage);
                 }
             }
@@ -351,7 +348,7 @@ public class SprintingAbility extends Ability {
                 float len = (float) sqrt((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y));
 
                 if (angle <= 90) {
-                    if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= killer.hitSize) {
+                    if (cos(toRadians(angle)) * len <= maxLength && sin(toRadians(angle)) * len <= killer.hitSize * 1.4f) {
                         damage(killer, b, damage);
                     }
                 }
