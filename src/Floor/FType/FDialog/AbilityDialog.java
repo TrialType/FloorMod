@@ -1,9 +1,11 @@
 package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
+import arc.Core;
 import arc.func.Boolp;
 import arc.func.Cons;
 import arc.func.Prov;
+import arc.graphics.Color;
 import arc.scene.ui.layout.Table;
 import mindustry.entities.abilities.*;
 import mindustry.gen.Icon;
@@ -43,7 +45,69 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
 
     public void rebuild() {
         cont.clear();
+        cont.pane(t -> {
+            t.setBackground(Tex.buttonEdge1);
+            t.label(() -> Core.bundle.get("dialog.ability." + aType)).width(100);
+            t.label(() -> Core.bundle.get("@heavyUse") + ": " + heavy + bulletHeavy).width(100);
+            t.button(b -> {
+                b.image(Icon.pencil);
 
+                b.clicked(() -> createSelectDialog(b, (tb, hide) -> {
+                    tb.clear();
+                    tb.button(Core.bundle.get("dialog.ability.repairField"), () -> {
+                        if (!aType.equals("repairField")) {
+                            setAbility(new RepairFieldAbility(0, 500, 0));
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                    tb.button(Core.bundle.get("dialog.ability.suppressionField"), () -> {
+                        if (!aType.equals("suppressionField")) {
+                            setAbility(new SuppressionFieldAbility());
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                    tb.button(Core.bundle.get("dialog.ability.regen"), () -> {
+                        if (!aType.equals("regen")) {
+                            setAbility(new RegenAbility());
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                    tb.button(Core.bundle.get("dialog.ability.forceField"), () -> {
+                        if (!aType.equals("forceField")) {
+                            setAbility(new ForceFieldAbility(0, 0, 0, 500));
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                    tb.button(Core.bundle.get("dialog.ability.shieldArc"), () -> {
+                        if (!aType.equals("shieldArc")) {
+                            setAbility(new ShieldArcAbility());
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                    tb.button(Core.bundle.get("dialog.ability.armorPlate"), () -> {
+                        if (!aType.equals("armorPlate")) {
+                            setAbility(new ArmorPlateAbility());
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                    tb.button(Core.bundle.get("dialog.ability.moveLightning"), () -> {
+                        if (!aType.equals("moveLightning")) {
+                            setAbility(new MoveLightningAbility(0, 0, 0, 0, 0, 0, new Color()));
+                            updateHeavy();
+                        }
+                        hide.run();
+                    }).width(100).row();
+                }));
+            }, () -> {
+            }).width(100).pad(5);
+        }).width(1400);
+        cont.row();
         cont.pane(t -> {
             type = t;
             type.setBackground(Tex.buttonEdge1);
@@ -71,27 +135,137 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             }
             case "suppressionField" -> {
                 SuppressionFieldAbility a = (SuppressionFieldAbility) ability;
-
+                createLevDialog(type, dia, "abilityStatus", "applyParticleChance", a.applyParticleChance,
+                        f -> a.applyParticleChance = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createLevDialog(type, dia, "abilityPower", "reload", a.reload,
+                        f -> a.reload = f, this::rebuildType, this::updateHeavy, powerUse, heavyUse);
+                createLevDialog(type, dia, "abilityBoost", "range", a.range,
+                        f -> a.range = f, this::rebuildType, this::updateHeavy, boostUse, heavyUse);
+                type.row();
+                createNumberDialog(type, dia, "orbRadius", a.orbRadius,
+                        f -> a.orbRadius = f, this::rebuildType);
+                createNumberDialog(type, dia, "orbMidScl", a.orbMidScl,
+                        f -> a.orbMidScl = f, this::rebuildType);
+                createNumberDialog(type, dia, "orbSinScl", a.orbSinScl,
+                        f -> a.orbSinScl = f, this::rebuildType);
+                type.row();
+                createNumberDialog(type, dia, "orbSinMag", a.orbSinMag,
+                        f -> a.orbSinMag = f, this::rebuildType);
+                createNumberDialog(type, dia, "layer", a.layer,
+                        f -> a.layer = f, this::rebuildType);
+                createColorDialog(type, dia, "color", a.color,
+                        c -> a.color = c, this::rebuildType);
+                type.row();
+                createNumberDialogWithLimit(type, dia, "x", a.x, 15, 0,
+                        f -> a.x = f, this::rebuildType);
+                createNumberDialogWithLimit(type, dia, "y", a.y, 15, -15,
+                        f -> a.y = f, this::rebuildType);
+                createNumberDialog(type, dia, "particleSize", a.particleSize,
+                        f -> a.particleSize = f, this::rebuildType);
+                type.row();
+                createNumberDialog(type, dia, "particleLen", a.particleLen,
+                        f -> a.particleLen = f, this::rebuildType);
+                createNumberDialog(type, dia, "rotateScl", a.rotateScl,
+                        f -> a.rotateScl = f, this::rebuildType);
+                createNumberDialog(type, dia, "particleLife", a.particleLife,
+                        f -> a.particleLife = f, this::rebuildType);
+                type.row();
+                createNumberDialog(type, dia, "particles", a.particles,
+                        f -> a.particles = (int) (f + 0), this::rebuildType);
+                createInterpolSelect(type, dia, "particleInterp", i -> a.particleInterp = i);
+                createColorDialog(type, dia, "particleColor", a.particleColor,
+                        c -> a.particleColor = c, this::rebuildType);
             }
             case "regen" -> {
                 RegenAbility a = (RegenAbility) ability;
-
+                createLevDialog(type, dia, "abilityStatus", "percentAmount", a.percentAmount,
+                        f -> a.percentAmount = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createLevDialog(type, dia, "abilityStatus", "amount", a.amount,
+                        f -> a.amount = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
             }
             case "forceField" -> {
                 ForceFieldAbility a = (ForceFieldAbility) ability;
-
+                createLevDialog(type, dia, "abilityBoost", "radius", a.radius,
+                        f -> a.radius = f, this::rebuildType, this::updateHeavy, boostUse, heavyUse);
+                createLevDialog(type, dia, "abilityStatus", "regen", a.regen,
+                        f -> a.regen = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createLevDialog(type, dia, "abilityStatus", "max", a.max,
+                        f -> a.max = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                type.row();
+                createLevDialog(type, dia, "abilityPower", "cooldown", a.cooldown,
+                        f -> a.cooldown = f, this::rebuildType, this::updateHeavy, powerUse, heavyUse);
+                createNumberDialog(type, dia, "sides", a.sides,
+                        f -> a.sides = (int) (f + 0), this::rebuildType);
+                createNumberDialog(type, dia, "rotation", a.rotation,
+                        f -> a.rotation = f, this::rebuildType);
             }
             case "shieldArc" -> {
                 ShieldArcAbility a = (ShieldArcAbility) ability;
-
+                createLevDialog(type, dia, "abilityBoost", "radius", a.radius,
+                        f -> a.radius = f, this::rebuildType, this::updateHeavy, boostUse, heavyUse);
+                createLevDialog(type, dia, "abilityStatus", "regen", a.regen,
+                        f -> a.regen = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createLevDialog(type, dia, "abilityStatus", "max", a.max,
+                        f -> a.max = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                type.row();
+                createLevDialog(type, dia, "abilityPower", "cooldown", a.cooldown,
+                        f -> a.cooldown = f, this::rebuildType, this::updateHeavy, powerUse, heavyUse);
+                createLevDialog(type, dia, "abilityBoost", "width", a.width,
+                        f -> a.width = f, this::rebuildType, this::updateHeavy, boostUse, heavyUse);
+                createNumberDialog(type, dia, "angle", a.angle,
+                        f -> a.angle = (int) (f + 0), this::rebuildType);
+                type.row();
+                createNumberDialog(type, dia, "angleOffset", a.angleOffset,
+                        f -> a.angleOffset = f, this::rebuildType);
+                createBooleanDialog(type, dia, "whenShooting", a.whenShooting,
+                        b -> a.whenShooting = b, this::rebuildType);
+                createBooleanDialog(type, dia, "drawArc", a.drawArc,
+                        b -> a.drawArc = b, this::rebuildType);
             }
             case "armorPlate" -> {
                 ArmorPlateAbility a = (ArmorPlateAbility) ability;
-
+                createLevDialog(type, dia, "abilityStatus", "healthMultiplier", a.healthMultiplier,
+                        f -> a.healthMultiplier = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createNumberDialogWithLimit(type, dia, "z", a.z, 220, -11,
+                        f -> a.z = f, this::rebuildType);
+                createColorDialog(type, dia, "color", a.color, c -> a.color = c, this::rebuildType);
             }
             case "moveLightning" -> {
                 MoveLightningAbility a = (MoveLightningAbility) ability;
-
+                createLevDialog(type, dia, "abilityStatus", "damage", a.damage,
+                        f -> a.damage = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createLevDialog(type, dia, "abilityBoost", "length", a.length,
+                        f -> a.length = (int) (f + 0), this::rebuildType, this::updateHeavy, boostUse, heavyUse);
+                createNumberDialogWithLimit(type, dia, "chance", a.chance, 1, 0,
+                        f -> a.chance = f, this::rebuildType);
+                type.row();
+                createNumberDialog(type, dia, "minSpeed", a.minSpeed,
+                        f -> a.minSpeed = f, this::rebuildType);
+                createNumberDialog(type, dia, "maxSpeed", a.maxSpeed,
+                        f -> a.maxSpeed = f, this::rebuildType);
+                createColorDialog(type, dia, "color", a.color, c -> a.color = c, this::rebuildType);
+                type.row();
+                createNumberDialogWithLimit(type, dia, "x", a.x, 12, 0,
+                        f -> a.x = f, this::rebuildType);
+                createNumberDialogWithLimit(type, dia, "y", a.y, 12, -12,
+                        f -> a.y = f, this::rebuildType);
+                createBooleanDialog(type, dia, "alternate", a.alternate,
+                        b -> a.alternate = b, this::rebuildType);
+                type.row();
+                createNumberDialog(type, dia, "bulletAngle", a.bulletAngle,
+                        f -> a.bulletAngle = f, this::rebuildType);
+                createNumberDialog(type, dia, "bulletSpread", a.bulletSpread,
+                        f -> a.bulletSpread = f, this::rebuildType);
+                type.table(t -> {
+                    t.label(() -> Core.bundle.get("dialog.ability.bullet")).width(100);
+                    t.button(Icon.pencil, () -> dialog.show()).pad(5);
+                }).width(250);
+                type.row();
+                createEffectList(type, this, dia, "shootEffect",
+                        () -> a.shootEffect, e -> a.shootEffect = e);
+                createSoundSelect(type, dia, "shootSound", s -> a.shootSound = s);
+                createBooleanDialog(type, dia, "parentizeEffects", a.parentizeEffects,
+                        b -> a.parentizeEffects = b, this::rebuildType);
             }
         }
     }
@@ -175,7 +349,6 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             this.ability = rfa;
             aType = "repairField";
         }
-        updateHeavy();
     }
 
     public void updateDialog(boolean add) {
@@ -189,7 +362,6 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             dialog.hidden(() -> freeSize += this.heavy);
         } else {
             dialog = null;
-            bulletHeavy = 0;
         }
     }
 
@@ -251,7 +423,8 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         return 120 * a.amount;
                     }
                     case "suppressionField" -> {
-                        return 50;
+                        SuppressionFieldAbility a = (SuppressionFieldAbility) ability;
+                        return a.applyParticleChance;
                     }
                     case "regen" -> {
                         RegenAbility a = (RegenAbility) ability;

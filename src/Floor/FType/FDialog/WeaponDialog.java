@@ -180,11 +180,13 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                 }).pad(5);
                 b.button(Icon.trash, () -> {
                     updateDialog(false);
+                    updateHeavy();
                     rebuildBase();
                 }).pad(5);
             } else {
                 b.button(Icon.add, () -> {
                     updateDialog(true);
+                    updateHeavy();
                     rebuildBase();
                 }).pad(5);
             }
@@ -365,11 +367,9 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                     b -> weapon.bullet = b, "", () -> (int) getShootVal(weapon.shoot));
             bulletDialog.hidden(() -> freeSize += this.heavy);
             bulletDialog.shown(() -> freeSize -= this.heavy);
-            bulletHeavy = bulletDialog.heavyOut();
         } else {
             bulletDialog = null;
             weapon.bullet = null;
-            bulletHeavy = 0;
         }
     }
 

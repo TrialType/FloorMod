@@ -365,7 +365,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         createBooleanDialog(baseOn, dia, "trailRotation", bullet.trailRotation,
                 b -> bullet.trailRotation = b, reb);
         createBooleanLevDialog(baseOn, dia, "splashDamagePierce", bullet.splashDamagePierce,
-                b -> bullet.splashDamagePierce = b, reb, pierceUse, hevUser);
+                b -> bullet.splashDamagePierce = b, reb, this::updateHeavy, pierceUse, hevUser);
         createPartsDialog(baseOn, dia, "parts", bullet.parts);
         baseOn.row();
         createColorDialog(baseOn, dia, "trailColor", bullet.trailColor, c -> bullet.trailColor = c, reb);

@@ -136,9 +136,11 @@ public class ProjectsLocated extends BaseDialog {
             weaponPack wp = weapons.get(i);
             int finalI = i;
             LWeapon.table(t -> {
+                t.setBackground(pushW == wp ? Tex.buttonEdge1 : Tex.windowEmpty);
+
                 t.clicked(() -> {
                     pushW = pushW == wp ? null : pushW;
-                    t.setBackground(pushW == wp ? Tex.buttonEdge3 : Tex.windowEmpty);
+                    rebuildWeapon();
                 });
                 t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(100).pad(5);
                 t.label(() -> Core.bundle.get("@heavyUse") + wp.heavy).left().width(100).pad(5);
@@ -228,13 +230,13 @@ public class ProjectsLocated extends BaseDialog {
         public abilityPack() {
             ability = new ForceFieldAbility(90, 0, 0, Float.MAX_VALUE, 0, 0);
             dialog = new AbilityDialog("", () -> ability, a -> ability = a);
-            heavy = 0.5f;
+            heavy = dialog.heavy;
         }
 
         public abilityPack(Ability ability) {
             this.ability = ability;
             dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a);
-            heavy = dialog.heavy;
+            heavy = dialog.heavy + dialog.bulletHeavy;
         }
     }
 }

@@ -233,17 +233,20 @@ abstract class ProjectUtils {
         }).pad(10).width(250);
     }
 
-    public static void createBooleanLevDialog(Table on, String dia, String tile, boolean def, Cons<Boolean> apply, Runnable rebuild, Boolp lev, Boolp hev) {
+    public static void createBooleanLevDialog(Table on, String dia, String tile, boolean def, Cons<Boolean> apply, Runnable rebuild, Runnable heavy, Boolp lev, Boolp hev) {
         on.table(t -> {
             t.label(() -> Core.bundle.get("dialog." + dia + "." + tile) + ":").pad(5);
             t.label(() -> Core.bundle.get("@" + def)).pad(5);
             t.button(Icon.rotateSmall, () -> {
                 apply.get(!def);
+                heavy.run();
                 if (!lev.get()) {
                     apply.get(def);
+                    heavy.run();
                     ui.showInfo(Core.bundle.get("@levelOutOfBounds"));
                 } else if (!hev.get()) {
                     apply.get(def);
+                    heavy.run();
                     ui.showInfo(Core.bundle.get("@tooHeavy"));
                 } else {
                     rebuild.run();
