@@ -1,5 +1,6 @@
 package Floor.FType.FDialog;
 
+import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.func.Cons;
 import arc.func.Prov;
 import arc.scene.ui.layout.Table;
@@ -7,15 +8,19 @@ import mindustry.entities.abilities.*;
 import mindustry.gen.Icon;
 import mindustry.ui.dialogs.BaseDialog;
 
+import static Floor.FType.FDialog.ProjectUtils.freeSize;
+
 public class AbilityDialog extends BaseDialog {
     public Table base, type;
     public Ability ability;
-    public float heavy;
+    public BulletDialog dialog;
+    public float heavy, bulletHeavy;
     public String aType;
 
     public AbilityDialog(String title, Prov<Ability> def, Cons<Ability> apply) {
         super(title);
         setAbility(def.get());
+        updateHeavy();
         shown(this::rebuild);
 
         buttons.button("@back", Icon.left, () -> {
@@ -50,15 +55,7 @@ public class AbilityDialog extends BaseDialog {
     }
 
     public void setAbility(Ability ability) {
-        if (ability instanceof RepairFieldAbility a) {
-            RepairFieldAbility rfa = new RepairFieldAbility(a.amount, a.reload, a.range);
-            rfa.activeEffect = a.activeEffect;
-            rfa.healEffect = a.healEffect;
-            rfa.parentizeEffects = a.parentizeEffects;
-            rfa.data = a.data;
-            this.ability = rfa;
-            aType = "repairField";
-        } else if (ability instanceof SuppressionFieldAbility a) {
+        if (ability instanceof SuppressionFieldAbility a) {
             SuppressionFieldAbility sfa = new SuppressionFieldAbility();
             sfa.active = a.active;
             sfa.data = a.data;
@@ -114,6 +111,49 @@ public class AbilityDialog extends BaseDialog {
             aa.color = a.color;
             aa.z = a.z;
             aType = "armorPlate";
+        } else if (ability instanceof MoveLightningAbility a) {
+            MoveLightningAbility mla = new MoveLightningAbility(a.damage, a.length, a.chance, a.y, a.minSpeed, a.maxSpeed, a.color);
+            mla.x = a.x;
+            mla.bullet = a.bullet;
+            mla.bulletAngle = a.bulletAngle;
+            mla.bulletSpread = a.bulletSpread;
+            mla.alternate = a.alternate;
+            mla.shootEffect = a.shootEffect;
+            mla.parentizeEffects = a.parentizeEffects;
+            mla.shootSound = a.shootSound;
+            mla.data = a.data;
+            this.ability = mla;
+            aType = "moveLightning";
+            updateDialog(mla.bullet != null);
+        } else {
+            RepairFieldAbility rfa;
+            if (ability instanceof RepairFieldAbility a) {
+                rfa = new RepairFieldAbility(a.amount, a.reload, a.range);
+                rfa.activeEffect = a.activeEffect;
+                rfa.healEffect = a.healEffect;
+                rfa.parentizeEffects = a.parentizeEffects;
+                rfa.data = a.data;
+            } else {
+                rfa = new RepairFieldAbility(0, 500, 0);
+            }
+            this.ability = rfa;
+            aType = "repairField";
+        }
+        updateHeavy();
+    }
+
+    public void updateDialog(boolean add) {
+        if (add) {
+            MoveLightningAbility a = (MoveLightningAbility) ability;
+            if (!(a.bullet instanceof LimitBulletType)) {
+                a.bullet = new LimitBulletType();
+            }
+            dialog = new BulletDialog(() -> a.bullet, f -> bulletHeavy = f, b -> a.bullet = b, "", () -> 1);
+            dialog.shown(() -> freeSize -= this.heavy);
+            dialog.hidden(() -> freeSize += this.heavy);
+        } else {
+            dialog = null;
+            bulletHeavy = 0;
         }
     }
 
@@ -135,6 +175,9 @@ public class AbilityDialog extends BaseDialog {
                     case "shieldArc" -> {
                         ShieldArcAbility a = (ShieldArcAbility) ability;
                         return 60 / a.cooldown;
+                    }
+                    case "moveLightning" -> {
+                        return 2f;
                     }
                 }
             }
@@ -158,6 +201,10 @@ public class AbilityDialog extends BaseDialog {
                     case "shieldArc" -> {
                         ShieldArcAbility a = (ShieldArcAbility) ability;
                         return a.radius / 4 + a.width / 4;
+                    }
+                    case "moveLightning" -> {
+                        MoveLightningAbility a = (MoveLightningAbility) ability;
+                        return a.length / 4f;
                     }
                 }
             }
@@ -186,6 +233,10 @@ public class AbilityDialog extends BaseDialog {
                         ArmorPlateAbility a = (ArmorPlateAbility) ability;
                         return 100 * a.healthMultiplier;
                     }
+                    case "moveLightning" -> {
+                        MoveLightningAbility a = (MoveLightningAbility) ability;
+                        return a.damage * 60;
+                    }
                 }
             }
         }
@@ -194,8 +245,9 @@ public class AbilityDialog extends BaseDialog {
 
     public void updateHeavy() {
         heavy = 0.5f;
-        heavy += ProjectUtils.getHeavy("abilityPower",findVal("abilityPower"));
-        heavy += ProjectUtils.getHeavy("abilityBoost",findVal("abilityBoost"));
-        heavy += ProjectUtils.getHeavy("abilityStatus",findVal("abilityStatus"));
+        heavy += ProjectUtils.getHeavy("abilityPower", findVal("abilityPower"));
+        heavy += ProjectUtils.getHeavy("abilityBoost", findVal("abilityBoost"));
+        heavy += ProjectUtils.getHeavy("abilityStatus", findVal("abilityStatus"));
+        bulletHeavy = dialog == null ? 0 : dialog.heavyOut() * 30;
     }
 }
