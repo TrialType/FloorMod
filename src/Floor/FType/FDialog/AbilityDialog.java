@@ -228,6 +228,11 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         b -> a.whenShooting = b, this::rebuildType);
                 createBooleanDialog(type, dia, "drawArc", a.drawArc,
                         b -> a.drawArc = b, this::rebuildType);
+                type.row();
+                createNumberDialogWithLimit(type, dia, "x", a.x, 12, 0,
+                        f -> a.x = f, this::rebuildType);
+                createNumberDialogWithLimit(type, dia, "x", a.x, 12, -12,
+                        f -> a.x = f, this::rebuildType);
             }
             case "armorPlate" -> {
                 ArmorPlateAbility a = (ArmorPlateAbility) ability;
