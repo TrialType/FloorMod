@@ -8,7 +8,7 @@ import mindustry.entities.abilities.*;
 import mindustry.gen.Icon;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static Floor.FType.FDialog.ProjectUtils.freeSize;
+import static Floor.FType.FDialog.ProjectUtils.*;
 
 public class AbilityDialog extends BaseDialog {
     public Table base, type;
