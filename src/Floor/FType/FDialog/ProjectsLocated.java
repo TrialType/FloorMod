@@ -131,7 +131,7 @@ public class ProjectsLocated extends BaseDialog {
             weaponPack wp = weapons.get(i);
             int finalI = i;
             LWeapon.table(t -> {
-                t.setBackground(pushW == wp ? Tex.buttonEdge3 : Tex.windowEmpty);
+                t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
 
                 t.clicked(() -> {
                     pushW = pushW == wp ? null : wp;
@@ -169,7 +169,7 @@ public class ProjectsLocated extends BaseDialog {
             int finalI = i;
             abilityPack ap = abilities.get(finalI);
             LAbility.table(t -> {
-                t.setBackground(ap == pushA ? Tex.buttonEdge2 : Tex.windowEmpty);
+                t.setBackground(ap == pushA ? Tex.buttonDown : Tex.windowEmpty);
 
                 t.clicked(() -> {
                     pushA = pushA == ap ? null : ap;
@@ -187,7 +187,7 @@ public class ProjectsLocated extends BaseDialog {
                 }).pad(5);
                 t.button(Icon.trash, () -> {
                     freeSize += ap.heavy;
-                    weapons.remove(finalI);
+                    abilities.remove(finalI);
                     pushA = pushA == ap ? null : pushA;
                     rebuildLocated();
                     rebuildAbility();

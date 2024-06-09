@@ -37,8 +37,8 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
         buttons.button("@back", Icon.left, () -> {
             apply.get(def.get());
             hide();
-        });
-        buttons.button("@apply", Icon.right, () -> {
+        }).width(100);
+        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             updateHeavy();
             if (heavy + bulletHeavy <= freeSize) {
                 apply.get(ability);
@@ -47,15 +47,15 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                 ui.showInfo(Core.bundle.get("@tooHeavy"));
             }
             hide();
-        });
+        }).width(100);
     }
 
     public void rebuild() {
         cont.clear();
         cont.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
-            t.label(() -> Core.bundle.get("dialog.ability." + aType)).width(100);
-            t.label(() -> Core.bundle.get("@heavyUse") + ": " + heavy + bulletHeavy).width(100);
+            t.label(() -> Core.bundle.get("dialog.ability." + aType)).width(200);
+            t.label(() -> Core.bundle.get("@heavyUse") + ": " + (heavy + bulletHeavy)).width(200);
             t.button(b -> {
                 b.image(Icon.pencil);
 
@@ -65,6 +65,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("repairField")) {
                             setAbility(new RepairFieldAbility(0, 500, 0));
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
@@ -72,13 +73,15 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("suppressionField")) {
                             setAbility(new SuppressionFieldAbility());
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
                     tb.button(Core.bundle.get("dialog.ability.regen"), () -> {
-                        if (!aType.equals("regen")) {
+                        if (!aType.equals("regen1")) {
                             setAbility(new RegenAbility());
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
@@ -86,6 +89,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("forceField")) {
                             setAbility(new ForceFieldAbility(0, 0, 0, 500));
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
@@ -93,6 +97,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("shieldArc")) {
                             setAbility(new ShieldArcAbility());
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
@@ -100,6 +105,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("armorPlate")) {
                             setAbility(new ArmorPlateAbility());
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
@@ -107,12 +113,13 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("moveLightning")) {
                             setAbility(new MoveLightningAbility(0, 0, 0, 0, 0, 0, new Color()));
                             updateHeavy();
+                            rebuildType();
                         }
                         hide.run();
                     }).width(100).row();
                 }));
             }, () -> {
-            }).width(100).pad(5);
+            }).width(75).pad(5);
         }).width(1400);
         cont.row();
         cont.pane(t -> {
@@ -270,7 +277,21 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         f -> a.bulletSpread = f, this::rebuildType);
                 type.table(t -> {
                     t.label(() -> Core.bundle.get("dialog.ability.bullet")).width(100);
-                    t.button(Icon.pencil, () -> dialog.show()).pad(5);
+                    if (dialog != null) {
+                        t.button(Icon.pencil, () -> dialog.show()).pad(5);
+                        t.button(Icon.trash, () -> {
+                            a.bullet = new LimitBulletType();
+                            updateDialog(false);
+                            updateHeavy();
+                            rebuildType();
+                        }).pad(5);
+                    } else {
+                        t.button(Icon.add, () -> {
+                            updateDialog(true);
+                            updateHeavy();
+                            rebuildType();
+                        }).pad(5);
+                    }
                 }).width(250);
                 type.row();
                 createEffectList(type, this, dia, "shootEffect",
@@ -365,11 +386,14 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
 
     public void updateDialog(boolean add) {
         if (add) {
+            if (!(ability instanceof MoveLightningAbility)) {
+                ability = new MoveLightningAbility(0, 0, 0, 0, 0, 0, new Color());
+            }
             MoveLightningAbility a = (MoveLightningAbility) ability;
             if (!(a.bullet instanceof LimitBulletType)) {
                 a.bullet = new LimitBulletType();
             }
-            dialog = new BulletDialog(() -> a.bullet, f -> bulletHeavy = f, b -> a.bullet = b, "", () -> 1);
+            dialog = new BulletDialog(() -> a.bullet, f -> bulletHeavy = f, b -> a.bullet = b, "", () -> 30);
             dialog.shown(() -> freeSize -= this.heavy);
             dialog.hidden(() -> freeSize += this.heavy);
         } else {
@@ -469,7 +493,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
         heavy += ProjectUtils.getHeavy("abilityPower", findVal("abilityPower"));
         heavy += ProjectUtils.getHeavy("abilityBoost", findVal("abilityBoost"));
         heavy += ProjectUtils.getHeavy("abilityStatus", findVal("abilityStatus"));
-        bulletHeavy = dialog == null ? 0 : dialog.heavyOut() * 30;
+        bulletHeavy = dialog == null ? 0 : dialog.heavyOut();
     }
 
     @Override
