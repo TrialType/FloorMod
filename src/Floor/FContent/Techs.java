@@ -290,6 +290,36 @@ public class Techs {
                     });
                 });
             });
+            node(powerProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(powerProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(powerProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(powerProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(powerProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(boostProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(boostProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(boostProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(boostProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(boostProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
+            node(statusProject1, ItemStack.with(blueprint1, 1000, silicon, 1000, copper, 1000), () -> {
+                node(statusProject2, ItemStack.with(blueprint2, 1000, silicon, 1000, copper, 1000), () -> {
+                    node(statusProject3, ItemStack.with(blueprint3, 1000, silicon, 1000, copper, 1000), () -> {
+                        node(statusProject4, ItemStack.with(blueprint4, 1000, silicon, 1000, copper, 1000), () -> {
+                            node(statusProject5, ItemStack.with(blueprint5, 1000, silicon, 1000, copper, 1000), () -> {
+                            });
+                        });
+                    });
+                });
+            });
         });
         tf.parent = head;
         head.children.add(tf);
