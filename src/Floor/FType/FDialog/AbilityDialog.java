@@ -1,21 +1,29 @@
 package Floor.FType.FDialog;
 
 import Floor.FEntities.FBulletType.LimitBulletType;
+import arc.func.Boolp;
 import arc.func.Cons;
 import arc.func.Prov;
 import arc.scene.ui.layout.Table;
 import mindustry.entities.abilities.*;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.ProjectUtils.*;
 
-public class AbilityDialog extends BaseDialog {
-    public Table base, type;
+public class AbilityDialog extends BaseDialog implements EffectTableGetter {
+    public Table type, effect;
     public Ability ability;
     public BulletDialog dialog;
     public float heavy, bulletHeavy;
     public String aType;
+    public Boolp
+            heavyUse = () -> heavy + bulletHeavy <= freeSize,
+            powerUse = () -> couldUse("abilityPower", findVal("abilityPower")),
+            boostUse = () -> couldUse("abilityBoost", findVal("abilityBoost")),
+            statusUse = () -> couldUse("abilityStatus", findVal("abilityStatus"));
+    protected static String dia = "ability";
 
     public AbilityDialog(String title, Prov<Ability> def, Cons<Ability> apply) {
         super(title);
@@ -37,28 +45,61 @@ public class AbilityDialog extends BaseDialog {
         cont.clear();
 
         cont.pane(t -> {
-            base = t;
-            rebuildBase();
-        }).width(1400).row();
-        cont.pane(t -> {
             type = t;
+            type.setBackground(Tex.buttonEdge1);
             rebuildType();
         }).width(1400);
     }
 
-    public void rebuildBase() {
-        base.clear();
-    }
-
     public void rebuildType() {
         type.clear();
+
+        switch (aType) {
+            case "repairField" -> {
+                RepairFieldAbility a = (RepairFieldAbility) ability;
+                createLevDialog(type, dia, "abilityStatus", "amount", a.amount,
+                        f -> a.amount = f, this::rebuildType, this::updateHeavy, statusUse, heavyUse);
+                createLevDialog(type, dia, "abilityPower", "reload", a.reload,
+                        f -> a.reload = f, this::rebuildType, this::updateHeavy, powerUse, heavyUse);
+                createLevDialog(type, dia, "abilityBoost", "range", a.range,
+                        f -> a.range = f, this::rebuildType, this::updateHeavy, boostUse, heavyUse);
+                type.row();
+                createEffectList(type, this, dia, "healEffect", () -> a.healEffect, e -> a.healEffect = e);
+                createEffectList(type, this, dia, "activeEffect", () -> a.activeEffect, e -> a.activeEffect = e);
+                createBooleanDialog(type, dia, "parentizeEffects", a.parentizeEffects,
+                        b -> a.parentizeEffects = b, this::rebuildType);
+            }
+            case "suppressionField" -> {
+                SuppressionFieldAbility a = (SuppressionFieldAbility) ability;
+
+            }
+            case "regen" -> {
+                RegenAbility a = (RegenAbility) ability;
+
+            }
+            case "forceField" -> {
+                ForceFieldAbility a = (ForceFieldAbility) ability;
+
+            }
+            case "shieldArc" -> {
+                ShieldArcAbility a = (ShieldArcAbility) ability;
+
+            }
+            case "armorPlate" -> {
+                ArmorPlateAbility a = (ArmorPlateAbility) ability;
+
+            }
+            case "moveLightning" -> {
+                MoveLightningAbility a = (MoveLightningAbility) ability;
+
+            }
+        }
     }
 
     public void setAbility(Ability ability) {
         if (ability instanceof SuppressionFieldAbility a) {
             SuppressionFieldAbility sfa = new SuppressionFieldAbility();
             sfa.active = a.active;
-            sfa.data = a.data;
             sfa.x = a.x;
             sfa.y = a.y;
             sfa.applyParticleChance = a.applyParticleChance;
@@ -81,7 +122,6 @@ public class AbilityDialog extends BaseDialog {
             aType = "suppressionField";
         } else if (ability instanceof RegenAbility a) {
             RegenAbility ra = new RegenAbility();
-            ra.data = a.data;
             ra.amount = a.amount;
             ra.percentAmount = a.percentAmount;
             this.ability = ra;
@@ -92,7 +132,6 @@ public class AbilityDialog extends BaseDialog {
             aType = "forceField";
         } else if (ability instanceof ShieldArcAbility a) {
             ShieldArcAbility saa = new ShieldArcAbility();
-            saa.data = a.data;
             saa.radius = a.radius;
             saa.regen = a.regen;
             saa.max = a.max;
@@ -106,7 +145,6 @@ public class AbilityDialog extends BaseDialog {
             aType = "shieldArc";
         } else if (ability instanceof ArmorPlateAbility a) {
             ArmorPlateAbility aa = new ArmorPlateAbility();
-            aa.data = a.data;
             aa.healthMultiplier = a.healthMultiplier;
             aa.color = a.color;
             aa.z = a.z;
@@ -121,7 +159,6 @@ public class AbilityDialog extends BaseDialog {
             mla.shootEffect = a.shootEffect;
             mla.parentizeEffects = a.parentizeEffects;
             mla.shootSound = a.shootSound;
-            mla.data = a.data;
             this.ability = mla;
             aType = "moveLightning";
             updateDialog(mla.bullet != null);
@@ -132,7 +169,6 @@ public class AbilityDialog extends BaseDialog {
                 rfa.activeEffect = a.activeEffect;
                 rfa.healEffect = a.healEffect;
                 rfa.parentizeEffects = a.parentizeEffects;
-                rfa.data = a.data;
             } else {
                 rfa = new RepairFieldAbility(0, 500, 0);
             }
@@ -249,5 +285,15 @@ public class AbilityDialog extends BaseDialog {
         heavy += ProjectUtils.getHeavy("abilityBoost", findVal("abilityBoost"));
         heavy += ProjectUtils.getHeavy("abilityStatus", findVal("abilityStatus"));
         bulletHeavy = dialog == null ? 0 : dialog.heavyOut() * 30;
+    }
+
+    @Override
+    public Table get() {
+        return effect;
+    }
+
+    @Override
+    public void set(Table table) {
+        effect = table;
     }
 }

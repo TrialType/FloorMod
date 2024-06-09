@@ -214,7 +214,7 @@ public class ShootDialog extends BaseDialog {
                 ShootMulti sm = (ShootMulti) shoot;
                 createShootList(type, dia, "dest", () -> sm.dest, s -> sm.dest = s, () -> use.get(), heavy);
                 createShootDialog(type, dia, "source", getHeavy("number", getShootVal(sm.source)), () -> sm.source,
-                        s -> sm.source = s, use, heavy, heavyUp, this::rebuildType);
+                        s -> sm.source = s, use, heavy, heavyUp);
                 break;
             }
             case "helix": {

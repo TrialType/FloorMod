@@ -367,10 +367,7 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 WrapEffect wrapEffect = (WrapEffect) effect;
                 createNumberDialog(tty, dia, "rotation", wrapEffect.rotation,
                         f -> wrapEffect.rotation = f, ret);
-                if (!(wrapEffect.effect instanceof MultiEffect)) {
-                    wrapEffect.effect = new MultiEffect();
-                }
-                createEffectList(tty, this, dia, "effect", wrapEffect.effect);
+                createEffectList(tty, this, dia, "effect", () -> wrapEffect.effect, e -> wrapEffect.effect = e);
                 createColorDialog(tty, dia, "color", wrapEffect.color,
                         c -> wrapEffect.color = c, ret);
                 break;
@@ -386,10 +383,8 @@ public class EffectDialog extends BaseDialog implements EffectTableGetter {
                 tty.row();
                 createNumberDialog(tty, dia, "amount", radialEffect.amount,
                         f -> radialEffect.amount = (int) (f + 0), ret);
-                if (!(radialEffect.effect instanceof MultiEffect)) {
-                    radialEffect.effect = new MultiEffect();
-                }
-                createEffectList(tty, this, dia, "effect", radialEffect.effect);
+                createEffectList(tty, this, dia, "effect",
+                        () -> radialEffect.effect, e -> radialEffect.effect = e);
                 break;
             }
             case "particle": {

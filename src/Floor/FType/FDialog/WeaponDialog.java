@@ -5,7 +5,6 @@ import arc.Core;
 import arc.func.Boolp;
 import arc.func.Cons;
 import arc.scene.ui.layout.Table;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.type.Weapon;
@@ -190,12 +189,9 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
                 }).pad(5);
             }
         });
-        if (!(weapon.ejectEffect instanceof MultiEffect)) {
-            weapon.ejectEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "ejectEffect", weapon.ejectEffect);
+        createEffectList(baseOn, this, dia, "ejectEffect", () -> weapon.ejectEffect, e -> weapon.ejectEffect = e);
         createShootDialog(baseOn, dia, "shoot", getHeavy("number", getVal("number")), () -> weapon.shoot,
-                s -> weapon.shoot = s, () -> couldUse("number", getVal("number")), hevUser, this::updateHeavy, this::rebuildBase);
+                s -> weapon.shoot = s, () -> couldUse("number", getVal("number")), hevUser, this::updateHeavy);
         baseOn.row();
         createNumberDialog(baseOn, dia, "x", weapon.x, f -> weapon.x = f, reBase);
         createNumberDialog(baseOn, dia, "y", weapon.y, f -> weapon.y = f, reBase);
@@ -255,10 +251,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             PointDefenseWeapon p = (PointDefenseWeapon) weapon;
             createColorDialog(typeOn, dia, "color", p.color,
                     c -> p.color = c, reType);
-            if (!(p.beamEffect instanceof MultiEffect)) {
-                p.beamEffect = new MultiEffect();
-            }
-            createEffectList(typeOn, this, dia, "effect", p.beamEffect);
+            createEffectList(typeOn, this, dia, "effect", () -> p.beamEffect, e -> p.beamEffect = e);
         } else if (type.equals("repair")) {
             RepairBeamWeapon r = (RepairBeamWeapon) weapon;
             createBooleanDialog(typeOn, dia, "targetBuildings", r.targetBuildings,
@@ -284,10 +277,7 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
             typeOn.row();
             createNumberDialog(typeOn, dia, "widthSinScl", r.widthSinScl,
                     f -> r.widthSinScl = f, reType);
-            if (!(r.healEffect instanceof MultiEffect)) {
-                r.healEffect = new MultiEffect();
-            }
-            createEffectList(typeOn, this, dia, "healEffect", r.healEffect);
+            createEffectList(typeOn, this, dia, "healEffect", () -> r.healEffect, e -> r.healEffect = e);
             createColorDialog(typeOn, dia, "laserColor", r.laserColor,
                     c -> r.laserColor = c, reType);
             typeOn.row();

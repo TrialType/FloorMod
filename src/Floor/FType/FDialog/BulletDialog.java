@@ -7,7 +7,6 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Strings;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.ui.Styles;
@@ -210,18 +209,12 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         createLevDialog(baseOn, dia, "emp", "unitDamageScl", bullet.unitDamageScl,
                 f -> bullet.unitDamageScl = f, reb, this::updateHeavy, empUse, hevUser);
         baseOn.row();
-        if (!(bullet.hitPowerEffect instanceof MultiEffect)) {
-            bullet.hitPowerEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "hitPowerEffect", bullet.hitPowerEffect);
-        if (!(bullet.chainEffect instanceof MultiEffect)) {
-            bullet.chainEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "chainEffect", bullet.chainEffect);
-        if (!(bullet.applyEffect instanceof MultiEffect)) {
-            bullet.applyEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "applyEffect", bullet.applyEffect);
+        createEffectList(baseOn, this, dia, "hitPowerEffect",
+                () -> bullet.hitPowerEffect, e -> bullet.hitPowerEffect = e);
+        createEffectList(baseOn, this, dia, "chainEffect",
+                () -> bullet.chainEffect, e -> bullet.chainEffect = e);
+        createEffectList(baseOn, this, dia, "applyEffect",
+                () -> bullet.applyEffect, e -> bullet.applyEffect = e);
         baseOn.row();
         createBooleanDialog(baseOn, dia, "hitUnits", bullet.hitUnits, b -> bullet.hitUnits = b, this::rebuildBase);
         createNumberDialog(baseOn, dia, "lifetime", bullet.lifetime, f -> {
@@ -256,27 +249,17 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         baseOn.row();
         createBooleanDialog(baseOn, dia, "removeAfterPierce", bullet.removeAfterPierce,
                 b -> bullet.removeAfterPierce = b, reb);
-        if (!(bullet.shootEffect instanceof MultiEffect)) {
-            bullet.shootEffect = new MultiEffect();
-        }
-        if (!(bullet.despawnEffect instanceof MultiEffect)) {
-            bullet.despawnEffect = new MultiEffect();
-        }
-        if (!(bullet.hitEffect instanceof MultiEffect)) {
-            bullet.hitEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "shootEffect", bullet.shootEffect);
-        createEffectList(baseOn, this, dia, "despawnEffect", bullet.despawnEffect);
+        createEffectList(baseOn, this, dia, "shootEffect",
+                () -> bullet.shootEffect, e -> bullet.shootEffect = e);
+        createEffectList(baseOn, this, dia, "despawnEffect",
+                () -> bullet.despawnEffect, e -> bullet.despawnEffect = e);
         baseOn.row();
-        createEffectList(baseOn, this, dia, "hitEffect", bullet.hitEffect);
-        if (!(bullet.chargeEffect instanceof MultiEffect)) {
-            bullet.chargeEffect = new MultiEffect();
-        }
-        if (!(bullet.smokeEffect instanceof MultiEffect)) {
-            bullet.smokeEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "chargeEffect", bullet.chargeEffect);
-        createEffectList(baseOn, this, dia, "smokeEffect", bullet.smokeEffect);
+        createEffectList(baseOn, this, dia, "hitEffect",
+                () -> bullet.hitEffect, e -> bullet.hitEffect = e);
+        createEffectList(baseOn, this, dia, "chargeEffect",
+                () -> bullet.chargeEffect, e -> bullet.chargeEffect = e);
+        createEffectList(baseOn, this, dia, "smokeEffect",
+                () -> bullet.smokeEffect, e -> bullet.smokeEffect = e);
         baseOn.row();
         createSoundSelect(baseOn, dia, "hitSound", s -> bullet.hitSound = s);
         createNumberDialog(baseOn, dia, "hitSoundPitch", bullet.hitSoundPitch,
@@ -376,10 +359,8 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         baseOn.row();
         createColorDialog(baseOn, dia, "hitColor", bullet.hitColor, c -> bullet.hitColor = c, reb);
         createColorDialog(baseOn, dia, "healColor", bullet.healColor, c -> bullet.healColor = c, reb);
-        if (!(bullet.healEffect instanceof MultiEffect)) {
-            bullet.healEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "healEffect", bullet.healEffect);
+        createEffectList(baseOn, this, dia, "healEffect",
+                () -> bullet.healEffect, e -> bullet.healEffect = e);
         baseOn.row();
         createBooleanDialog(baseOn, dia, "trailRotation", bullet.trailRotation,
                 b -> bullet.trailRotation = b, reb);
@@ -406,10 +387,8 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         createNumberDialog(baseOn, dia, "trailSinScl", bullet.trailSinScl,
                 f -> bullet.trailSinScl = f, reb);
         baseOn.row();
-        if (!(bullet.trailEffect instanceof MultiEffect)) {
-            bullet.trailEffect = new MultiEffect();
-        }
-        createEffectList(baseOn, this, dia, "trailEffect", bullet.trailEffect);
+        createEffectList(baseOn, this, dia, "trailEffect",
+                () -> bullet.trailEffect, e -> bullet.trailEffect = e);
         createLevDialog(baseOn, dia, "splash", "splashDamageRadius", bullet.splashDamageRadius,
                 f -> bullet.splashDamageRadius = f, reb, this::updateHeavy, splashUse, hevUser);
         createNumberDialog(baseOn, dia, "homingPower", bullet.homingPower,
@@ -480,10 +459,8 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
             case "laser" -> {
                 createColorDialogList(typeOn, dia, "colors", bullet.colors,
                         c -> bullet.colors = c);
-                if (!(bullet.laserEffect instanceof MultiEffect)) {
-                    bullet.laserEffect = new MultiEffect();
-                }
-                createEffectList(typeOn, this, dia, "largeHit", bullet.laserEffect);
+                createEffectList(typeOn, this, dia, "laserEffect",
+                        () -> bullet.laserEffect, e -> bullet.laserEffect = e);
                 createBooleanDialog(typeOn, dia, "largeHit", bullet.largeHit,
                         b -> bullet.largeHit = b, ret);
                 typeOn.row();
@@ -613,23 +590,15 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                         f -> bullet.trailSpacing = f, ret);
             }
             case "rail" -> {
-                if (!(bullet.pierceEffect instanceof MultiEffect)) {
-                    bullet.pierceEffect = new MultiEffect();
-                }
-                createEffectList(typeOn, this, dia, "pierceEffect", bullet.pierceEffect);
-                if (!(bullet.pointEffect instanceof MultiEffect)) {
-                    bullet.pointEffect = new MultiEffect();
-                }
-                createEffectList(typeOn, this, dia, "pointEffect", bullet.pointEffect);
-                if (!(bullet.lineEffect instanceof MultiEffect)) {
-                    bullet.lineEffect = new MultiEffect();
-                }
-                createEffectList(typeOn, this, dia, "lineEffect", bullet.lineEffect);
+                createEffectList(typeOn, this, dia, "pierceEffect",
+                        () -> bullet.pierceEffect, e -> bullet.pierceEffect = e);
+                createEffectList(typeOn, this, dia, "pointEffect",
+                        () -> bullet.pointEffect, e -> bullet.pointEffect = e);
+                createEffectList(typeOn, this, dia, "lineEffect",
+                        () -> bullet.lineEffect, e -> bullet.lineEffect = e);
                 typeOn.row();
-                if (!(bullet.endEffect instanceof MultiEffect)) {
-                    bullet.endEffect = new MultiEffect();
-                }
-                createEffectList(typeOn, this, dia, "endEffect", bullet.endEffect);
+                createEffectList(typeOn, this, dia, "endEffect",
+                        () -> bullet.endEffect, e -> bullet.endEffect = e);
                 createLevDialog(typeOn, dia, "bulletBase", "railLength", bullet.railLength,
                         f -> bullet.railLength = f, ret, this::updateHeavy, baseUse, hevUser);
                 createNumberDialog(typeOn, dia, "pointEffectSpace", bullet.pointEffectSpace,
