@@ -181,7 +181,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                         () -> getBaseHeavy(true) <= freeSize);
                 createLevDialog(t, "unit", "boostReload", "reload", boost.reload,
                         f -> boost.reload = f, this::rebuildBase, () -> {
-                        }, () -> couldUse("boost", (60 / boost.reload)),
+                        }, () -> couldUse("boostReload", (60 / boost.reload)),
                         () -> getBaseHeavy(true) <= freeSize);
                 t.row();
                 createNumberDialog(t, "unit", "powerReload", boost.powerReload,

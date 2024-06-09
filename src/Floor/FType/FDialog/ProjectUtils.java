@@ -154,6 +154,24 @@ abstract class ProjectUtils {
             }
         }
 
+        //boost
+        maxLevel.put("boost", 0);
+        for (int i = allBoostBase.length; i > 0; i--) {
+            if (allBoostBase[i - 1].unlocked()) {
+                maxLevel.put("boost", i);
+                break;
+            }
+        }
+
+        //boostReload
+        maxLevel.put("boostReload", 0);
+        for (int i = allBoostReload.length; i > 0; i--) {
+            if (allBoostReload[i - 1].unlocked()) {
+                maxLevel.put("boostReload", i);
+                break;
+            }
+        }
+
         //bulletBase
         maxLevel.put("bulletBase", 0);
         for (int i = allBulletBase.length; i > 0; i--) {
