@@ -20,7 +20,14 @@ import static mindustry.Vars.ui;
 
 public class ProjectsLocated extends BaseDialog {
     public static ProjectsLocated projects;
-    public static StatusEffect heal, speed;
+    public static Cons<Unit> app;
+    public StatusEffect heal = new StatusEffect("floor-project-heal") {{
+        show = false;
+        permanent = true;
+    }}, speed = new StatusEffect("floor-project-speed") {{
+        show = false;
+        permanent = true;
+    }};
     public float healthBoost, SpeedBoost;
     public SprintingAbility boost;
     public final Seq<weaponPack> weapons = new Seq<>();
@@ -72,14 +79,6 @@ public class ProjectsLocated extends BaseDialog {
     private weaponPack pushW = null;
     private abilityPack pushA = null;
 
-    static {
-        heal = new StatusEffect("floor-project-heal");
-        speed = new StatusEffect("floor-project-speed");
-
-        heal.show = speed.show = false;
-        heal.permanent = speed.permanent = true;
-    }
-
     public ProjectsLocated(String title, int seed) {
         super(title);
 
@@ -89,6 +88,7 @@ public class ProjectsLocated extends BaseDialog {
         ProjectUtils.init();
 
         shown(this::rebuild);
+        hidden(() -> app = upper);
 
         buttons.button("@back", Icon.left, this::hide).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
@@ -109,6 +109,10 @@ public class ProjectsLocated extends BaseDialog {
                 rebuildAbility();
             }
         }).width(300);
+        buttons.button(Core.bundle.get("dialog.unit.base"), Icon.pencil, () -> {
+            BaseDialog bd = new BaseDialog("");
+
+        }).width(200);
     }
 
     public void rebuild() {

@@ -65,7 +65,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("repairField")) {
                             setAbility(new RepairFieldAbility(0, 500, 0));
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();
@@ -73,7 +73,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("suppressionField")) {
                             setAbility(new SuppressionFieldAbility());
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();
@@ -81,7 +81,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("regen1")) {
                             setAbility(new RegenAbility());
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();
@@ -89,7 +89,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("forceField")) {
                             setAbility(new ForceFieldAbility(0, 0, 0, 500));
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();
@@ -97,7 +97,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("shieldArc")) {
                             setAbility(new ShieldArcAbility());
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();
@@ -105,7 +105,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("armorPlate")) {
                             setAbility(new ArmorPlateAbility());
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();
@@ -113,7 +113,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
                         if (!aType.equals("moveLightning")) {
                             setAbility(new MoveLightningAbility(0, 0, 0, 0, 0, 0, new Color()));
                             updateHeavy();
-                            rebuildType();
+                            rebuild();
                         }
                         hide.run();
                     }).width(100).row();

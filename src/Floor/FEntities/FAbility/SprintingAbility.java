@@ -66,7 +66,7 @@ public class SprintingAbility extends Ability {
         if (!unit.isPlayer()) {
             stats = 0;
         } else if (stats == 0) {
-            if(mobile){
+            if (mobile) {
                 MobileInput input = (MobileInput) control.input;
                 lastZoom = input.lastZoom;
             }
@@ -248,8 +248,11 @@ public class SprintingAbility extends Ability {
                     powerTimer = 0;
                     timer = 0;
                     applyDamage(x, y, damage, unit);
-                    unit.x = (float) (x + cos(toRadians(unit.rotation)) * maxLength);
-                    unit.y = (float) (y + sin(toRadians(unit.rotation)) * maxLength);
+                    Vec2 mo = boostMove(unit.x, unit.y,
+                            (float) cos(toRadians(unit.rotation)) * maxLength,
+                            (float) sin(toRadians(unit.rotation)) * maxLength);
+                    unit.x = x + mo.x;
+                    unit.y = y + mo.y;
                 } else if (needPress && getting) {
                     needPress = false;
                 }
@@ -264,8 +267,11 @@ public class SprintingAbility extends Ability {
                             timer = 0;
                             float angle = Angles.angle(x, y, target.x(), target.y());
                             applyDamage(x, y, damage, unit);
-                            unit.x = x + (float) cos(toRadians(angle)) * maxLength;
-                            unit.y = y + (float) sin(toRadians(angle)) * maxLength;
+                            Vec2 mo = boostMove(unit.x, unit.y,
+                                    (float) cos(toRadians(angle)) * maxLength,
+                                    (float) sin(toRadians(angle)) * maxLength);
+                            unit.x = x + mo.x;
+                            unit.y = y + mo.y;
                         } else {
                             unit.lookAt(target);
                         }
@@ -275,6 +281,54 @@ public class SprintingAbility extends Ability {
                 } else {
                     maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                 }
+            }
+        }
+    }
+
+    protected Vec2 boostMove(float x, float y, float mx, float my) {
+        if (x + mx > world.width() * 8 || x + mx < 0) {
+            if (y + my > world.height() * 8 || y + my < 0) {
+                float mxx, mxy;
+                if (y + my > world.height() * 8) {
+                    if (x + mx > world.width() * 8) {
+                        mxx = mx + x - world.width() * 8;
+                    } else {
+                        mxx = mx + x;
+                    }
+                    mxy = my + y - world.height() * 8;
+                } else {
+                    if (x + mx > world.width() * 8) {
+                        mxx = mx + x - world.width() * 8;
+                    } else {
+                        mxx = mx + x;
+                    }
+                    mxy = my + y;
+                }
+                if (mxx / mx > mxy / my) {
+                    return new Vec2(mx * mxy / my, mxy);
+                } else {
+                    return new Vec2(mxx, my * mxx / mx);
+                }
+            } else {
+                float mxx;
+                if (x + mx > world.width() * 8) {
+                    mxx = x + mx - world.width() * 8;
+                } else {
+                    mxx = x + mx;
+                }
+                return new Vec2(mxx, my * mxx / mx);
+            }
+        } else {
+            if (y + my > world.height() * 8 || y + my < 0) {
+                float mxy;
+                if (y + my > world.height() * 8) {
+                    mxy = y + my - world.height() * 8;
+                } else {
+                    mxy = y + my;
+                }
+                return new Vec2(mx * mxy / my, mxy);
+            } else {
+                return new Vec2(mx, my);
             }
         }
     }
