@@ -335,7 +335,6 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             aType = "regen";
         } else if (ability instanceof ForceFieldAbility a) {
             this.ability = new ForceFieldAbility(a.radius, a.regen, a.max, a.cooldown, a.sides, a.rotation);
-            this.ability.data = a.data;
             aType = "forceField";
         } else if (ability instanceof ShieldArcAbility a) {
             ShieldArcAbility saa = new ShieldArcAbility();
@@ -355,6 +354,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
             aa.healthMultiplier = a.healthMultiplier;
             aa.color = a.color;
             aa.z = a.z;
+            this.ability = aa;
             aType = "armorPlate";
         } else if (ability instanceof MoveLightningAbility a) {
             MoveLightningAbility mla = new MoveLightningAbility(a.damage, a.length, a.chance, a.y, a.minSpeed, a.maxSpeed, a.color);
@@ -493,7 +493,7 @@ public class AbilityDialog extends BaseDialog implements EffectTableGetter {
         heavy += ProjectUtils.getHeavy("abilityPower", findVal("abilityPower"));
         heavy += ProjectUtils.getHeavy("abilityBoost", findVal("abilityBoost"));
         heavy += ProjectUtils.getHeavy("abilityStatus", findVal("abilityStatus"));
-        bulletHeavy = dialog == null ? 0 : dialog.heavyOut();
+        bulletHeavy = dialog == null ? 0 : dialog.heavyOut() * 30;
     }
 
     @Override
