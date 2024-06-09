@@ -24,11 +24,11 @@ import static java.lang.Math.toRadians;
 import static mindustry.Vars.*;
 
 public class SprintingAbility extends Ability {
-    public float damage = 1000;
-    public float maxLength = 200;
+    public float damage = 50;
+    public float maxLength = 150;
     public float reload = 180;
     public float powerReload = 60;
-    public Effect maxPowerEffect = new Effect(3, e -> {
+    public Effect powerEffect = new Effect(2, e -> {
         Place p = (Place) e.data;
         Unit u = p.unit;
         float f = p.fin;
@@ -44,6 +44,7 @@ public class SprintingAbility extends Ability {
         v1.trns(ro - 90, u.hitSize);
         Lines.line(x + v1.x, y + v1.y, x + v1.x + v2.x, y + v1.y + v2.y);
     });
+    public Effect maxPowerEffect = new Effect();
 
     protected float powerTimer = 0;
     protected float timer = 0;
@@ -206,13 +207,17 @@ public class SprintingAbility extends Ability {
 
         timer += Time.delta;
         if (timer >= reload) {
+            if (powerTimer >= powerReload) {
+                maxPowerEffect.at(unit.x, unit.y, unit.rotation, unit);
+            }
+
             float x = unit.x;
             float y = unit.y;
             if (unit.isPlayer() && stats != 0) {
                 boolean getting = Vars.mobile ? onSign() : Core.input.keyDown(KeyCode.altLeft);
 
                 if (!(!getting && powerTimer >= powerReload) && powerTimer > 0) {
-                    maxPowerEffect.at(x, y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
+                    powerEffect.at(x, y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                 }
 
                 if (getting) {
@@ -276,10 +281,10 @@ public class SprintingAbility extends Ability {
                             unit.lookAt(target);
                         }
                     } else {
-                        maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
+                        powerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                     }
                 } else {
-                    maxPowerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
+                    powerEffect.at(unit.x, unit.y, 0, new Place(unit, Math.min(1, powerTimer / powerReload)));
                 }
             }
         }

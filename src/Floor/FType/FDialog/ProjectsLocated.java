@@ -18,9 +18,10 @@ import mindustry.ui.dialogs.BaseDialog;
 import static Floor.FType.FDialog.ProjectUtils.*;
 import static mindustry.Vars.ui;
 
-public class ProjectsLocated extends BaseDialog {
+public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static ProjectsLocated projects;
     public static Cons<Unit> app;
+    public Table effect;
     public StatusEffect heal = new StatusEffect("floor-project-heal") {{
         show = false;
         permanent = true;
@@ -91,10 +92,13 @@ public class ProjectsLocated extends BaseDialog {
         shown(this::rebuild);
         hidden(() -> app = upper);
 
-        buttons.button("@back", Icon.left, this::hide).width(100);
-        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
+        buttons.button("@back", Icon.left, () -> {
+            read();
             hide();
+        }).width(100);
+        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             write();
+            hide();
         }).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
@@ -130,21 +134,76 @@ public class ProjectsLocated extends BaseDialog {
                     ui.showInfo(Core.bundle.get("@tooHeavy"));
                 }
             }).width(100);
-            bd.shown(() -> freeSize += (getHeavy("speed", speedD) + getHeavy("health", healD)));
-            bd.hidden(() -> freeSize -= (getHeavy("speed", speedD) + getHeavy("health", healD)));
+            bd.shown(() -> freeSize += getBaseHeavy(false));
+            bd.hidden(() -> freeSize -= getBaseHeavy(true));
             bd.show();
         }).width(200);
     }
 
     public void rebuildBase() {
-        createLevDialog(base, "unit", "health", "healBoost", healD, f -> healD = f, this::rebuildBase,
-                () -> {
-                }, () -> couldUse("health", healD),
-                () -> getHeavy("speed", speedD) + getHeavy("health", healD) <= freeSize);
-        createLevDialog(base, "unit", "speed", "speedBoost", speedD, f -> speedD = f, this::rebuildBase,
-                () -> {
-                }, () -> couldUse("speed", speedD),
-                () -> getHeavy("speed", speedD) + getHeavy("health", healD) <= freeSize);
+        base.clear();
+        base.table(t -> {
+            createLevDialog(t, "unit", "health", "healBoost", healD, f -> healD = f, this::rebuildBase,
+                    () -> {
+                    }, () -> couldUse("health", healD),
+                    () -> getBaseHeavy(true) <= freeSize);
+            createLevDialog(t, "unit", "speed", "speedBoost", speedD, f -> speedD = f, this::rebuildBase,
+                    () -> {
+                    }, () -> couldUse("speed", speedD),
+                    () -> getBaseHeavy(true) <= freeSize);
+        });
+
+        base.row();
+        base.table(t -> {
+            t.label(() -> Core.bundle.get("dialog.unit.boost")).left().width(150);
+            t.label(() -> Core.bundle.get("@heavyUse") + ": " + (boost == null ? 0 :
+                    getHeavy("boost", boost.damage + boost.maxLength) +
+                            getHeavy("boostReload", (60 / boost.reload)))).left().width(150);
+            if (boost == null) {
+                t.button(Icon.add, () -> {
+                    boost = new SprintingAbility();
+                    rebuildBase();
+                }).left().pad(5);
+                t.row();
+            } else {
+                t.button(Icon.trash, () -> {
+                    boost = null;
+                    rebuildBase();
+                }).pad(5);
+                t.row();
+                createLevDialog(t, "unit", "boost", "damage", boost.damage,
+                        f -> boost.damage = f, this::rebuildBase, () -> {
+                        }, () -> couldUse("boost", boost.damage + boost.maxLength),
+                        () -> getBaseHeavy(true) <= freeSize);
+                createLevDialog(t, "unit", "boost", "maxLength", boost.maxLength,
+                        f -> boost.maxLength = f, this::rebuildBase, () -> {
+                        }, () -> couldUse("boost", boost.damage + boost.maxLength),
+                        () -> getBaseHeavy(true) <= freeSize);
+                createLevDialog(t, "unit", "boostReload", "reload", boost.reload,
+                        f -> boost.reload = f, this::rebuildBase, () -> {
+                        }, () -> couldUse("boost", (60 / boost.reload)),
+                        () -> getBaseHeavy(true) <= freeSize);
+                t.row();
+                createNumberDialog(t, "unit", "powerReload", boost.powerReload,
+                        f -> boost.powerReload = f, this::rebuildBase);
+                createEffectList(t, this, "unit", "powerEffect",
+                        () -> boost.powerEffect, e -> boost.powerEffect = e);
+                createEffectList(t, this, "unit", "maxPowerEffect",
+                        () -> boost.maxPowerEffect, e -> boost.maxPowerEffect = e);
+            }
+        }).width(1350);
+    }
+
+    public float getBaseHeavy(boolean write) {
+        if (write) {
+            return getHeavy("speed", speedD) + getHeavy("health", healD) + (boost == null ? 0 :
+                    (getHeavy("boost", boost.damage + boost.maxLength) +
+                            getHeavy("boostReload", (60 / boost.reload))));
+        } else {
+            return getHeavy("speed", speedBoost) + getHeavy("health", healthBoost) + (boost == null ? 0 :
+                    (getHeavy("boost", boost.damage + boost.maxLength) +
+                            getHeavy("boostReload", (60 / boost.reload))));
+        }
     }
 
     public void rebuild() {
@@ -265,6 +324,8 @@ public class ProjectsLocated extends BaseDialog {
         }
         Core.settings.putJson("floor-project-weapons-" + seed, Seq.class, w);
         Core.settings.putJson("floor-project-abilities-" + seed, Seq.class, a);
+        Core.settings.put("floor-project-healthBoost-" + seed, healthBoost);
+        Core.settings.put("floor-project-speedBoost-" + seed, speedBoost);
     }
 
     public void read() {
@@ -276,6 +337,8 @@ public class ProjectsLocated extends BaseDialog {
         w = (Seq<Weapon>) Core.settings.getJson("floor-project-weapons-" + seed, Seq.class, Seq::new);
         //noinspection unchecked
         a = (Seq<Ability>) Core.settings.getJson("floor-project-abilities-" + seed, Seq.class, Seq::new);
+        healthBoost = Core.settings.getFloat("floor-project-healthBoost-" + seed, 1);
+        speedBoost = Core.settings.getFloat("floor-project-speedBoost-" + seed, 1);
         for (Weapon ww : w) {
             weapons.add(new weaponPack(ww));
         }
@@ -298,6 +361,16 @@ public class ProjectsLocated extends BaseDialog {
             heavy += ap.heavy;
         }
         return heavy;
+    }
+
+    @Override
+    public Table get() {
+        return effect;
+    }
+
+    @Override
+    public void set(Table table) {
+        effect = table;
     }
 
     public static class weaponPack {

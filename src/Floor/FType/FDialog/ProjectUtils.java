@@ -50,9 +50,13 @@ abstract class ProjectUtils {
         //base
         heavies.put("health", i -> i * 0.8f);
         heavies.put("speed", i -> i * 0.8f);
+        heavies.put("boost", i -> i * 0.8f);
+        heavies.put("boostReload", i -> i * 1.2f);
 
         levels.put("health", f -> f <= 1 ? 0 : f <= 1.2 ? 1 : f <= 1.5 ? 2 : f <= 1.9 ? 3 : f <= 2.5 ? 4 : f <= 3.2 ? 5 : 6);
         levels.put("speed", f -> f <= 1 ? 0 : f <= 1.2 ? 1 : f <= 1.5 ? 2 : f <= 1.8 ? 3 : f <= 2.1 ? 4 : f <= 2.5 ? 5 : 6);
+        levels.put("boost", f -> f <= 40 ? 0 : f <= 80 ? 1 : f <= 120 ? 2 : f <= 160 ? 3 : f <= 200 ? 4 : f <= 250 ? 5 : 6);
+        levels.put("boostReload", f -> f <= 0.1f ? 0 : f <= 0.2f ? 1 : f <= 0.3f ? 2 : f <= 0.4f ? 3 : f <= 0.5f ? 4 : f <= 0.6f ? 5 : 6);
         //bullet
         heavies.put("bulletBase", i -> i * 1f);
         heavies.put("splash", i -> i * 1.5f);
@@ -127,6 +131,8 @@ abstract class ProjectUtils {
         for (ProjectsLocated.abilityPack ap : projects.abilities) {
             freeSize -= ap.heavy;
         }
+        freeSize -= getHeavy("health", projects.healthBoost);
+        freeSize -= getHeavy("speed", projects.speedBoost);
     }
 
     public static void updateMaxLevel() {
@@ -379,7 +385,7 @@ abstract class ProjectUtils {
                     ui.showInfo(Core.bundle.get("@inputError"));
                 }
             })).size(55);
-        }).pad(10).width(250);
+        }).width(250);
     }
 
     public static void createPartsDialog(Table on, String dia, String tile, Seq<DrawPart> parts) {
