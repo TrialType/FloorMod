@@ -28,13 +28,14 @@ public class ProjectsLocated extends BaseDialog {
         show = false;
         permanent = true;
     }};
-    public float healthBoost, SpeedBoost;
+    public float healthBoost, speedBoost;
+    public float healD, speedD;
     public SprintingAbility boost;
     public final Seq<weaponPack> weapons = new Seq<>();
     public final Seq<abilityPack> abilities = new Seq<>();
     public Cons<Unit> upper = u -> {
         heal.healthMultiplier = healthBoost;
-        speed.speedMultiplier = SpeedBoost;
+        speed.speedMultiplier = speedBoost;
         u.apply(heal);
         u.apply(speed);
         Seq<Weapon> we = new Seq<>();
@@ -74,7 +75,7 @@ public class ProjectsLocated extends BaseDialog {
     };
 
     protected int seed;
-    protected Table located, LWeapon, LAbility;
+    protected Table located, LWeapon, LAbility, base;
 
     private weaponPack pushW = null;
     private abilityPack pushA = null;
@@ -101,18 +102,49 @@ public class ProjectsLocated extends BaseDialog {
                 freeSize -= 0.5f;
                 rebuildWeapon();
             }
-        }).width(300);
+        }).width(250);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
                 abilities.add(new abilityPack());
                 freeSize -= 0.5f;
                 rebuildAbility();
             }
-        }).width(300);
+        }).width(250);
         buttons.button(Core.bundle.get("dialog.unit.base"), Icon.pencil, () -> {
             BaseDialog bd = new BaseDialog("");
+            healD = healthBoost;
+            speedD = speedBoost;
+            bd.cont.pane(t -> {
+                base = t;
+                bd.setBackground(Tex.buttonEdge1);
+                rebuildBase();
+            });
 
+            bd.buttons.button("@back", Icon.left, bd::hide).width(100);
+            bd.buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
+                if ((getHeavy("speed", speedD) + getHeavy("health", healD)) <= freeSize) {
+                    healthBoost = healD;
+                    speedBoost = speedD;
+                    bd.hide();
+                } else {
+                    ui.showInfo(Core.bundle.get("@tooHeavy"));
+                }
+            }).width(100);
+            bd.shown(() -> freeSize += (getHeavy("speed", speedD) + getHeavy("health", healD)));
+            bd.hidden(() -> freeSize -= (getHeavy("speed", speedD) + getHeavy("health", healD)));
+            bd.show();
         }).width(200);
+    }
+
+    public void rebuildBase() {
+        createLevDialog(base, "unit", "health", "healBoost", healD, f -> healD = f, this::rebuildBase,
+                () -> {
+                }, () -> couldUse("health", healD),
+                () -> getHeavy("speed", speedD) + getHeavy("health", healD) <= freeSize);
+        createLevDialog(base, "unit", "speed", "speedBoost", speedD, f -> speedD = f, this::rebuildBase,
+                () -> {
+                }, () -> couldUse("speed", speedD),
+                () -> getHeavy("speed", speedD) + getHeavy("health", healD) <= freeSize);
     }
 
     public void rebuild() {

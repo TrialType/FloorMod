@@ -47,6 +47,12 @@ abstract class ProjectUtils {
 
         levels.put("none", f -> 0);
 
+        //base
+        heavies.put("health", i -> i * 0.8f);
+        heavies.put("speed", i -> i * 0.8f);
+
+        levels.put("health", f -> f <= 1 ? 0 : f <= 1.2 ? 1 : f <= 1.5 ? 2 : f <= 1.9 ? 3 : f <= 2.5 ? 4 : f <= 3.2 ? 5 : 6);
+        levels.put("speed", f -> f <= 1 ? 0 : f <= 1.2 ? 1 : f <= 1.5 ? 2 : f <= 1.8 ? 3 : f <= 2.1 ? 4 : f <= 2.5 ? 5 : 6);
         //bullet
         heavies.put("bulletBase", i -> i * 1f);
         heavies.put("splash", i -> i * 1.5f);
@@ -124,6 +130,24 @@ abstract class ProjectUtils {
     }
 
     public static void updateMaxLevel() {
+        //health
+        maxLevel.put("health", 0);
+        for (int i = allHealth.length; i > 0; i--) {
+            if (allHealth[i - 1].unlocked()) {
+                maxLevel.put("health", i);
+                break;
+            }
+        }
+
+        //speed
+        maxLevel.put("speed", 0);
+        for (int i = allSpeed.length; i > 0; i--) {
+            if (allSpeed[i - 1].unlocked()) {
+                maxLevel.put("speed", i);
+                break;
+            }
+        }
+
         //bulletBase
         maxLevel.put("bulletBase", 0);
         for (int i = allBulletBase.length; i > 0; i--) {
