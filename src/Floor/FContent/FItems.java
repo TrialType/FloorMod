@@ -21,10 +21,14 @@ public class FItems {
             targetIntervalProject1, targetIntervalProject2, targetIntervalProject3, targetIntervalProject4, targetIntervalProject5,
             bulletNumberProject1, bulletNumberProject2, bulletNumberProject3, bulletNumberProject4, bulletNumberProject5,
             suppressionProject1, suppressionProject2, suppressionProject3, suppressionProject4, suppressionProject5,
-            puddlesProject1, puddlesProject2, puddlesProject3, puddlesProject4, puddlesProject5;
+            puddlesProject1, puddlesProject2, puddlesProject3, puddlesProject4, puddlesProject5,
+            powerProject1, powerProject2, powerProject3, powerProject4, powerProject5,
+            boostProject1, boostProject2, boostProject3, boostProject4, boostProject5,
+            statusProject1, statusProject2, statusProject3, statusProject4, statusProject5;
     public static Item[] allSize, allSpeed, allHealth, allBulletBase, allReload,
             allShield, allSplash, allKnock, allPercent, allTargetInterval,
-            allLightning, allEmp, allFrag, allBulletNumber, allSuppression, allPuddles;
+            allLightning, allEmp, allFrag, allBulletNumber, allSuppression,
+            allPuddles, allPower, allBoost, allStatus;
     public static Item[][] allBullet, allAbility, allBase, allWeapon;
 
     public static void load() {
@@ -409,6 +413,66 @@ public class FItems {
             hidden = true;
             buildable = false;
         }};
+        powerProject1 = new Item("power-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        powerProject2 = new Item("power-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        powerProject3 = new Item("power-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        powerProject4 = new Item("power-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        powerProject5 = new Item("power-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        boostProject1 = new Item("boost-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        boostProject2 = new Item("boost-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        boostProject3 = new Item("boost-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        boostProject4 = new Item("boost-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        boostProject5 = new Item("boost-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
+        statusProject1 = new Item("status-project1") {{
+            hidden = true;
+            buildable = false;
+        }};
+        statusProject2 = new Item("status-project2") {{
+            hidden = true;
+            buildable = false;
+        }};
+        statusProject3 = new Item("status-project3") {{
+            hidden = true;
+            buildable = false;
+        }};
+        statusProject4 = new Item("status-project4") {{
+            hidden = true;
+            buildable = false;
+        }};
+        statusProject5 = new Item("status-project5") {{
+            hidden = true;
+            buildable = false;
+        }};
 
         //base
         allSize = new Item[]{
@@ -452,9 +516,9 @@ public class FItems {
         };
 
         //ability
-        allShield = new Item[]{
-                shieldProject1, shieldProject2, shieldProject3, shieldProject4, shieldProject5
-        };
+        allPower = new Item[]{powerProject1, powerProject2, powerProject3, powerProject4, powerProject5};
+        allBoost = new Item[]{boostProject1, boostProject2, boostProject3, boostProject4, boostProject5};
+        allStatus = new Item[]{statusProject1, statusProject2, statusProject3, statusProject4, statusProject5};
 
         //weapon
         allReload = new Item[]{
@@ -469,7 +533,7 @@ public class FItems {
 
         allBullet = new Item[][]{allBulletBase, allSplash, allKnock, allPercent, allLightning, allEmp, allFrag, allSuppression, allPuddles};
         allWeapon = new Item[][]{allReload, allTargetInterval, allBulletNumber};
-        allAbility = new Item[][]{allShield};
+        allAbility = new Item[][]{allPower, allBoost, allStatus};
         allBase = new Item[][]{allSize, allHealth, allSpeed};
 
         sizeProject10.alwaysUnlocked = true;
@@ -486,5 +550,8 @@ public class FItems {
         bulletNumberProject5.alwaysUnlocked = true;
         suppressionProject5.alwaysUnlocked = true;
         puddlesProject5.alwaysUnlocked = true;
+        powerProject5.alwaysUnlocked = true;
+        boostProject5.alwaysUnlocked = true;
+        statusProject5.alwaysUnlocked = true;
     }
 }

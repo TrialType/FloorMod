@@ -77,6 +77,15 @@ abstract class ProjectUtils {
         levels.put("reload", f -> f >= 150 ? 0 : f >= 120 ? 1 : f >= 90 ? 2 : f >= 60 ? 3 : f >= 30 ? 4 : f >= 15 ? 5 : 6);
         levels.put("target", f -> f >= 60 ? 0 : f >= 50 ? 1 : f >= 40 ? 2 : f >= 30 ? 3 : f >= 20 ? 4 : f >= 10 ? 5 : 6);
 
+        //ability
+        heavies.put("abilityPower", i -> i * 2);
+        heavies.put("abilityBoost", i -> i * 1.5f);
+        heavies.put("abilityStatus", i -> i * 1.5f);
+
+        levels.put("abilityPower", f -> f <= 0.5 ? 0 : f <= 1 ? 1 : f <= 1.5 ? 2 : f <= 2 ? 3 : f <= 3.5 ? 4 : f <= 5 ? 5 : 6);
+        levels.put("abilityBoost", f -> f <= 4 ? 0 : f <= 8 ? 1 : f <= 12 ? 2 : f <= 16 ? 3 : f <= 20 ? 4 : f <= 26 ? 5 : 6);
+        levels.put("abilityStatus", f -> f <= 10 ? 0 : f <= 30 ? 1 : f <= 50 ? 2 : f <= 70 ? 3 : f <= 90 ? 4 : f <= 120 ? 5 : 6);
+
         updateMaxLevel();
         updateHeavy();
     }
@@ -201,6 +210,51 @@ abstract class ProjectUtils {
         for (int i = allTargetInterval.length; i > 0; i--) {
             if (allTargetInterval[i - 1].unlocked()) {
                 maxLevel.put("target", i);
+                break;
+            }
+        }
+
+        //suppression
+        maxLevel.put("suppression", 0);
+        for (int i = allSuppression.length; i > 0; i--) {
+            if (allSuppression[i - 1].unlocked()) {
+                maxLevel.put("suppression", i);
+                break;
+            }
+        }
+
+        //puddles
+        maxLevel.put("puddles", 0);
+        for (int i = allPuddles.length; i > 0; i--) {
+            if (allPuddles[i - 1].unlocked()) {
+                maxLevel.put("puddles", i);
+                break;
+            }
+        }
+
+        //abilityPower
+        maxLevel.put("abilityPower", 0);
+        for (int i = allPower.length; i > 0; i--) {
+            if (allPower[i - 1].unlocked()) {
+                maxLevel.put("abilityPower", i);
+                break;
+            }
+        }
+
+        //abilityBoost
+        maxLevel.put("abilityBoost", 0);
+        for (int i = allBoost.length; i > 0; i--) {
+            if (allBoost[i - 1].unlocked()) {
+                maxLevel.put("abilityBoost", i);
+                break;
+            }
+        }
+
+        //abilityStatus
+        maxLevel.put("abilityStatus", 0);
+        for (int i = allStatus.length; i > 0; i--) {
+            if (allStatus[i - 1].unlocked()) {
+                maxLevel.put("abilityStatus", i);
                 break;
             }
         }
