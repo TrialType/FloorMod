@@ -105,16 +105,18 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
-                weapons.add(new weaponPack());
-                freeSize -= 0.5f;
+                weaponPack w = new weaponPack();
+                weapons.add(w);
+                freeSize -= w.heavy;
                 rebuildWeapon();
                 rebuildLocated();
             }
         }).width(200);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
-                abilities.add(new abilityPack());
-                freeSize -= 0.5f;
+                abilityPack a = new abilityPack();
+                abilities.add(a);
+                freeSize -= a.heavy;
                 rebuildAbility();
                 rebuildLocated();
             }
@@ -259,27 +261,31 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             if (wp.on == null) {
                 Table t = new Table();
                 t.setSize(210, 40);
+
+                t.update(() -> {
+                    t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
+                    t.setPosition(8 * wp.weapon.x + located.x + located.getWidth() / 2,
+                            8 * wp.weapon.y + located.y + located.getHeight() / 2);
+
+//                    t.keepInStage();
+//                    t.invalidateHierarchy();
+                    t.pack();
+                });
+
+                Core.scene.add(t);
+
                 t.top().pane(w -> {
                     w.top();
                     w.setSize(200, 30);
 
                     w.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI);
                 }).top();
-                t.update(() -> {
-                    t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
-                    t.setPosition(8 * wp.weapon.x + located.x + located.getWidth() / 2,
-                            8 * wp.weapon.y + located.y + located.getHeight() / 2);
 
-                    t.keepInStage();
-                    t.invalidateHierarchy();
-                    t.pack();
-                });
-                Core.scene.add(t);
-                t.actions(Actions.alpha(0), Actions.fadeIn(0));
+                t.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
+
                 t.pack();
                 wp.on = t;
             }
-
         }
     }
 
@@ -313,8 +319,8 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                     freeSize += wp.heavy;
                     weapons.remove(finalI);
                     if (wp.on != null) {
-                        wp.on.actions(Actions.fadeOut(0), Actions.remove());
                         Core.app.post(wp.on::remove);
+                        wp.on.actions(Actions.fadeOut(0.001f), Actions.remove());
                     }
                     pushW = pushW == wp ? null : pushW;
                     rebuildLocated();
