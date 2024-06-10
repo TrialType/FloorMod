@@ -15,6 +15,7 @@ import arc.util.Strings;
 import arc.util.Tmp;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
+import mindustry.core.GameState;
 import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.DrawPart;
@@ -32,10 +33,10 @@ import java.util.HashMap;
 import static Floor.FContent.FItems.*;
 import static Floor.FContent.FItems.allTargetInterval;
 import static Floor.FType.FDialog.ProjectsLocated.projects;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
-abstract class ProjectUtils {
-    public static Table colorList;
+public abstract class ProjectUtils {
+    public static Table colorList, door;
     public static float maxSize = 0;
     public static float freeSize = 0;
     public static final HashMap<String, heavyGetter> heavies = new HashMap<>();
@@ -43,6 +44,26 @@ abstract class ProjectUtils {
     public static final HashMap<String, Integer> maxLevel = new HashMap<>();
 
     public static void init() {
+        door = new Table();
+        door.button(Icon.units, () -> {
+            if (projects == null) {
+                projects = new ProjectsLocated("");
+            }
+            projects.init(player.unit());
+            if (!net.client()) {
+                state.set(GameState.State.paused);
+            }
+            projects.show();
+        }).width(100);
+        door.update(() -> {
+            if (state.isGame() && player.unit().spawnedByCore()) {
+                door.actions(Actions.fadeIn(1));
+            } else {
+                door.actions(Actions.fadeOut(0.0001f));
+            }
+        });
+        Core.scene.add(door);
+
         heavies.put("none", i -> 0);
 
         levels.put("none", f -> 0);
@@ -125,14 +146,16 @@ abstract class ProjectUtils {
             }
         }
         freeSize = maxSize;
-        for (ProjectsLocated.weaponPack wp : projects.weapons) {
-            freeSize -= wp.heavy;
+        if (projects != null) {
+            for (ProjectsLocated.weaponPack wp : projects.weapons) {
+                freeSize -= wp.heavy;
+            }
+            for (ProjectsLocated.abilityPack ap : projects.abilities) {
+                freeSize -= ap.heavy;
+            }
+            freeSize -= getHeavy("health", projects.healthBoost);
+            freeSize -= getHeavy("speed", projects.speedBoost);
         }
-        for (ProjectsLocated.abilityPack ap : projects.abilities) {
-            freeSize -= ap.heavy;
-        }
-        freeSize -= getHeavy("health", projects.healthBoost);
-        freeSize -= getHeavy("speed", projects.speedBoost);
     }
 
     public static void updateMaxLevel() {

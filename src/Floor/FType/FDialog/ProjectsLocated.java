@@ -17,12 +17,13 @@ import mindustry.type.Weapon;
 import mindustry.ui.dialogs.BaseDialog;
 
 import static Floor.FType.FDialog.ProjectUtils.*;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static ProjectsLocated projects;
     public static Cons<Unit> app = u -> {
     };
+    public static boolean applied = false;
     public Table effect;
     public StatusEffect heal = new StatusEffect("floor-project-heal") {{
         show = false;
@@ -77,32 +78,35 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
     };
 
-    protected int seed;
+    protected Unit seed;
     protected Table located, LWeapon, LAbility, base;
 
     private weaponPack pushW = null;
     private abilityPack pushA = null;
 
-    public ProjectsLocated(String title, int seed) {
+    public ProjectsLocated(String title) {
         super(title);
 
         projects = this;
 
-        init(seed);
-        ProjectUtils.init();
-
         shown(this::rebuild);
-        hidden(() -> app = upper);
+        hidden(() -> {
+            app = upper;
+            applied = false;
+        });
         hidden(this::removeTables);
 
+        update(() -> {
+            if (state.isGame() && player.unit().spawnedByCore() && (!applied || !player.unit().hasEffect(heal))) {
+                app.get(player.unit());
+            }
+        });
+
         buttons.button("@back", Icon.left, () -> {
-            read();
+            set();
             hide();
         }).width(100);
-        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
-            write();
-            hide();
-        }).width(100);
+        buttons.button(Core.bundle.get("@apply"), Icon.right, this::hide).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
                 weaponPack w = new weaponPack();
@@ -342,7 +346,6 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 Core.scene.add(t);
 
                 t.top().pane(w -> {
-                    w.top();
                     w.setSize(200, 30);
 
                     w.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI);
@@ -397,43 +400,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
     }
 
-    public void init(int seed) {
-        this.seed = seed;
-        read();
-    }
-
-    public void write() {
-        Seq<Weapon> w = new Seq<>();
-        Seq<Ability> a = new Seq<>();
-        for (weaponPack p : weapons) {
-            w.add(p.weapon);
-        }
-        for (abilityPack p : abilities) {
-            a.add(p.ability);
-        }
-        Core.settings.putJson("floor-project-weapons-" + seed, Seq.class, w);
-        Core.settings.putJson("floor-project-abilities-" + seed, Seq.class, a);
-        Core.settings.put("floor-project-healthBoost-" + seed, healthBoost);
-        Core.settings.put("floor-project-speedBoost-" + seed, speedBoost);
-    }
-
-    public void read() {
-        weapons.clear();
-        abilities.clear();
-        Seq<Weapon> w;
-        Seq<Ability> a;
-        //noinspection unchecked
-        w = (Seq<Weapon>) Core.settings.getJson("floor-project-weapons-" + seed, Seq.class, Seq::new);
-        //noinspection unchecked
-        a = (Seq<Ability>) Core.settings.getJson("floor-project-abilities-" + seed, Seq.class, Seq::new);
-        healthBoost = Core.settings.getFloat("floor-project-healthBoost-" + seed, 1);
-        speedBoost = Core.settings.getFloat("floor-project-speedBoost-" + seed, 1);
-        for (Weapon ww : w) {
-            weapons.add(new weaponPack(ww));
-        }
-        for (Ability ab : a) {
-            abilities.add(new abilityPack(ab));
-        }
+    public void init(Unit unit) {
+        this.seed = unit;
+        set();
+        updateTable();
     }
 
     public float getWeaponHeavy() {
@@ -450,6 +420,23 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             heavy += ap.heavy;
         }
         return heavy;
+    }
+
+    public void set() {
+        if (seed != null) {
+            if (seed.hasEffect(heal)) {
+                healthBoost = heal.healthMultiplier;
+                speedBoost = speed.speedMultiplier;
+                WeaponMount[] mounts = seed.mounts;
+                for (int i = seed.type.weapons.size; i < mounts.length; i++) {
+                    weapons.add(new weaponPack(mounts[i].weapon));
+                }
+                Ability[] a = seed.abilities;
+                for (int i = seed.type.abilities.size; i < a.length; i++) {
+                    abilities.add(new abilityPack(a[i]));
+                }
+            }
+        }
     }
 
     @Override
