@@ -20,7 +20,8 @@ import static mindustry.Vars.ui;
 
 public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static ProjectsLocated projects;
-    public static Cons<Unit> app;
+    public static Cons<Unit> app = u -> {
+    };
     public Table effect;
     public StatusEffect heal = new StatusEffect("floor-project-heal") {{
         show = false;
@@ -106,14 +107,14 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 freeSize -= 0.5f;
                 rebuildWeapon();
             }
-        }).width(250);
+        }).width(200);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
                 abilities.add(new abilityPack());
                 freeSize -= 0.5f;
                 rebuildAbility();
             }
-        }).width(250);
+        }).width(200);
         buttons.button(Core.bundle.get("dialog.unit.base"), Icon.pencil, () -> {
             BaseDialog bd = new BaseDialog("");
             healD = healthBoost;
