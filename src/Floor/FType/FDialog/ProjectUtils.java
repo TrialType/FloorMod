@@ -2363,6 +2363,15 @@ abstract class ProjectUtils {
         on.label(() -> Core.bundle.get("dialog." + dia + "." + name)).center().width(35).pad(5);
     }
 
+    public static void createLevLine(Table on, String tile, float heavy) {
+        on.table(t -> {
+            t.setBackground(Tex.underline2);
+
+            t.label(() -> Core.bundle.get("dialog." + tile)).width(100);
+            t.label(() -> Core.bundle.get("@heavyUse") + ": " + heavy);
+        }).left().fillX();
+    }
+
     public static float getShootVal(ShootPattern shoot) {
         float val = 0;
         if (shoot instanceof ShootMulti sm) {
