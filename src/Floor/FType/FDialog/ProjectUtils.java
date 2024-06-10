@@ -45,16 +45,17 @@ public abstract class ProjectUtils {
 
     public static void init() {
         door = new Table();
+        door.setBounds(200, 200, 50, 30);
         door.button(Icon.units, () -> {
             if (projects == null) {
-                projects = new ProjectsLocated("");
+                new ProjectsLocated("");
             }
             projects.init(player.unit());
             if (!net.client()) {
                 state.set(GameState.State.paused);
             }
             projects.show();
-        }).width(100);
+        }).width(50);
         door.update(() -> {
             if (state.isGame() && player.unit().spawnedByCore()) {
                 door.actions(Actions.fadeIn(1));
@@ -63,6 +64,7 @@ public abstract class ProjectUtils {
             }
         });
         Core.scene.add(door);
+        door.actions(Actions.fadeIn(0.0001f));
 
         heavies.put("none", i -> 0);
 

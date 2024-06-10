@@ -24,27 +24,28 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static Cons<Unit> app = u -> {
     };
     public static boolean applied = false;
-    public Table effect;
-    public StatusEffect heal = new StatusEffect("floor-project-heal") {{
-        show = false;
-        permanent = true;
-    }}, speed = new StatusEffect("floor-project-speed") {{
+    public static StatusEffect eff = new StatusEffect("floor-project-eff") {{
         show = false;
         permanent = true;
     }};
+    public Table effect;
     public float healthBoost, speedBoost;
     public float healD, speedD;
     public SprintingAbility boost;
     public final Seq<weaponPack> weapons = new Seq<>();
     public final Seq<abilityPack> abilities = new Seq<>();
     public Cons<Unit> upper = u -> {
-        heal.healthMultiplier = healthBoost;
-        speed.speedMultiplier = speedBoost;
-        u.apply(heal);
-        u.apply(speed);
+        eff.healthMultiplier = healthBoost;
+        eff.speedMultiplier = speedBoost;
+        eff.load();
+        u.apply(eff);
         Seq<Weapon> we = new Seq<>();
         Seq<Ability> ab = new Seq<>();
         for (weaponPack wp : weapons) {
+            wp.weapon.load();
+            wp.weapon.init();
+            wp.weapon.bullet.load();
+            wp.weapon.bullet.init();
             we.add(wp.weapon);
         }
         for (abilityPack ap : abilities) {
@@ -90,6 +91,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         projects = this;
 
         shown(this::rebuild);
+
         hidden(() -> {
             app = upper;
             applied = false;
@@ -97,7 +99,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         hidden(this::removeTables);
 
         update(() -> {
-            if (state.isGame() && player.unit().spawnedByCore() && (!applied || !player.unit().hasEffect(heal))) {
+            if (state.isGame() && player.unit().spawnedByCore() && (!applied || !player.unit().hasEffect(eff))) {
                 app.get(player.unit());
             }
         });
@@ -424,9 +426,9 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
     public void set() {
         if (seed != null) {
-            if (seed.hasEffect(heal)) {
-                healthBoost = heal.healthMultiplier;
-                speedBoost = speed.speedMultiplier;
+            if (seed.hasEffect(eff)) {
+                healthBoost = eff.healthMultiplier;
+                speedBoost = eff.speedMultiplier;
                 WeaponMount[] mounts = seed.mounts;
                 for (int i = seed.type.weapons.size; i < mounts.length; i++) {
                     weapons.add(new weaponPack(mounts[i].weapon));
