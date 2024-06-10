@@ -1,11 +1,13 @@
 package Floor.FType.FDialog;
 
+import Floor.FContent.FStatusEffects;
 import Floor.FEntities.FAbility.SprintingAbility;
 import arc.Core;
 import arc.func.Cons;
 import arc.scene.actions.Actions;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import mindustry.core.GameState;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.ForceFieldAbility;
 import mindustry.entities.units.WeaponMount;
@@ -24,7 +26,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static Cons<Unit> app = u -> {
     };
     public static boolean applied = false;
-    public static StatusEffect eff = new StatusEffect("floor-project-eff") {{
+    public static StatusEffect eff = new StatusEffect("eff") {{
         show = false;
         permanent = true;
     }};
@@ -35,10 +37,9 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public final Seq<weaponPack> weapons = new Seq<>();
     public final Seq<abilityPack> abilities = new Seq<>();
     public Cons<Unit> upper = u -> {
-        eff.healthMultiplier = healthBoost;
-        eff.speedMultiplier = speedBoost;
-        eff.load();
-        u.apply(eff);
+        eff.healthMultiplier = Math.max(1, healthBoost);
+        eff.speedMultiplier = Math.max(1, speedBoost);
+        u.apply(FStatusEffects.pureT);
         Seq<Weapon> we = new Seq<>();
         Seq<Ability> ab = new Seq<>();
         for (weaponPack wp : weapons) {
@@ -100,15 +101,20 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
         update(() -> {
             if (state.isGame() && player.unit().spawnedByCore() && (!applied || !player.unit().hasEffect(eff))) {
+                applied = true;
                 app.get(player.unit());
             }
         });
 
         buttons.button("@back", Icon.left, () -> {
+            state.set(GameState.State.playing);
             set();
             hide();
         }).width(100);
-        buttons.button(Core.bundle.get("@apply"), Icon.right, this::hide).width(100);
+        buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
+            state.set(GameState.State.playing);
+            hide();
+        }).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
             if (freeSize >= 0.5f) {
                 weaponPack w = new weaponPack();
@@ -140,8 +146,8 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             bd.buttons.button("@back", Icon.left, bd::hide).width(100);
             bd.buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
                 if ((getHeavy("speed", speedD) + getHeavy("health", healD)) <= freeSize) {
-                    healthBoost = healD;
-                    speedBoost = speedD;
+                    healthBoost = Math.max(1, healD);
+                    speedBoost = Math.max(1, speedD);
                     bd.hide();
                 } else {
                     ui.showInfo(Core.bundle.get("@tooHeavy"));
@@ -158,11 +164,13 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public void rebuildBase() {
         base.clear();
         base.table(t -> {
-            createLevDialog(t, "unit", "health", "healBoost", healD, f -> healD = f, this::rebuildBase,
+            createLevDialog(t, "unit", "health", "healBoost", healD,
+                    f -> healD = Math.max(1, f), this::rebuildBase,
                     () -> {
                     }, () -> couldUse("health", healD),
                     () -> getBaseHeavy(true) <= freeSize);
-            createLevDialog(t, "unit", "speed", "speedBoost", speedD, f -> speedD = f, this::rebuildBase,
+            createLevDialog(t, "unit", "speed", "speedBoost", speedD,
+                    f -> speedD = Math.max(1, f), this::rebuildBase,
                     () -> {
                     }, () -> couldUse("speed", speedD),
                     () -> getBaseHeavy(true) <= freeSize);
