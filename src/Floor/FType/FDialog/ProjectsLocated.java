@@ -255,6 +255,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         for (int i = 0; i < weapons.size; i++) {
             int finalI = i;
             weaponPack wp = weapons.get(finalI);
+
             if (wp.on == null) {
                 Table t = new Table();
                 t.setSize(210, 40);
@@ -263,11 +264,11 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                     w.setSize(200, 30);
 
                     w.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI);
-                });
+                }).top();
                 t.update(() -> {
                     t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
-                    t.setPosition(wp.weapon.x + located.x + located.getWidth() / 2,
-                            wp.weapon.y + located.y + located.getHeight() / 2);
+                    t.setPosition(8 * wp.weapon.x + located.x + located.getWidth() / 2,
+                            8 * wp.weapon.y + located.y + located.getHeight() / 2);
 
                     t.keepInStage();
                     t.invalidateHierarchy();
@@ -278,6 +279,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 t.pack();
                 wp.on = t;
             }
+
         }
     }
 
@@ -311,7 +313,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                     freeSize += wp.heavy;
                     weapons.remove(finalI);
                     if (wp.on != null) {
-                        wp.on.actions(Actions.remove());
+                        wp.on.actions(Actions.fadeOut(0), Actions.remove());
                         Core.app.post(wp.on::remove);
                     }
                     pushW = pushW == wp ? null : pushW;
