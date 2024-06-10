@@ -212,7 +212,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         cont.pane(t -> {
             t.setBackground(Tex.buttonEdge1);
             located = t;
-        }).width(1000).height(1000);
+        }).width(800).height(800);
         cont.pane(t -> {
             t.table(w -> {
                 w.setBackground(Tex.buttonEdge1);
@@ -239,12 +239,13 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             int finalI = i;
             weaponPack wp = weapons.get(finalI);
             located.table(t -> {
-                t.setPosition(wp.weapon.x + 450, wp.weapon.y + 485);
+                t.setPosition(wp.weapon.x + 400, wp.weapon.y + 485);
                 t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
 
                 t.label(() -> Core.bundle.get("dialog.weapon.index") + ": ");
                 t.label(() -> Core.bundle.get("dialog.weapon.index") + finalI).pad(5);
-            }).width(100).height(30);
+                t.layout();
+            }).width(200).height(30);
         }
     }
 
@@ -388,7 +389,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         effect = table;
     }
 
-    public static class weaponPack {
+    public class weaponPack {
         public Weapon weapon;
         public WeaponDialog dialog;
         public float heavy;
@@ -398,17 +399,19 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             weapon.reload = 500;
             weapon.targetSwitchInterval = weapon.targetInterval = 500;
             dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
+            dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = 0.5f + dialog.bulletHeavy;
         }
 
         public weaponPack(Weapon weapon) {
             this.weapon = weapon;
             dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
+            dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy + getShootVal(weapon.shoot) * dialog.bulletHeavy;
         }
     }
 
-    public static class abilityPack {
+    public class abilityPack {
         public Ability ability;
         public AbilityDialog dialog;
         public float heavy;
@@ -416,12 +419,14 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public abilityPack() {
             ability = new ForceFieldAbility(90, 0, 0, Float.MAX_VALUE, 0, 0);
             dialog = new AbilityDialog("", () -> ability, a -> ability = a, f -> heavy = f);
+            dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy;
         }
 
         public abilityPack(Ability ability) {
             this.ability = ability;
             dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a, f -> heavy = f);
+            dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy + dialog.bulletHeavy;
         }
     }
