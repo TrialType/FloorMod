@@ -42,10 +42,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         u.apply(speed);
         Seq<Weapon> we = new Seq<>();
         Seq<Ability> ab = new Seq<>();
-        for (ProjectsLocated.weaponPack wp : weapons) {
+        for (weaponPack wp : weapons) {
             we.add(wp.weapon);
         }
-        for (ProjectsLocated.abilityPack ap : abilities) {
+        for (abilityPack ap : abilities) {
             ab.add(ap.ability);
         }
         if (u.mounts == null) {
@@ -232,6 +232,20 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public void rebuildLocated() {
         located.clear();
         located.image(Core.atlas.find("gamma", "")).width(950).height(950);
+
+        located.setLayoutEnabled(true);
+
+        for (int i = 0; i < weapons.size; i++) {
+            int finalI = i;
+            weaponPack wp = weapons.get(finalI);
+            located.table(t -> {
+                t.setPosition(wp.weapon.x + 450, wp.weapon.y + 485);
+                t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
+
+                t.label(() -> Core.bundle.get("dialog.weapon.index") + ": ");
+                t.label(() -> Core.bundle.get("dialog.weapon.index") + finalI).pad(5);
+            }).width(100).height(30);
+        }
     }
 
     public void rebuildWeapon() {
