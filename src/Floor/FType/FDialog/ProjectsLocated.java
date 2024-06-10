@@ -109,7 +109,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 weapons.add(w);
                 freeSize -= w.heavy;
                 rebuildWeapon();
-                rebuildLocated();
+                updateTable();
             }
         }).width(200);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
@@ -118,7 +118,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 abilities.add(a);
                 freeSize -= a.heavy;
                 rebuildAbility();
-                rebuildLocated();
+                updateTable();
             }
         }).width(200);
         buttons.button(Core.bundle.get("dialog.unit.base"), Icon.pencil, () -> {
@@ -142,7 +142,9 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 }
             }).width(100);
             bd.shown(() -> freeSize += getBaseHeavy(false));
+            bd.shown(this::hideTables);
             bd.hidden(() -> freeSize -= getBaseHeavy(true));
+            bd.hidden(this::showTables);
             bd.show();
         }).width(200);
     }
@@ -235,58 +237,9 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         rebuildAbility();
     }
 
-    public void removeTables() {
-        for (weaponPack wp : weapons) {
-            if (wp.on != null) {
-                wp.on.actions(Actions.fadeOut(0), Actions.remove());
-                Core.app.post(wp.on::remove);
-            }
-        }
-        for (abilityPack ap : abilities) {
-            if (ap.on != null) {
-                ap.on.actions(Actions.fadeOut(0), Actions.remove());
-                Core.app.post(ap.on::remove);
-            }
-        }
-    }
-
     public void rebuildLocated() {
         located.clear();
         located.image(Core.atlas.find("gamma", "")).width(700).height(700);
-
-        for (int i = 0; i < weapons.size; i++) {
-            int finalI = i;
-            weaponPack wp = weapons.get(finalI);
-
-            if (wp.on == null) {
-                Table t = new Table();
-                t.setSize(210, 40);
-
-                t.update(() -> {
-                    t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
-                    t.setPosition(8 * wp.weapon.x + located.x + located.getWidth() / 2,
-                            8 * wp.weapon.y + located.y + located.getHeight() / 2);
-
-//                    t.keepInStage();
-//                    t.invalidateHierarchy();
-                    t.pack();
-                });
-
-                Core.scene.add(t);
-
-                t.top().pane(w -> {
-                    w.top();
-                    w.setSize(200, 30);
-
-                    w.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI);
-                }).top();
-
-                t.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
-
-                t.pack();
-                wp.on = t;
-            }
-        }
     }
 
     public void rebuildWeapon() {
@@ -303,7 +256,6 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
                 t.clicked(() -> {
                     pushW = pushW == wp ? null : wp;
-                    rebuildLocated();
                     rebuildWeapon();
                 });
                 t.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI).left().width(100).pad(5);
@@ -323,7 +275,6 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                         wp.on.actions(Actions.fadeOut(0.001f), Actions.remove());
                     }
                     pushW = pushW == wp ? null : pushW;
-                    rebuildLocated();
                     rebuildWeapon();
                 }).pad(5);
             }).width(500);
@@ -345,7 +296,6 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
                 t.clicked(() -> {
                     pushA = pushA == ap ? null : ap;
-                    rebuildLocated();
                     rebuildAbility();
                 });
                 t.label(() -> Core.bundle.get("dialog.ability.index") + ": " + finalI).left().width(100).pad(5);
@@ -364,10 +314,86 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                         Core.app.post(ap.on::remove);
                     }
                     pushA = pushA == ap ? null : pushA;
-                    rebuildLocated();
                     rebuildAbility();
                 }).pad(5);
             }).width(500).row();
+        }
+    }
+
+    public void updateTable() {
+        for (int i = 0; i < weapons.size; i++) {
+            int finalI = i;
+            weaponPack wp = weapons.get(finalI);
+
+            if (wp.on == null) {
+                Table t = new Table();
+                t.setSize(210, 40);
+
+                t.update(() -> {
+                    t.setBackground(pushW == wp ? Tex.buttonDown : Tex.windowEmpty);
+                    t.setPosition(8 * wp.weapon.x + located.x + located.getWidth() / 2,
+                            8 * wp.weapon.y + located.y + located.getHeight() / 2);
+
+                    t.keepInStage();
+                    t.invalidateHierarchy();
+                    t.pack();
+                });
+
+                Core.scene.add(t);
+
+                t.top().pane(w -> {
+                    w.top();
+                    w.setSize(200, 30);
+
+                    w.label(() -> Core.bundle.get("dialog.weapon.index") + ": " + finalI);
+                }).top();
+
+                t.actions(Actions.alpha(0), Actions.fadeIn(0.001f));
+
+                t.pack();
+                wp.on = t;
+            }
+        }
+    }
+
+    public void removeTables() {
+        for (weaponPack wp : weapons) {
+            if (wp.on != null) {
+                wp.on.actions(Actions.fadeOut(0), Actions.remove());
+                Core.app.post(wp.on::remove);
+            }
+        }
+        for (abilityPack ap : abilities) {
+            if (ap.on != null) {
+                ap.on.actions(Actions.fadeOut(0), Actions.remove());
+                Core.app.post(ap.on::remove);
+            }
+        }
+    }
+
+    public void hideTables() {
+        for (weaponPack wp : weapons) {
+            if (wp.on != null) {
+                wp.on.actions(Actions.fadeOut(0.001f));
+            }
+        }
+        for (abilityPack ap : abilities) {
+            if (ap.on != null) {
+                ap.on.actions(Actions.fadeOut(0.001f));
+            }
+        }
+    }
+
+    public void showTables() {
+        for (weaponPack wp : weapons) {
+            if (wp.on != null) {
+                wp.on.actions(Actions.fadeIn(0.001f));
+            }
+        }
+        for (abilityPack ap : abilities) {
+            if (ap.on != null) {
+                ap.on.actions(Actions.fadeIn(0.001f));
+            }
         }
     }
 
@@ -447,7 +473,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             weapon.reload = 500;
             weapon.targetSwitchInterval = weapon.targetInterval = 500;
             dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::removeTables);
+            dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = 0.5f + dialog.bulletHeavy;
         }
@@ -455,7 +481,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public weaponPack(Weapon weapon) {
             this.weapon = weapon;
             dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::removeTables);
+            dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy + getShootVal(weapon.shoot) * dialog.bulletHeavy;
         }
@@ -470,7 +496,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public abilityPack() {
             ability = new ForceFieldAbility(90, 0, 0, Float.MAX_VALUE, 0, 0);
             dialog = new AbilityDialog("", () -> ability, a -> ability = a, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::removeTables);
+            dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy;
         }
@@ -478,7 +504,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public abilityPack(Ability ability) {
             this.ability = ability;
             dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::removeTables);
+            dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy + dialog.bulletHeavy;
         }
