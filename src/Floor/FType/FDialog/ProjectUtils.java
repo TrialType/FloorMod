@@ -1,5 +1,6 @@
 package Floor.FType.FDialog;
 
+import Floor.FContent.FStatusEffects;
 import arc.Core;
 import arc.audio.Sound;
 import arc.func.*;
@@ -12,6 +13,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Strings;
+import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
@@ -24,6 +26,7 @@ import mindustry.entities.pattern.ShootPattern;
 import mindustry.gen.Icon;
 import mindustry.gen.Sounds;
 import mindustry.gen.Tex;
+import mindustry.gen.Unit;
 import mindustry.type.Liquid;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
@@ -32,6 +35,7 @@ import java.util.HashMap;
 
 import static Floor.FContent.FItems.*;
 import static Floor.FContent.FItems.allTargetInterval;
+import static Floor.FType.FDialog.ProjectsLocated.eff;
 import static Floor.FType.FDialog.ProjectsLocated.projects;
 import static mindustry.Vars.*;
 
@@ -46,25 +50,30 @@ public abstract class ProjectUtils {
     public static void init() {
         door = new Table();
         door.setBounds(200, 200, 50, 30);
+        new ProjectsLocated("");
         door.button(Icon.units, () -> {
-            if (projects == null) {
-                new ProjectsLocated("");
-            }
-            projects.init(player.unit());
             if (!net.client()) {
                 state.set(GameState.State.paused);
             }
             projects.show();
         }).width(50);
         door.update(() -> {
-            if (state.isGame() && player.unit().spawnedByCore()) {
-                door.actions(Actions.fadeIn(1));
+            if (state.isGame() && player.unit() != null && player.unit().spawnedByCore) {
+                door.actions(Actions.fadeIn(0.001f));
+                Unit u = player.unit();
+                if (!u.hasEffect(eff)) {
+                    upUnit(0, u);
+                    projects.upper.get(u);
+                    projects.seed = u;
+                } else if (projects.seed != u) {
+                    projects.init(u);
+                }
             } else {
-                door.actions(Actions.fadeOut(0.0001f));
+                door.actions(Actions.fadeOut(0.001f));
             }
         });
         Core.scene.add(door);
-        door.actions(Actions.fadeIn(0.0001f));
+        door.actions(Actions.fadeIn(0.001f));
 
         heavies.put("none", i -> 0);
 
@@ -121,6 +130,14 @@ public abstract class ProjectUtils {
 
         updateMaxLevel();
         updateHeavy();
+    }
+
+    public static void upUnit(float duration, Unit u) {
+        Fx.unitSpawn.at(u.x, u.y, u.rotation, u);
+        u.apply(FStatusEffects.StrongStop);
+        if (state.isGame() && !state.isPaused() && !u.dead && duration + Time.delta < 180) {
+            Time.run(1, () -> upUnit(duration + Time.delta, u));
+        }
     }
 
     public static float getHeavy(String type, float val) {

@@ -1,6 +1,5 @@
 package Floor.FType.FDialog;
 
-import Floor.FContent.FStatusEffects;
 import Floor.FEntities.FAbility.SprintingAbility;
 import arc.Core;
 import arc.func.Cons;
@@ -23,23 +22,17 @@ import static mindustry.Vars.*;
 
 public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static ProjectsLocated projects;
-    public static Cons<Unit> app = u -> {
-    };
-    public static boolean applied = false;
-    public static StatusEffect eff = new StatusEffect("eff") {{
-        show = false;
-        permanent = true;
-    }};
+    public static StatusEffect eff;
     public Table effect;
-    public float healthBoost, speedBoost;
+    public float healthBoost = 1, speedBoost = 1;
     public float healD, speedD;
     public SprintingAbility boost;
     public final Seq<weaponPack> weapons = new Seq<>();
     public final Seq<abilityPack> abilities = new Seq<>();
     public Cons<Unit> upper = u -> {
-        eff.healthMultiplier = Math.max(1, healthBoost);
-        eff.speedMultiplier = Math.max(1, speedBoost);
-        u.apply(FStatusEffects.pureT);
+        eff.healthMultiplier = Math.max(0.01f, healthBoost);
+        eff.speedMultiplier = Math.max(0.01f, speedBoost);
+        u.apply(eff);
         Seq<Weapon> we = new Seq<>();
         Seq<Ability> ab = new Seq<>();
         for (weaponPack wp : weapons) {
@@ -58,7 +51,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 u.mounts[i] = new WeaponMount(we.get(i));
             }
         } else {
-            int len = u.mounts.length;
+            int len = u.type.weapons.size;
             WeaponMount[] wm = new WeaponMount[len + we.size];
             System.arraycopy(u.mounts, 0, wm, 0, len);
             for (int i = len; i < wm.length; i++) {
@@ -70,7 +63,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         if (u.abilities == null) {
             u.abilities = ab.items;
         } else {
-            int len = u.abilities.length;
+            int len = u.type.abilities.size;
             Ability[] a = new Ability[len + ab.size];
             System.arraycopy(u.abilities, 0, a, 0, len);
             for (int i = len; i < a.length; i++) {
@@ -93,26 +86,18 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
         shown(this::rebuild);
 
-        hidden(() -> {
-            app = upper;
-            applied = false;
-        });
+        hidden(() -> upper.get(seed));
         hidden(this::removeTables);
-
-        update(() -> {
-            if (state.isGame() && player.unit().spawnedByCore() && (!applied || !player.unit().hasEffect(eff))) {
-                applied = true;
-                app.get(player.unit());
-            }
-        });
 
         buttons.button("@back", Icon.left, () -> {
             state.set(GameState.State.playing);
-            set();
+            init(seed);
             hide();
         }).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             state.set(GameState.State.playing);
+            Core.settings.put("floor-project-heal", healthBoost);
+            Core.settings.put("floor-project-speed", speedBoost);
             hide();
         }).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
@@ -146,8 +131,8 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             bd.buttons.button("@back", Icon.left, bd::hide).width(100);
             bd.buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
                 if ((getHeavy("speed", speedD) + getHeavy("health", healD)) <= freeSize) {
-                    healthBoost = Math.max(1, healD);
-                    speedBoost = Math.max(1, speedD);
+                    healthBoost = Math.max(0.01f, healD);
+                    speedBoost = Math.max(0.01f, speedD);
                     bd.hide();
                 } else {
                     ui.showInfo(Core.bundle.get("@tooHeavy"));
@@ -165,12 +150,12 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         base.clear();
         base.table(t -> {
             createLevDialog(t, "unit", "health", "healBoost", healD,
-                    f -> healD = Math.max(1, f), this::rebuildBase,
+                    f -> healD = Math.max(0.01f, f), this::rebuildBase,
                     () -> {
                     }, () -> couldUse("health", healD),
                     () -> getBaseHeavy(true) <= freeSize);
             createLevDialog(t, "unit", "speed", "speedBoost", speedD,
-                    f -> speedD = Math.max(1, f), this::rebuildBase,
+                    f -> speedD = Math.max(0.01f, f), this::rebuildBase,
                     () -> {
                     }, () -> couldUse("speed", speedD),
                     () -> getBaseHeavy(true) <= freeSize);
@@ -433,14 +418,16 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     }
 
     public void set() {
-        if (seed != null) {
+        if (seed != null && seed.spawnedByCore) {
             if (seed.hasEffect(eff)) {
                 healthBoost = eff.healthMultiplier;
                 speedBoost = eff.speedMultiplier;
+                weapons.clear();
                 WeaponMount[] mounts = seed.mounts;
                 for (int i = seed.type.weapons.size; i < mounts.length; i++) {
                     weapons.add(new weaponPack(mounts[i].weapon));
                 }
+                abilities.clear();
                 Ability[] a = seed.abilities;
                 for (int i = seed.type.abilities.size; i < a.length; i++) {
                     abilities.add(new abilityPack(a[i]));

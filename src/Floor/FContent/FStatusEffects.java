@@ -1,6 +1,9 @@
 package Floor.FContent;
 
+import Floor.FType.FDialog.ProjectUtils;
+import Floor.FType.FDialog.ProjectsLocated;
 import Floor.FType.FStatusEffect.WithMoreStatus;
+import arc.Core;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.Seq;
@@ -529,5 +532,12 @@ public class FStatusEffects {
         }};
 
         burnings.addAll(StatusEffects.burning, burningII, burningIII, burningIV, burningV);
+
+        ProjectsLocated.eff = new StatusEffect("eff") {{
+            show = false;
+            permanent = true;
+            healthMultiplier = Core.settings.getFloat("floor-project-heal", 1);
+            speedMultiplier = Core.settings.getFloat("floor-project-speed", 1);
+        }};
     }
 }

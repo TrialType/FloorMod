@@ -17,8 +17,9 @@ import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.Vars;
 import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.entities.*;
-import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.*;
 import mindustry.game.EventType;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -416,6 +417,112 @@ public class LimitBulletType extends BulletType {
             }
             default: {
                 super.init();
+            }
+        }
+    }
+
+    public void setType(String type) {
+        this.type = type;
+        switch (type) {
+            case "bullet": {
+                break;
+            }
+            case "laser": {
+                speed = 0f;
+                hitEffect = Fx.hitLaserBlast;
+                hitColor = colors[2];
+                despawnEffect = Fx.none;
+                shootEffect = Fx.hitLancer;
+                smokeEffect = Fx.none;
+                hitSize = 4;
+                lifetime = 16f;
+                impact = true;
+                keepVelocity = false;
+                collides = false;
+                pierce = true;
+                hittable = false;
+                absorbable = false;
+                removeAfterPierce = false;
+                break;
+            }
+            case "lightning": {
+                speed = 0f;
+                lifetime = 1;
+                despawnEffect = Fx.none;
+                hitEffect = Fx.hitLancer;
+                keepVelocity = false;
+                hittable = false;
+                status = StatusEffects.shocked;
+                break;
+            }
+            case "point": {
+                scaleLife = true;
+                lifetime = 100f;
+                collides = false;
+                reflectable = false;
+                keepVelocity = false;
+                backMove = false;
+                break;
+            }
+            case "rail": {
+                speed = 0f;
+                pierceBuilding = true;
+                pierce = true;
+                reflectable = false;
+                hitEffect = Fx.none;
+                despawnEffect = Fx.none;
+                collides = false;
+                keepVelocity = false;
+                lifetime = 1f;
+                break;
+            }
+            case "continuousF": {
+                removeAfterPierce = false;
+                pierceCap = -1;
+                speed = 0f;
+                despawnEffect = Fx.none;
+                shootEffect = Fx.none;
+                impact = true;
+                keepVelocity = false;
+                collides = false;
+                pierce = true;
+                hittable = false;
+                absorbable = false;
+                optimalLifeFract = 0.5f;
+                hitEffect = Fx.hitFlameBeam;
+                hitSize = 4;
+                drawSize = 420f;
+                lifetime = 16f;
+                hitColor = colors.length > 1 ? colors[1].cpy().a(1f) : hitColor;
+                lightColor = hitColor;
+                laserAbsorb = false;
+                ammoMultiplier = 1f;
+                pierceArmor = true;
+                break;
+            }
+            case "continuousL": {
+                removeAfterPierce = false;
+                pierceCap = -1;
+                speed = 0f;
+                despawnEffect = Fx.none;
+                shootEffect = Fx.none;
+                impact = true;
+                keepVelocity = false;
+                collides = false;
+                pierce = true;
+                hittable = false;
+                absorbable = false;
+                shake = 1f;
+                largeHit = true;
+                hitEffect = Fx.hitBeam;
+                hitSize = 4;
+                drawSize = 420f;
+                lifetime = 16f;
+                hitColor = colors[2];
+                incendAmount = 1;
+                incendSpread = 5;
+                incendChance = 0.4f;
+                lightColor = Color.orange;
             }
         }
     }

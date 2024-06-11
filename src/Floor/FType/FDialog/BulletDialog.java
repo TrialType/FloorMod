@@ -131,6 +131,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                             Front(table);
 
                         }).width(100);
+                        bullet.setType(name);
                         tb.row();
                     }
                 }));
@@ -163,19 +164,21 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         createLevDialog(baseOn, dia, "frags", "fragBullets", bullet.fragBullets,
                 f -> bullet.fragBullets = (int) (f + 0), reb, this::updateHeavy, fragUse, hevUser);
         baseOn.row();
-        baseOn.label(() -> Core.bundle.get("dialog.bullet.writeFrag") + "->").width(100);
-        if (dialog == null) {
-            baseOn.button(Icon.add, () -> {
-                updateDialog(true);
-                rebuildBase();
-            }).pad(5);
-        } else {
-            baseOn.button(Icon.pencil, () -> dialog.show()).pad(5);
-            baseOn.button(Icon.trash, () -> {
-                updateDialog(false);
-                rebuildBase();
-            }).pad(5);
-        }
+        baseOn.table(t -> {
+            t.label(() -> Core.bundle.get("dialog.bullet.writeFrag") + "->").width(100);
+            if (dialog == null) {
+                t.button(Icon.add, () -> {
+                    updateDialog(true);
+                    rebuildBase();
+                }).pad(5);
+            } else {
+                t.button(Icon.pencil, () -> dialog.show()).pad(5);
+                t.button(Icon.trash, () -> {
+                    updateDialog(false);
+                    rebuildBase();
+                }).pad(5);
+            }
+        }).width(250);
         createNumberDialogWithLimit(baseOn, dia, "lightningAngle", bullet.lightningAngle,
                 360, 0, f -> bullet.lightningAngle = f, reb);
         createNumberDialogWithLimit(baseOn, dia, "lightningCone", bullet.lightningCone,
@@ -552,6 +555,11 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                         bd.show();
                     });
                 });
+                createLevDialog(typeOn, dia, "bulletBase", "damageInterval", bullet.damageInterval,
+                        f -> bullet.damageInterval = f, ret, this::updateHeavy, baseUse, hevUser);
+                typeOn.row();
+                createNumberDialog(typeOn, dia, "shake", bullet.shake,
+                        f -> bullet.shake = f, ret);
             }
             case "continuousL" -> {
                 createNumberDialog(typeOn, dia, "fadeTime", bullet.fadeTime,
@@ -584,6 +592,10 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
                 typeOn.row();
                 createColorDialogList(typeOn, dia, "colors", bullet.colors,
                         c -> bullet.colors = c);
+                createLevDialog(typeOn, dia, "bulletBase", "damageInterval", bullet.damageInterval,
+                        f -> bullet.damageInterval = f, ret, this::updateHeavy, baseUse, hevUser);
+                createNumberDialog(typeOn, dia, "shake", bullet.shake,
+                        f -> bullet.shake = f, ret);
             }
             case "point" -> {
                 createNumberDialog(typeOn, dia, "trailSpacing", bullet.trailSpacing,
@@ -652,9 +664,9 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     public float findVal(String name) {
         return switch (name) {
             case "bulletBase" -> switch (newType) {
-                case "point" -> bullet.damage / 1.4f + bullet.range / 8 + 100 *
+                case "point" -> bullet.damage / 1.4f + bullet.rangeOverride / 8 + 100 *
                         Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
-                case "bullet" -> bullet.damage + bullet.range / 8 + bullet.pierceCap + 100 *
+                case "bullet" -> bullet.damage + bullet.rangeOverride / 8 + bullet.pierceCap + 100 *
                         Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
                 case "laser" -> bullet.damage + bullet.laserLength / 8 + bullet.pierceCap + 100 *
                         Math.max(0, bullet.healPercent) + 30 * Math.max(0, bullet.healAmount);
