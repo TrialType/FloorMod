@@ -48,33 +48,6 @@ public abstract class ProjectUtils {
     public static final HashMap<String, Integer> maxLevel = new HashMap<>();
 
     public static void init() {
-        door = new Table();
-        door.setBounds(200, 200, 50, 30);
-        new ProjectsLocated("");
-        door.button(Icon.units, () -> {
-            if (!net.client()) {
-                state.set(GameState.State.paused);
-            }
-            projects.show();
-        }).width(50);
-        door.update(() -> {
-            if (state.isGame() && player.unit() != null && player.unit().spawnedByCore) {
-                door.actions(Actions.fadeIn(0.001f));
-                Unit u = player.unit();
-                if (!u.hasEffect(eff)) {
-                    upUnit(0, u);
-                    projects.upper.get(u);
-                    projects.seed = u;
-                } else if (projects.seed != u) {
-                    projects.init(u);
-                }
-            } else {
-                door.actions(Actions.fadeOut(0.001f));
-            }
-        });
-        Core.scene.add(door);
-        door.actions(Actions.fadeIn(0.001f));
-
         heavies.put("none", i -> 0);
 
         levels.put("none", f -> 0);

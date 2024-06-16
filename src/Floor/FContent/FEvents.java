@@ -28,7 +28,6 @@ public class FEvents {
 
     public static void load() {
         Events.on(EventType.ClientLoadEvent.class, e -> Time.runTask(10f, () -> Vars.ui.research = new MoreResearchDialog()));
-        Events.on(EventType.ClientLoadEvent.class, e -> Time.runTask(10f, ProjectUtils::init));
 
         Events.on(EventType.WorldLoadEndEvent.class, e -> CorrosionMist.init());
 

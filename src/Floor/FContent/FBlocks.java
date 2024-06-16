@@ -63,7 +63,7 @@ public class FBlocks {
     //crafting
     public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
     //effect
-    public static Block buildCore, slowProject;
+    public static Block buildCore, slowProject, unitUpper;
 
     public static void load() {
         //crafting
@@ -1864,6 +1864,15 @@ public class FBlocks {
 
             unitCapModifier = 2;
             requirements(Category.effect, ItemStack.with(Items.copper, 1000, Items.lead, 1000, Items.graphite, 1000, Items.silicon, 1000, Items.titanium, 1000));
+        }};
+
+        unitUpper = new UnitProjectBlock("unit-upper") {{
+            size = 3;
+            health = 2500;
+            itemCapacity = 0;
+
+            requirements(Category.effect, ItemStack.with(Items.copper, 2000, Items.lead, 2000,
+                    Items.graphite, 2000, Items.silicon, 2000, Items.titanium, 2000));
         }};
 //======================================================================================================================
         blockOverride();
