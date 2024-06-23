@@ -163,21 +163,21 @@ public class EMPBullet extends Bullet {
             new MultiEffect(new WaveEffect() {{
                 lifetime = 16;
                 sizeFrom = 0;
-                sizeTo = 120;
+                sizeTo = downRange * 1.2f;
                 strokeFrom = 0;
                 strokeTo = 9;
                 colorTo = colorFrom = Color.valueOf("bb1111");
             }}, new Effect(40, e -> {
                 Draw.color(Color.valueOf("bb1111"));
                 Lines.stroke(9);
-                Lines.poly(e.x, e.y, 72, 120, 0);
+                Lines.poly(e.x, e.y, 72, downRange * 1.2f, 0);
             }) {{
                 startDelay = 16;
             }}, new WaveEffect() {{
                 startDelay = 56;
                 lifetime = 16;
-                sizeFrom = 120;
-                sizeTo = 120;
+                sizeFrom = downRange * 1.2f;
+                sizeTo = downRange * 1.2f;
                 strokeFrom = 9;
                 strokeTo = 0;
                 colorTo = colorFrom = Color.valueOf("bb1111");

@@ -45,7 +45,7 @@ public class SummonBulletType extends BasicBulletType {
 
     public void summon(Entityc owner, Team team, float x, float y, float rotate) {
         float dx = (float) (summonRange * Math.cos(rotate)), dy = (float) (summonRange * Math.sin(rotate));
-        Bullet bu = summon.create(owner, team, dx + x, dy + y, 0);
+        Bullet bu = summon.create(owner, team, dx + x, dy + y, -rotate);
         bu.vel.set(-dx, -dy).setLength(summon.speed);
         bu.rotation(Angles.angle(-dx, -dy));
     }

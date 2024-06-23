@@ -26,6 +26,12 @@ public class FollowUnit extends UnitEntity implements OwnerSpawner {
             owner = Groups.unit.getByID(ownerId);
             ownerId = -1;
         }
+        if (owner == null || owner.dead) {
+            health -= maxHealth * 0.001f;
+        }
+        if (health <= 0) {
+            kill();
+        }
         super.update();
     }
 

@@ -11,13 +11,13 @@ public class HealthOnlyAI extends AIController {
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground) {
         t = null;
-        Units.nearby(unit.team, x, y, range, u -> {
-            if (u.damaged()) {
+        Units.nearby(unit.team, x, y, range * 25, u -> {
+            if (u.health < u.maxHealth && u.type.isEnemy) {
                 t = u;
             }
         });
         if (t == null) {
-            Units.nearby(unit.team, x, y, range, u -> t = u.type == FUnits.rejuvenate ? t : u);
+            Units.nearby(unit.team, x, y, range * 25, u -> t = (u.type == FUnits.rejuvenate || !u.type.isEnemy) ? t : u);
         }
         return t;
     }

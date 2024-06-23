@@ -81,18 +81,20 @@ public class FUnits {
                 x = y = 0;
                 shootX = shootY = 0;
                 shoot = new ShootSummon(0, 0, 12, 15) {{
-                    shots = 10;
+                    shots = 3;
                     shotDelay = 6;
                 }};
                 bullet = new EMPLarge() {{
-                    absorbable = reflectable = false;
-                    hittable = true;
-                    damage = 120;
+                    reflectable = false;
+                    damage = 140;
                     speed = 8;
                     lifetime = 240;
                     trailColor = Pal.lightishGray;
                     trailLength = 8;
                     trailWidth = 3;
+                    homingPower = 0.1f;
+                    homingDelay = 120;
+                    homingRange = 1000;
 
                     maxLife = 300;
                     downRange = 200;
@@ -110,17 +112,18 @@ public class FUnits {
                 shootX = 0;
                 shootY = -4;
                 shoot = new ShootBarrel() {{
-                    shots = 3;
+                    shots = 4;
                     shotDelay = 6;
                     barrels = new float[]{
                             0, 0, 95,
                             0, 0, 100,
-                            0, 0, 105
+                            0, 0, 105,
+                            0, 0, 110
                     };
                 }};
                 bullet = new SummonBulletType() {{
                     width = height = 12;
-                    damage = 180;
+                    damage = 120;
                     speed = 8;
                     lifetime = 240;
                     homingDelay = 0.1f;
@@ -129,27 +132,69 @@ public class FUnits {
                     trailColor = Pal.redDust;
                     trailLength = 16;
                     trailWidth = 2;
+                    hittable = false;
 
                     summon = new LightningBulletType() {{
-                        lightningLength = 65;
-                        damage = 270;
-                        speed = 150;
+                        lightningLength = 25;
+                        damage = 90;
+                        speed = 80;
 
                         lightningColor = Pal.redDust;
                     }};
-                    summonRange = 150;
+                    summonRange = 80;
                     summonNumber = 8;
                 }};
             }});
-        }};
 
+            weapons.add(new Weapon() {{
+                shootCone = 360;
+                reload = 75;
+                mirror = true;
+                rotate = false;
+                y = 0;
+                x = 15;
+                shootX = 0;
+                shootY = -4;
+                shoot = new ShootBarrel() {{
+                    shots = 4;
+                    shotDelay = 6;
+                    barrels = new float[]{
+                            0, 0, -5,
+                            0, 0, 0,
+                            0, 0, 5,
+                            0, 0, 10
+                    };
+                }};
+                bullet = new SummonBulletType() {{
+                    width = height = 12;
+                    damage = 100;
+                    speed = 8;
+                    lifetime = 240;
+                    homingDelay = 0.1f;
+                    homingRange = 1000;
+                    homingPower = 0.1f;
+                    trailColor = Pal.techBlue;
+                    trailLength = 16;
+                    trailWidth = 2;
+                    absorbable = false;
+
+                    summon = new MissileBulletType(5, 260) {{
+                        lifetime = 60;
+                        frontColor = backColor = trailColor = Pal.techBlue;
+                    }};
+                    summonRange = 120;
+                    summonNumber = 8;
+                    everySummonDelay = 9;
+                }};
+            }});
+        }};
         rejuvenate = new UnitType("rejuvenate") {{
             constructor = LegsUnit::create;
             aiController = HealthOnlyAI::new;
 
             health = 30000;
             armor = 100;
-            speed = 1f;
+            speed = 1.8f;
             accel = 0.9f;
             drag = 0.9f;
             hitSize = 35;
