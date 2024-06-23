@@ -813,7 +813,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             write.bool(weapon.ignoreRotation);
             write.bool(weapon.noAttack);
             write.bool(weapon.linearWarmup);
-            writeParts(write, weapon.parts.size == 0 ? new DrawPart[0] : (DrawPart[]) weapon.parts.items);
+            writeParts(write, weapon.parts);
             writeShoot(write, weapon.shoot);
             if (weapon instanceof RepairBeamWeapon r) {
                 write.f(r.repairSpeed);
@@ -915,7 +915,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         write.f(bullet.fragAngle);
         write.bool(bullet.trailRotation);
         write.bool(bullet.splashDamagePierce);
-        writeParts(write, bullet.parts.size == 0 ? new DrawPart[0] : (DrawPart[]) bullet.parts.items);
+        writeParts(write, bullet.parts);
         //(bullet.trailInterp);
         write.f(bullet.trailChance);
         write.f(bullet.trailInterval);
@@ -1038,8 +1038,8 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
     }
 
-    public void writeParts(Writes write, DrawPart[] parts) {
-        write.i(parts.length);
+    public void writeParts(Writes write, Seq<DrawPart> parts) {
+        write.i(parts.size);
         for (DrawPart part : parts) {
             if (part instanceof ShapePart) {
                 write.str("shape");
@@ -1073,7 +1073,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 write.f(s.layer);
                 write.f(s.layerOffset);
                 TypeIO.writeColor(write, s.color);
-                TypeIO.writeColor(write, s.colorTo);
+                TypeIO.writeColor(write, s.colorTo == null ? Color.white : s.colorTo);
             } else if (part instanceof HoverPart h) {
                 write.f(h.x);
                 write.f(h.y);
@@ -1573,6 +1573,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                     f.sides = read.i();
                     f.radius = read.f();
                     f.radiusTo = read.f();
+                    f.stroke = read.f();
                     f.innerScl = read.f();
                     f.innerRadScl = read.f();
                     f.x = read.f();
