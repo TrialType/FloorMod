@@ -25,9 +25,7 @@ import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.part.HoverPart;
 import mindustry.entities.part.ShapePart;
-import mindustry.entities.pattern.ShootBarrel;
-import mindustry.entities.pattern.ShootPattern;
-import mindustry.entities.pattern.ShootSpread;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
@@ -55,32 +53,86 @@ public class FUnits {
     public static UnitType recluse;
 
     //special
-    public static UnitType bulletInterception, rejuvenate;
+    public static UnitType bulletInterception, rejuvenate, vibrate;
 
     //Test
-    public static UnitType d;
+    public static UnitType e;
 
     public static void load() {
-        d = new UnitType("d") {{
-            constructor = FUnitEntity::create;
+        vibrate = new UnitType("vibrate") {{
+            constructor = FLegsUnit::create;
 
+            speed = 1;
+            health = 20000;
+            armor = 18;
+            hitSize = 35;
             faceTarget = false;
+
+            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 120, 90, 80));
+            abilities.add(new StatusFieldAbility(StatusEffects.overdrive, 120, 90, 80));
+
             weapons.add(new Weapon() {{
-                reload = 60;
-                rotate = true;
-                rotateSpeed = 12;
-                bullet = new BulletType() {{
-                    damage = 12;
+                shootCone = 360;
+                reload = 120;
+                mirror = false;
+                rotate = false;
+                x = y = 0;
+                shootX = shootY = 0;
+                shoot = new ShootSummon(0, 0, 24, 60) {{
+                    shots = 10;
+                    shotDelay = 6;
+                }};
+                bullet = new EMPLarge() {{
+                    absorbable = reflectable = hittable = false;
+                    damage = 0;
                     speed = 8;
-                    lifetime = 60;
+                    lifetime = 240;
+                    trailColor = Pal.lightishGray;
+
+                    maxLife = 300;
+                    downRange = 200;
+                    downDamage = 120;
                 }};
             }});
 
-            abilities.add(new SprintingAbility());
-            abilities.add(new MoveLightningAbility(12, 12, 1, 0, 1, 2, Pal.bulletYellow));
-            flying = true;
-            speed = 2;
-            health = 114514;
+            weapons.add(new Weapon() {{
+                shootCone = 360;
+                reload = 120;
+                mirror = true;
+                rotate = false;
+                y = 0;
+                x = 5;
+                shootX = 0;
+                shootY = -4;
+                shoot = new ShootBarrel() {{
+                    shots = 3;
+                    shotDelay = 6;
+                    barrels = new float[]{
+                            0, 0, 100,
+                            0, 0, 110,
+                            0, 0, 120
+                    };
+                }};
+                bullet = new SummonBulletType() {{
+                    damage = 180;
+                    speed = 8;
+                    lifetime = 240;
+                    homingDelay = 0.1f;
+                    homingRange = 1000;
+                    homingPower = 0.1f;
+                    trailColor = Pal.lightishGray;
+
+                    summon = new LightningBulletType() {{
+                        lightningLength = 65;
+                        damage = 70;
+                        speed = 150;
+
+                        lightningColor = Pal.redDust;
+                    }};
+                    summonRange = 150;
+                    summonNumber = 8;
+                }};
+            }});
         }};
 
         rejuvenate = new UnitType("rejuvenate") {{
@@ -92,11 +144,11 @@ public class FUnits {
             speed = 1f;
             accel = 0.9f;
             drag = 0.9f;
+            hitSize = 35;
             range = maxRange = 1000;
             isEnemy = false;
 
-            abilities.add(new StatusFieldAbility(FStatusEffects.healthV, 2400, 1200, 160));
-            abilities.add(new StatusFieldAbility(FStatusEffects.healthV, 2400, 1200, 160));
+            abilities.add(new StatusFieldAbility(FStatusEffects.healthIV, 2400, 1200, 160));
             abilities.add(new ShieldRegenFieldAbility(5000, 100000, 600, 160));
 
             weapons.add(new RepairBeamWeapon() {{

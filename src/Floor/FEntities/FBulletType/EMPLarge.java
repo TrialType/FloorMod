@@ -14,6 +14,24 @@ import static mindustry.Vars.net;
 import static mindustry.Vars.world;
 
 public class EMPLarge extends BasicBulletType {
+    public float slowDown = 0;
+    public float maxLife = 180;
+    public float downDuration = 600;
+    public float downRange = 100;
+    public float downDamage = 0;
+
+    @Override
+    public void init(Bullet b) {
+        super.init(b);
+        if (b instanceof EMPBullet e) {
+            e.slowDown = slowDown;
+            e.maxLife = maxLife;
+            e.downDuration = downDuration;
+            e.downRange = downRange;
+            e.downDamage = downDamage;
+        }
+    }
+
     @Override
     public EMPBullet create(Entityc owner, Entityc shooter, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl, Object data, Mover mover, float aimX, float aimY) {
         if (!Mathf.chance(createChance)) return null;

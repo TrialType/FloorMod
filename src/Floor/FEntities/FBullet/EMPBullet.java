@@ -15,6 +15,7 @@ import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.core.World;
+import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BulletType;
@@ -27,6 +28,12 @@ import mindustry.world.blocks.environment.StaticWall;
 import static mindustry.Vars.world;
 
 public class EMPBullet extends Bullet {
+    public float slowDown = 0;
+    public float maxLife = 180;
+    public float downDuration = 600;
+    public float downRange = 100;
+    public float downDamage = 0;
+
     public Effect lightning = new Effect(30, e -> {
         if (e.data instanceof Seq<?> s) {
             Seq<Vec2> points = new Seq<>();
@@ -152,7 +159,7 @@ public class EMPBullet extends Bullet {
         if (on != null) {
             timer += Time.delta;
         }
-        if (this.timer >= 180) {
+        if (this.timer >= maxLife) {
             new MultiEffect(new WaveEffect() {{
                 lifetime = 16;
                 sizeFrom = 0;
@@ -183,20 +190,26 @@ public class EMPBullet extends Bullet {
                 float ro = random.range(360);
                 float finalRo = ro;
                 float lx = this.x, ly = this.y;
-                for (int j = 0; j < 12; j++) {
+                for (int j = 0; j < downRange / 8; j++) {
                     lines.add(new Vec2(lx + Mathf.range(3f), ly + Mathf.range(3f)));
                     ro += random.range(20f);
-                    lx += Angles.trnsx(ro, 12);
-                    ly += Angles.trnsy(ro, 12);
+                    lx += Angles.trnsx(ro, 10);
+                    ly += Angles.trnsy(ro, 10);
                 }
 
                 lightning.at(x, y, finalRo, lines);
             }
 
-            Units.nearbyEnemies(team, x, y, 100, u -> u.apply(FStatusEffects.StrongStop, 600));
-            Units.nearbyBuildings(x, y, 100, b -> {
+            if (downDamage > 0) {
+                Damage.damage(team, x, y, downRange, downDamage, false, true, true, true, this);
+            }
+            Units.nearbyEnemies(team, x, y, downRange, u -> {
+                u.apply(FStatusEffects.StrongStop, downDuration);
+
+            });
+            Units.nearbyBuildings(x, y, downRange, b -> {
                 if (b.team != this.team && b.block.canOverdrive) {
-                    b.applySlowdown(0, 600);
+                    b.applySlowdown(slowDown, downDuration);
                 }
             });
             remove();
