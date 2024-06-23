@@ -1,7 +1,6 @@
 package Floor.FEntities.FAbility;
 
-import Floor.FEntities.FUnit.F.TileMiner;
-import Floor.FTools.interfaces.StrongSpawner;
+import Floor.FTools.interfaces.OwnerSpawner;
 import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
@@ -23,22 +22,19 @@ import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.state;
 
-public class StrongMinerAbility extends Ability {
-    private UnitType unit;
-    public float spawnTime = 100, spawnX, spawnY;
+public class OwnerUnitSpawnAbility extends Ability {
+    public UnitType unit;
+    public float spawnTime, spawnX, spawnY, maxNum = 2;
     public Effect spawnEffect = Fx.spawn;
     public boolean parentizeEffects;
 
     protected float timer;
 
-    public StrongMinerAbility(UnitType unit, float spawnTime, float spawnX, float spawnY) {
+    public OwnerUnitSpawnAbility(UnitType unit, float spawnTime, float spawnX, float spawnY) {
         this.unit = unit;
         this.spawnTime = spawnTime;
         this.spawnX = spawnX;
         this.spawnY = spawnY;
-    }
-
-    public StrongMinerAbility() {
     }
 
     @Override
@@ -50,21 +46,24 @@ public class StrongMinerAbility extends Ability {
 
     @Override
     public void update(Unit unit) {
-        if (unit instanceof StrongSpawner ss && ss.miner().size < 2) {
+        if (unit instanceof OwnerSpawner ss && ss.unit().size < maxNum) {
             timer += Time.delta * state.rules.unitBuildSpeed(unit.team);
 
             if (timer >= spawnTime && Units.canCreate(unit.team, this.unit)) {
-                float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX), y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
+                float x = unit.x + Angles.trnsx(unit.rotation, spawnY, spawnX),
+                        y = unit.y + Angles.trnsy(unit.rotation, spawnY, spawnX);
                 spawnEffect.at(x, y, 0f, parentizeEffects ? unit : null);
-                TileMiner u = (TileMiner) this.unit.create(unit.team);
+                Unit u = this.unit.create(unit.team);
                 u.set(x, y);
                 u.rotation = unit.rotation;
-                u.spawner = unit;
+                if (u instanceof OwnerSpawner s) {
+                    s.spawner(unit);
+                }
                 Events.fire(new EventType.UnitCreateEvent(u, null, unit));
                 if (!Vars.net.client()) {
                     u.add();
                 }
-                ss.miner().add(u);
+                ss.unit().add(u);
 
                 timer = 0f;
             }

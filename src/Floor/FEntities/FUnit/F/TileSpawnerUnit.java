@@ -1,6 +1,6 @@
 package Floor.FEntities.FUnit.F;
 
-import Floor.FTools.interfaces.StrongSpawner;
+import Floor.FTools.interfaces.OwnerSpawner;
 import arc.math.Mathf;
 import arc.struct.Bits;
 import arc.struct.Seq;
@@ -13,10 +13,10 @@ import mindustry.gen.Groups;
 import mindustry.gen.Unit;
 import mindustry.io.TypeIO;
 
-public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner {
+public class TileSpawnerUnit extends ENGSWEISUnitEntity implements OwnerSpawner {
     private final Seq<Integer> idList = new Seq<>();
     private final Seq<Integer> minerId = new Seq<>();
-    public Seq<TileMiner> miners = new Seq<>();
+    public Seq<Unit> miners = new Seq<>();
 
     protected TileSpawnerUnit() {
         this.applied = new Bits(Vars.content.getBy(ContentType.status).size);
@@ -32,13 +32,13 @@ public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner
     public void update() {
         if (minerId.size > 0 && miners.size == 0) {
             for (int id : minerId) {
-                miners.add((TileMiner) Groups.unit.getByID(id));
+                miners.add(Groups.unit.getByID(id));
             }
             minerId.clear();
         }
-        for (TileMiner sm : miners) {
-            if (sm.dead || sm.health() < 0) {
-                miners.remove(sm);
+        for (Unit u : miners) {
+            if (u.dead || u.health() < 0) {
+                miners.remove(u);
             }
         }
         super.update();
@@ -369,7 +369,7 @@ public class TileSpawnerUnit extends ENGSWEISUnitEntity implements StrongSpawner
     }
 
     @Override
-    public Seq<TileMiner> miner() {
+    public Seq<Unit> unit() {
         return miners;
     }
 }

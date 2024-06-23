@@ -8,16 +8,12 @@ import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.*;
 import Floor.FTools.classes.BossList;
-import arc.Core;
 import arc.graphics.Color;
-import arc.graphics.Gl;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
-import arc.graphics.gl.Shader;
 import arc.math.Interp;
 import arc.math.Mathf;
-import mindustry.Vars;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -34,20 +30,14 @@ import mindustry.entities.pattern.ShootPattern;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.graphics.Shaders;
-import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
 
-import static arc.Core.files;
 import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.math.Angles.randLenVectors;
-import static mindustry.Vars.renderer;
-import static mindustry.Vars.tree;
 
 public class FUnits {
     public static UnitType transfer, shuttlev_I, bulletInterception_a;
@@ -119,8 +109,8 @@ public class FUnits {
             }});
         }};
         bulletInterception_a = new UnitType("bulletInterception_a") {{
-            constructor = UnitEntity::create;
-            controller = u -> new WeaponDefendAI();
+            constructor = FollowUnit::create;
+            controller = u -> new FollowAI();
 
             health = 1000;
             speed = 1.5F;
@@ -170,7 +160,7 @@ public class FUnits {
             }});
         }};
         bulletInterception = new UpGradeUnitType("bulletInterception") {{
-            constructor = FLegsUnit::create;
+            constructor = SpawnerUnit::create;
 
             range = 1000;
             health = 10000;
@@ -187,6 +177,9 @@ public class FUnits {
                 angle = 360;
                 whenShooting = false;
             }});
+            abilities.add(new OwnerUnitSpawnAbility(bulletInterception_a, 600, 0, 0));
+
+
             weapons.add(new PointDefenseWeapon() {{
                 mirror = false;
                 rotateSpeed = 360;
@@ -197,13 +190,6 @@ public class FUnits {
                     damage = 300;
                     maxRange = 100;
                     hitEffect = Fx.none;
-                }};
-            }});
-            weapons.add(new Weapon() {{
-                reload = 150;
-                mirror = false;
-                bullet = new BulletType() {{
-                    spawnUnit = bulletInterception;
                 }};
             }});
             weapons.add(new Weapon() {{
@@ -985,7 +971,7 @@ public class FUnits {
             health = 2000;
             armor = 9f;
 
-            abilities.add(new StrongMinerAbility(transfer, 2400, 1, 1));
+            abilities.add(new OwnerUnitSpawnAbility(transfer, 2400, 1, 1));
             abilities.add(new ShieldRegenFieldAbility(25, 900, 90, range));
 
             weapons.add(new Weapon() {{

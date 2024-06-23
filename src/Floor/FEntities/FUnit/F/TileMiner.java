@@ -3,8 +3,10 @@ package Floor.FEntities.FUnit.F;
 
 import Floor.FAI.PoseBridgeCommand;
 import Floor.FTools.classes.FLocated;
+import Floor.FTools.interfaces.OwnerSpawner;
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import arc.util.io.Reads;
@@ -28,11 +30,12 @@ import static mindustry.Vars.content;
 import static mindustry.Vars.world;
 
 
-public class TileMiner extends UnitEntityLegacyMono {
+public class TileMiner extends UnitEntityLegacyMono implements OwnerSpawner {
     private int sid = -1;
     public Unit spawner;
     public Floor[] tiles = new Floor[2];
     public Tile lastMineTile = null;
+
     @Override
     public void update() {
 
@@ -342,6 +345,7 @@ public class TileMiner extends UnitEntityLegacyMono {
     }
 
     protected TileMiner() {
+        super();
     }
 
     public static TileMiner create() {
@@ -576,7 +580,7 @@ public class TileMiner extends UnitEntityLegacyMono {
         sid = read.i();
         FLocated.tm.put(mineTile, this);
         mineTimer = read.f();
-        if(controller instanceof CommandAI && !(controller instanceof PoseBridgeCommand)){
+        if (controller instanceof CommandAI && !(controller instanceof PoseBridgeCommand)) {
             controller = new PoseBridgeCommand();
             controller.unit(this);
         }
@@ -640,5 +644,20 @@ public class TileMiner extends UnitEntityLegacyMono {
     public void clearItem() {
         super.clearItem();
         tiles[0] = tiles[1] = null;
+    }
+
+    @Override
+    public Seq<Unit> unit() {
+        return null;
+    }
+
+    @Override
+    public void spawner(Unit u) {
+        this.spawner = u;
+    }
+
+    @Override
+    public Unit spawner() {
+        return spawner;
     }
 }
