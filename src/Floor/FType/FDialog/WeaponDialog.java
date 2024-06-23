@@ -340,9 +340,6 @@ public class WeaponDialog extends BaseDialog implements EffectTableGetter {
         } else {
             this.weapon = new Weapon();
             cloneWeapon(weapon, this.weapon);
-            weapon.reload = 500;
-            weapon.shoot.shots = 1;
-            weapon.targetSwitchInterval = weapon.targetInterval = 500;
             type = "default";
         }
     }

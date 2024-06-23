@@ -1,17 +1,20 @@
 package Floor.FType.FDialog;
 
 import Floor.FEntities.FAbility.SprintingAbility;
+import Floor.FEntities.FBulletType.LimitBulletType;
 import arc.Core;
 import arc.func.Cons;
+import arc.graphics.Color;
 import arc.scene.actions.Actions;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.io.PropertiesUtils;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.core.GameState;
+import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
-import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.bullet.BulletType;
+import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.entities.units.WeaponMount;
@@ -46,8 +49,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         for (weaponPack wp : weapons) {
             wp.weapon.load();
             wp.weapon.init();
-            wp.weapon.bullet.load();
-            wp.weapon.bullet.init();
+            if (wp.weapon.bullet != null) {
+                wp.weapon.bullet.load();
+                wp.weapon.bullet.init();
+            }
             we.add(wp.weapon);
         }
         for (abilityPack ap : abilities) {
@@ -99,7 +104,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         shown(ProjectUtils::updateHeavy);
 
         hidden(() -> upper.get(seed));
-        hidden(this::removeTables);
+        //hidden(this::removeTables);
 
         buttons.button("@back", Icon.left, () -> {
             state.set(GameState.State.playing);
@@ -118,7 +123,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 weapons.add(w);
                 freeSize -= w.heavy;
                 rebuildWeapon();
-                updateTable();
+                //updateTable();
             }
         }).width(200);
         buttons.button(Core.bundle.get("dialog.ability.add"), Icon.add, () -> {
@@ -127,7 +132,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 abilities.add(a);
                 freeSize -= a.heavy;
                 rebuildAbility();
-                updateTable();
+                //updateTable();
             }
         }).width(200);
         buttons.button(Core.bundle.get("dialog.unit.base"), Icon.pencil, () -> {
@@ -151,7 +156,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 }
             }).width(100);
             bd.shown(() -> freeSize += getBaseHeavy(false));
-            bd.shown(this::hideTables);
+            //bd.shown(this::hideTables);
             bd.hidden(() -> freeSize -= getBaseHeavy(true));
             bd.hidden(this::showTables);
             bd.show();
@@ -228,22 +233,22 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
     public void rebuild() {
         cont.clear();
-        cont.pane(t -> {
-            t.setBackground(Tex.buttonEdge1);
-            located = t;
-        }).width(900).height(900);
+//        cont.pane(t -> {
+//            t.setBackground(Tex.buttonEdge1);
+//            located = t;
+//        }).width(900).height(900);
         cont.pane(t -> {
             t.table(w -> {
                 w.setBackground(Tex.buttonEdge1);
                 LWeapon = w;
-            }).width(500).growY();
+            })/*.width(500)*/.growY();
             t.table(a -> {
                 a.setBackground(Tex.buttonEdge1);
                 LAbility = a;
-            }).width(500).growY();
-        }).width(1000);
+            })/*.width(500)*/.growY();
+        })/*.width(1000)*/;
 
-        rebuildLocated();
+        //rebuildLocated();
         rebuildWeapon();
         rebuildAbility();
     }
@@ -538,7 +543,9 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                     MoveLightningAbility a = new MoveLightningAbility(read.f(), read.i(), read.f(), read.f(),
                             read.f(), read.f(), TypeIO.readColor(read));
                     a.x = read.f();
-                    a.bullet = TypeIO.readBulletType(read);
+                    if (read.bool()) {
+                        a.bullet = readBullet(read);
+                    }
                     a.bulletAngle = read.f();
                     a.bulletSpread = read.f();
                     a.alternate = read.bool();
@@ -565,7 +572,9 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 case "defense" -> w = new PointDefenseWeapon();
                 default -> w = new Weapon();
             }
-            w.bullet = TypeIO.readBulletType(read);
+            if (read.bool()) {
+                w.bullet = readBullet(read);
+            }
             w.ejectEffect = TypeIO.readEffect(read);
             w.x = read.f();
             w.y = read.f();
@@ -581,12 +590,14 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             w.alwaysContinuous = read.bool();
             w.controllable = read.bool();
             w.aiControllable = read.bool();
+            w.alwaysShooting = read.bool();
             w.autoTarget = read.bool();
             w.predictTarget = read.bool();
             w.useAttackRange = read.bool();
             w.targetInterval = read.f();
             w.targetSwitchInterval = read.f();
             w.reload = read.f();
+            w.inaccuracy = read.f();
             w.shake = read.f();
             w.recoil = read.f();
             w.recoils = read.i();
@@ -621,16 +632,19 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 p.color = TypeIO.readColor(read);
                 p.beamEffect = TypeIO.readEffect(read);
             }
+            weapons.add(new weaponPack(w));
         }
-        healthBoost = read.f();
-        speedBoost = read.f();
+        eff.healthMultiplier = healthBoost = read.f();
+        eff.speedMultiplier = speedBoost = read.f();
     }
 
     public void write(Writes write) {
         for (weaponPack w : weapons) {
             w.weapon.load();
+            w.weapon.init();
             if (w.weapon.bullet != null) {
                 w.weapon.bullet.load();
+                w.weapon.bullet.init();
             }
         }
         write.i(abilities.size);
@@ -694,7 +708,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 write.f(a.maxSpeed);
                 TypeIO.writeColor(write, a.color);
                 write.f(a.x);
-                TypeIO.writeBulletType(write, a.bullet);
+                write.bool(a.bullet != null);
+                if (a.bullet != null) {
+                    writeBullet(write, a.bullet);
+                }
                 write.f(a.bulletAngle);
                 write.f(a.bulletSpread);
                 write.bool(a.alternate);
@@ -721,7 +738,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             } else {
                 write.str("default");
             }
-            TypeIO.writeBulletType(write, weapon.bullet);
+            write.bool(weapon.bullet != null);
+            if (weapon.bullet != null) {
+                writeBullet(write, weapon.bullet);
+            }
             TypeIO.writeEffect(write, weapon.ejectEffect);
             write.f(weapon.x);
             write.f(weapon.y);
@@ -758,7 +778,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             write.bool(weapon.ignoreRotation);
             write.bool(weapon.noAttack);
             write.bool(weapon.linearWarmup);
-            writeParts(write, weapon.parts.items);
+            writeParts(write, weapon.parts.size == 0 ? new DrawPart[0] : weapon.parts.items);
             writeShoot(write, weapon.shoot);
             if (weapon instanceof RepairBeamWeapon r) {
                 write.f(r.repairSpeed);
@@ -782,6 +802,205 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
         write.f(healthBoost);
         write.f(speedBoost);
+    }
+
+    public void writeBullet(Writes write, BulletType bullet) {
+        LimitBulletType l;
+        if (bullet instanceof LimitBulletType) {
+            l = (LimitBulletType) bullet;
+        } else {
+            l = null;
+        }
+        write.f(bullet.damage);
+        write.f(bullet.fragAngle);
+        write.i(bullet.fragBullets);
+        write.bool(bullet.fragBullet != null);
+        if (bullet.fragBullet != null) {
+            writeBullet(write, bullet.fragBullet);
+        }
+        write.f(bullet.lightningAngle);
+        write.f(bullet.lightningCone);
+        write.i(bullet.lightningLength);
+        write.i(bullet.lightningLengthRand);
+        write.f(bullet.lightningDamage);
+        write.i(bullet.lightning);
+        write.f(bullet.lifetime);
+        write.f(bullet.speed);
+        write.f(bullet.hitSize);
+        write.f(bullet.drawSize);
+        write.f(bullet.drag);
+        write.i(bullet.pierceCap);
+        write.f(bullet.pierceDamageFactor);
+        write.f(bullet.optimalLifeFract);
+        write.f(bullet.layer);
+        write.bool(bullet.pierce);
+        write.bool(bullet.pierceBuilding);
+        write.bool(bullet.removeAfterPierce);
+        TypeIO.writeSound(write, bullet.hitSound);
+        write.f(bullet.hitSoundPitch);
+        write.f(bullet.hitSoundVolume);
+        TypeIO.writeSound(write, bullet.despawnSound);
+        write.f(bullet.inaccuracy);
+        write.f(bullet.ammoMultiplier);
+        write.f(bullet.reloadMultiplier);
+        write.f(bullet.buildingDamageMultiplier);
+        write.f(bullet.recoil);
+        write.f(bullet.splashDamage);
+        write.bool(bullet.killShooter);
+        write.bool(bullet.instantDisappear);
+        write.bool(bullet.scaledSplashDamage);
+        write.f(bullet.knockback);
+        write.f(bullet.createChance);
+        write.f(bullet.rangeChange);
+        write.bool(bullet.impact);
+        write.bool(bullet.collidesTiles);
+        write.bool(bullet.collidesTeam);
+        write.bool(bullet.collidesAir);
+        write.bool(bullet.collidesGround);
+        write.bool(bullet.collides);
+        write.bool(bullet.collideFloor);
+        write.bool(bullet.collideTerrain);
+        write.bool(bullet.keepVelocity);
+        write.bool(bullet.scaleLife);
+        write.bool(bullet.hittable);
+        write.bool(bullet.reflectable);
+        write.bool(bullet.absorbable);
+        write.bool(bullet.backMove);
+        write.bool(bullet.ignoreSpawnAngle);
+        write.f(bullet.rangeOverride);
+        write.f(bullet.healPercent);
+        write.f(bullet.healAmount);
+        write.bool(bullet.fragOnHit);
+        write.bool(bullet.fragOnAbsorb);
+        write.bool(bullet.pierceArmor);
+        write.f(bullet.hitShake);
+        write.f(bullet.despawnShake);
+        write.f(bullet.fragRandomSpread);
+        write.f(bullet.fragSpread);
+        write.f(bullet.fragAngle);
+        write.bool(bullet.trailRotation);
+        write.bool(bullet.splashDamagePierce);
+        writeParts(write, bullet.parts.items);
+        //(bullet.trailInterp);
+        write.f(bullet.trailChance);
+        write.f(bullet.trailInterval);
+        write.f(bullet.trailParam);
+        write.i(bullet.trailLength);
+        write.f(bullet.trailWidth);
+        write.f(bullet.trailSinMag);
+        write.f(bullet.trailSinScl);
+        write.f(bullet.splashDamageRadius);
+        write.f(bullet.homingPower);
+        write.f(bullet.homingRange);
+        write.f(bullet.homingDelay);
+        write.f(bullet.suppressionRange);
+        write.f(bullet.suppressionDuration);
+        write.f(bullet.suppressionEffectChance);
+        write.f(bullet.weaveScale);
+        write.f(bullet.weaveMag);
+        write.bool(bullet.weaveRandom);
+        write.i(bullet.puddles);
+        write.f(bullet.puddleRange);
+        write.f(bullet.puddleAmount);
+        write.f(bullet.lightRadius);
+        write.f(bullet.lightOpacity);
+        write.bool(bullet.puddleLiquid != null);
+        if (bullet.puddleLiquid != null) {
+            TypeIO.writeLiquid(write, bullet.puddleLiquid);
+        }
+        TypeIO.writeColor(write, bullet.hitColor);
+        TypeIO.writeColor(write, bullet.healColor);
+        TypeIO.writeColor(write, bullet.trailColor);
+        TypeIO.writeColor(write, bullet.lightningColor);
+        TypeIO.writeColor(write, bullet.lightColor);
+        writeEffect(write, bullet.shootEffect);
+        writeEffect(write, bullet.despawnEffect);
+        writeEffect(write, bullet.hitEffect);
+        writeEffect(write, bullet.chargeEffect);
+        writeEffect(write, bullet.smokeEffect);
+        writeEffect(write, bullet.healEffect);
+        writeEffect(write, bullet.trailEffect);
+        write.bool(l != null);
+        if (l != null) {
+            write.str(l.type);
+            write.bool(l.hitUnits);
+            write.bool(l.haveEmp);
+            write.bool(l.havePercent);
+            write.bool(l.continuous);
+            write.bool(l.largeHit);
+            write.bool(l.drawFlare);
+            write.bool(l.rotateFlare);
+            write.f(l.percent);
+            write.f(l.empDamage);
+            write.f(l.radius);
+            write.f(l.timeDuration);
+            write.f(l.timeIncrease);
+            write.f(l.powerDamageScl);
+            write.f(l.powerSclDecrease);
+            write.f(l.unitDamageScl);
+            write.f(l.width);
+            write.f(l.height);
+            write.f(l.shrinkX);
+            write.f(l.shrinkY);
+            write.f(l.spin);
+            write.f(l.rotationOffset);
+            write.f(l.damageInterval);
+            write.f(l.shake);
+            write.f(l.flareLength);
+            write.f(l.lightStroke);
+            write.f(l.oscScl);
+            write.f(l.oscMag);
+            write.f(l.flareWidth);
+            write.f(l.flareInnerScl);
+            write.f(l.flareInnerLenScl);
+            write.f(l.flareLayer);
+            write.f(l.flareRotSpeed);
+            write.f(l.laserCLength);
+            write.f(l.fadeTime);
+            write.f(l.strokeFrom);
+            write.f(l.strokeTo);
+            write.f(l.pointyScaling);
+            write.f(l.backLength);
+            write.f(l.frontLength);
+            write.f(l.laserLength);
+            write.f(l.lengthFalloff);
+            write.f(l.sideLength);
+            write.f(l.sideWidth);
+            write.f(l.sideAngle);
+            write.f(l.lightningSpacing);
+            write.f(l.lightningDelay);
+            write.f(l.lightningAngleRand);
+            write.f(l.trailSpacing);
+            write.f(l.railLength);
+            write.f(l.pointEffectSpace);
+            write.i(l.lengthWidthPans.length);
+            for (float f : l.lengthWidthPans) {
+                write.f(f);
+            }
+            write.i(l.divisions);
+            write.i(l.bulletLightningLength);
+            write.i(l.bulletLightningLengthRand);
+            TypeIO.writeColor(write, l.backColor);
+            TypeIO.writeColor(write, l.frontColor);
+            TypeIO.writeColor(write, l.mixColorFrom);
+            TypeIO.writeColor(write, l.mixColorTo);
+            TypeIO.writeColor(write, l.flareColor);
+            TypeIO.writeColor(write, l.bulletLightningColor);
+            write.i(l.colors.length);
+            for (Color c : l.colors) {
+                TypeIO.writeColor(write, c);
+            }
+            writeEffect(write, l.hitPowerEffect);
+            writeEffect(write, l.chainEffect);
+            writeEffect(write, l.applyEffect);
+            writeEffect(write, l.laserEffect);
+            writeEffect(write, l.pierceEffect);
+            writeEffect(write, l.pointEffect);
+            writeEffect(write, l.lineEffect);
+            writeEffect(write, l.endEffect);
+            //shrinkInterp;
+            //lengthInterp;
+        }
     }
 
     public void writeParts(Writes write, DrawPart[] parts) {
@@ -935,18 +1154,305 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
     }
 
+    public void writeEffect(Writes write, Effect effect) {
+        if (effect instanceof WaveEffect) {
+            write.str("wave");
+        } else if (effect instanceof WrapEffect) {
+            write.str("wrap");
+        } else if (effect instanceof RadialEffect) {
+            write.str("radial");
+        } else if (effect instanceof ParticleEffect) {
+            write.str("particle");
+        } else if (effect instanceof ExplosionEffect) {
+            write.str("explosion");
+        } else {
+            write.str("effect");
+            TypeIO.writeEffect(write, effect);
+            return;
+        }
+        write.f(effect.lifetime);
+        write.f(effect.clip);
+        write.f(effect.startDelay);
+        write.f(effect.baseRotation);
+        write.bool(effect.followParent);
+        write.bool(effect.rotWithParent);
+        write.f(effect.layer);
+        write.f(effect.layerDuration);
+        if (effect instanceof WaveEffect waveEffect) {
+            write.f(waveEffect.sizeFrom);
+            write.f(waveEffect.sizeTo);
+            write.i(waveEffect.sides);
+            write.f(waveEffect.lightScl);
+            write.f(waveEffect.lightOpacity);
+            write.f(waveEffect.rotation);
+            write.f(waveEffect.strokeFrom);
+            write.f(waveEffect.strokeTo);
+            write.f(waveEffect.offsetX);
+            write.f(waveEffect.offsetY);
+            TypeIO.writeColor(write, waveEffect.colorFrom);
+            TypeIO.writeColor(write, waveEffect.colorTo);
+            TypeIO.writeColor(write, waveEffect.lightColor);
+            //(waveEffect.interp);
+            //(waveEffect.lightInterp);
+        } else if (effect instanceof WrapEffect wrapEffect) {
+            write.f(wrapEffect.rotation);
+            writeEffect(write, wrapEffect.effect);
+            TypeIO.writeColor(write, wrapEffect.color);
+        } else if (effect instanceof RadialEffect radialEffect) {
+            write.f(radialEffect.rotationSpacing);
+            write.f(radialEffect.rotationOffset);
+            write.f(radialEffect.lengthOffset);
+            write.i(radialEffect.amount);
+            writeEffect(write, radialEffect.effect);
+        } else if (effect instanceof ParticleEffect particleEffect) {
+            write.i(particleEffect.particles);
+            write.bool(particleEffect.randLength);
+            write.bool(particleEffect.casingFlip);
+            write.f(particleEffect.cone);
+            write.f(particleEffect.length);
+            write.f(particleEffect.baseLength);
+            write.f(particleEffect.offsetX);
+            write.f(particleEffect.offsetY);
+            write.f(particleEffect.lightScl);
+            write.f(particleEffect.strokeFrom);
+            write.f(particleEffect.strokeTo);
+            write.f(particleEffect.lenFrom);
+            write.f(particleEffect.lenTo);
+            write.bool(particleEffect.line);
+            write.bool(particleEffect.cap);
+            write.f(particleEffect.lightOpacity);
+            //(particleEffect.interp);
+            //(particleEffect.sizeInterp);
+            TypeIO.writeColor(write, particleEffect.colorFrom);
+            TypeIO.writeColor(write, particleEffect.colorTo);
+            TypeIO.writeColor(write, particleEffect.lightColor);
+        } else {
+            ExplosionEffect explosionEffect = (ExplosionEffect) effect;
+            write.f(explosionEffect.waveLife);
+            write.f(explosionEffect.waveStroke);
+            write.f(explosionEffect.waveRad);
+            write.f(explosionEffect.waveRadBase);
+            write.f(explosionEffect.sparkStroke);
+            write.f(explosionEffect.sparkRad);
+            write.f(explosionEffect.sparkLen);
+            write.f(explosionEffect.smokeSize);
+            write.f(explosionEffect.smokeSizeBase);
+            write.f(explosionEffect.smokeRad);
+            write.i(explosionEffect.smokes);
+            write.i(explosionEffect.sparks);
+            TypeIO.writeColor(write, explosionEffect.waveColor);
+            TypeIO.writeColor(write, explosionEffect.smokeColor);
+            TypeIO.writeColor(write, explosionEffect.sparkColor);
+        }
+    }
+
+    public LimitBulletType readBullet(Reads read) {
+        LimitBulletType bullet = new LimitBulletType();
+        bullet.damage = read.f();
+        bullet.fragAngle = read.f();
+        bullet.fragBullets = read.i();
+        if (read.bool()) {
+            bullet.fragBullet = readBullet(read);
+        }
+        bullet.lightningAngle = read.f();
+        bullet.lightningCone = read.f();
+        bullet.lightningLength = read.i();
+        bullet.lightningLengthRand = read.i();
+        bullet.lightningDamage = read.f();
+        bullet.lightning = read.i();
+        bullet.lifetime = read.f();
+        bullet.speed = read.f();
+        bullet.hitSize = read.f();
+        bullet.drawSize = read.f();
+        bullet.drag = read.f();
+        bullet.pierceCap = read.i();
+        bullet.pierceDamageFactor = read.f();
+        bullet.optimalLifeFract = read.f();
+        bullet.layer = read.f();
+        bullet.pierce = read.bool();
+        bullet.pierceBuilding = read.bool();
+        bullet.removeAfterPierce = read.bool();
+        bullet.hitSound = TypeIO.readSound(read);
+        bullet.hitSoundPitch = read.f();
+        bullet.hitSoundVolume = read.f();
+        bullet.despawnSound = TypeIO.readSound(read);
+        bullet.inaccuracy = read.f();
+        bullet.ammoMultiplier = read.f();
+        bullet.reloadMultiplier = read.f();
+        bullet.buildingDamageMultiplier = read.f();
+        bullet.recoil = read.f();
+        bullet.splashDamage = read.f();
+        bullet.killShooter = read.bool();
+        bullet.instantDisappear = read.bool();
+        bullet.scaledSplashDamage = read.bool();
+        bullet.knockback = read.f();
+        bullet.createChance = read.f();
+        bullet.rangeChange = read.f();
+        bullet.impact = read.bool();
+        bullet.collidesTiles = read.bool();
+        bullet.collidesTeam = read.bool();
+        bullet.collidesAir = read.bool();
+        bullet.collidesGround = read.bool();
+        bullet.collides = read.bool();
+        bullet.collideFloor = read.bool();
+        bullet.collideTerrain = read.bool();
+        bullet.keepVelocity = read.bool();
+        bullet.scaleLife = read.bool();
+        bullet.hittable = read.bool();
+        bullet.reflectable = read.bool();
+        bullet.absorbable = read.bool();
+        bullet.backMove = read.bool();
+        bullet.ignoreSpawnAngle = read.bool();
+        bullet.rangeOverride = read.f();
+        bullet.healPercent = read.f();
+        bullet.healAmount = read.f();
+        bullet.fragOnHit = read.bool();
+        bullet.fragOnAbsorb = read.bool();
+        bullet.pierceArmor = read.bool();
+        bullet.hitShake = read.f();
+        bullet.despawnShake = read.f();
+        bullet.fragRandomSpread = read.f();
+        bullet.fragSpread = read.f();
+        bullet.fragAngle = read.f();
+        bullet.trailRotation = read.bool();
+        bullet.splashDamagePierce = read.bool();
+        bullet.parts = new Seq<>(readParts(read));
+        bullet.trailChance = read.f();
+        bullet.trailInterval = read.f();
+        bullet.trailParam = read.f();
+        bullet.trailLength = read.i();
+        bullet.trailWidth = read.f();
+        bullet.trailSinMag = read.f();
+        bullet.trailSinScl = read.f();
+        bullet.splashDamageRadius = read.f();
+        bullet.homingPower = read.f();
+        bullet.homingRange = read.f();
+        bullet.homingDelay = read.f();
+        bullet.suppressionRange = read.f();
+        bullet.suppressionDuration = read.f();
+        bullet.suppressionEffectChance = read.f();
+        bullet.weaveScale = read.f();
+        bullet.weaveMag = read.f();
+        bullet.weaveRandom = read.bool();
+        bullet.puddles = read.i();
+        bullet.puddleRange = read.f();
+        bullet.puddleAmount = read.f();
+        bullet.lightRadius = read.f();
+        bullet.lightOpacity = read.f();
+        if (read.bool()) {
+            bullet.puddleLiquid = TypeIO.readLiquid(read);
+        }
+        bullet.hitColor = TypeIO.readColor(read);
+        bullet.healColor = TypeIO.readColor(read);
+        bullet.trailColor = TypeIO.readColor(read);
+        bullet.lightningColor = TypeIO.readColor(read);
+        bullet.lightColor = TypeIO.readColor(read);
+        bullet.shootEffect = readEffect(read);
+        bullet.despawnEffect = readEffect(read);
+        bullet.hitEffect = readEffect(read);
+        bullet.chargeEffect = readEffect(read);
+        bullet.smokeEffect = readEffect(read);
+        bullet.healEffect = readEffect(read);
+        bullet.trailEffect = readEffect(read);
+        if (read.bool()) {
+            bullet.type = read.str();
+            bullet.hitUnits = read.bool();
+            bullet.haveEmp = read.bool();
+            bullet.havePercent = read.bool();
+            bullet.continuous = read.bool();
+            bullet.largeHit = read.bool();
+            bullet.drawFlare = read.bool();
+            bullet.rotateFlare = read.bool();
+            bullet.percent = read.f();
+            bullet.empDamage = read.f();
+            bullet.radius = read.f();
+            bullet.timeDuration = read.f();
+            bullet.timeIncrease = read.f();
+            bullet.powerDamageScl = read.f();
+            bullet.powerSclDecrease = read.f();
+            bullet.unitDamageScl = read.f();
+            bullet.width = read.f();
+            bullet.height = read.f();
+            bullet.shrinkX = read.f();
+            bullet.shrinkY = read.f();
+            bullet.spin = read.f();
+            bullet.rotationOffset = read.f();
+            bullet.damageInterval = read.f();
+            bullet.shake = read.f();
+            bullet.flareLength = read.f();
+            bullet.lightStroke = read.f();
+            bullet.oscScl = read.f();
+            bullet.oscMag = read.f();
+            bullet.flareWidth = read.f();
+            bullet.flareInnerScl = read.f();
+            bullet.flareInnerLenScl = read.f();
+            bullet.flareLayer = read.f();
+            bullet.flareRotSpeed = read.f();
+            bullet.laserCLength = read.f();
+            bullet.fadeTime = read.f();
+            bullet.strokeFrom = read.f();
+            bullet.strokeTo = read.f();
+            bullet.pointyScaling = read.f();
+            bullet.backLength = read.f();
+            bullet.frontLength = read.f();
+            bullet.laserLength = read.f();
+            bullet.lengthFalloff = read.f();
+            bullet.sideLength = read.f();
+            bullet.sideWidth = read.f();
+            bullet.sideAngle = read.f();
+            bullet.lightningSpacing = read.f();
+            bullet.lightningDelay = read.f();
+            bullet.lightningAngleRand = read.f();
+            bullet.trailSpacing = read.f();
+            bullet.railLength = read.f();
+            bullet.pointEffectSpace = read.f();
+            bullet.lengthWidthPans = new float[read.i()];
+            for (int i = 0; i < bullet.lengthWidthPans.length; i++) {
+                bullet.lengthWidthPans[i] = read.f();
+            }
+            bullet.divisions = read.i();
+            bullet.bulletLightningLength = read.i();
+            bullet.bulletLightningLengthRand = read.i();
+            bullet.backColor = TypeIO.readColor(read);
+            bullet.frontColor = TypeIO.readColor(read);
+            bullet.mixColorFrom = TypeIO.readColor(read);
+            bullet.mixColorTo = TypeIO.readColor(read);
+            bullet.flareColor = TypeIO.readColor(read);
+            bullet.bulletLightningColor = TypeIO.readColor(read);
+            bullet.colors = new Color[read.i()];
+            for (int i = 0; i < bullet.colors.length; i++) {
+                bullet.colors[i] = TypeIO.readColor(read);
+            }
+            bullet.hitPowerEffect = readEffect(read);
+            bullet.chainEffect = readEffect(read);
+            bullet.applyEffect = readEffect(read);
+            bullet.laserEffect = readEffect(read);
+            bullet.pierceEffect = readEffect(read);
+            bullet.pointEffect = readEffect(read);
+            bullet.lineEffect = readEffect(read);
+            bullet.endEffect = readEffect(read);
+        }
+        bullet.init();
+        bullet.load();
+        return bullet;
+    }
+
     public DrawPart[] readParts(Reads read) {
         int num = read.i();
         DrawPart[] result = new DrawPart[num];
         for (int i = 0; i < num; i++) {
             String type = read.str();
+            boolean turretShading = read.bool();
+            boolean under = read.bool();
+            int weaponIndex = read.i();
+            int recoilIndex = read.i();
             switch (type) {
                 case "shape" -> {
                     ShapePart s = new ShapePart();
-                    s.turretShading = read.bool();
-                    s.under = read.bool();
-                    s.weaponIndex = read.i();
-                    s.recoilIndex = read.i();
+                    s.turretShading = turretShading;
+                    s.under = under;
+                    s.weaponIndex = weaponIndex;
+                    s.recoilIndex = recoilIndex;
                     s.circle = read.bool();
                     s.hollow = read.bool();
                     s.mirror = read.bool();
@@ -970,6 +1476,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 }
                 case "hover" -> {
                     HoverPart h = new HoverPart();
+                    h.turretShading = turretShading;
+                    h.under = under;
+                    h.weaponIndex = weaponIndex;
+                    h.recoilIndex = recoilIndex;
                     h.x = read.f();
                     h.y = read.f();
                     h.rotation = read.f();
@@ -987,6 +1497,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 }
                 case "halo" -> {
                     HaloPart h = new HaloPart();
+                    h.turretShading = turretShading;
+                    h.under = under;
+                    h.weaponIndex = weaponIndex;
+                    h.recoilIndex = recoilIndex;
                     h.tri = read.bool();
                     h.hollow = read.bool();
                     h.mirror = read.bool();
@@ -1017,6 +1531,10 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 }
                 case "flare" -> {
                     FlarePart f = new FlarePart();
+                    f.turretShading = turretShading;
+                    f.under = under;
+                    f.weaponIndex = weaponIndex;
+                    f.recoilIndex = recoilIndex;
                     f.sides = read.i();
                     f.radius = read.f();
                     f.radiusTo = read.f();
@@ -1127,6 +1645,108 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
     }
 
+    public Effect readEffect(Reads read) {
+        String type = read.str();
+        if (type.equals("effect")) {
+            return TypeIO.readEffect(read);
+        }
+        Effect e;
+        float lifetime = read.f();
+        float clip = read.f();
+        float startDelay = read.f();
+        float baseRotation = read.f();
+        boolean followParent = read.bool();
+        boolean rotWithParent = read.bool();
+        float layer = read.f();
+        float layerDuration = read.f();
+        switch (type) {
+            case "wave" -> {
+                e = new WaveEffect();
+                WaveEffect w = (WaveEffect) e;
+                w.sizeFrom = read.f();
+                w.sizeTo = read.f();
+                w.sides = read.i();
+                w.lightScl = read.f();
+                w.lightOpacity = read.f();
+                w.rotation = read.f();
+                w.strokeFrom = read.f();
+                w.strokeTo = read.f();
+                w.offsetX = read.f();
+                w.offsetY = read.f();
+                w.colorFrom = TypeIO.readColor(read);
+                w.colorTo = TypeIO.readColor(read);
+                w.lightColor = TypeIO.readColor(read);
+            }
+            case "wrap" -> {
+                e = new WrapEffect();
+                WrapEffect w = (WrapEffect) e;
+                w.rotation = read.f();
+                w.effect = readEffect(read);
+                w.color = TypeIO.readColor(read);
+            }
+            case "radial" -> {
+                e = new RadialEffect();
+                RadialEffect r = (RadialEffect) e;
+                r.rotationSpacing = read.f();
+                r.rotationOffset = read.f();
+                r.lengthOffset = read.f();
+                r.amount = read.i();
+                r.effect = readEffect(read);
+            }
+            case "particle" -> {
+                e = new ParticleEffect();
+                ParticleEffect p = (ParticleEffect) e;
+                p.particles = read.i();
+                p.randLength = read.bool();
+                p.casingFlip = read.bool();
+                p.cone = read.f();
+                p.length = read.f();
+                p.baseLength = read.f();
+                p.offsetX = read.f();
+                p.offsetY = read.f();
+                p.lightScl = read.f();
+                p.strokeFrom = read.f();
+                p.strokeTo = read.f();
+                p.lenFrom = read.f();
+                p.lenTo = read.f();
+                p.line = read.bool();
+                p.cap = read.bool();
+                p.lightOpacity = read.f();
+                p.colorFrom = TypeIO.readColor(read);
+                p.colorTo = TypeIO.readColor(read);
+                p.lightColor = TypeIO.readColor(read);
+            }
+            default -> {
+                e = new ExplosionEffect();
+                ExplosionEffect ex = (ExplosionEffect) e;
+                ex.waveLife = read.f();
+                ex.waveStroke = read.f();
+                ex.waveRad = read.f();
+                ex.waveRadBase = read.f();
+                ex.sparkStroke = read.f();
+                ex.sparkRad = read.f();
+                ex.sparkLen = read.f();
+                ex.smokeSize = read.f();
+                ex.smokeSizeBase = read.f();
+                ex.smokeRad = read.f();
+                ex.smokes = read.i();
+                ex.sparks = read.i();
+                ex.waveColor = TypeIO.readColor(read);
+                ex.smokeColor = TypeIO.readColor(read);
+                ex.sparkColor = TypeIO.readColor(read);
+            }
+        }
+        e.lifetime = lifetime;
+        e.clip = clip;
+        e.startDelay = startDelay;
+        e.baseRotation = baseRotation;
+        e.followParent = followParent;
+        e.rotWithParent = rotWithParent;
+        e.layer = layer;
+        e.layerDuration = layerDuration;
+        return e;
+    }
+
     public class weaponPack {
         public Table on;
         public Weapon weapon;
@@ -1138,7 +1758,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             weapon.reload = 500;
             weapon.targetSwitchInterval = weapon.targetInterval = 500;
             dialog = new WeaponDialog("", weapon, w -> weapon = w, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::hideTables);
+            //dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = 0.5f + dialog.bulletHeavy;
         }
@@ -1146,7 +1766,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public weaponPack(Weapon weapon) {
             this.weapon = weapon;
             dialog = new WeaponDialog("", this.weapon, w -> this.weapon = w, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::hideTables);
+            //dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy + getShootVal(weapon.shoot) * dialog.bulletHeavy;
         }
@@ -1161,7 +1781,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public abilityPack() {
             ability = new ForceFieldAbility(90, 0, 0, Float.MAX_VALUE, 0, 0);
             dialog = new AbilityDialog("", () -> ability, a -> ability = a, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::hideTables);
+            //dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy;
         }
@@ -1169,7 +1789,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         public abilityPack(Ability ability) {
             this.ability = ability;
             dialog = new AbilityDialog("", () -> this.ability, a -> this.ability = a, f -> heavy = f);
-            dialog.shown(ProjectsLocated.this::hideTables);
+            //dialog.shown(ProjectsLocated.this::hideTables);
             dialog.hidden(ProjectsLocated.this::rebuild);
             heavy = dialog.heavy + dialog.bulletHeavy;
         }

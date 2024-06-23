@@ -36,7 +36,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected static String dia = "bullet";
     protected Runnable reb = this::rebuildBase;
     protected Runnable ret = this::rebuildType;
-    protected Boolp
+    protected final Boolp
             hevUser = () -> boost * (heavy + bullet.fragBullets * bulletHeavy) <= freeSize,
             baseUse = () -> couldUse("bulletBase", findVal("bulletBase")),
             fragUse = () -> couldUse("frags", findVal("frags")),

@@ -28,14 +28,16 @@ public class UnitProjectBlock extends Block {
     }
 
     public class UnitProjectBuild extends Building {
+        boolean applied = false;
         @Override
         public void updateTile() {
             if (projects == null) {
                 ProjectsLocated.create();
             }
-            if (Vars.player.unit() != null) {
-                if (!Vars.player.unit().hasEffect(ProjectsLocated.eff)) {
+            if (Vars.player.unit() != null && Vars.player.unit().spawnedByCore) {
+                if (!applied) {
                     projects.upper.get(Vars.player.unit());
+                    applied = true;
                 }
             }
         }
@@ -55,6 +57,11 @@ public class UnitProjectBlock extends Block {
         @Override
         public void add() {
             super.add();
+            if (projects == null) {
+                ProjectsLocated.create();
+            }
+            projects.setZero();
+            applied = false;
             num = 1;
         }
 
@@ -78,6 +85,7 @@ public class UnitProjectBlock extends Block {
                 ProjectsLocated.create();
             }
             projects.read(read);
+            applied = false;
             num = 1;
         }
     }
