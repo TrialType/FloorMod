@@ -1,11 +1,9 @@
 package Floor.FContent;
 
 import Floor.FAI.*;
-import Floor.FAI.GeodeticAI.*;
 import Floor.FEntities.FAbility.*;
 import Floor.FEntities.FBulletType.*;
 import Floor.FEntities.FUnit.F.*;
-import Floor.FEntities.FUnit.Geodetic.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
 import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.*;
@@ -68,9 +66,6 @@ public class FUnits {
 
     //special
     public static UnitType bulletInterception, rejuvenate;
-
-    //Geodetic
-    public static UnitType chou, yin, mao, wu, xu;
 
     //Test
     public static UnitType d;
@@ -1352,170 +1347,6 @@ public class FUnits {
                     colors = new Color[]{Pal.techBlue, Pal.techBlue, Pal.techBlue};
                 }};
             }});
-        }};
-
-        chou = new UnitType("chou") {{
-            constructor = ChouNiu::create;
-            controller = u -> new ChouAI();
-
-            physics = false;
-            allowLegStep = false;
-
-            drag = 0.03f;
-            accel = 1;
-            health = 500000;
-            hitSize = 45;
-            speed = 8;
-            armor = 280;
-            rotateSpeed = 36;
-
-            legCount = 4;
-            legLength = 4;
-
-            abilities.add(new LevelSign());
-        }};
-
-        yin = new UnitType("yin") {{
-            constructor = YinHu::create;
-            controller = u -> new YinAI();
-
-            drag = 0.5f;
-            accel = 1;
-            health = 250000;
-            hitSize = 45;
-            speed = 1.5f;
-            armor = 50;
-            rotateSpeed = 36;
-
-            legCount = 4;
-            legLength = 4;
-            mechLandShake = stepShake = 0;
-            allowLegStep = false;
-
-            weapons.add(new Weapon() {{
-                reload = 60;
-                mirror = false;
-                x = y = 0;
-                bullet = new OnePlaceBulletType() {{
-                    lifetime = 150;
-                    speed = 9;
-
-                    homingPower = 0.18f;
-                    homingRange = 1000;
-                    homingDelay = 15;
-
-                    Effect ef = new Effect(12, e -> {
-                        float range = (float) e.data;
-                        Draw.color(Color.white);
-                        Draw.z(Layer.buildBeam);
-                        Fill.circle(e.x, e.y, range);
-                    });
-                    addPlace(0, 0, 100, ef);
-                    addPlace(90, 41.5f, 15, ef);
-                    addPlace(40, 92.6f, 15, ef);
-                    addPlace(0, 101, 15, ef);
-                    addPlace(-90, 44.5f, 15, ef);
-                    addPlace(-40, 92.6f, 15, ef);
-                }};
-            }});
-
-            abilities.add(new LevelSign());
-        }};
-
-        mao = new UnitType("mao") {{
-            constructor = MaoTu::create;
-            controller = u -> new MaoAI();
-
-            drag = 0.5f;
-            accel = 1;
-            health = 150000;
-            hitSize = 25;
-            speed = 6f;
-            armor = 25;
-            rotateSpeed = 36;
-
-            legCount = 4;
-            legLength = 1;
-            mechLandShake = stepShake = 0;
-            allowLegStep = true;
-
-            weapons.add(new Weapon() {{
-                x = y = 0;
-                alwaysShooting = true;
-                reload = 45;
-                inaccuracy = 360;
-
-                bullet = new SummonBulletType() {{
-                    absorbable = hittable = reflectable = false;
-                    width = height = 60;
-
-                    lifetime = 360;
-                    speed = 8;
-
-                    homingPower = 1;
-                    homingRange = 1000;
-
-                    everySummonDelay = 12;
-                    summon = new BasicBulletType() {{
-                        width = height = 80;
-
-                        speed = 6;
-                        lifetime = 45;
-                        damage = 100;
-                        pierceBuilding = pierce = true;
-                        absorbable = hittable = reflectable = false;
-
-                        lightning = 2;
-                        lightningDamage = 100;
-                        lightningAngle = 75;
-                        lightningLength = 12;
-                    }};
-                }};
-            }});
-
-            abilities.add(new LevelSign());
-        }};
-
-        wu = new UnitType("wu") {{
-            constructor = WuMa::create;
-            controller = u -> new WuAI();
-
-            range = maxRange = 4000;
-            drag = 0.5f;
-            accel = 1;
-            health = 150000;
-            hitSize = 45;
-            speed = 1f;
-            armor = 25;
-            rotateSpeed = 36;
-
-            legCount = 4;
-            legLength = 1;
-            mechLandShake = stepShake = 0;
-            allowLegStep = true;
-
-            abilities.add(new LevelSign());
-        }};
-
-        xu = new UnitType("xu") {{
-            constructor = XuGou::create;
-            controller = u -> new XuAI();
-
-            range = maxRange = 4000;
-            drag = 0.5f;
-            accel = 1;
-            health = 100000;
-            hitSize = 12;
-            speed = 2f;
-            armor = 12;
-            rotateSpeed = 36;
-
-            legCount = 4;
-            legLength = 1;
-            mechLandShake = stepShake = 0;
-            allowLegStep = false;
-
-            abilities.add(new LevelSign());
         }};
 
         BossList.list.add(velocity);
