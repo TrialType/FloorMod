@@ -140,8 +140,6 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }).width(100);
         buttons.button(Core.bundle.get("@apply"), Icon.right, () -> {
             state.set(GameState.State.playing);
-            Core.settings.put("floor-project-heal", healthBoost);
-            Core.settings.put("floor-project-speed", speedBoost);
             hide();
         }).width(100);
         buttons.button(Core.bundle.get("dialog.weapon.add"), Icon.add, () -> {
@@ -185,7 +183,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             bd.shown(() -> freeSize += getBaseHeavy(false));
             //bd.shown(this::hideTables);
             bd.hidden(() -> freeSize -= getBaseHeavy(true));
-            bd.hidden(this::showTables);
+            //bd.hidden(this::showTables);
             bd.show();
         }).width(200);
     }
