@@ -5,7 +5,6 @@ import Floor.FType.FDialog.ProjectsLocated;
 import arc.scene.ui.layout.Table;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.Ability;
@@ -17,10 +16,11 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 
 import static Floor.FType.FDialog.ProjectsLocated.*;
+import static mindustry.Vars.player;
 
 public class UnitProjectBlock extends Block {
     private static int num = 0;
-    public Effect applyEffect = Fx.none;
+    public Effect applyEffect = Fx.unitDespawn;
 
     public UnitProjectBlock(String name) {
         super(name);
@@ -40,10 +40,10 @@ public class UnitProjectBlock extends Block {
             if (projects == null) {
                 ProjectsLocated.create();
             }
-            if (Vars.player.unit() != null && Vars.player.unit().spawnedByCore) {
-                if (!(Vars.player.unit().mounts[Vars.player.unit().mounts.length - 1] == sign)) {
-                    Vars.player.unit().apply(FStatusEffects.StrongStop, 180);
-                    projects.upper.get(Vars.player.unit());
+            if (player.unit() != null && player.unit().spawnedByCore) {
+                if (!(player.unit().mounts[player.unit().mounts.length - 1] == sign)) {
+                    player.unit().apply(FStatusEffects.StrongStop, 180);
+                    projects.upper.get(player.unit());
                 }
             }
         }
@@ -55,7 +55,7 @@ public class UnitProjectBlock extends Block {
                 if (projects == null) {
                     ProjectsLocated.create();
                 }
-                projects.set(Vars.player.unit());
+                projects.set(player.unit());
                 projects.show();
             }));
         }
@@ -76,16 +76,16 @@ public class UnitProjectBlock extends Block {
             num = 0;
             if (projects != null) {
                 projects.setZero();
-                if (Vars.player.unit() != null && Vars.player.unit().spawnedByCore) {
-                    projects.upper.get(Vars.player.unit());
-                    applyEffect.at(Vars.player.unit());
-                    Vars.player.unit().unapply(eff);
-                    WeaponMount[] mount = new WeaponMount[Vars.player.unit().type.weapons.size];
-                    System.arraycopy(Vars.player.unit().mounts, 0, mount, 0, mount.length);
-                    Vars.player.unit().mounts = mount;
-                    Ability[] ability = new Ability[Vars.player.unit().type.abilities.size];
-                    System.arraycopy(Vars.player.unit().abilities, 0, ability, 0, ability.length);
-                    Vars.player.unit().abilities = ability;
+                if (player.unit() != null && player.unit().spawnedByCore) {
+                    projects.upper.get(player.unit());
+                    applyEffect.at(player.unit().x, player.unit().y, 0, player.unit());
+                    player.unit().unapply(eff);
+                    WeaponMount[] mount = new WeaponMount[player.unit().type.weapons.size];
+                    System.arraycopy(player.unit().mounts, 0, mount, 0, mount.length);
+                    player.unit().mounts = mount;
+                    Ability[] ability = new Ability[player.unit().type.abilities.size];
+                    System.arraycopy(player.unit().abilities, 0, ability, 0, ability.length);
+                    player.unit().abilities = ability;
                 }
             }
         }
@@ -93,8 +93,8 @@ public class UnitProjectBlock extends Block {
         @Override
         public void write(Writes write) {
             super.write(write);
-            if (Vars.player.unit() != null) {
-                projects.set(Vars.player.unit());
+            if (player.unit() != null) {
+                projects.set(player.unit());
             }
             projects.write(write);
             num = 0;
