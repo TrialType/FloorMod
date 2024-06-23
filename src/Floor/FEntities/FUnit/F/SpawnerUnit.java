@@ -37,6 +37,8 @@ public class SpawnerUnit extends FLegsUnit implements OwnerSpawner {
             }
             childId.clear();
         }
+
+        child.removeAll(u -> u.dead || u.health <= 0 || !u.isAdded());
     }
 
     @Override

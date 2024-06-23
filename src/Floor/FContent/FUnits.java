@@ -112,11 +112,11 @@ public class FUnits {
             constructor = FollowUnit::create;
             controller = u -> new FollowAI();
 
-            health = 1000;
-            speed = 1.5F;
-            armor = 0;
-            rotateSpeed = 1;
-            drag = 0;
+            health = 3000;
+            speed = 2.5f;
+            armor = 20;
+            rotateSpeed = 5;
+            drag = 0.2f;
             accel = 1;
             maxRange = range = 120;
             isEnemy = false;
@@ -143,19 +143,7 @@ public class FUnits {
                 targetSwitchInterval = 0;
                 bullet = new BasicBulletType() {{
                     damage = 500;
-                    maxRange = 100;
-                }};
-            }});
-            weapons.add(new Weapon() {{
-
-                mirror = false;
-                x = 0;
-                alwaysShooting = true;
-                shoot = new ShootBarrel() {{
-                    firstShotDelay = 300;
-                }};
-                bullet = new ExplosionBulletType() {{
-                    damage = 0;
+                    rangeOverride = 100;
                 }};
             }});
         }};
@@ -177,7 +165,9 @@ public class FUnits {
                 angle = 360;
                 whenShooting = false;
             }});
-            abilities.add(new OwnerUnitSpawnAbility(bulletInterception_a, 600, 0, 0));
+            abilities.add(new OwnerUnitSpawnAbility(bulletInterception_a, 600, 0, 0) {{
+                maxNum = 4;
+            }});
 
 
             weapons.add(new PointDefenseWeapon() {{
