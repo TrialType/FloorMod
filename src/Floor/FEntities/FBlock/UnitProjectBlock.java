@@ -93,6 +93,9 @@ public class UnitProjectBlock extends Block {
         @Override
         public void write(Writes write) {
             super.write(write);
+            if (Vars.player.unit() != null) {
+                projects.set(Vars.player.unit());
+            }
             projects.write(write);
             num = 0;
         }

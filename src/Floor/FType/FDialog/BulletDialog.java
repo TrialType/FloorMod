@@ -19,7 +19,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
     protected int boost;
     protected Cons<BulletType> apply;
     protected Cons<Float> heavyApply;
-    protected String newType = "bullet";
+    protected String newType;
     //global
     protected LimitBulletType bullet;
     protected BulletDialog dialog;
@@ -57,6 +57,7 @@ public class BulletDialog extends BaseDialog implements EffectTableGetter {
         this.boost = boost.get();
         this.heavyApply = heavyApply;
         this.bullet = def.get() instanceof LimitBulletType l ? l : new LimitBulletType();
+        this.newType = this.bullet.type;
         if (bullet.fragBullet != null) {
             updateDialog(true);
         }
