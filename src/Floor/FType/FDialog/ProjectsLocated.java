@@ -671,6 +671,15 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
         eff.healthMultiplier = healthBoost = read.f();
         eff.speedMultiplier = speedBoost = read.f();
+        if (read.bool()) {
+            boost = new SprintingAbility();
+            boost.damage = read.f();
+            boost.maxLength = read.f();
+            boost.reload = read.f();
+            boost.powerReload = read.f();
+            boost.powerEffect = readEffect(read);
+            boost.maxPowerEffect = readEffect(read);
+        }
     }
 
     public void write(Writes write) {
@@ -837,6 +846,15 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
         write.f(healthBoost);
         write.f(speedBoost);
+        write.bool(boost != null);
+        if (boost != null) {
+            write.f(boost.damage);
+            write.f(boost.maxLength);
+            write.f(boost.reload);
+            write.f(boost.powerReload);
+            writeEffect(write, boost.powerEffect);
+            writeEffect(write, boost.maxPowerEffect);
+        }
     }
 
     public void writeBullet(Writes write, BulletType bullet) {
@@ -1189,95 +1207,101 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         }
     }
 
-    public void writeEffect(Writes write, Effect effect) {
-        if (effect instanceof WaveEffect) {
-            write.str("wave");
-        } else if (effect instanceof WrapEffect) {
-            write.str("wrap");
-        } else if (effect instanceof RadialEffect) {
-            write.str("radial");
-        } else if (effect instanceof ParticleEffect) {
-            write.str("particle");
-        } else if (effect instanceof ExplosionEffect) {
-            write.str("explosion");
-        } else {
-            write.str("effect");
-            TypeIO.writeEffect(write, effect);
-            return;
-        }
-        write.f(effect.lifetime);
-        write.f(effect.clip);
-        write.f(effect.startDelay);
-        write.f(effect.baseRotation);
-        write.bool(effect.followParent);
-        write.bool(effect.rotWithParent);
-        write.f(effect.layer);
-        write.f(effect.layerDuration);
-        if (effect instanceof WaveEffect waveEffect) {
-            write.f(waveEffect.sizeFrom);
-            write.f(waveEffect.sizeTo);
-            write.i(waveEffect.sides);
-            write.f(waveEffect.lightScl);
-            write.f(waveEffect.lightOpacity);
-            write.f(waveEffect.rotation);
-            write.f(waveEffect.strokeFrom);
-            write.f(waveEffect.strokeTo);
-            write.f(waveEffect.offsetX);
-            write.f(waveEffect.offsetY);
-            TypeIO.writeColor(write, waveEffect.colorFrom);
-            TypeIO.writeColor(write, waveEffect.colorTo);
-            TypeIO.writeColor(write, waveEffect.lightColor);
-            //(waveEffect.interp);
-            //(waveEffect.lightInterp);
-        } else if (effect instanceof WrapEffect wrapEffect) {
-            write.f(wrapEffect.rotation);
-            writeEffect(write, wrapEffect.effect);
-            TypeIO.writeColor(write, wrapEffect.color);
-        } else if (effect instanceof RadialEffect radialEffect) {
-            write.f(radialEffect.rotationSpacing);
-            write.f(radialEffect.rotationOffset);
-            write.f(radialEffect.lengthOffset);
-            write.i(radialEffect.amount);
-            writeEffect(write, radialEffect.effect);
-        } else if (effect instanceof ParticleEffect particleEffect) {
-            write.i(particleEffect.particles);
-            write.bool(particleEffect.randLength);
-            write.bool(particleEffect.casingFlip);
-            write.f(particleEffect.cone);
-            write.f(particleEffect.length);
-            write.f(particleEffect.baseLength);
-            write.f(particleEffect.offsetX);
-            write.f(particleEffect.offsetY);
-            write.f(particleEffect.lightScl);
-            write.f(particleEffect.strokeFrom);
-            write.f(particleEffect.strokeTo);
-            write.f(particleEffect.lenFrom);
-            write.f(particleEffect.lenTo);
-            write.bool(particleEffect.line);
-            write.bool(particleEffect.cap);
-            write.f(particleEffect.lightOpacity);
-            //(particleEffect.interp);
-            //(particleEffect.sizeInterp);
-            TypeIO.writeColor(write, particleEffect.colorFrom);
-            TypeIO.writeColor(write, particleEffect.colorTo);
-            TypeIO.writeColor(write, particleEffect.lightColor);
-        } else {
-            ExplosionEffect explosionEffect = (ExplosionEffect) effect;
-            write.f(explosionEffect.waveLife);
-            write.f(explosionEffect.waveStroke);
-            write.f(explosionEffect.waveRad);
-            write.f(explosionEffect.waveRadBase);
-            write.f(explosionEffect.sparkStroke);
-            write.f(explosionEffect.sparkRad);
-            write.f(explosionEffect.sparkLen);
-            write.f(explosionEffect.smokeSize);
-            write.f(explosionEffect.smokeSizeBase);
-            write.f(explosionEffect.smokeRad);
-            write.i(explosionEffect.smokes);
-            write.i(explosionEffect.sparks);
-            TypeIO.writeColor(write, explosionEffect.waveColor);
-            TypeIO.writeColor(write, explosionEffect.smokeColor);
-            TypeIO.writeColor(write, explosionEffect.sparkColor);
+    public void writeEffect(Writes write, Effect e) {
+        write.bool(e instanceof MultiEffect);
+        if (e instanceof MultiEffect m) {
+            write.i(m.effects.length);
+            for (Effect effect : m.effects) {
+                if (effect instanceof WaveEffect) {
+                    write.str("wave");
+                } else if (effect instanceof WrapEffect) {
+                    write.str("wrap");
+                } else if (effect instanceof RadialEffect) {
+                    write.str("radial");
+                } else if (effect instanceof ParticleEffect) {
+                    write.str("particle");
+                } else if (effect instanceof ExplosionEffect) {
+                    write.str("explosion");
+                } else {
+                    write.str("effect");
+                    TypeIO.writeEffect(write, effect);
+                    return;
+                }
+                write.f(effect.lifetime);
+                write.f(effect.clip);
+                write.f(effect.startDelay);
+                write.f(effect.baseRotation);
+                write.bool(effect.followParent);
+                write.bool(effect.rotWithParent);
+                write.f(effect.layer);
+                write.f(effect.layerDuration);
+                if (effect instanceof WaveEffect waveEffect) {
+                    write.f(waveEffect.sizeFrom);
+                    write.f(waveEffect.sizeTo);
+                    write.i(waveEffect.sides);
+                    write.f(waveEffect.lightScl);
+                    write.f(waveEffect.lightOpacity);
+                    write.f(waveEffect.rotation);
+                    write.f(waveEffect.strokeFrom);
+                    write.f(waveEffect.strokeTo);
+                    write.f(waveEffect.offsetX);
+                    write.f(waveEffect.offsetY);
+                    TypeIO.writeColor(write, waveEffect.colorFrom);
+                    TypeIO.writeColor(write, waveEffect.colorTo);
+                    TypeIO.writeColor(write, waveEffect.lightColor);
+                    //(waveEffect.interp);
+                    //(waveEffect.lightInterp);
+                } else if (effect instanceof WrapEffect wrapEffect) {
+                    write.f(wrapEffect.rotation);
+                    writeEffect(write, wrapEffect.effect);
+                    TypeIO.writeColor(write, wrapEffect.color);
+                } else if (effect instanceof RadialEffect radialEffect) {
+                    write.f(radialEffect.rotationSpacing);
+                    write.f(radialEffect.rotationOffset);
+                    write.f(radialEffect.lengthOffset);
+                    write.i(radialEffect.amount);
+                    writeEffect(write, radialEffect.effect);
+                } else if (effect instanceof ParticleEffect particleEffect) {
+                    write.i(particleEffect.particles);
+                    write.bool(particleEffect.randLength);
+                    write.bool(particleEffect.casingFlip);
+                    write.f(particleEffect.cone);
+                    write.f(particleEffect.length);
+                    write.f(particleEffect.baseLength);
+                    write.f(particleEffect.offsetX);
+                    write.f(particleEffect.offsetY);
+                    write.f(particleEffect.lightScl);
+                    write.f(particleEffect.strokeFrom);
+                    write.f(particleEffect.strokeTo);
+                    write.f(particleEffect.lenFrom);
+                    write.f(particleEffect.lenTo);
+                    write.bool(particleEffect.line);
+                    write.bool(particleEffect.cap);
+                    write.f(particleEffect.lightOpacity);
+                    //(particleEffect.interp);
+                    //(particleEffect.sizeInterp);
+                    TypeIO.writeColor(write, particleEffect.colorFrom);
+                    TypeIO.writeColor(write, particleEffect.colorTo);
+                    TypeIO.writeColor(write, particleEffect.lightColor);
+                } else {
+                    ExplosionEffect explosionEffect = (ExplosionEffect) effect;
+                    write.f(explosionEffect.waveLife);
+                    write.f(explosionEffect.waveStroke);
+                    write.f(explosionEffect.waveRad);
+                    write.f(explosionEffect.waveRadBase);
+                    write.f(explosionEffect.sparkStroke);
+                    write.f(explosionEffect.sparkRad);
+                    write.f(explosionEffect.sparkLen);
+                    write.f(explosionEffect.smokeSize);
+                    write.f(explosionEffect.smokeSizeBase);
+                    write.f(explosionEffect.smokeRad);
+                    write.i(explosionEffect.smokes);
+                    write.i(explosionEffect.sparks);
+                    TypeIO.writeColor(write, explosionEffect.waveColor);
+                    TypeIO.writeColor(write, explosionEffect.smokeColor);
+                    TypeIO.writeColor(write, explosionEffect.sparkColor);
+                }
+            }
         }
     }
 
@@ -1682,105 +1706,114 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     }
 
     public Effect readEffect(Reads read) {
-        String type = read.str();
-        if (type.equals("effect")) {
-            return TypeIO.readEffect(read);
+        MultiEffect m = new MultiEffect();
+        if (read.bool()) {
+            int num = read.i();
+            m.effects = new Effect[num];
+            for (int i = 0; i < num; i++) {
+                String type = read.str();
+                if (type.equals("effect")) {
+                    Effect e = TypeIO.readEffect(read);
+                    return e == null ? Fx.none : e;
+                }
+                Effect e;
+                float lifetime = read.f();
+                float clip = read.f();
+                float startDelay = read.f();
+                float baseRotation = read.f();
+                boolean followParent = read.bool();
+                boolean rotWithParent = read.bool();
+                float layer = read.f();
+                float layerDuration = read.f();
+                switch (type) {
+                    case "wave" -> {
+                        e = new WaveEffect();
+                        WaveEffect w = (WaveEffect) e;
+                        w.sizeFrom = read.f();
+                        w.sizeTo = read.f();
+                        w.sides = read.i();
+                        w.lightScl = read.f();
+                        w.lightOpacity = read.f();
+                        w.rotation = read.f();
+                        w.strokeFrom = read.f();
+                        w.strokeTo = read.f();
+                        w.offsetX = read.f();
+                        w.offsetY = read.f();
+                        w.colorFrom = TypeIO.readColor(read);
+                        w.colorTo = TypeIO.readColor(read);
+                        w.lightColor = TypeIO.readColor(read);
+                    }
+                    case "wrap" -> {
+                        e = new WrapEffect();
+                        WrapEffect w = (WrapEffect) e;
+                        w.rotation = read.f();
+                        w.effect = readEffect(read);
+                        w.color = TypeIO.readColor(read);
+                    }
+                    case "radial" -> {
+                        e = new RadialEffect();
+                        RadialEffect r = (RadialEffect) e;
+                        r.rotationSpacing = read.f();
+                        r.rotationOffset = read.f();
+                        r.lengthOffset = read.f();
+                        r.amount = read.i();
+                        r.effect = readEffect(read);
+                    }
+                    case "particle" -> {
+                        e = new ParticleEffect();
+                        ParticleEffect p = (ParticleEffect) e;
+                        p.particles = read.i();
+                        p.randLength = read.bool();
+                        p.casingFlip = read.bool();
+                        p.cone = read.f();
+                        p.length = read.f();
+                        p.baseLength = read.f();
+                        p.offsetX = read.f();
+                        p.offsetY = read.f();
+                        p.lightScl = read.f();
+                        p.strokeFrom = read.f();
+                        p.strokeTo = read.f();
+                        p.lenFrom = read.f();
+                        p.lenTo = read.f();
+                        p.line = read.bool();
+                        p.cap = read.bool();
+                        p.lightOpacity = read.f();
+                        p.colorFrom = TypeIO.readColor(read);
+                        p.colorTo = TypeIO.readColor(read);
+                        p.lightColor = TypeIO.readColor(read);
+                    }
+                    default -> {
+                        e = new ExplosionEffect();
+                        ExplosionEffect ex = (ExplosionEffect) e;
+                        ex.waveLife = read.f();
+                        ex.waveStroke = read.f();
+                        ex.waveRad = read.f();
+                        ex.waveRadBase = read.f();
+                        ex.sparkStroke = read.f();
+                        ex.sparkRad = read.f();
+                        ex.sparkLen = read.f();
+                        ex.smokeSize = read.f();
+                        ex.smokeSizeBase = read.f();
+                        ex.smokeRad = read.f();
+                        ex.smokes = read.i();
+                        ex.sparks = read.i();
+                        ex.waveColor = TypeIO.readColor(read);
+                        ex.smokeColor = TypeIO.readColor(read);
+                        ex.sparkColor = TypeIO.readColor(read);
+                    }
+                }
+                e.lifetime = lifetime;
+                e.clip = clip;
+                e.startDelay = startDelay;
+                e.baseRotation = baseRotation;
+                e.followParent = followParent;
+                e.rotWithParent = rotWithParent;
+                e.layer = layer;
+                e.layerDuration = layerDuration;
+                m.effects[i] = e;
+            }
         }
-        Effect e;
-        float lifetime = read.f();
-        float clip = read.f();
-        float startDelay = read.f();
-        float baseRotation = read.f();
-        boolean followParent = read.bool();
-        boolean rotWithParent = read.bool();
-        float layer = read.f();
-        float layerDuration = read.f();
-        switch (type) {
-            case "wave" -> {
-                e = new WaveEffect();
-                WaveEffect w = (WaveEffect) e;
-                w.sizeFrom = read.f();
-                w.sizeTo = read.f();
-                w.sides = read.i();
-                w.lightScl = read.f();
-                w.lightOpacity = read.f();
-                w.rotation = read.f();
-                w.strokeFrom = read.f();
-                w.strokeTo = read.f();
-                w.offsetX = read.f();
-                w.offsetY = read.f();
-                w.colorFrom = TypeIO.readColor(read);
-                w.colorTo = TypeIO.readColor(read);
-                w.lightColor = TypeIO.readColor(read);
-            }
-            case "wrap" -> {
-                e = new WrapEffect();
-                WrapEffect w = (WrapEffect) e;
-                w.rotation = read.f();
-                w.effect = readEffect(read);
-                w.color = TypeIO.readColor(read);
-            }
-            case "radial" -> {
-                e = new RadialEffect();
-                RadialEffect r = (RadialEffect) e;
-                r.rotationSpacing = read.f();
-                r.rotationOffset = read.f();
-                r.lengthOffset = read.f();
-                r.amount = read.i();
-                r.effect = readEffect(read);
-            }
-            case "particle" -> {
-                e = new ParticleEffect();
-                ParticleEffect p = (ParticleEffect) e;
-                p.particles = read.i();
-                p.randLength = read.bool();
-                p.casingFlip = read.bool();
-                p.cone = read.f();
-                p.length = read.f();
-                p.baseLength = read.f();
-                p.offsetX = read.f();
-                p.offsetY = read.f();
-                p.lightScl = read.f();
-                p.strokeFrom = read.f();
-                p.strokeTo = read.f();
-                p.lenFrom = read.f();
-                p.lenTo = read.f();
-                p.line = read.bool();
-                p.cap = read.bool();
-                p.lightOpacity = read.f();
-                p.colorFrom = TypeIO.readColor(read);
-                p.colorTo = TypeIO.readColor(read);
-                p.lightColor = TypeIO.readColor(read);
-            }
-            default -> {
-                e = new ExplosionEffect();
-                ExplosionEffect ex = (ExplosionEffect) e;
-                ex.waveLife = read.f();
-                ex.waveStroke = read.f();
-                ex.waveRad = read.f();
-                ex.waveRadBase = read.f();
-                ex.sparkStroke = read.f();
-                ex.sparkRad = read.f();
-                ex.sparkLen = read.f();
-                ex.smokeSize = read.f();
-                ex.smokeSizeBase = read.f();
-                ex.smokeRad = read.f();
-                ex.smokes = read.i();
-                ex.sparks = read.i();
-                ex.waveColor = TypeIO.readColor(read);
-                ex.smokeColor = TypeIO.readColor(read);
-                ex.sparkColor = TypeIO.readColor(read);
-            }
-        }
-        e.lifetime = lifetime;
-        e.clip = clip;
-        e.startDelay = startDelay;
-        e.baseRotation = baseRotation;
-        e.followParent = followParent;
-        e.rotWithParent = rotWithParent;
-        e.layer = layer;
-        e.layerDuration = layerDuration;
-        return e;
+        return m;
     }
 
     public class weaponPack {
