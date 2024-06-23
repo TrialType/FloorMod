@@ -66,10 +66,12 @@ public class FUnits {
             health = 20000;
             armor = 18;
             hitSize = 35;
+            stepShake = 0;
+            mechLandShake = 0;
             faceTarget = false;
 
-            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 120, 90, 80));
-            abilities.add(new StatusFieldAbility(StatusEffects.overdrive, 120, 90, 80));
+            abilities.add(new StatusFieldAbility(StatusEffects.overclock, 180, 90, 80));
+            abilities.add(new StatusFieldAbility(StatusEffects.shielded, 300, 420, 40));
 
             weapons.add(new Weapon() {{
                 shootCone = 360;
@@ -78,16 +80,19 @@ public class FUnits {
                 rotate = false;
                 x = y = 0;
                 shootX = shootY = 0;
-                shoot = new ShootSummon(0, 0, 24, 60) {{
+                shoot = new ShootSummon(0, 0, 12, 15) {{
                     shots = 10;
                     shotDelay = 6;
                 }};
                 bullet = new EMPLarge() {{
-                    absorbable = reflectable = hittable = false;
-                    damage = 0;
+                    absorbable = reflectable = false;
+                    hittable = true;
+                    damage = 120;
                     speed = 8;
                     lifetime = 240;
                     trailColor = Pal.lightishGray;
+                    trailLength = 8;
+                    trailWidth = 3;
 
                     maxLife = 300;
                     downRange = 200;
@@ -97,7 +102,7 @@ public class FUnits {
 
             weapons.add(new Weapon() {{
                 shootCone = 360;
-                reload = 120;
+                reload = 75;
                 mirror = true;
                 rotate = false;
                 y = 0;
@@ -108,23 +113,26 @@ public class FUnits {
                     shots = 3;
                     shotDelay = 6;
                     barrels = new float[]{
+                            0, 0, 95,
                             0, 0, 100,
-                            0, 0, 110,
-                            0, 0, 120
+                            0, 0, 105
                     };
                 }};
                 bullet = new SummonBulletType() {{
+                    width = height = 12;
                     damage = 180;
                     speed = 8;
                     lifetime = 240;
                     homingDelay = 0.1f;
                     homingRange = 1000;
                     homingPower = 0.1f;
-                    trailColor = Pal.lightishGray;
+                    trailColor = Pal.redDust;
+                    trailLength = 16;
+                    trailWidth = 2;
 
                     summon = new LightningBulletType() {{
                         lightningLength = 65;
-                        damage = 70;
+                        damage = 270;
                         speed = 150;
 
                         lightningColor = Pal.redDust;
