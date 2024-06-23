@@ -10,6 +10,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.content.Fx;
 import mindustry.core.GameState;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
@@ -19,6 +20,7 @@ import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.Icon;
+import mindustry.gen.Sounds;
 import mindustry.gen.Tex;
 import mindustry.gen.Unit;
 import mindustry.io.TypeIO;
@@ -34,6 +36,20 @@ import static mindustry.Vars.*;
 public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
     public static ProjectsLocated projects;
     public static StatusEffect eff;
+    public static WeaponMount sign = new WeaponMount(new Weapon() {{
+        controllable = false;
+        aiControllable = false;
+        mirror = false;
+        x = y = 0;
+        reload = Float.MAX_VALUE;
+        targetSwitchInterval = targetInterval = Float.MAX_VALUE;
+        shootSound = Sounds.none;
+        bullet = new BulletType(0, 0) {{
+            hittable = reflectable = absorbable = false;
+            collides = false;
+            despawnEffect = Fx.none;
+        }};
+    }});
     public Table effect;
     public float healthBoost = 1, speedBoost = 1;
     public float healD, speedD;
@@ -59,17 +75,19 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             ab.add(ap.ability);
         }
         if (u.mounts == null) {
-            u.mounts = new WeaponMount[we.size];
+            u.mounts = new WeaponMount[we.size + 1];
             for (int i = 0; i < we.size; i++) {
                 u.mounts[i] = new WeaponMount(we.get(i));
             }
+            u.mounts[we.size] = sign;
         } else {
             int len = u.type.weapons.size;
-            WeaponMount[] wm = new WeaponMount[len + we.size];
+            WeaponMount[] wm = new WeaponMount[len + we.size + 1];
             System.arraycopy(u.mounts, 0, wm, 0, len);
-            for (int i = len; i < wm.length; i++) {
+            for (int i = len; i < wm.length - 1; i++) {
                 wm[i] = new WeaponMount(we.get(i - len));
             }
+            wm[wm.length - 1] = sign;
             u.mounts = wm;
         }
 
@@ -77,10 +95,13 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             u.abilities = ab.items;
         } else {
             int len = u.type.abilities.size;
-            Ability[] a = new Ability[len + ab.size];
+            Ability[] a = new Ability[len + ab.size + (boost == null ? 0 : 1)];
             System.arraycopy(u.abilities, 0, a, 0, len);
             for (int i = len; i < a.length; i++) {
                 a[i] = ab.get(i - len);
+            }
+            if (boost != null) {
+                a[a.length - 1] = boost;
             }
             u.abilities = a;
         }

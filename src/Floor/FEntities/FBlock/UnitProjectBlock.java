@@ -1,20 +1,24 @@
 package Floor.FEntities.FBlock;
 
+import Floor.FContent.FStatusEffects;
 import Floor.FType.FDialog.ProjectsLocated;
 import arc.scene.ui.layout.Table;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
+import mindustry.content.Fx;
+import mindustry.entities.Effect;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 
-import static Floor.FType.FDialog.ProjectsLocated.projects;
+import static Floor.FType.FDialog.ProjectsLocated.*;
 
 public class UnitProjectBlock extends Block {
     private static int num = 0;
+    public Effect applyEffect = Fx.none;
 
     public UnitProjectBlock(String name) {
         super(name);
@@ -28,16 +32,13 @@ public class UnitProjectBlock extends Block {
     }
 
     public class UnitProjectBuild extends Building {
-        boolean applied = false;
+
         @Override
         public void updateTile() {
-            if (projects == null) {
-                ProjectsLocated.create();
-            }
             if (Vars.player.unit() != null && Vars.player.unit().spawnedByCore) {
-                if (!applied) {
+                if (!(Vars.player.unit().mounts[Vars.player.unit().mounts.length - 1] == sign)) {
+                    Vars.player.unit().apply(FStatusEffects.StrongStop, 180);
                     projects.upper.get(Vars.player.unit());
-                    applied = true;
                 }
             }
         }
@@ -61,7 +62,6 @@ public class UnitProjectBlock extends Block {
                 ProjectsLocated.create();
             }
             projects.setZero();
-            applied = false;
             num = 1;
         }
 
@@ -69,6 +69,14 @@ public class UnitProjectBlock extends Block {
         public void remove() {
             super.remove();
             num = 0;
+            if (projects != null) {
+                projects.setZero();
+                if (Vars.player.unit() != null && Vars.player.unit().spawnedByCore) {
+                    projects.upper.get(Vars.player.unit());
+                    applyEffect.at(Vars.player.unit());
+                    Vars.player.unit().unapply(eff);
+                }
+            }
         }
 
         @Override
@@ -85,7 +93,6 @@ public class UnitProjectBlock extends Block {
                 ProjectsLocated.create();
             }
             projects.read(read);
-            applied = false;
             num = 1;
         }
     }
