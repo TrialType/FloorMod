@@ -48,7 +48,13 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             hittable = reflectable = absorbable = false;
             collides = false;
             despawnEffect = Fx.none;
+
+            init();
+            load();
         }};
+
+        init();
+        load();
     }});
     public Table effect;
     public float healthBoost = 1, speedBoost = 1;
@@ -97,7 +103,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             int len = u.type.abilities.size;
             Ability[] a = new Ability[len + ab.size + (boost == null ? 0 : 1)];
             System.arraycopy(u.abilities, 0, a, 0, len);
-            for (int i = len; i < a.length; i++) {
+            for (int i = len; i < a.length - 1; i++) {
                 a[i] = ab.get(i - len);
             }
             if (boost != null) {
@@ -443,11 +449,15 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 speedBoost = eff.speedMultiplier;
                 WeaponMount[] mounts = seed.mounts;
                 for (int i = seed.type.weapons.size; i < mounts.length; i++) {
-                    weapons.add(new weaponPack(mounts[i].weapon));
+                    if (mounts[i] != sign) {
+                        weapons.add(new weaponPack(mounts[i].weapon));
+                    }
                 }
                 Ability[] a = seed.abilities;
                 for (int i = seed.type.abilities.size; i < a.length; i++) {
-                    abilities.add(new abilityPack(a[i]));
+                    if (a[i] != boost) {
+                        abilities.add(new abilityPack(a[i]));
+                    }
                 }
             }
         }
@@ -456,14 +466,18 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
 
     public void set(Ability[] a) {
         for (Ability ability : a) {
-            abilities.add(new abilityPack(ability));
+            if (ability != boost) {
+                abilities.add(new abilityPack(ability));
+            }
         }
         updateHeavy();
     }
 
     public void set(WeaponMount[] w) {
         for (WeaponMount mount : w) {
-            weapons.add(new weaponPack(mount.weapon));
+            if (mount != sign) {
+                weapons.add(new weaponPack(mount.weapon));
+            }
         }
         updateHeavy();
     }
@@ -799,7 +813,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             write.bool(weapon.ignoreRotation);
             write.bool(weapon.noAttack);
             write.bool(weapon.linearWarmup);
-            writeParts(write, weapon.parts.size == 0 ? new DrawPart[0] : weapon.parts.items);
+            writeParts(write, weapon.parts.size == 0 ? new DrawPart[0] : (DrawPart[]) weapon.parts.items);
             writeShoot(write, weapon.shoot);
             if (weapon instanceof RepairBeamWeapon r) {
                 write.f(r.repairSpeed);
@@ -901,7 +915,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
         write.f(bullet.fragAngle);
         write.bool(bullet.trailRotation);
         write.bool(bullet.splashDamagePierce);
-        writeParts(write, bullet.parts.items);
+        writeParts(write, bullet.parts.size == 0 ? new DrawPart[0] : (DrawPart[]) bullet.parts.items);
         //(bullet.trailInterp);
         write.f(bullet.trailChance);
         write.f(bullet.trailInterval);
@@ -1036,7 +1050,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
             } else if (part instanceof FlarePart) {
                 write.str("flare");
             }
-            write.bool(part.turretShading);
+            write.bool(false);
             write.bool(part.under);
             write.i(part.weaponIndex);
             write.i(part.recoilIndex);
@@ -1100,7 +1114,7 @@ public class ProjectsLocated extends BaseDialog implements EffectTableGetter {
                 write.f(h.layer);
                 write.f(h.layerOffset);
                 TypeIO.writeColor(write, h.color);
-                TypeIO.writeColor(write, h.colorTo);
+                TypeIO.writeColor(write, h.colorTo == null ? Color.white : h.colorTo);
             } else if (part instanceof FlarePart f) {
                 write.i(f.sides);
                 write.f(f.radius);

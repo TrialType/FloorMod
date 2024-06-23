@@ -8,6 +8,8 @@ import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.entities.abilities.Ability;
+import mindustry.entities.units.WeaponMount;
 import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
@@ -35,6 +37,9 @@ public class UnitProjectBlock extends Block {
 
         @Override
         public void updateTile() {
+            if (projects == null) {
+                ProjectsLocated.create();
+            }
             if (Vars.player.unit() != null && Vars.player.unit().spawnedByCore) {
                 if (!(Vars.player.unit().mounts[Vars.player.unit().mounts.length - 1] == sign)) {
                     Vars.player.unit().apply(FStatusEffects.StrongStop, 180);
@@ -75,6 +80,12 @@ public class UnitProjectBlock extends Block {
                     projects.upper.get(Vars.player.unit());
                     applyEffect.at(Vars.player.unit());
                     Vars.player.unit().unapply(eff);
+                    WeaponMount[] mount = new WeaponMount[Vars.player.unit().type.weapons.size];
+                    System.arraycopy(Vars.player.unit().mounts, 0, mount, 0, mount.length);
+                    Vars.player.unit().mounts = mount;
+                    Ability[] ability = new Ability[Vars.player.unit().type.abilities.size];
+                    System.arraycopy(Vars.player.unit().abilities, 0, ability, 0, ability.length);
+                    Vars.player.unit().abilities = ability;
                 }
             }
         }
