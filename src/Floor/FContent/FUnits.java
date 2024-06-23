@@ -72,6 +72,7 @@ public class FUnits {
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 180, 90, 80));
             abilities.add(new StatusFieldAbility(StatusEffects.shielded, 300, 420, 40));
+            abilities.add(new LevelSign());
 
             weapons.add(new Weapon() {{
                 shootCone = 360;
@@ -273,6 +274,7 @@ public class FUnits {
             abilities.add(new OwnerUnitSpawnAbility(bulletInterception_a, 600, 0, 0) {{
                 maxNum = 4;
             }});
+            abilities.add(new LevelSign());
 
 
             weapons.add(new PointDefenseWeapon() {{
