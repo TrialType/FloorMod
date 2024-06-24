@@ -30,14 +30,16 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
+import mindustry.type.unit.MissileUnitType;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.type.weapons.RepairBeamWeapon;
+import mindustry.world.blocks.production.BurstDrill;
 
 import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.math.Angles.randLenVectors;
 
 public class FUnits {
-    public static UnitType transfer, shuttlev_I, bulletInterception_a;
+    public static UnitType transfer, shuttlev_I, bulletInterception_a, rejuvenate_a;
 
     ////ENGSWEISBoss
     public static UnitType velocity, velocity_d, velocity_s, hidden, cave;
@@ -101,7 +103,6 @@ public class FUnits {
                     downDamage = 120;
                 }};
             }});
-
             weapons.add(new Weapon() {{
                 shootCone = 360;
                 reload = 120;
@@ -145,7 +146,6 @@ public class FUnits {
                     summonNumber = 8;
                 }};
             }});
-
             weapons.add(new Weapon() {{
                 shootCone = 360;
                 reload = 120;
@@ -186,6 +186,26 @@ public class FUnits {
                 }};
             }});
         }};
+        rejuvenate_a = new MissileUnitType("rejuvenate-a") {{
+            hidden = true;
+
+            health = 10000;
+            armor = 260;
+            speed = 6;
+            range = maxRange = 120;
+            lifetime = 1200;
+            trailLength = 15;
+            trailColor = Color.valueOf("00DDAAFF");
+            immunities.addAll(StatusEffects.slow, FStatusEffects.slowII, FStatusEffects.StrongStop);
+
+            weapons.add(new Weapon() {{
+                bullet = new ExplosionBulletType(15, 120) {{
+                    rangeOverride = 120;
+                    status = FStatusEffects.breakHelIV;
+                    statusDuration = 300;
+                }};
+            }});
+        }};
         rejuvenate = new UnitType("rejuvenate") {{
             constructor = LegsUnit::create;
             aiController = HealthOnlyAI::new;
@@ -196,19 +216,70 @@ public class FUnits {
             accel = 0.9f;
             drag = 0.9f;
             hitSize = 35;
-            range = maxRange = 1000;
+            range = maxRange = 3600;
             isEnemy = false;
 
             abilities.add(new StatusFieldAbility(FStatusEffects.healthIV, 3600, 300, 160));
             abilities.add(new ShieldRegenFieldAbility(5000, 100000, 600, 160));
 
             weapons.add(new RepairBeamWeapon() {{
-                range = maxRange = 1000;
                 rotateSpeed = 12;
                 reload = 480;
 
                 repairSpeed = 10;
                 fractionRepairSpeed = 0.4f;
+            }});
+
+            weapons.add(new Weapon() {{
+                shootCone = 360;
+                reload = 120;
+                mirror = true;
+                shootX = 8;
+                shootY = 12;
+                shoot = new ShootBarrel() {{
+                    shots = 2;
+                    shotDelay = 60;
+                    barrels = new float[]{
+                            0, 0, 30,
+                            0, 0, 150
+                    };
+                }};
+
+                bullet = new BulletType(0, 0) {{
+                    hittable = reflectable = absorbable = collides = false;
+                    lifetime = 0;
+
+                    spawnUnit = rejuvenate_a;
+                }};
+            }});
+
+            weapons.add(new Weapon() {{
+                shootCone = 360;
+                reload = 240;
+                mirror = false;
+                shootX = 0;
+                shootY = -28;
+                shoot = new ShootBarrel() {{
+                    shots = 3;
+                    shotDelay = 60;
+                    barrels = new float[]{
+                            0, 0, 170,
+                            0, 0, 180,
+                            0, 0, 190
+                    };
+                }};
+
+                bullet = new AroundBulletType() {{
+                    absorbable = false;
+                    reflectable = false;
+                    lifetime = 600;
+                    speed = 5.5f;
+                    damage = 20;
+                    targetRange = 1000;
+                    circleRange = 60;
+                    statusEffect = FStatusEffects.suppressIV;
+                    statusTime = 300;
+                }};
             }});
         }};
         bulletInterception_a = new UnitType("bulletInterception_a") {{

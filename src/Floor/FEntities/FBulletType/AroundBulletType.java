@@ -47,6 +47,7 @@ public class AroundBulletType extends BasicBulletType {
             Vec2 vec2 = new Vec2();
             vec2.set(ab.target.x - ab.x, ab.target.y - ab.y);
             vec2.setLength(speed);
+            ab.rotation(Angles.angle(ab.target.x - ab.x, ab.target.y - ab.y));
             ab.move(vec2);
         }
     }

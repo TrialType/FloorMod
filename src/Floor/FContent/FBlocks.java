@@ -54,7 +54,7 @@ public class FBlocks {
             inputPowerFactoryII, outPowerFactoryIII, inputPowerFactoryIII,
             specialUnitFactory;
     //defense
-    public static Block eleFence, eleFenceII, eleFenceIII;
+    public static Block eleFenceII, eleFenceIII;
     //turret
     public static Block fourNet, fireBoost,
             middleWindTurret, largeWindTurret,
@@ -446,12 +446,11 @@ public class FBlocks {
                                 mirror = false;
                                 shootCone = 360;
                                 inaccuracy = 15;
-                                reload = 8;
+                                reload = 60;
                                 alwaysShooting = true;
 
                                 shootSound = Sounds.flame;
                                 shoot = new ShootBarrel() {{
-                                    shotDelay = 2;
                                     shots = 16;
                                     barrels = new float[]{
                                             0, 0, 0,
@@ -480,7 +479,13 @@ public class FBlocks {
                                     lifetime = 30;
                                     speed = 2.3f;
                                     ammoMultiplier = 8;
-                                    shootEffect = Fx.shootPyraFlame;
+                                    shootEffect = new Effect(33f, 80f, e -> {
+                                        color(Color.valueOf("8da1e3"), Color.valueOf("8da1e3"), Color.gray, e.fin());
+
+                                        randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
+                                            Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
+                                        });
+                                    });
                                     status = StatusEffects.burning;
                                     statusDuration = 180;
                                     hitEffect = despawnEffect = Fx.none;
@@ -531,12 +536,11 @@ public class FBlocks {
                                 mirror = false;
                                 shootCone = 360;
                                 inaccuracy = 15;
-                                reload = 5;
+                                reload = 80;
                                 alwaysShooting = true;
 
                                 shootSound = Sounds.flame;
                                 shoot = new ShootBarrel() {{
-                                    shotDelay = 2;
                                     shots = 16;
                                     barrels = new float[]{
                                             0, 0, 0,
@@ -565,7 +569,13 @@ public class FBlocks {
                                     lifetime = 45;
                                     speed = 2.5f;
                                     ammoMultiplier = 16;
-                                    shootEffect = Fx.shootPyraFlame;
+                                    shootEffect = new Effect(33f, 80f, e -> {
+                                        color(Color.valueOf("f9a3c7"), Color.valueOf("f9a3c7"), Color.gray, e.fin());
+
+                                        randLenVectors(e.id, 10, e.finpow() * 70f, e.rotation, 10f, (x, y) -> {
+                                            Fill.circle(e.x + x, e.y + y, 0.65f + e.fout() * 1.6f);
+                                        });
+                                    });
                                     status = FStatusEffects.burningII;
                                     statusDuration = 300;
                                     hitEffect = despawnEffect = Fx.none;
@@ -1496,26 +1506,6 @@ public class FBlocks {
                     Items.copper, 4999, Items.thorium, 4999, Items.silicon, 4999, Items.phaseFabric, 4999));
         }};
 //======================================================================================================================
-        eleFence = new ElectricFence("ele_fence") {{
-            health = 300;
-            size = 2;
-            clipSize = 2;
-            hasPower = true;
-
-            maxLength = 200;
-            maxConnect = 5;
-            maxFenceSize = 80;
-            eleDamage = 0.6f;
-            air = true;
-
-            consume(new ConsumePower(10, 1000, false));
-
-            requirements(Category.defense, ItemStack.with(
-                    Items.titanium, 150,
-                    Items.copper, 300,
-                    Items.silicon, 150
-            ));
-        }};
         eleFenceII = new ElectricFence("ele_fenceII") {{
             health = 1500;
             size = 3;
