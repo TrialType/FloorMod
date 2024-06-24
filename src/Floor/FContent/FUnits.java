@@ -75,7 +75,7 @@ public class FUnits {
 
             weapons.add(new Weapon() {{
                 shootCone = 360;
-                reload = 120;
+                reload = 240;
                 mirror = false;
                 rotate = false;
                 x = y = 0;
@@ -104,7 +104,7 @@ public class FUnits {
 
             weapons.add(new Weapon() {{
                 shootCone = 360;
-                reload = 75;
+                reload = 120;
                 mirror = true;
                 rotate = false;
                 y = 0;
@@ -148,7 +148,7 @@ public class FUnits {
 
             weapons.add(new Weapon() {{
                 shootCone = 360;
-                reload = 75;
+                reload = 120;
                 mirror = true;
                 rotate = false;
                 y = 0;
@@ -156,13 +156,11 @@ public class FUnits {
                 shootX = 0;
                 shootY = -4;
                 shoot = new ShootBarrel() {{
-                    shots = 4;
+                    shots = 2;
                     shotDelay = 6;
                     barrels = new float[]{
                             0, 0, -5,
-                            0, 0, 0,
-                            0, 0, 5,
-                            0, 0, 10
+                            0, 0, 5
                     };
                 }};
                 bullet = new SummonBulletType() {{
@@ -192,22 +190,22 @@ public class FUnits {
             constructor = LegsUnit::create;
             aiController = HealthOnlyAI::new;
 
-            health = 30000;
-            armor = 100;
-            speed = 1.8f;
+            health = 50000;
+            armor = 180;
+            speed = 1.3f;
             accel = 0.9f;
             drag = 0.9f;
             hitSize = 35;
             range = maxRange = 1000;
             isEnemy = false;
 
-            abilities.add(new StatusFieldAbility(FStatusEffects.healthIV, 2400, 1200, 160));
+            abilities.add(new StatusFieldAbility(FStatusEffects.healthIV, 3600, 300, 160));
             abilities.add(new ShieldRegenFieldAbility(5000, 100000, 600, 160));
 
             weapons.add(new RepairBeamWeapon() {{
                 range = maxRange = 1000;
                 rotateSpeed = 12;
-                reload = 1200;
+                reload = 480;
 
                 repairSpeed = 10;
                 fractionRepairSpeed = 0.4f;
