@@ -451,7 +451,7 @@ public class FBlocks {
 
                                 shootSound = Sounds.flame;
                                 shoot = new ShootBarrel() {{
-                                    firstShotDelay = 15;
+                                    shotDelay = 2;
                                     shots = 16;
                                     barrels = new float[]{
                                             0, 0, 0,
@@ -536,7 +536,7 @@ public class FBlocks {
 
                                 shootSound = Sounds.flame;
                                 shoot = new ShootBarrel() {{
-                                    firstShotDelay = 15;
+                                    shotDelay = 2;
                                     shots = 16;
                                     barrels = new float[]{
                                             0, 0, 0,
