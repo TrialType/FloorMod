@@ -8,6 +8,7 @@ import mindustry.entities.units.AIController;
 import mindustry.gen.Teamc;
 import mindustry.gen.Unit;
 import mindustry.gen.Unitc;
+import mindustry.type.Weapon;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.storage.CoreBlock;
 
@@ -60,6 +61,8 @@ public class FollowAI extends AIController {
 
     public void updateTarget() {
         float x = unit.x, y = unit.y, range = unit.range() * 10;
-        defendTarget = Units.closestTarget(unit.team, x, y, range, Unitc::hasWeapons, b -> b instanceof Turret.TurretBuild);
+        defendTarget = Units.closestTarget(unit.team, x, y, range,
+                u -> u.hasWeapons() && u.mounts[0].weapon.getClass() == Weapon.class,
+                b -> b instanceof Turret.TurretBuild t && t.peekAmmo().damage > 0);
     }
 }
