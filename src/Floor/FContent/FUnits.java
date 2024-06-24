@@ -5,7 +5,6 @@ import Floor.FEntities.FAbility.*;
 import Floor.FEntities.FBulletType.*;
 import Floor.FEntities.FUnit.F.*;
 import Floor.FEntities.FUnit.Override.FLegsUnit;
-import Floor.FEntities.FUnit.Override.FUnitEntity;
 import Floor.FEntities.FUnitType.*;
 import Floor.FTools.classes.BossList;
 import arc.graphics.Color;
