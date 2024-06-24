@@ -6,18 +6,13 @@ import mindustry.entities.units.AIController;
 import mindustry.gen.Teamc;
 
 public class HealthOnlyAI extends AIController {
-    private Teamc t;
 
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground) {
-        t = null;
-        Units.nearby(unit.team, x, y, range * 25, u -> {
-            if (u.health < u.maxHealth && u.type.isEnemy) {
-                t = u;
-            }
-        });
+        Teamc t;
+        t = Units.closest(unit.team, x, y, range * 25, u -> u.health < u.maxHealth && u.type.isEnemy);
         if (t == null) {
-            Units.nearby(unit.team, x, y, range * 25, u -> t = (u.type == FUnits.rejuvenate || !u.type.isEnemy) ? t : u);
+            t = Units.closest(unit.team, x, y, range * 25, u -> !(u.type == FUnits.rejuvenate || !u.type.isEnemy));
         }
         return t;
     }

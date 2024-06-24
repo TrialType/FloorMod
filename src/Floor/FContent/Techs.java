@@ -52,10 +52,8 @@ public class Techs {
                 tf.parent = t;
                 t.children.add(tf);
             } else if (t.content == copperWall) {
-                tf = node(eleFence, ItemStack.with(Items.titanium, 1500, Items.copper, 3000, Items.silicon, 1500), Seq.with(new Objectives.SectorComplete(fungalPass)), () -> {
-                    node(eleFenceII, ItemStack.with(Items.titanium, 3500, Items.copper, 6000, Items.silicon, 3000), Seq.with(new Objectives.SectorComplete(saltFlats)), () -> {
-                        node(eleFenceIII, ItemStack.with(Items.titanium, 4500, Items.copper, 10000, Items.silicon, 5000), Seq.with(new Objectives.SectorComplete(nuclearComplex)), () -> {
-                        });
+                tf = node(eleFenceII, ItemStack.with(Items.titanium, 3500, Items.copper, 6000, Items.silicon, 3000), Seq.with(new Objectives.SectorComplete(saltFlats)), () -> {
+                    node(eleFenceIII, ItemStack.with(Items.titanium, 4500, Items.copper, 10000, Items.silicon, 5000), Seq.with(new Objectives.SectorComplete(nuclearComplex)), () -> {
                     });
                 });
                 tf.parent = t;

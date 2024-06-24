@@ -238,7 +238,7 @@ public class FUnits {
                 shootY = 12;
                 shoot = new ShootBarrel() {{
                     shots = 2;
-                    shotDelay = 60;
+                    shotDelay = 16;
                     barrels = new float[]{
                             0, 0, 30,
                             0, 0, 150
@@ -261,7 +261,7 @@ public class FUnits {
                 shootY = -28;
                 shoot = new ShootBarrel() {{
                     shots = 3;
-                    shotDelay = 60;
+                    shotDelay = 16;
                     barrels = new float[]{
                             0, 0, 170,
                             0, 0, 180,
@@ -1089,9 +1089,9 @@ public class FUnits {
             useUnitCap = false;
 
             flying = true;
-            health = 100;
+            health = 400;
             speed = 1.7F;
-            armor = 2;
+            armor = 7;
             drag = 0.8F;
             accel = 0.8F;
             rotateSpeed = 4;
