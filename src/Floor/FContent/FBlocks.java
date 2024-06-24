@@ -57,9 +57,9 @@ public class FBlocks {
     public static Block eleFence, eleFenceII, eleFenceIII;
     //turret
     public static Block fourNet, fireBoost,
-            smallWindTurret, middleWindTurret, largeWindTurret,
+            middleWindTurret, largeWindTurret,
             stay, bind, tranquil,
-            fireStream, tortoise, explode;
+            fireStream, residual;
     //crafting
     public static Block primarySolidification, intermediateSolidification, advancedSolidification, ultimateSolidification;
     //effect
@@ -344,123 +344,7 @@ public class FBlocks {
             requirements(Category.effect, ItemStack.with(Items.copper, 1));
         }};
 //======================================================================================================================
-        explode = new ItemTurret("explode") {{
-            requirements(Category.turret, with(Items.copper, 100, Items.graphite, 60, Items.titanium, 60, Items.silicon, 60));
-
-            ammo(
-                    Items.titanium, new BulletType(0, 0) {{
-                        rangeOverride = 540;
-                        ammoMultiplier = 2f;
-                        absorbable = reflectable = hittable = collides = false;
-                        spawnUnit = new MissileUnitType("explode1") {{
-                            health = 600;
-                            armor = 3;
-                            lifetime = 135;
-                            speed = 4;
-                            trailLength = 36;
-                            trailColor = Color.valueOf("8da1e3");
-
-                            weapons.add(new Weapon() {{
-                                x = y = 0;
-                                mirror = false;
-                                bullet = new ExplosionBulletType(36, 36) {{
-                                    absorbable = reflectable = hittable = false;
-                                    rangeOverride = 30;
-
-                                    lightning = 6;
-                                    lightningDamage = 12;
-                                    lightningLength = 8;
-                                    lightningColor = Color.valueOf("8da1e3");
-                                }};
-                            }});
-
-                            parts.add(new EffectPart() {{
-                                effect = new Effect(50, e -> {
-                                    color(Color.valueOf("8da1e3"));
-                                    Rand rand = new Rand(e.id);
-                                    for (int i = 0; i < 3; i++) {
-                                        float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
-
-                                        if (fin <= 1f) {
-                                            Tmp.v1.trns(angle, fin * 24f * len);
-
-                                            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
-                                            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
-                                        }
-                                    }
-                                });
-                            }});
-                        }};
-                    }},
-                    Items.thorium, new BulletType(0, 0) {{
-                        rangeOverride = 360;
-                        ammoMultiplier = 1f;
-                        absorbable = reflectable = hittable = collides = false;
-                        spawnUnit = new MissileUnitType("explode2") {{
-                            health = 400;
-                            armor = 1;
-                            lifetime = 90;
-                            speed = 4;
-                            trailLength = 36;
-                            trailColor = Color.valueOf("f9a3c7");
-
-                            weapons.add(new Weapon() {{
-                                x = y = 0;
-                                mirror = false;
-                                bullet = new ExplosionBulletType(48, 36) {{
-                                    absorbable = reflectable = hittable = false;
-                                    rangeOverride = 30;
-
-                                    fragVelocityMax = 1;
-                                    fragVelocityMin = 0.5f;
-                                    fragLifeMax = 2;
-                                    fragLifeMin = 1;
-                                    fragBullets = 4;
-                                    fragBullet = new BasicBulletType() {{
-                                        width = height = 8;
-                                        damage = 0;
-                                        splashDamage = 16;
-                                        splashDamageRadius = 24;
-                                        frontColor = backColor = Color.valueOf("f9a3c7");
-                                    }};
-                                }};
-                            }});
-
-                            parts.add(new EffectPart() {{
-                                effect = new Effect(50, e -> {
-                                    color(Color.valueOf("f9a3c7"));
-                                    Rand rand = new Rand(e.id);
-                                    for (int i = 0; i < 3; i++) {
-                                        float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
-
-                                        if (fin <= 1f) {
-                                            Tmp.v1.trns(angle, fin * 24f * len);
-
-                                            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
-                                            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
-                                        }
-                                    }
-                                });
-                            }});
-                        }};
-                    }}
-            );
-
-            size = 2;
-            recoil = 3;
-            shootY = 3f;
-            reload = 150;
-            range = 540;
-            shootCone = 15f;
-            ammoUseEffect = Fx.casing1;
-            ammoPerShot = 10;
-            health = 1000;
-            inaccuracy = 0;
-            rotateSpeed = 10f;
-            coolant = consumeCoolant(0.05f);
-            researchCostMultiplier = 8f;
-        }};
-        tortoise = new ItemTurret("tortoise") {{
+        residual = new ItemTurret("residual") {{
             requirements(Category.turret, with(Items.copper, 100, Items.graphite, 80, Items.titanium, 25, Items.silicon, 25));
             ammo(
                     Items.titanium, new BasicBulletType(4, 15) {{
@@ -516,69 +400,197 @@ public class FBlocks {
                     Items.copper, 300,
                     Items.graphite, 350
             ));
-            coolant = consume(new ConsumeCoolant(0.2f));
             coolantMultiplier = 2f;
-
             hasItems = true;
             itemCapacity = 32;
             maxAmmo = 32;
             consumeAmmoOnce = false;
-            shootX = shootY = 0;
-            inaccuracy = 15;
-            shootCone = 360;
-
-            reload = 5;
             size = 2;
-            health = 900;
+            recoil = 3;
+            shootY = 3f;
+            reload = 150;
+            range = 540;
+            shootCone = 15f;
+            ammoUseEffect = Fx.casing1;
+            ammoPerShot = 10;
+            health = 1000;
+            inaccuracy = 0;
+            rotateSpeed = 10f;
+            coolant = consumeCoolant(0.05f);
+            researchCostMultiplier = 8f;
 
-            shootSound = Sounds.flame;
-            shoot = new ShootBarrel() {{
-                shots = 16;
-                barrels = new float[]{
-                        0, 0, 0,
-                        0, 0, 22.5f,
-                        0, 0, 45,
-                        0, 0, 67.5f,
-                        0, 0, 90,
-                        0, 0, 112.5f,
-                        0, 0, 135,
-                        0, 0, 157.5f,
-                        0, 0, 180,
-                        0, 0, 202.5f,
-                        0, 0, 225,
-                        0, 0, 247.5f,
-                        0, 0, 270,
-                        0, 0, 292.5f,
-                        0, 0, 315,
-                        0, 0, 337.5f,
-                };
-            }};
-            ammoTypes.put(Items.coal, new BasicBulletType() {{
-                absorbable = reflectable = hittable = false;
+            ammo(
+                    Items.coal, new BulletType(0, 0) {{
+                        rangeOverride = 540;
+                        ammoMultiplier = 2f;
+                        absorbable = reflectable = hittable = collides = false;
+                        spawnUnit = new MissileUnitType("explode1") {{
+                            health = 600;
+                            armor = 3;
+                            lifetime = 135;
+                            speed = 4;
+                            trailLength = 36;
+                            trailColor = Color.valueOf("8da1e3");
 
-                damage = 38;
-                lifetime = 30;
-                speed = 2.3f;
-                width = height = 0;
-                ammoMultiplier = 8;
-                shootEffect = Fx.shootPyraFlame;
-                status = StatusEffects.burning;
-                statusDuration = 180;
-                hitEffect = despawnEffect = Fx.none;
-            }});
-            ammoTypes.put(Items.pyratite, new BasicBulletType() {{
-                absorbable = reflectable = hittable = false;
+                            weapons.add(new Weapon() {{
+                                x = y = 0;
+                                mirror = false;
+                                bullet = new ExplosionBulletType(35, 36) {{
+                                    absorbable = reflectable = hittable = false;
+                                    rangeOverride = 30;
+                                }};
+                            }});
 
-                damage = 64;
-                lifetime = 45;
-                speed = 2.5f;
-                width = height = 0;
-                ammoMultiplier = 16;
-                shootEffect = Fx.shootPyraFlame;
-                status = FStatusEffects.burningII;
-                statusDuration = 300;
-                hitEffect = despawnEffect = Fx.none;
-            }});
+                            weapons.add(new Weapon() {{
+                                x = y = shootX = shootY = 0;
+                                mirror = false;
+                                shootCone = 360;
+                                inaccuracy = 15;
+                                reload = 8;
+                                alwaysShooting = true;
+
+                                shootSound = Sounds.flame;
+                                shoot = new ShootBarrel() {{
+                                    firstShotDelay = 15;
+                                    shots = 16;
+                                    barrels = new float[]{
+                                            0, 0, 0,
+                                            0, 0, 22.5f,
+                                            0, 0, 45,
+                                            0, 0, 67.5f,
+                                            0, 0, 90,
+                                            0, 0, 112.5f,
+                                            0, 0, 135,
+                                            0, 0, 157.5f,
+                                            0, 0, 180,
+                                            0, 0, 202.5f,
+                                            0, 0, 225,
+                                            0, 0, 247.5f,
+                                            0, 0, 270,
+                                            0, 0, 292.5f,
+                                            0, 0, 315,
+                                            0, 0, 337.5f,
+                                    };
+                                }};
+
+                                bullet = new BulletType(){{
+                                    absorbable = reflectable = hittable = false;
+
+                                    damage = 38;
+                                    lifetime = 30;
+                                    speed = 2.3f;
+                                    ammoMultiplier = 8;
+                                    shootEffect = Fx.shootPyraFlame;
+                                    status = StatusEffects.burning;
+                                    statusDuration = 180;
+                                    hitEffect = despawnEffect = Fx.none;
+                                }};
+                            }});
+
+                            parts.add(new EffectPart() {{
+                                effect = new Effect(50, e -> {
+                                    color(Color.valueOf("8da1e3"));
+                                    Rand rand = new Rand(e.id);
+                                    for (int i = 0; i < 3; i++) {
+                                        float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+                                        if (fin <= 1f) {
+                                            Tmp.v1.trns(angle, fin * 24f * len);
+
+                                            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                                            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+                                        }
+                                    }
+                                });
+                            }});
+                        }};
+                    }},
+                    Items.pyratite, new BulletType(0, 0) {{
+                        rangeOverride = 360;
+                        ammoMultiplier = 1f;
+                        absorbable = reflectable = hittable = collides = false;
+                        spawnUnit = new MissileUnitType("explode2") {{
+                            health = 400;
+                            armor = 1;
+                            lifetime = 90;
+                            speed = 4;
+                            trailLength = 36;
+                            trailColor = Color.valueOf("f9a3c7");
+
+                            weapons.add(new Weapon() {{
+                                x = y = 0;
+                                mirror = false;
+                                bullet = new ExplosionBulletType(45, 36) {{
+                                    absorbable = reflectable = hittable = false;
+                                    rangeOverride = 30;
+                                }};
+                            }});
+
+                            weapons.add(new Weapon() {{
+                                x = y = shootX = shootY = 0;
+                                mirror = false;
+                                shootCone = 360;
+                                inaccuracy = 15;
+                                reload = 5;
+                                alwaysShooting = true;
+
+                                shootSound = Sounds.flame;
+                                shoot = new ShootBarrel() {{
+                                    firstShotDelay = 15;
+                                    shots = 16;
+                                    barrels = new float[]{
+                                            0, 0, 0,
+                                            0, 0, 22.5f,
+                                            0, 0, 45,
+                                            0, 0, 67.5f,
+                                            0, 0, 90,
+                                            0, 0, 112.5f,
+                                            0, 0, 135,
+                                            0, 0, 157.5f,
+                                            0, 0, 180,
+                                            0, 0, 202.5f,
+                                            0, 0, 225,
+                                            0, 0, 247.5f,
+                                            0, 0, 270,
+                                            0, 0, 292.5f,
+                                            0, 0, 315,
+                                            0, 0, 337.5f,
+                                    };
+                                }};
+
+                                bullet = new BulletType(){{
+                                    absorbable = reflectable = hittable = false;
+
+                                    damage = 64;
+                                    lifetime = 45;
+                                    speed = 2.5f;
+                                    ammoMultiplier = 16;
+                                    shootEffect = Fx.shootPyraFlame;
+                                    status = FStatusEffects.burningII;
+                                    statusDuration = 300;
+                                    hitEffect = despawnEffect = Fx.none;
+                                }};
+                            }});
+
+                            parts.add(new EffectPart() {{
+                                effect = new Effect(50, e -> {
+                                    color(Color.valueOf("f9a3c7"));
+                                    Rand rand = new Rand(e.id);
+                                    for (int i = 0; i < 3; i++) {
+                                        float fin = e.fin() / rand.random(0.5f, 1f), fout = 1f - fin, angle = rand.random(360f), len = rand.random(0.5f, 1f);
+
+                                        if (fin <= 1f) {
+                                            Tmp.v1.trns(angle, fin * 24f * len);
+
+                                            alpha((0.5f - Math.abs(fin - 0.5f)) * 2f);
+                                            Fill.circle(e.x + Tmp.v1.x, e.y + Tmp.v1.y, 0.5f + fout * 4f);
+                                        }
+                                    }
+                                });
+                            }});
+                        }};
+                    }}
+            );
         }};
         fireBoost = new OwnerTurret("fire_boost") {{
             targetAir = targetGround = true;
@@ -889,276 +901,6 @@ public class FBlocks {
                     Items.graphite, 800
             ));
         }};
-        smallWindTurret = new ItemTurret("small_wind_turret") {{
-            requirements(Category.turret, ItemStack.with(
-                    Items.titanium, 300,
-                    Items.copper, 240,
-                    Items.silicon, 185
-            ));
-            consume(new ConsumePower(8.4f, 0, false));
-            coolant = consume(new ConsumeCoolant(0.3f));
-            coolantMultiplier = 1.05f;
-
-            hasItems = true;
-            itemCapacity = 15;
-            maxAmmo = 15;
-            ammoPerShot = 5;
-            consumeAmmoOnce = false;
-            shootX = shootY = 0;
-
-            range = 200;
-            reload = 600;
-            size = 3;
-            clipSize = 3;
-            health = 1300;
-
-            ammoTypes.put(Items.blastCompound, new BasicBulletType() {{
-                Color c = Color.valueOf("ff795e");
-                trailEffect = Fx.none;
-
-                damage = 0;
-                lifetime = 300;
-                speed = 3f;
-                width = height = 6;
-                shrinkX = shrinkY = 0;
-                backColor = frontColor = c;
-
-                reflectable = absorbable = false;
-
-                trailLength = 100;
-                trailWidth = 2;
-                trailChance = 1f;
-                trailRotation = true;
-                trailEffect = new Effect(90, e -> {
-                    float len = (float) Math.abs(Math.cos(Math.toRadians((e.time + Time.time) * 6 - 3))) * 8,
-                            x = e.x, y = e.y, rotation = e.rotation;
-                    Draw.color(c);
-                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation + 90))),
-                            (float) (y + len * Math.sin(Math.toRadians(rotation + 90))), (1 - e.fin()) * 2);
-                    Fill.circle((float) (x + len * Math.cos(Math.toRadians(rotation - 90))),
-                            (float) (y + len * Math.sin(Math.toRadians(rotation - 90))), (1 - e.fin()) * 2);
-                });
-
-                parts.addAll(/*new EffectPart() {{
-                    lifetime = 300;
-                    effect = new Effect(1, e -> FireBallRenderer.addPlace(e.x, e.y, 25, e.rotation, 0, c));
-                }}, */new ShapePart() {{
-                    rotateSpeed = 3;
-                    sides = 3;
-                    lifetime = 400;
-                    radius = 8;
-                    radiusTo = 8;
-                    colorTo = color = c;
-                }}, new ShapePart() {{
-                    rotateSpeed = 3;
-                    sides = 3;
-                    lifetime = 400;
-                    rotation = 180;
-                    radius = 8;
-                    radiusTo = 8;
-                    colorTo = color = c;
-                }}, new ShapePart() {{
-                    rotateSpeed = -3;
-                    sides = 3;
-                    lifetime = 400;
-                    rotation = 30;
-                    radius = 8;
-                    radiusTo = 8;
-                    colorTo = color = c;
-                }}, new ShapePart() {{
-                    rotateSpeed = -3;
-                    sides = 3;
-                    lifetime = 400;
-                    rotation = 210;
-                    radius = 8;
-                    radiusTo = 8;
-                    colorTo = color = c;
-                }});
-
-                fragAngle = 0;
-                fragRandomSpread = 0;
-                fragSpread = 0;
-                fragOnAbsorb = fragOnHit = true;
-                fragBullets = 1;
-
-                fragBullet = new WindBulletType() {{
-                    lifetime = 400;
-                    damage = 0.5f;
-                    windPower = 0.3f;
-                    applyEffect = FStatusEffects.burningIII;
-
-                    fillRange = false;
-                    windEffect = new Effect(120, 80f, e -> {
-                        Draw.color(c, c, Color.gray, e.fin());
-                        randLenVectors(e.id, 3, e.finpow() * Math.max(windLength, windWidth / 2) * 1.4f, e.rotation, 50,
-                                (x, y) -> Fill.circle(e.x + x, e.y + y, 1 * (1 - e.fin()))
-                        );
-                    });
-                    everyHit = new Effect(120, e -> {
-                        if (e.data instanceof Unit u) {
-                            float size = u.hitSize;
-                            float angle = Angles.angle(e.x, e.y, u.x, u.y);
-                            float x = u.x - Angles.trnsx(angle, size / 1.2f);
-                            float y = u.y - Angles.trnsy(angle, size / 1.2f);
-                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
-                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
-                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
-                                } else {
-                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
-                                }
-                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
-                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
-                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
-                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
-                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
-                                );
-                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
-                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
-                                );
-                            }
-                        }
-                        if (e.data instanceof Building b) {
-                            float size = b.hitSize();
-                            float angle = Angles.angle(e.x, e.y, b.x, b.y);
-                            float x = b.x - Angles.trnsx(angle, size / 1.2f);
-                            float y = b.y - Angles.trnsy(angle, size / 1.2f);
-                            for (float i = -size / 1.5f; i <= size / 1.5f; i += 1) {
-                                if (i + size / 1.5f <= 1.1 || i - size / 1.5f >= -1.9) {
-                                    Draw.color(Pal.lightPyraFlame, Pal.darkPyraFlame, Color.gray, e.fin());
-                                } else {
-                                    Draw.color(Pal.darkPyraFlame, Color.valueOf("00000099"), Color.valueOf("00000044"), e.fin());
-                                }
-                                float len = (float) (size / 1.2f - Math.sqrt(size * size / 1.2f / 1.2f - i * i));
-                                float lx = x + Angles.trnsx(angle + 90, i) + Angles.trnsx(angle, len);
-                                float ly = y + Angles.trnsy(angle + 90, i) + Angles.trnsy(angle, len);
-                                randLenVectors((long) (e.id + i), 1, e.finpow() * 200, angle, 24,
-                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
-                                );
-                                randLenVectors((long) (e.id - i), 1, e.finpow() * 200, angle, 24,
-                                        (cx, cy) -> Fill.circle(lx + cx, ly + cy, 2 * (1 - e.fin()))
-                                );
-                            }
-                        }
-                    });
-
-                    parts.addAll(new ShapePart() {{
-                        rotateSpeed = 3;
-                        sides = 3;
-                        lifetime = 400;
-                        radius = 8;
-                        radiusTo = 0;
-                        colorTo = color = c;
-                    }}, new ShapePart() {{
-                        rotateSpeed = 3;
-                        sides = 3;
-                        lifetime = 400;
-                        rotation = 180;
-                        radius = 8;
-                        radiusTo = 0;
-                        colorTo = color = c;
-                    }}, new ShapePart() {{
-                        rotateSpeed = 3;
-                        sides = 3;
-                        lifetime = 400;
-                        rotation = 30;
-                        radius = 8;
-                        radiusTo = 0;
-                        colorTo = color = c;
-                    }}, new ShapePart() {{
-                        rotateSpeed = 3;
-                        sides = 3;
-                        lifetime = 400;
-                        rotation = 210;
-                        radius = 8;
-                        radiusTo = 0;
-                        colorTo = color = c;
-                    }});
-                }};
-            }});
-            ammoTypes.put(Items.metaglass, new PointBulletType() {{
-                trailEffect = Fx.none;
-
-                damage = 0;
-                lifetime = 600;
-                speed = 500;
-                trailSpacing = 20f;
-
-                fragAngle = 0;
-                fragRandomSpread = 0;
-                fragSpread = 0;
-                fragOnAbsorb = fragOnHit = true;
-                fragBullets = 1;
-
-                fragBullet = new FreeBulletType() {{
-                    lifetime = 400;
-                    damage = 0;
-                    speed = 0;
-                    hittable = absorbable = reflectable = collides = false;
-                    despawnEffect = hitEffect = Fx.none;
-
-                    parts.add(new FlarePart() {{
-                        sides = 3;
-                        radius = 36;
-                        radiusTo = 0;
-                        rotMove = 1000;
-                        stroke = 24;
-                        innerScl = 0.2f;
-                        color1 = Color.valueOf("EBEEF588");
-                        color2 = Color.valueOf("EBEEF5");
-                    }});
-
-                    intervalBullets = 1;
-                    intervalRandomSpread = 360;
-                    bulletInterval = 1;
-                    intervalDelay = 0;
-                    intervalBullet = new BulletType(0, 0) {{
-                        rangeOverride = 60;
-                        lifetime = 0;
-                        splashDamageRadius = 40;
-                        splashDamage = 26;
-                        status = FStatusEffects.breakHelII;
-                        statusDuration = 240;
-
-                        collides = hittable = absorbable = reflectable = false;
-                    }};
-
-                    intervalHitEffect = new ExplosionEffect() {{
-                        lifetime = 45;
-                        sparks = 0;
-                        waveLife = 0;
-                        smokes = 20;
-                        smokeRad = 35;
-                        smokeColor = Color.valueOf("EBEEF522");
-                        smokeSizeBase = 2.5f;
-
-                        renderer = f -> {
-                            Draw.color(this.waveColor);
-                            f.scaled(this.waveLife, (i) -> {
-                                Lines.stroke(this.waveStroke * i.fout());
-                                Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
-                            });
-                            Draw.color(this.smokeColor);
-                            if (this.smokeSize > 0.0F) {
-                                Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
-                            }
-
-                            Draw.color(this.sparkColor);
-                            Lines.stroke(f.fout() * this.sparkStroke);
-                            Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
-                                Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
-                                Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
-                            });
-
-                            if (f.data instanceof Vec2 v) {
-                                color(Color.valueOf("EBEEF522"));
-                                Lines.stroke(7.5f * (1 - f.fin()));
-                                Lines.line(f.x, f.y, v.x, v.y);
-                            }
-                        };
-                    }};
-                }};
-            }});
-        }};
         middleWindTurret = new ItemTurret("middle_wind_turret") {{
             requirements(Category.turret, ItemStack.with(
                     Items.titanium, 700,
@@ -1391,40 +1133,13 @@ public class FBlocks {
                         collides = hittable = absorbable = reflectable = false;
                     }};
 
-                    intervalHitEffect = new ExplosionEffect() {{
-                        lifetime = 45;
-                        sparks = 0;
-                        waveLife = 0;
-                        smokes = 20;
-                        smokeRad = 45;
-                        smokeColor = Color.valueOf("EBEEF522");
-                        smokeSizeBase = 3;
-
-                        renderer = f -> {
-                            Draw.color(this.waveColor);
-                            f.scaled(this.waveLife, (i) -> {
-                                Lines.stroke(this.waveStroke * i.fout());
-                                Lines.circle(f.x, f.y, this.waveRadBase + i.fin() * this.waveRad);
-                            });
-                            Draw.color(this.smokeColor);
-                            if (this.smokeSize > 0.0F) {
-                                Angles.randLenVectors(f.id, this.smokes, 2.0F + this.smokeRad * f.finpow(), (x, y) -> Fill.circle(f.x + x, f.y + y, f.fout() * this.smokeSize + this.smokeSizeBase));
-                            }
-
-                            Draw.color(this.sparkColor);
-                            Lines.stroke(f.fout() * this.sparkStroke);
-                            Angles.randLenVectors(f.id + 1, this.sparks, 1.0F + this.sparkRad * f.finpow(), (x, y) -> {
-                                Lines.lineAngle(f.x + x, f.y + y, Mathf.angle(x, y), 1.0F + f.fout() * this.sparkLen);
-                                Drawf.light(f.x + x, f.y + y, f.fout() * this.sparkLen * 4.0F, this.sparkColor, 0.7F);
-                            });
-
-                            if (f.data instanceof Vec2 v) {
-                                color(Color.valueOf("EBEEF522"));
-                                Lines.stroke(7.5f * (1 - f.fin()));
-                                Lines.line(f.x, f.y, v.x, v.y);
-                            }
-                        };
-                    }};
+                    intervalHitEffect = new Effect(45, e -> {
+                        if (e.data instanceof Vec2 v) {
+                            color(Color.valueOf("EBEEF522"));
+                            Lines.stroke(7.5f * (1 - e.fin()));
+                            Lines.line(e.x, e.y, v.x, v.y);
+                        }
+                    });
                 }};
             }});
         }};
@@ -1855,7 +1570,6 @@ public class FBlocks {
             size = 2;
             consumeItem(Items.phaseFabric).boost();
         }};
-
         buildCore = new DesCore("buildCore") {{
             size = 3;
             health = 500;
@@ -1865,7 +1579,6 @@ public class FBlocks {
             unitCapModifier = 2;
             requirements(Category.effect, ItemStack.with(Items.copper, 1000, Items.lead, 1000, Items.graphite, 1000, Items.silicon, 1000, Items.titanium, 1000));
         }};
-
         unitUpper = new UnitProjectBlock("unit-upper") {{
             size = 3;
             health = 2500;
